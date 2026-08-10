@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "workgraph",
+  "description": "A small Claude Code plugin for explicit execution Graph orchestration.",
+  "owner": {
+    "name": "ririnto",
+    "email": "ririnto@kakao.com"
+  },
+  "plugins": [
+    {
+      "name": "workgraph",
+      "source": "./",
+      "description": "Session-scoped implementation and execution-graph discipline for Claude Code.",
+      "category": "development",
+      "author": {
+        "name": "ririnto"
+      },
+      "license": "MIT"
+    }
+  ]
+}
