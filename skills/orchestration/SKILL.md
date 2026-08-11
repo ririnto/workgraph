@@ -20,7 +20,16 @@ Parallel calls alone do not justify multiple nodes.
 
 Send broad, uncertain, multi-file, multi-source, or library discovery first to a haiku scout.
 Use a scout Graph when discovery lanes are independent.
-Open a Graph for every node dispatch.
+Use a Graph record for every node dispatch.
+Define a phase as a semantic execution stage, distinct from a bounded node. Completion, state, or a decision from one phase enables later Graph work. A phase can contain one node or multiple independent nodes.
+Select the execution surface from the phase structure:
+
+- A Graph with one phase uses direct Agent or node dispatch, including multiple independent nodes in that phase.
+- Workflow requires at least two phases connected by a dependency, state transition, or decision-bearing handoff.
+- Do not wrap one phase, one node, one Agent call, or independent nodes with no later dependent phase in a Workflow.
+- A one-phase configuration never uses Workflow, even when the user explicitly requests Workflow.
+
+The Main Agent alone selects and applies the execution surface under these rules. A dispatched node cannot select or spawn a Workflow.
 Dense coding dependencies can favor one implementation node.
 
 Use one node when one isolated lane is enough.
@@ -36,7 +45,8 @@ Never use model IDs, automatic escalation chains, or numeric routing thresholds.
 
 ## Construct the Graph
 
-Before the first node dispatch, materialize the smallest inspectable execution Graph in concise prose or a native task/Workflow surface. A one-node Graph contains only applicable information; do not add empty scaffolding.
+The Graph is an internal control-plane record, not user output.
+Before the first node dispatch, construct the smallest inspectable execution Graph in concise internal prose or a native task surface. Use a native Workflow surface only when the execution-surface rule permits it. A one-node Graph contains only applicable information; do not add empty scaffolding.
 Give each node a stable identity, independently testable outcome, selected model alias, authority and owner, owned mutable resources, predecessor dependencies, acceptance evidence, and terminal condition.
 Distinguish scheduling dependencies from decision-bearing state transfer on every edge. Treat a resource conflict as a scheduling dependency. For dynamic expansion, record each stable branch identity and its parent expansion, including an explicit empty expansion. Apply one dependency-readiness rule to ordinary dependents and every required fan-in input or branch: a node is ready only when every scheduling dependency is satisfied, required predecessor state is available, and no owned mutable resource conflicts.
 

@@ -36,7 +36,12 @@ This includes dispatch payloads, intermediate coordination, continuation steerin
 ## Progress
 
 Before the first tool call of a multi-step task, state the first step in one sentence.
-Then update only for a material phase, finding, direction change, or blocker.
+Then update only for a material user-visible stage, finding, direction change, or blocker.
+Progress stages do not determine Graph phases or Workflow eligibility.
+Separate three channels: the internal Graph record, the node dispatch payload, and user-visible progress.
+The Graph record is control-plane state.
+Keep Graph construction, each node dispatch, ready-set calculation, recovery, and compact reload internal.
+Do not report them to the user unless the user asks, or a material change affects the user's result, scope, authority, risk, blocker, or next decision.
 State the result and next step.
 State a correction only when it changes the user's result or decision.
 

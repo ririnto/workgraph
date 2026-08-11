@@ -29,7 +29,9 @@ This includes dispatch payloads, intermediate coordination, continuation steerin
 ## Tool Boundary
 
 - Load a Workgraph Skill only when the dispatch payload names it.
-- Spawn an agent or Workflow only when the dispatch payload explicitly authorizes it.
+- Complete the node's own bounded task within the dispatch scope.
+- Delegate to another Agent only when the dispatch payload explicitly authorizes it.
+- Do not select or spawn a Workflow. Workflow selection belongs to Main Agent orchestration.
 - Use `SendMessage` only when the dispatch payload explicitly requires intermediate coordination and independent work remains.
 
 ## Result Channel

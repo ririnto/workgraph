@@ -13,31 +13,12 @@ It keeps common session behavior small and loads Graph mechanics only when a tas
 | `SessionStart: resume` | No additional context |
 | `SubagentStart` | Full `WORKGRAPH_SUBAGENT_V1` bounded-node contract from `hooks/subagent-context.md` |
 
-The Main Agent is the orchestrator and terminal reporter.
-It forms, routes, dispatches, coordinates, integrates, resolves conflicts, validates the control plane,
-and performs source-control integration only when authorized.
-It does not implement changes. Nodes own every implementation and task-side mutation, including small changes.
-Before the first dispatch, it materializes the smallest inspectable execution Graph. The Graph makes topology,
-ownership, predecessor dependencies, resource conflicts, branch identity, join readiness, and loop exit conditions explicit.
-The Main Agent validates cycles and resource ownership, updates the Graph before each ready-set calculation,
-and dispatches only nodes ready in the current Graph. Nodes receive only their local Graph slice and decision-bearing predecessor state.
-Every required branch contributes a terminal outcome before a join, unless defined compensation satisfies that input.
-Dependency outcomes control downstream readiness: completed satisfies a dependency; blocked blocks it; failed fails it unless compensation applies; unknown requires recovery.
-Model aliases steer dispatch: `haiku` for exploration, research, simple bounded implementation, or bounded review;
-`sonnet` for complex or multi-file implementation, substantial lane planning, or comprehensive review;
-`opus` for architecture and other high-intelligence decisions, never implementation; `fable` only when explicitly requested.
-The Main Agent keeps exact-known narrow reads and required repository-wide integration gates.
-The node contract enforces the authority and completion boundary of each dispatched node.
-The injected Main and node contracts require English for all Agent-to-Agent communication.
-`compact-context.md` only tells the Main Agent to load `main-agent-contract` when `WORKGRAPH_MAIN_V1` is absent.
-
-## Graph Records
-
-Each task uses an explicit, inspectable Graph record.
-The record names node identity, activity, model alias, owner, mutable resources, predecessor dependencies, authority, acceptance evidence, and terminal state.
-Nodes receive local Graph slices and only the predecessor state that changes their decisions.
-Discovery stays delegated to nodes. The Main Agent retains orchestration and control-plane work.
-Dependency outcomes remain explicit through joins and terminal synthesis.
+The Main Agent performs integration and terminal reporting.
+Orchestration owns Graph construction and the rules for dependencies, readiness, concurrency,
+resources, edge state, integration, and completion.
+Graph records are internal control-plane state and are not routine user output.
+Skills are authoritative for runtime mechanics.
+Workflow is for connected multi-phase Graphs; single-phase work uses direct nodes.
 
 ## Skills
 
@@ -48,12 +29,6 @@ Dependency outcomes remain explicit through joins and terminal synthesis.
 Each Skill is self-contained.
 A Skill does not load another Skill.
 
-The orchestration Skill owns Graph construction, dependency and join readiness, concurrency,
-resource ownership, edge state, integration, and Graph completion.
-The recovery Skill owns lifecycle inspection, terminal-outcome interpretation, retry decisions,
-and resume, curate, or replace decisions.
-Hooks inject context. They do not enforce ownership, prevent duplicate spawns, provide durable replay,
-or guarantee exactly-once behavior.
 The orchestration Skill has one direct reference:
 
 - `payload-contracts.md`: Load before dispatching a node or accepting its terminal result.
