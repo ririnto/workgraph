@@ -26,14 +26,14 @@ Each Skill is self-contained and does not load another Skill.
 
 ## Requirements
 
-- Bash. Use Git Bash on Windows.
-- A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with shell `bash`, the native Agent dispatch surface, and the native Workflow surface.
+- POSIX sh.
+- A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with a POSIX sh runtime, the native Agent dispatch surface, and the native Workflow surface.
 
 The runtime has no third-party package dependencies.
 The plugin manifest owns the version: `.claude-plugin/plugin.json`.
 The marketplace manifest does not contain a version.
 
-Hook dispatch fails fast when Bash is missing, the route is unknown, or the selected contract file is missing, unreadable, or empty.
+Hook dispatch fails fast when POSIX sh is missing, the route is unknown, or the selected contract file is missing, unreadable, or empty.
 
 ## Claude Code
 
@@ -72,7 +72,6 @@ workgraph/
 |   +-- plugin.json
 +-- hooks/
 |   +-- hooks.json
-|   +-- run-hook.cmd
 |   +-- inject-context
 |   +-- subagent-context.md
 +-- skills/

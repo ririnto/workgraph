@@ -7,10 +7,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" inject-context session-start",
+            "command": "sh",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/inject-context",
+              "session-start"
+            ],
             "timeout": 5,
             "async": false,
-            "shell": "bash",
             "statusMessage": "Loading Workgraph main contract"
           }
         ]
@@ -21,10 +24,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" inject-context subagent-start",
+            "command": "sh",
+            "args": [
+              "${CLAUDE_PLUGIN_ROOT}/hooks/inject-context",
+              "subagent-start"
+            ],
             "timeout": 5,
             "async": false,
-            "shell": "bash",
             "statusMessage": "Loading Workgraph node contract"
           }
         ]
