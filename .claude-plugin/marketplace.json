@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "workgraph",
-  "description": "A small Claude Code plugin for explicit execution Graph orchestration.",
+  "description": "A dependency-free Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
   "owner": {
     "name": "ririnto",
     "email": "ririnto@kakao.com"
@@ -10,7 +10,7 @@
     {
       "name": "workgraph",
       "source": "./",
-      "description": "Session-scoped implementation and execution-graph discipline for Claude Code.",
+      "description": "A dependency-free Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
       "category": "development",
       "author": {
         "name": "ririnto"

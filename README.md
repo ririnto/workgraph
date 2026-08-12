@@ -1,46 +1,39 @@
 # Workgraph
 
-Workgraph is a dependency-free Claude Code plugin and single-plugin marketplace.
-It keeps common session behavior small and loads Graph mechanics only when a task needs them.
+Workgraph is a dependency-free Claude Code plugin that injects advisory Main Agent and bounded node context contracts.
 
 ## Session Behavior
 
 | Event | Injected context |
 | --- | --- |
-| `SessionStart: startup` | Full `WORKGRAPH_MAIN_V1` contract from `skills/main-agent-contract/SKILL.md` |
-| `SessionStart: clear` | Full `WORKGRAPH_MAIN_V1` contract from `skills/main-agent-contract/SKILL.md` |
-| `SessionStart: compact` | Main-contract reload check from `hooks/compact-context.md` |
-| `SessionStart: resume` | No additional context |
-| `SubagentStart` | Full `WORKGRAPH_SUBAGENT_V1` bounded-node contract from `hooks/subagent-context.md` |
+| `SessionStart: startup` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
+| `SessionStart: clear` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
+| `SessionStart: compact` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
+| `SessionStart: resume` | Unregistered; no additional context |
+| `SubagentStart` | Full bounded-node contract from `hooks/subagent-context.md` |
 
-The Main Agent performs integration and terminal reporting.
-Orchestration owns Graph construction and the rules for dependencies, readiness, concurrency,
-resources, edge state, integration, and completion.
-Graph records are internal control-plane state and are not routine user output.
-Skills are authoritative for runtime mechanics.
-Workflow is for connected multi-phase Graphs; single-phase work uses direct nodes.
+Native Claude Code Agent/Workflow lifecycle owns execution state.
+The Main Agent is the orchestrator and terminal reporter, not an implementation worker.
+One semantic phase uses direct Agent dispatch; independent work can dispatch in parallel.
+Workflow requires at least two connected semantic phases plus a stronger reason, and an explicit request does not override that floor.
 
 ## Skills
 
-- `main-agent-contract`: Use when a compacted session lacks `WORKGRAPH_MAIN_V1` to restore the Workgraph Main Agent session invariants.
-- `orchestration`: Use for every Workgraph node dispatch and for dependency, ownership, concurrency, join, or terminal result synthesis decisions.
-- `recovery`: Use when a Workgraph node has interrupted or ambiguous identity, activity, ownership, or terminal state.
+- `main-agent-contract`: Main Agent contract for advisory orchestration and bounded node dispatch.
 
-Each Skill is self-contained.
-A Skill does not load another Skill.
-
-The orchestration Skill has one direct reference:
-
-- `payload-contracts.md`: Load before dispatching a node or accepting its terminal result.
+`hooks/subagent-context.md` is self-contained injected node context, not a Skill.
+Each Skill is self-contained and does not load another Skill.
 
 ## Requirements
 
-- Node.js 22 or newer.
-- A Claude Code release that supports plugin-bundled `SessionStart` and `SubagentStart` command hooks.
+- Bash. Use Git Bash on Windows.
+- A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with shell `bash`, the native Agent dispatch surface, and the native Workflow surface.
 
 The runtime has no third-party package dependencies.
 The plugin manifest owns the version: `.claude-plugin/plugin.json`.
 The marketplace manifest does not contain a version.
+
+Hook dispatch fails fast when Bash is missing, the route is unknown, or the selected contract file is missing, unreadable, or empty.
 
 ## Claude Code
 
@@ -69,7 +62,6 @@ claude --plugin-dir ./
 ```
 
 Use `/hooks` to confirm that the `SessionStart` and `SubagentStart` handlers are active.
-Restart Claude Code or run `/reload-plugins` after hook or manifest changes.
 
 ## Layout
 
@@ -80,17 +72,11 @@ workgraph/
 |   +-- plugin.json
 +-- hooks/
 |   +-- hooks.json
-|   +-- compact-context.md
-|   +-- inject-context.mjs
+|   +-- run-hook.cmd
+|   +-- inject-context
 |   +-- subagent-context.md
 +-- skills/
 |   +-- main-agent-contract/
-|   |   +-- SKILL.md
-|   +-- orchestration/
-|   |   +-- SKILL.md
-|   |   +-- references/
-|   |       +-- payload-contracts.md
-|   +-- recovery/
 |       +-- SKILL.md
 +-- AGENTS.md
 +-- CLAUDE.md
@@ -101,5 +87,5 @@ workgraph/
 
 ## Design Sources
 
-The design is an original synthesis of the Agent Skills specification, Claude Code plugin guidance, and the supplied Claude Opus 5 and GPT-5.6 prompting guides.
-Pinned upstream versions are recorded in `THIRD_PARTY_NOTICES.md`.
+`THIRD_PARTY_NOTICES.md` is the authoritative attribution inventory.
+The design names only Superpowers, Ponytail, and Giver Architecture.
