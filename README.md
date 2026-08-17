@@ -1,6 +1,7 @@
 # Workgraph
 
-Workgraph is a dependency-free Claude Code plugin that injects advisory Main Agent and bounded node context contracts.
+Workgraph is a Claude Code plugin with no runtime package dependencies.
+It injects advisory Main Agent and bounded-node context contracts.
 
 ## Session Behavior
 
@@ -9,13 +10,15 @@ Workgraph is a dependency-free Claude Code plugin that injects advisory Main Age
 | `SessionStart: startup` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
 | `SessionStart: clear` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
 | `SessionStart: compact` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
-| `SessionStart: resume` | Unregistered; no additional context |
+| `SessionStart: resume` | Unregistered, no additional context |
 | `SubagentStart` | Full bounded-node contract from `hooks/subagent-context.md` |
 
-Native Claude Code Agent/Workflow lifecycle owns execution state.
-The Main Agent is the orchestrator and terminal reporter, not an implementation worker.
-One semantic phase uses direct Agent dispatch; independent work can dispatch in parallel.
-Workflow requires at least two connected semantic phases plus a stronger reason, and an explicit request does not override that floor.
+Claude Code's native Agent and Workflow lifecycle owns execution state.
+The Main Agent orchestrates and reports the final result; it does not implement tasks.
+Dispatch one semantic phase directly with Agent.
+Dispatch independent work in parallel.
+Use Workflow only for at least two connected semantic phases and a stronger reason.
+An explicit Workflow request does not remove this requirement.
 
 ## Skills
 
@@ -26,14 +29,17 @@ Each Skill is self-contained and does not load another Skill.
 
 ## Requirements
 
-- POSIX sh.
-- A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with a POSIX sh runtime, the native Agent dispatch surface, and the native Workflow surface.
+- Node.js 18 through the current LTS.
+- A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with a Node runtime, the native Agent dispatch surface, and the native Workflow surface.
 
-The runtime has no third-party package dependencies.
+The plugin runtime is zero-package-dependency.
+The development toolchain (Node, npm, and the `package.json` tooling) is separate from the plugin runtime.
+Contributors need Node 22 for development tooling.
+The plugin runtime itself runs on Node.js 18 through the current LTS.
 The plugin manifest owns the version: `.claude-plugin/plugin.json`.
 The marketplace manifest does not contain a version.
 
-Hook dispatch fails fast when POSIX sh is missing, the route is unknown, or the selected contract file is missing, unreadable, or empty.
+Hook dispatch fails fast when Node is missing, the route is unknown, or the selected contract file is missing, unreadable, or empty.
 
 ## Claude Code
 
@@ -72,16 +78,25 @@ workgraph/
 |   +-- plugin.json
 +-- hooks/
 |   +-- hooks.json
-|   +-- inject-context
+|   +-- inject-context.mjs
 |   +-- subagent-context.md
++-- rules/
+|   +-- no-box-drawing.ts
 +-- skills/
 |   +-- main-agent-contract/
 |       +-- SKILL.md
++-- .editorconfig
++-- .gitignore
++-- .markdownlint-cli2.jsonc
 +-- AGENTS.md
 +-- CLAUDE.md
 +-- LICENSE
 +-- README.md
 +-- THIRD_PARTY_NOTICES.md
++-- oxlint.config.ts
++-- oxfmt.config.ts
++-- package-lock.json
++-- package.json
 ```
 
 ## Design Sources

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "workgraph",
-  "description": "A dependency-free Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
+  "description": "A zero-package-dependency Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
   "owner": {
     "name": "ririnto",
     "email": "ririnto@kakao.com"
@@ -10,7 +10,7 @@
     {
       "name": "workgraph",
       "source": "./",
-      "description": "A dependency-free Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
+      "description": "A zero-package-dependency Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
       "category": "development",
       "author": {
         "name": "ririnto"

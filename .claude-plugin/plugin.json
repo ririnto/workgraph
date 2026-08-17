@@ -3,7 +3,7 @@
   "author": {
     "name": "ririnto"
   },
-  "description": "A dependency-free Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
+  "description": "A zero-package-dependency Claude Code plugin that injects advisory Main Agent and bounded node context contracts.",
   "homepage": "https://github.com/ririnto/workgraph",
   "keywords": [
     "claude-code",
@@ -15,5 +15,5 @@
   "license": "MIT",
   "name": "workgraph",
   "repository": "https://github.com/ririnto/workgraph",
-  "version": "2026.08.12.01"
+  "version": "2026.08.17.00"
 }

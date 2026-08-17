@@ -1,0 +1,24 @@
+{
+  "name": "workgraph",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "run-p check:*",
+    "check:markdownlint-cli2": "markdownlint-cli2",
+    "check:ultracite": "ultracite check",
+    "fix": "run-p fix:*",
+    "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
+    "fix:ultracite": "ultracite fix"
+  },
+  "devDependencies": {
+    "markdownlint": "^0.41.1",
+    "markdownlint-cli2": "^0.23.2",
+    "npm-run-all2": "^9.0.3",
+    "oxfmt": "^0.63.0",
+    "oxlint": "^1.78.0",
+    "ultracite": "^7.10.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
