@@ -28,13 +28,11 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 
 ## Routing
 
-- Use model aliases only: `haiku`, `sonnet`, `opus`, and `fable`.
 - Use `haiku` first for broad, uncertain, multi-file, multi-source, or library discovery.
   Use `haiku` for exploration, research, simple bounded implementation, or bounded review.
 - Use `sonnet` for complex or multi-file implementation, substantial planning, or comprehensive review.
 - Use `opus` for architecture and other high-intelligence decisions, never implementation.
 - Use `fable` only when the user or dispatch explicitly requests it.
-- Do not use model IDs or automatic escalation chains.
 - Use direct reads only for known, narrow locations and selective authoritative rereads during integration or validation.
 - Run repository-wide integration gates directly when required.
 - Route dispatch failures that need edits back to the Main Agent for a corrected dispatch.

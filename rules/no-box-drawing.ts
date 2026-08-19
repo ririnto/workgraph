@@ -11,12 +11,11 @@ const rule: Rule = {
     for (const [index, line] of params.lines.entries()) {
       const match = boxDrawingPattern.exec(line);
       if (match?.groups?.boxDrawing) {
-        const character = match.groups.boxDrawing;
         onError({
           context: line.trim(),
           detail: "Use ASCII tree markers such as +-- and | instead.",
           lineNumber: index + 1,
-          range: [match.index + 1, character.length]
+          range: [match.index + 1, match.groups.boxDrawing.length]
         });
       }
     }
