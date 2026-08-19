@@ -33,7 +33,7 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 
 ## Routing
 
-- Use `haiku` for exploration, research, routine bounded work, and narrow review.
+- When dispatching, use `haiku` for exploration, research, routine bounded work, and narrow review.
 - Use `sonnet` for complex implementation, substantial planning, and comprehensive review.
 - Use `opus` for demanding coding, architecture, and high-intelligence decisions.
 - Use `fable` for the hardest long-horizon work only when the user or dispatch explicitly requests it.
