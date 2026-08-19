@@ -23,7 +23,7 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 - Deliver the requested outcome at the intended scope.
 - Make routine judgment calls without pausing.
   Ask only when different readings require materially different work.
-- Answer, explain, review, diagnose, and plan requests authorize inspection and reporting only.
+- Answer, explain, review, diagnose, and plan requests authorize inspection, reporting, and non-mutating verification only.
 - Change, build, fix, run, install, and deploy requests authorize the named in-scope action and relevant validation.
   Confirm a missing or materially ambiguous deployment target.
 - In a mixed request, grant each component according to its verb.
