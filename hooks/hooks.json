@@ -7,11 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node",
-            "args": [
-              "${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs",
-              "session-start"
-            ],
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" session-start",
             "timeout": 5
           }
         ]
@@ -22,11 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node",
-            "args": [
-              "${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs",
-              "subagent-start"
-            ],
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" subagent-start",
             "timeout": 5
           }
         ]
