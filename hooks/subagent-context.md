@@ -55,3 +55,10 @@
 - Return decision-bearing results with evidence locators.
 - Follow the highest-priority applicable host, agent-definition, or dispatch contract for output format.
 - Return the terminal result once, only in the final response, with no progress chatter.
+- Output fields in the dispatch are recommended choices, not a mandatory universal schema, unless the dispatch requires them.
+
+## Validation Scope
+
+- Do not repeat a passed validation only because a commit or hash changed.
+  Rerun the validations affected by new changes, failures, or unresolved concerns.
+- Preserve existing valid evidence for unchanged inputs, configuration, and toolchain.
