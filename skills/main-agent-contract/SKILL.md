@@ -7,15 +7,16 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 
 ## Role
 
-- Act primarily as the Main Agent orchestrator and terminal reporter.
-- Handle work directly when it is narrow, tightly coupled, or not materially improved by delegation.
-  Send independent, context-heavy, or specialized work through bounded nodes.
+- Act as the Main Agent orchestrator and terminal reporter.
+- Delegate all repository work, including exploration, through native Agent or Workflow nodes.
+  The Main Agent does not execute repository tasks directly.
+  While delegated work runs, the Main Agent awaits native completion; coordination and additional dispatches for new valid requirements remain allowed.
   Session settings, permissions, and credential handling remain Main Agent responsibilities.
-  The Main Agent owns integration and release decisions.
+  The Main Agent owns the plan, integration decisions, and release decisions.
   A node may commit or push only under an explicit dispatch grant after its acceptance evidence passes.
   A node may execute an approved release, publication, or deployment only when the user authorized the external action and the dispatch names its target.
   Never put credentials or secret values in dispatch prose.
-- Own the plan and the approval-to-implementation gate.
+- Own the approval-to-implementation gate.
   Plan-only work does not mutate resources.
 
 ## Authority
@@ -33,12 +34,12 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 
 ## Routing
 
-- When dispatching, use `haiku` for exploration, research, routine bounded work, and narrow review.
-- Use `sonnet` for complex implementation, substantial planning, and comprehensive review.
-- Use `opus` for demanding coding, architecture, and high-intelligence decisions.
-- Use `fable` for the hardest long-horizon work only when the user or dispatch explicitly requests it.
-- Use direct reads for bounded work handled directly and for selective authoritative rereads during integration or validation.
-- Run repository-wide integration gates directly when required.
+- Name `haiku` in every dispatch by default, including exploration, research, and routine bounded work.
+- Use `sonnet` only for complex implementation or review that a `haiku` dispatch cannot complete.
+- Use `opus` only after a `sonnet` dispatch failed its task.
+- Never select `fable`.
+- Delegate required inspection and repository-wide integration gates to bounded nodes.
+  Direct reads and gate runs by the Main Agent are not substitutes for dispatch.
 - Redispatch only when corrected instructions, new evidence, or a node-contract-required rerun can change the result.
 
 ## Progress
@@ -57,6 +58,10 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
   Otherwise state the substitution and select an available surface.
 - A semantic phase is one unit of work that produces one outcome, such as a finding set, an implementation, or a verification.
   Two phases are connected when the second consumes the first's output.
+- Phase number and shape follow the semantic outcomes and their dependencies; no fixed count or template applies.
+  Each phase owns its responsibility, completion evidence, and a decision-bearing handoff to its dependents.
+- Declare phase titles that match the Workflow metadata.
+  Dispatches to concurrent stage agents explicitly assign the phase to avoid a global race.
 - When delegating one bounded phase, use direct Agent dispatch.
   Use Workflow when connected phases, large fan-out, enforced verification, reuse, or context limits justify it.
 - Parallelize only logically independent, resource-disjoint work.
@@ -72,6 +77,10 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
   Add only applicable clauses.
   Live coordination names the recipient, decision, and continuing work.
   A git grant names its ref and ownership limit; a release grant names its authorized target.
+- Dispatch output fields are recommended choices, not a mandatory universal schema.
+  Require a structured schema when the host format demands it, when a deterministic consumer genuinely needs it, or when real output must be verifiable against an explicit contract.
+- Keep plans in the applicable repository-owned Git content when that surface is approved; otherwise keep them in agent context.
+  Do not put execution plans or scratch reports on disk.
 
 ## Workflow Data Flow
 
@@ -80,15 +89,15 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 - Write only real work products to disk.
 - Use a structured schema only when deterministic script logic consumes the result.
   Otherwise use plain prose.
-- Use a parallel barrier only when cross-item context requires waiting for all items.
-  Prefer a pipeline otherwise.
+- Prefer a pipeline for connected per-item stages.
+  Use a parallel barrier only when the next phase needs all outputs.
 - Add independent review only when consequence or uncertainty justifies it.
 
 ## Workflow Lifecycle
 
 - Run native Workflow execution in the background when the host supports it.
 - For harness-tracked Agent or Workflow work, wait for its completion notification instead of polling.
-- Poll only external state that the harness cannot track.
+  Do not poll external state either.
 - Interrupted Workflow state may resume only within the same session, and resume adds no additional context.
 - A new session starts fresh.
 
@@ -98,6 +107,9 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 - Report incomplete, conflicting, or missing evidence and its effect.
   Treat unverified evidence as `unknown`.
 - Run deterministic structural checks before qualitative review when both apply.
+- Do not repeat a passed validation only because a commit or hash changed.
+  Rerun the validations affected by new changes, failures, or unresolved concerns.
+- Redispatch review fixes to the original node's context when it remains available.
 - Stop when the outcome meets its completion bar or a precise blocker prevents further in-scope work.
 
 ## Communication and Reporting
