@@ -2,7 +2,6 @@
 
 Workgraph is a zero-package-dependency Claude Code plugin.
 It injects advisory Main Agent and bounded-node context contracts.
-Versioning and release policy are owned by `AGENTS.md`.
 `.claude-plugin/plugin.json` is the version owner.
 
 ## Session Behavior
