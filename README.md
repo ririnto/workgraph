@@ -1,7 +1,8 @@
 # Workgraph
 
-Workgraph is a Claude Code plugin with no runtime package dependencies.
+Workgraph is a zero-package-dependency Claude Code plugin.
 It injects advisory Main Agent and bounded-node context contracts.
+`.claude-plugin/plugin.json` is the version owner.
 
 ## Session Behavior
 
@@ -14,7 +15,8 @@ It injects advisory Main Agent and bounded-node context contracts.
 | `SubagentStart` | Full bounded-node contract from `hooks/subagent-context.md` |
 
 Claude Code's native Agent and Workflow lifecycle owns execution state.
-The Main Agent orchestrates and reports the final result; it does not implement tasks.
+The Main Agent orchestrates and reports the final result.
+It does not implement tasks.
 Dispatch one semantic phase directly with Agent.
 Dispatch independent work in parallel.
 Use Workflow only for at least two connected semantic phases and a stronger reason.
@@ -29,15 +31,9 @@ Each Skill is self-contained and does not load another Skill.
 
 ## Requirements
 
-- Node.js 18 through the current LTS.
+- Node.js 18 through the current LTS for the plugin runtime.
+- Node 22 for the development toolchain (Node, npm, and the `package.json` tooling), which is separate from the plugin runtime.
 - A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with a Node runtime, the native Agent dispatch surface, and the native Workflow surface.
-
-The plugin runtime is zero-package-dependency.
-The development toolchain (Node, npm, and the `package.json` tooling) is separate from the plugin runtime.
-Contributors need Node 22 for development tooling.
-The plugin runtime itself runs on Node.js 18 through the current LTS.
-The plugin manifest owns the version: `.claude-plugin/plugin.json`.
-The marketplace manifest does not contain a version.
 
 Hook dispatch fails fast when Node is missing, the route is unknown, or the selected contract file is missing, unreadable, or empty.
 

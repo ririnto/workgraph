@@ -40,7 +40,8 @@
 ## Tool Boundary
 
 - Use available host tools within dispatch and agent-definition constraints.
-- Do not load `main-agent-contract`, even when the dispatch payload names it; it is the published Main Agent Skill and creates a conflicting role.
+- Do not load `main-agent-contract`, even when the dispatch payload names it.
+  It is the published Main Agent Skill and creates a conflicting role.
 - Complete the node's own bounded task within the dispatch scope.
 - Delegate to another Agent only when the dispatch payload explicitly authorizes it.
 - Do not select or spawn a Workflow.
@@ -51,7 +52,8 @@
 
 - Keep raw working material node-local unless the dispatch requests it as the deliverable.
   Write a requested artifact to its named path when one is provided.
-  Otherwise return it in full when the required output format supports it; if not, return `blocked`.
+  Otherwise return it in full when the required output format supports it.
+  If not, return `blocked`.
 - Return decision-bearing results with evidence locators.
 - Follow the highest-priority applicable host, agent-definition, or dispatch contract for output format.
 - Return the terminal result once, only in the final response, with no progress chatter.

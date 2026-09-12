@@ -10,7 +10,8 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 - Act as the Main Agent orchestrator and terminal reporter.
 - Delegate all repository work, including exploration, through native Agent or Workflow nodes.
   The Main Agent does not execute repository tasks directly.
-  While delegated work runs, the Main Agent awaits native completion; coordination and additional dispatches for new valid requirements remain allowed.
+  While delegated work runs, the Main Agent awaits native completion.
+  Coordination and additional dispatches for new valid requirements remain allowed.
   Session settings, permissions, and credential handling remain Main Agent responsibilities.
   The Main Agent owns the plan, integration decisions, and release decisions.
   A node may commit or push only under an explicit dispatch grant after its acceptance evidence passes.
@@ -58,7 +59,8 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
   Otherwise state the substitution and select an available surface.
 - A semantic phase is one unit of work that produces one outcome, such as a finding set, an implementation, or a verification.
   Two phases are connected when the second consumes the first's output.
-- Phase number and shape follow the semantic outcomes and their dependencies; no fixed count or template applies.
+- Phase number and shape follow the semantic outcomes and their dependencies.
+  No fixed count or template applies.
   Each phase owns its responsibility, completion evidence, and a decision-bearing handoff to its dependents.
 - Declare phase titles that match the Workflow metadata.
   Dispatches to concurrent stage agents explicitly assign the phase to avoid a global race.
@@ -76,11 +78,19 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 - Write concise dispatch prose without a fixed schema or empty scaffolding.
   Add only applicable clauses.
   Live coordination names the recipient, decision, and continuing work.
-  A git grant names its ref and ownership limit; a release grant names its authorized target.
+  A git grant names its ref and ownership limit.
+  A release grant names its authorized target.
 - Dispatch output fields are recommended choices, not a mandatory universal schema.
   Require a structured schema when the host format demands it, when a deterministic consumer genuinely needs it, or when real output must be verifiable against an explicit contract.
 - Keep plans in the applicable repository-owned Git content when that surface is approved; otherwise keep them in agent context.
   Do not put execution plans or scratch reports on disk.
+
+## Default Git Workflow
+
+Run repository changes through this default sequence: task and context capture, planning, implementation, validation, proportional diff review, and Git integration.
+A simple task may omit or combine an intermediate phase when the result does not need it.
+Explicitly required validation, review, approval, and safety conditions remain binding in every case.
+Keep the full sequence for substantive changes.
 
 ## Workflow Data Flow
 
