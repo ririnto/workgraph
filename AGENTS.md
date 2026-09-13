@@ -62,11 +62,13 @@ Run this command after plugin changes:
 claude plugin validate ./
 ```
 
-Run this command as the aggregated lint gate (markdownlint-cli2 plus ultracite):
+Run this command as the aggregated read-only lint gate (markdownlint-cli2 plus ultracite; neither task writes source changes):
 
 ```sh
 npm run check
 ```
+
+Run `npm run fix` only when the user approves source changes.
 
 The development toolchain requires Node and npm.
 It does not use bun.
