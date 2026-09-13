@@ -21,6 +21,23 @@ Workgraph is a standalone Claude Code plugin and single-plugin marketplace.
 Preserve these named top-level components and their responsibilities.
 Adding, removing, or moving a top-level component requires updates to the architecture, consumers, and relevant documentation.
 
+## Code Style
+
+Common rules apply to every language in this repository.
+Language-specific rules apply to their language only and live under their language heading.
+
+Remove blank lines inside function bodies.
+Blank lines between declarations and lint-required spacing stay.
+Inline a single-use local only when evaluation order, evaluation count, exception timing, mutable snapshots, and closure capture are preserved.
+Explanations live in documentation comments on declarations, never as inline comments inside function bodies.
+Document every externally exposed declaration.
+
+### TypeScript And JavaScript
+
+Prefer `const` for bindings that do not need reassignment.
+Prefer a function reference over a pass-through lambda when behavior and binding are identical.
+Use no named capture group when `match[0]` reads the same value.
+
 ## Versioning
 
 `.claude-plugin/plugin.json` is the only version owner.
