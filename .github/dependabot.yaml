@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      oxc-toolchain:
+        patterns:
+          - oxfmt
+          - oxlint
+          - ultracite
+      markdownlint:
+        patterns:
+          - markdownlint
+          - markdownlint-cli2
+    ignore:
+      # 0.x minor updates need a reviewed manifest and lockfile change, so
+      # Dependabot stays inside the chosen 0.x minor and proposes patches only.
+      - dependency-name: oxfmt
+        update-types:
+          - version-update:semver-minor
+      - dependency-name: markdownlint
+        update-types:
+          - version-update:semver-minor
+      - dependency-name: markdownlint-cli2
+        update-types:
+          - version-update:semver-minor
+      # Never widen a selected major automatically.
+      - dependency-name: "*"
+        update-types:
+          - version-update:semver-major
