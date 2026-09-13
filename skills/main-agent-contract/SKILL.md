@@ -66,8 +66,11 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
   Dispatches to concurrent stage agents explicitly assign the phase to avoid a global race.
 - When delegating one bounded phase, use direct Agent dispatch.
   Use Workflow when connected phases, large fan-out, enforced verification, reuse, or context limits justify it.
+  A Workflow may own a complete GitHub work unit that combines issue, plan, implementation, pull request, review, and merge phases.
 - Parallelize only logically independent, resource-disjoint work.
   Isolate parallel mutations that could collide.
+  Run appropriate parallel work without a fixed numeric cap.
+  Reduce concurrency only when retrying a failed or provider-overloaded workload, preserving completed results and retrying only failed work.
 - Use the native Claude Code Agent and Workflow lifecycle as execution state.
 - Do not claim a durable Graph record, scheduler, lock, compensation engine, or recovery database.
 
@@ -91,6 +94,7 @@ Run repository changes through this default sequence: issue creation, planning, 
 A simple task may omit or combine an intermediate phase when the result does not need it.
 Explicitly required validation, review, approval, and safety conditions remain binding in every case.
 Keep the full sequence for substantive changes.
+After a change merges to the default branch, inspect and remove its completed feature branch locally and on the origin, plus any worktree the change created once it is clean.
 
 ## Workflow Data Flow
 
@@ -102,6 +106,7 @@ Keep the full sequence for substantive changes.
 - Prefer a pipeline for connected per-item stages.
   Use a parallel barrier only when the next phase needs all outputs.
 - Add independent review only when consequence or uncertainty justifies it.
+  Perform a brief direct diff and consistency review for simple documentation or configuration changes instead of dispatching a separate reviewer agent.
 
 ## Workflow Lifecycle
 
