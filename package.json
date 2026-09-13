@@ -5,7 +5,7 @@
   "scripts": {
     "check": "run-p check:*",
     "check:markdownlint-cli2": "markdownlint-cli2",
-    "check:ultracite": "ultracite check",
+    "check:ultracite": "ultracite fix",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
     "fix:ultracite": "ultracite fix"
@@ -14,11 +14,11 @@
     "markdownlint": "^0.41.1",
     "markdownlint-cli2": "^0.23.2",
     "npm-run-all2": "^9.0.3",
-    "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
-    "ultracite": "^7.10.5"
+    "oxfmt": "^0.67.0",
+    "oxlint": "^1.82.0",
+    "ultracite": "^7.11.1"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=24.15.0 <25"
   }
 }
