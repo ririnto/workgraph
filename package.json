@@ -5,7 +5,7 @@
   "scripts": {
     "check": "run-p check:*",
     "check:markdownlint-cli2": "markdownlint-cli2",
-    "check:ultracite": "ultracite fix",
+    "check:ultracite": "ultracite check",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
     "fix:ultracite": "ultracite fix"
