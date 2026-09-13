@@ -51,7 +51,7 @@ const fail = (message, code) => {
 if (process.argv.length !== 3) {
   fail("expected exactly one route", 2);
 }
-const route = resolveRoute(process.argv[2] ?? "");
+const route = resolveRoute(process.argv[2]);
 if (!route) {
   fail(`unknown route: ${process.argv[2]}`, 2);
 }

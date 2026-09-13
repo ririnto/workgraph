@@ -12,6 +12,8 @@ Workgraph is a standalone Claude Code plugin and single-plugin marketplace.
 - `LICENSE` owns the MIT license text.
 - `THIRD_PARTY_NOTICES.md` owns attribution and pinned source metadata.
 - `.gitignore` owns local cache and scratch exclusions.
+- `.github/dependabot.yaml` owns the weekly npm dependency update schedule.
+  It groups coupled updates, ignores semver-major updates, and ignores 0.x semver-minor updates so a 0.x minor needs a reviewed manifest and lockfile change.
 - `.markdownlint-cli2.jsonc` owns the Markdown lint configuration.
 - `rules/` owns the `no-box-drawing` markdownlint custom rule.
 - `package.json` and `package-lock.json` own the Markdown and Oxlint toolchain dependency pins.
@@ -37,6 +39,13 @@ Document every externally exposed declaration.
 Prefer `const` for bindings that do not need reassignment.
 Prefer a function reference over a pass-through lambda when behavior and binding are identical.
 Use no named capture group when `match[0]` reads the same value.
+Use no trailing comma in TypeScript.
+
+### YAML
+
+Use the `.yaml` extension for every maintained YAML file unless the consuming host or tool requires `.yml` (for example `.gitlab-ci.yml` at a GitLab repository root).
+Write sequences in block style.
+Keep a flow sequence only for an explicit empty sequence (`key: []`), because block style cannot express an empty sequence without turning it into null.
 
 ## Versioning
 
