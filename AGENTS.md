@@ -37,6 +37,7 @@ Document every externally exposed declaration.
 Prefer `const` for bindings that do not need reassignment.
 Prefer a function reference over a pass-through lambda when behavior and binding are identical.
 Use no named capture group when `match[0]` reads the same value.
+Use no trailing comma in TypeScript.
 
 ## Versioning
 
