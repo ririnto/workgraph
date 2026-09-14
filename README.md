@@ -12,7 +12,7 @@ It injects advisory Main Agent and bounded-node context contracts.
 | `SessionStart: clear` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
 | `SessionStart: compact` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
 | `SessionStart: resume` | Unregistered, no additional context |
-| `SubagentStart` | Full bounded-node contract from `hooks/subagent-context.md` |
+| `SubagentStart` | Full bounded-node contract from `skills/subagent-context/SKILL.md` |
 
 Claude Code's native Agent and Workflow lifecycle owns execution state.
 The Main Agent orchestrates and reports the final result.
@@ -25,8 +25,8 @@ An explicit Workflow request does not remove this requirement.
 ## Skills
 
 - `main-agent-contract`: Main Agent contract for advisory orchestration and bounded node dispatch.
+- `subagent-context`: bounded-node contract for outcome, authority, data flow, communication, tool boundary, and result reporting.
 
-`hooks/subagent-context.md` is self-contained injected node context, not a Skill.
 Each Skill is self-contained and does not load another Skill.
 
 ## Requirements
@@ -75,11 +75,12 @@ workgraph/
 +-- hooks/
 |   +-- hooks.json
 |   +-- inject-context.mjs
-|   +-- subagent-context.md
 +-- rules/
 |   +-- no-box-drawing.ts
 +-- skills/
 |   +-- main-agent-contract/
+|   |   +-- SKILL.md
+|   +-- subagent-context/
 |       +-- SKILL.md
 +-- .editorconfig
 +-- .gitignore

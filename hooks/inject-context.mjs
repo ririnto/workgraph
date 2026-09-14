@@ -31,7 +31,7 @@ const resolveRoute = (route) =>
       eventName: "SessionStart"
     },
     "subagent-start": {
-      contractFile: path.join(pluginRoot, "hooks/subagent-context.md"),
+      contractFile: path.join(pluginRoot, "skills/subagent-context/SKILL.md"),
       eventName: "SubagentStart"
     }
   })[route];

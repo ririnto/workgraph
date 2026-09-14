@@ -6,8 +6,8 @@ Workgraph is a standalone Claude Code plugin and single-plugin marketplace.
 
 - `.claude-plugin/` owns the marketplace and plugin manifests.
   `plugin.json` is the only version owner.
-- `hooks/` owns runtime hook configuration and context injection files.
-- `skills/` owns the portable Agent Skills that define Workgraph behavior.
+- `hooks/` owns runtime hook configuration and context injection.
+- `skills/` owns the portable Agent Skills that define Workgraph behavior, including the injected bounded-node contract.
 - `README.md` owns installation, use, and layout guidance.
 - `LICENSE` owns the MIT license text.
 - `THIRD_PARTY_NOTICES.md` owns attribution and pinned source metadata.

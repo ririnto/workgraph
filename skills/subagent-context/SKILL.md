@@ -1,3 +1,8 @@
+---
+name: subagent-context
+description: Use when running as a Workgraph dispatch node to apply the bounded node contract covering outcome, authority, data flow, communication, tool boundary, and result reporting.
+---
+
 # Workgraph Node Contract
 
 ## Outcome
