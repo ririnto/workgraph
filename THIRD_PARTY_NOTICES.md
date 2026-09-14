@@ -34,3 +34,13 @@ The project informed implementation discipline.
 - Source: `https://github.com/sng2c/giver-architecture`
 
 The reference informed the explicit steering and working-I/O partition, steering-only edge payloads, composed downstream history, result payloads without code bodies or test output, and cumulative breaking-change propagation.
+
+## OpenAI Prompt Guidance
+
+- Article: "Rethinking skills and prompts for GPT-6 Astra"
+- Publisher: OpenAI
+- Source: <https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md>
+
+The article informed concise activation descriptions, conditional workflows, proportional checks, and explicit authority and completion boundaries.
+This is an attributed adaptation, not a quotation or evidence of measured performance.
+Explicit user requirements and each contract's standalone authority rules remain binding.

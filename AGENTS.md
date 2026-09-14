@@ -56,24 +56,14 @@ Do not add a version to `marketplace.json`.
 
 ## Validation
 
-Run this command after plugin changes:
+- Run `claude plugin validate ./` after plugin changes.
+- Use `npm run check` as the read-only lint gate for Markdown and ultracite.
+- When hooks or injected contracts change, run the affected hook routes directly and inspect their emitted context.
+- Reuse passing evidence for unchanged inputs, configuration, and toolchain; a new commit hash alone does not invalidate it.
+- Run `npm run fix` only when source changes are authorized.
 
-```sh
-claude plugin validate ./
-```
-
-Run this command as the aggregated read-only lint gate (markdownlint-cli2 plus ultracite; neither task writes source changes):
-
-```sh
-npm run check
-```
-
-Run `npm run fix` only when the user approves source changes.
-
-The development toolchain requires Node and npm.
-It does not use bun.
-
-Use focused direct hook smoke checks when available without adding dependencies.
+Use Node and npm for the development toolchain, not bun.
+`package.json` defines the supported development Node version.
 
 ## Boundaries
 
@@ -81,6 +71,7 @@ Do not add a second marketplace, host adapter, compatibility surface, package ma
 Do not add package manifests, lockfiles, scripts, release workflows, alternate harness manifests, tests, or evaluation trees without an external requirement.
 Do not commit work-item identifiers, review-system URLs, or private local environment details.
 Use repository-relative paths and portable examples in committed guidance and reports.
-The Main Agent owns the release decision and ungranted git work.
-Subagents run mutating git commands, such as commit or push, only under an explicit dispatch grant and after required verification passes.
-Read-only git inspection follows the dispatch scope.
+The Main Agent owns the plan and integration and publication decisions, and delegates all repository work.
+Git mutations require an explicit dispatch grant naming operations, refs, ownership, and required pre-action evidence.
+Passed permissions cannot increase authority.
+Preserve unrelated work and stop unexplained changes rather than overwrite them.
