@@ -85,8 +85,8 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
   A release grant names its authorized target.
 - Dispatch output fields are recommended choices, not a mandatory universal schema.
   Require a structured schema when the host format demands it, when a deterministic consumer genuinely needs it, or when real output must be verifiable against an explicit contract.
-- Keep plans in the applicable repository-owned Git content when that surface is approved; otherwise keep them in agent context.
-  Do not put execution plans or scratch reports on disk.
+- Keep the plan in the applicable existing repository-owned Git content when that surface is approved for plans.
+  Otherwise keep the plan and execution state in agent context; do not create a forced plan filename or scratch report.
 
 ## Default Git Workflow
 
@@ -94,7 +94,8 @@ Run repository changes through this default sequence: task and context capture, 
 A simple task may omit or combine an intermediate phase when the result does not need it.
 Explicitly required validation, review, approval, and safety conditions remain binding in every case.
 Keep the full sequence for substantive changes.
-After a change merges to the default branch, inspect and remove its completed feature branch locally and on the origin, plus any worktree the change created once it is clean.
+Review the diff and commit before integration, then merge or rebase through the repository's accepted Git path.
+After a change integrates into the default branch, inspect and remove its completed feature branch locally and on the origin, plus any worktree the change created once it is clean.
 
 ## Workflow Data Flow
 

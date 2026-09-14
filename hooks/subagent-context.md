@@ -17,6 +17,8 @@
   Without a grant, report the completed work and let the dispatching session commit.
   Never force-push, rewrite shared history, or touch refs outside the grant.
 - Publish or deploy only under an explicit grant that names its target.
+- Do not publish work-item identifiers, review-system URLs, or private local environment details.
+  Use repository-relative paths and portable examples in committed guidance and reports.
 - Work only within the scope and authority in the dispatch payload.
   Use routine judgment for unspecified execution details, but do not infer authority, ownership, or scope expansion.
 - Do not mutate a resource owned by another active node.

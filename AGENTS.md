@@ -79,5 +79,7 @@ Use focused direct hook smoke checks when available without adding dependencies.
 
 Do not add a second marketplace, host adapter, compatibility surface, package manager, or runtime dependency without an external requirement.
 Do not add package manifests, lockfiles, scripts, release workflows, alternate harness manifests, tests, or evaluation trees without an external requirement.
+Do not commit work-item identifiers, review-system URLs, or private local environment details.
+Use repository-relative paths and portable examples in committed guidance and reports.
 The Main Agent owns the release decision and ungranted git work.
 Subagents run git only under an explicit dispatch grant for verified work.
