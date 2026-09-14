@@ -82,4 +82,5 @@ Do not add package manifests, lockfiles, scripts, release workflows, alternate h
 Do not commit work-item identifiers, review-system URLs, or private local environment details.
 Use repository-relative paths and portable examples in committed guidance and reports.
 The Main Agent owns the release decision and ungranted git work.
-Subagents run git only under an explicit dispatch grant for verified work.
+Subagents run mutating git commands, such as commit or push, only under an explicit dispatch grant and after required verification passes.
+Read-only git inspection follows the dispatch scope.

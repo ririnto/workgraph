@@ -57,6 +57,7 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
 
 - Honor an explicit execution-surface request when the host permits it.
   Otherwise state the substitution and select an available surface.
+  Without an explicit request, one bounded phase uses direct Agent dispatch, and Workflow requires at least two connected phases plus a stronger reason.
 - A semantic phase is one unit of work that produces one outcome, such as a finding set, an implementation, or a verification.
   Two phases are connected when the second consumes the first's output.
 - Phase number and shape follow the semantic outcomes and their dependencies.
@@ -64,7 +65,7 @@ description: Use when running as the Workgraph Main Agent to apply advisory orch
   Each phase owns its responsibility, completion evidence, and a decision-bearing handoff to its dependents.
 - Declare phase titles that match the Workflow metadata.
   Dispatches to concurrent stage agents explicitly assign the phase to avoid a global race.
-- When delegating one bounded phase, use direct Agent dispatch.
+- When delegating one bounded phase without an explicit surface request, use direct Agent dispatch.
   Use Workflow when connected phases, large fan-out, enforced verification, reuse, or context limits justify it.
   A Workflow may own a complete engineering change that combines task context, planning, implementation, validation, review, and Git integration phases.
 - Parallelize only logically independent, resource-disjoint work.
@@ -107,7 +108,8 @@ After a change integrates into the default branch, inspect and remove its comple
 - Prefer a pipeline for connected per-item stages.
   Use a parallel barrier only when the next phase needs all outputs.
 - Add independent review only when consequence or uncertainty justifies it.
-  Perform a brief direct diff and consistency review for simple documentation or configuration changes instead of dispatching a separate reviewer agent.
+  For simple documentation or configuration changes, the implementing node performs a brief direct diff and consistency review instead of a separate reviewer dispatch.
+  Explicitly required independent review remains binding.
 
 ## Workflow Lifecycle
 

@@ -17,10 +17,11 @@ It injects advisory Main Agent and bounded-node context contracts.
 Claude Code's native Agent and Workflow lifecycle owns execution state.
 The Main Agent orchestrates and reports the final result.
 It does not implement tasks.
-Dispatch one semantic phase directly with Agent.
+Dispatch one semantic phase directly with Agent by default when no explicit surface is requested.
 Dispatch independent work in parallel.
 Use Workflow only for at least two connected semantic phases and a stronger reason.
-An explicit Workflow request does not remove this requirement.
+Follow an explicitly requested execution surface when the host permits it.
+Without an explicit request, dispatch one bounded phase directly with Agent.
 
 ## Skills
 
