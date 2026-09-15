@@ -31,7 +31,7 @@ Neither loads its sibling to recover authority, model-selection, completion, or 
 
 ## Requirements
 
-- Node.js 18 through the current LTS for the plugin runtime.
+- Node.js 22.x LTS (Maintenance) or 24.x LTS (Active) for the plugin runtime.
 - Node matching `package.json` engines and npm for development, separate from the plugin runtime.
 - A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with a Node runtime, the native Agent dispatch surface, and the native Workflow surface.
 
@@ -86,7 +86,6 @@ workgraph/
 +-- .gitignore
 +-- .markdownlint-cli2.jsonc
 +-- AGENTS.md
-+-- CLAUDE.md
 +-- LICENSE
 +-- README.md
 +-- THIRD_PARTY_NOTICES.md

@@ -27,6 +27,7 @@ Adding, removing, or moving a top-level component requires updates to the archit
 
 Common rules apply to every language in this repository.
 Language-specific rules apply to their language only and live under their language heading.
+Write instruction and guidance content in concise English.
 
 Remove blank lines inside function bodies.
 Blank lines between declarations and lint-required spacing stay.
