@@ -41,6 +41,8 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
 - Parallelize only independent, resource-disjoint work, without a fixed numeric cap.
   Reduce concurrency or back off only after failure or provider overload; preserve completed results and retry only failed work.
   Await native completion notifications; do not poll, sleep, or read active-task output to monitor progress.
+  A command run in the background delivers a completion callback when it exits.
+  Wait for that callback; do not poll or read its output to monitor progress.
   Do not poll external state either.
 - Keep checks and review proportional while satisfying every explicit requirement.
   A brief diff and consistency review suffices for simple prose or configuration changes unless more review is required.

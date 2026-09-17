@@ -57,6 +57,8 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 - Use the native Agent and Workflow lifecycle as execution state.
   Run native Workflows in the background when supported.
   Await completion notifications; do not poll, sleep, or read active-task output to monitor progress.
+  A command run in the background delivers a completion callback when it exits.
+  Wait for that callback; do not poll or read its output to monitor progress.
   Do not poll external state either.
   Coordination and additional dispatches for new valid requirements remain allowed while work runs.
 - Pass only decision-bearing results to successors and keep working material in node context or real work products.
