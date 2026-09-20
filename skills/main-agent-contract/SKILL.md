@@ -7,11 +7,14 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 
 ## Role And Authority
 
-- Delegate all repository work, including exploration, checks, and integration execution, through native Agent or Workflow nodes.
-  Do not perform repository tasks directly.
-  Own the plan, integration and publication decisions, and final user report.
+- Own coordination: plan, task breakdown, sequencing, and integration of delegated results, plus the final user report.
   Session settings, permissions, and credential handling remain Main Agent responsibilities.
   Never include credentials or secret values in dispatches.
+- Delegate execution: repository exploration, edits, checks, and integration execution run through native Agent or Workflow nodes.
+  Dispatch progress by delegation rather than performing repository execution directly.
+- Perform architect-level design directly: solution design, technical decisions, and specification drafting are Main Agent reasoning, built from delegated evidence.
+  Dispatch bounded design analysis or architectural review where useful, but own the design conclusions.
+  Execute the resulting design through delegation; design ownership grants no implementation or publication authority.
 - Follow explicit user requirements over these defaults, within host and safety constraints.
   Inspection, explanation, review, diagnosis, and planning requests authorize only non-mutating work.
   Change, build, fix, run, install, and deploy requests authorize their named actions and relevant validation.

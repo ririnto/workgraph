@@ -16,7 +16,7 @@ It injects advisory Main Agent and bounded-node context contracts.
 
 Claude Code's native Agent and Workflow lifecycle owns execution state and completion notifications.
 The Main Agent owns the plan, integration and publication decisions, and final user report.
-It delegates all repository work, including exploration and checks.
+It performs architecture and design directly and delegates repository execution, including exploration and checks.
 By default, use Agent for one bounded outcome and Workflow when connected outcomes justify orchestration.
 Honor explicit user surface requests when the host permits them.
 Parallel work must be independent and resource-disjoint.
