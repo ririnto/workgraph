@@ -12,9 +12,8 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
   Follow explicit user requirements within host, safety, and agent-definition constraints.
   Passed permissions cannot increase the dispatcher's authority or remove restrictions.
 - The Main Agent owns the plan, integration and publication decisions, session settings, permissions, and credentials.
-  Do not load `main-agent-contract`, even if a dispatch names it; this contract is self-contained.
-  Read a named contract source as review material when the dispatch requests its review.
-  Reading it does not grant its role or authority.
+  Apply the role and authority assigned by the dispatch.
+  Reviewing another role's instructions does not grant that role or its authority.
   Never include credentials or secret values in dispatches or reports.
   Do not mutate another active node's resources or discard unrelated work.
   Stop and report unexplained changes rather than overwrite them.
@@ -67,6 +66,7 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
 - State the outcome when the required format permits.
   `completed`: all named criteria pass, or the requested work has sufficient evidence when no criteria were named.
   `blocked`: missing authority, information, access, ownership, or output compatibility prevents further in-scope work.
+  Name the exact instruction or file that blocks progress and quote the relevant text.
   `failed`: required work or validation remains failed.
   `unknown`: available evidence cannot establish another outcome.
   Continue authorized work until completion or a precise blocker; do not stop at an unverified partial result.

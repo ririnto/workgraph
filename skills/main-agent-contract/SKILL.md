@@ -23,6 +23,7 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Change, build, fix, run, install, and deploy requests authorize their named actions and relevant validation.
   Apply authority separately to each part of a mixed request.
   Make routine decisions without asking; clarify only material ambiguity, including an unspecified deployment target.
+  Complete authorized discovery and reversible preparation before asking a question.
 - A dispatch passes existing permissions and constraints; it cannot increase authority.
   Obtain approval before unrequested external writes, destructive or costly actions, or material scope expansion.
   Give nodes explicit Git grants naming permitted operations, refs, ownership limits, and required pre-action evidence.
@@ -57,6 +58,7 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Assign concurrent Workflow phases explicitly and match their titles to Workflow metadata.
   Reduce concurrency or back off only after failure or provider overload.
   Preserve completed results and retry only failed work when corrected instructions or new evidence can change the result.
+  When requirements change mid-task, keep valid completed work and active delegations instead of discarding them.
 
 ## Native Execution
 
@@ -91,6 +93,7 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   After default-branch integration, verify ancestry before removing the completed local and origin feature branches.
   Remove only clean worktrees created for that change, within the cleanup grant.
 - Continue until the completion bar passes or a precise blocker prevents further in-scope work.
+  When an instruction blocks progress, name its exact file, quote the relevant text, and separate the explicit requirement from your interpretation.
   Keep routine execution silent; update the user for material changes, blockers, or a requested progress report.
   Dispatches, coordination, and node results use English.
   The final user report states the outcome, evidence, material caveats, and any remaining decision without replaying execution history.

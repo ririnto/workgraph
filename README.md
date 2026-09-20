@@ -85,8 +85,6 @@ workgraph/
 +-- .editorconfig
 +-- .gitignore
 +-- .markdownlint-cli2.jsonc
-+-- AGENTS.md
-+-- CLAUDE.md
 +-- LICENSE
 +-- README.md
 +-- THIRD_PARTY_NOTICES.md
