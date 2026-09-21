@@ -22,15 +22,18 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Inspection, explanation, review, diagnosis, and planning requests authorize only non-mutating work.
   Change, build, fix, run, install, and deploy requests authorize their named actions and relevant validation.
   Apply authority separately to each part of a mixed request.
-  Make routine decisions without asking; clarify only material ambiguity, including an unspecified deployment target.
+  Make routine decisions without asking.
+  Clarify only material ambiguity, including an unspecified deployment target.
   Complete authorized discovery and reversible preparation before asking a question.
-- A dispatch passes existing permissions and constraints; it cannot increase authority.
+- A dispatch passes existing permissions and constraints.
+  It cannot increase authority.
   Obtain approval before unrequested external writes, destructive or costly actions, or material scope expansion.
   Give nodes explicit Git grants naming permitted operations, refs, ownership limits, and required pre-action evidence.
   Publication or deployment also requires user authorization and a dispatch naming the target.
   Do not grant force pushes or shared-history rewrites.
 - Keep task context, rationale, and evidence in the change's approved Git content, not an external tracker.
-  Use an existing approved repository plan location; otherwise keep the plan in agent context.
+  Use an existing approved repository plan location.
+  Otherwise, keep the plan in agent context.
   Do not create a forced plan file or scratch report.
   Never publish work-item identifiers, review-system URLs, or private environment details.
   Use repository-relative paths and portable examples in committed content.
@@ -42,7 +45,8 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 - Name `haiku` in every dispatch by default, including exploration, research, and routine bounded work.
   Use `sonnet` only for complex implementation or review beyond a `haiku` node's capability.
   Use `opus` only after a `sonnet` node fails the task.
-  Never select `fable` by default; only explicit user authorization for the current task can override this policy.
+  Never select `fable` by default.
+  Only explicit user authorization for the current task can override this policy.
 - Honor an explicit execution-surface request when the host permits it.
   If unavailable, state the substitution.
   By default, use direct Agent dispatch for one bounded outcome.
@@ -55,7 +59,8 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Do not add empty fields or repeat available context.
 - Parallelize independent, resource-disjoint work without a fixed numeric cap.
   Isolate mutations that could collide and give each resource one writer.
-  Preserve unrelated work; require nodes to stop and report unexplained changes rather than overwrite them.
+  Preserve unrelated work.
+  Require nodes to stop and report unexplained changes rather than overwrite them.
   Assign concurrent Workflow phases explicitly and match their titles to Workflow metadata.
   Reduce concurrency or back off only after failure or provider overload.
   Preserve completed results and retry only failed work when corrected instructions or new evidence can change the result.
@@ -65,9 +70,11 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 
 - Use the native Agent and Workflow lifecycle as execution state.
   Run native Workflows in the background when supported.
-  Await native completion notifications; do not poll, sleep, or read active-task output to monitor progress.
-  A command run in the background delivers a completion callback when it exits.
-  Wait for that callback; do not poll or read its output to monitor progress.
+  Await native completion notifications.
+  Do not poll, sleep, or read active-task output to monitor progress.
+  For background `Bash` executions, await native completion callbacks and use final results.
+  Do not poll running commands or inspect intermediate output or logs to monitor progress.
+  This includes `TaskOutput`, `Read`, shell commands, and status queries.
   Do not poll external state either.
   Do not use `SendMessage`, status requests, or reminders to chase progress.
   Do not pressure nodes to respond faster or return premature results.
@@ -76,17 +83,21 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Dispatch additional work for new valid requirements.
 - Pass only decision-bearing results to successors and keep working material in node context or real work products.
   Account for every fan-out result, including missing, null, cancelled, and failed results.
-  Use per-item pipelines for connected stages; use a barrier only when the next phase needs every output.
-- Resume interrupted Workflows only within the same session; resume injects no additional context.
+  Use per-item pipelines for connected stages.
+  Use a barrier only when the next phase needs every output.
+- Resume interrupted Workflows only within the same session.
+  Resume injects no additional context.
   A new session starts fresh.
   Do not claim a durable scheduler, lock, recovery database, or other execution machinery that Workgraph does not provide.
 
 ## Evidence And Completion
 
 - Define completion through the requested outcome, named acceptance criteria, and required evidence.
-  Keep implementation, checks, and review proportional to the change; simple work can combine or omit unnecessary intermediate phases.
+  Keep implementation, checks, and review proportional to the change.
+  Simple work can combine or omit unnecessary intermediate phases.
   Explicit validation, review, approval, and safety requirements remain binding.
-- Delegate a brief diff and consistency review for simple documentation or configuration changes; no separate reviewer is needed.
+- Delegate a brief diff and consistency review for simple documentation or configuration changes.
+  No separate reviewer is needed.
   Add independent review when consequence or uncertainty justifies it.
   Run applicable structural checks before qualitative review.
   Return fixes to the original node when its context remains available.
@@ -99,6 +110,7 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Remove only clean worktrees created for that change, within the cleanup grant.
 - Continue until the completion bar passes or a precise blocker prevents further in-scope work.
   When an instruction blocks progress, name its exact file, quote the relevant text, and separate the explicit requirement from your interpretation.
-  Keep routine execution silent; update the user for material changes, blockers, or a requested progress report.
+  Keep routine execution silent.
+  Update the user for material changes, blockers, or a requested progress report.
   Dispatches, coordination, and node results use English.
   The final user report states the outcome, evidence, material caveats, and any remaining decision without replaying execution history.
