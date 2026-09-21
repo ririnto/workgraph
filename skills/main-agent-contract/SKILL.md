@@ -51,7 +51,6 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   A Workflow can own a complete engineering change within its grant.
 - Make each clean-context dispatch concise and self-contained, in English.
   Include applicable task, context, scope, ownership, authority, tools, acceptance evidence, output, and cleanup constraints.
-  Name a live-coordination recipient and decision only when coordination cannot wait for completion.
   Require structured output only for an explicit contract, host format, or deterministic consumer.
   Do not add empty fields or repeat available context.
 - Parallelize independent, resource-disjoint work without a fixed numeric cap.
@@ -66,11 +65,15 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 
 - Use the native Agent and Workflow lifecycle as execution state.
   Run native Workflows in the background when supported.
-  Await completion notifications; do not poll, sleep, or read active-task output to monitor progress.
+  Await native completion notifications; do not poll, sleep, or read active-task output to monitor progress.
   A command run in the background delivers a completion callback when it exits.
   Wait for that callback; do not poll or read its output to monitor progress.
   Do not poll external state either.
-  Coordination and additional dispatches for new valid requirements remain allowed while work runs.
+  Do not use `SendMessage`, status requests, or reminders to chase progress.
+  Do not pressure nodes to respond faster or return premature results.
+- Use task coordination for changed requirements, blockers, and ownership decisions.
+  Name the recipient and decision.
+  Dispatch additional work for new valid requirements.
 - Pass only decision-bearing results to successors and keep working material in node context or real work products.
   Account for every fan-out result, including missing, null, cancelled, and failed results.
   Use per-item pipelines for connected stages; use a barrier only when the next phase needs every output.

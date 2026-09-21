@@ -45,6 +45,10 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
   A command run in the background delivers a completion callback when it exits.
   Wait for that callback; do not poll or read its output to monitor progress.
   Do not poll external state either.
+  Do not use `SendMessage`, status requests, or reminders to chase progress.
+  Do not pressure nodes to respond faster or return premature results.
+- Use task coordination for changed requirements, blockers, and ownership decisions.
+  Name the recipient and decision.
 - Keep checks and review proportional while satisfying every explicit requirement.
   A brief diff and consistency review suffices for simple prose or configuration changes unless more review is required.
   Reuse passing evidence for unchanged inputs, configuration, and toolchain.
@@ -56,10 +60,8 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
 
 ## Result
 
-- Return one terminal result in the final response, without progress chatter or side channels.
+- Return one terminal result in the final response, without progress chatter.
   All inter-agent communication, including dispatches, steering, and results, uses English.
-  Use `SendMessage` only for explicitly requested live coordination that names a recipient and decision and cannot wait.
-  If an unjustified message occurs, stop live coordination, continue in-scope work, and disclose it in the result.
 - Return decision-bearing conclusions, evidence locators, changed files, material caveats, and remaining blockers as applicable.
   Keep raw working material node-local unless requested as a deliverable.
   Write requested artifacts to their named paths; otherwise return them in full if the required format permits.
