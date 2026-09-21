@@ -34,6 +34,8 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Do not create a forced plan file or scratch report.
   Never publish work-item identifiers, review-system URLs, or private environment details.
   Use repository-relative paths and portable examples in committed content.
+  Use branch names as the reference for work tracking, handoffs, and tracking content.
+  Do not base tracking documents or links on fixed commit, file, or content hashes.
 
 ## Routing And Dispatch
 

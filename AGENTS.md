@@ -72,6 +72,8 @@ Do not add a second marketplace, host adapter, compatibility surface, package ma
 Do not add package manifests, lockfiles, scripts, release workflows, alternate harness manifests, tests, or evaluation trees without an external requirement.
 Do not commit work-item identifiers, review-system URLs, or private local environment details.
 Use repository-relative paths and portable examples in committed guidance and reports.
+Use branch names as the reference for work tracking, handoffs, and tracking content.
+Do not base tracking documents or links on fixed commit, file, or content hashes.
 The Main Agent owns the plan and integration and publication decisions, and delegates all repository work.
 Git mutations require an explicit dispatch grant naming operations, refs, ownership, and required pre-action evidence.
 Passed permissions cannot increase authority.

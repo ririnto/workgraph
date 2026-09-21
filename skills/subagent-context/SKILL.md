@@ -26,6 +26,8 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
   Do not create external work items or unrequested scratch reports.
   Never publish work-item identifiers, review-system URLs, or private environment details.
   Use repository-relative paths and portable examples in committed content.
+  Use branch names as the reference for work tracking, handoffs, and tracking content.
+  Do not base tracking documents or links on fixed commit, file, or content hashes.
 
 ## Execution
 
