@@ -2,6 +2,19 @@
 
 Workgraph is a standalone Claude Code plugin and single-plugin marketplace.
 
+## Task Guidance
+
+Follow explicit user instructions over repository defaults and skills, within host and safety constraints.
+Read only instructions and references relevant to the affected paths and requested outcome.
+Keep one plan in the existing task context or the user's designated location.
+Define completion and required evidence before editing; continue authorized work until completion or a concrete blocker.
+Use direct execution for small or tightly coupled work and honor requests to work without delegation.
+Use Agent or the available native Workflow tool when authorized delegation improves the outcome.
+Keep graph planning proportional: identify dependencies, owned resources, evidence, and termination without adding a graph runtime.
+Use English for inter-agent prompts, messages, steering, and results; user-facing explanations follow the requested language.
+For any pending background tool, including Bash, continue independent work or end the turn and resume on native completion.
+Do not fill the wait with repeated thinking, status messages, polling, or tool calls.
+
 ## Project Structure
 
 - `.claude-plugin/` owns the marketplace and plugin manifests.
@@ -61,6 +74,8 @@ Do not add a version to `marketplace.json`.
 - Use `npm run check` as the read-only lint gate for Markdown and ultracite.
 - When hooks or injected contracts change, run the affected hook routes directly and inspect their emitted context.
 - Reuse passing evidence for unchanged inputs, configuration, and toolchain; a new commit hash alone does not invalidate it.
+- Run only affected checks; broaden or repeat them for changes, failures, or unresolved concerns.
+- Do not add tests that merely repeat low-impact prose or configuration changes.
 - Run `npm run fix` only when source changes are authorized.
 
 Use Node and npm for the development toolchain, not bun.
@@ -74,7 +89,8 @@ Do not commit work-item identifiers, review-system URLs, or private local enviro
 Use repository-relative paths and portable examples in committed guidance and reports.
 Use branch names as the reference for work tracking, handoffs, and tracking content.
 Do not base tracking documents or links on fixed commit, file, or content hashes.
-The Main Agent owns the plan and integration and publication decisions, and delegates all repository work.
-Git mutations require an explicit dispatch grant naming operations, refs, ownership, and required pre-action evidence.
+The Main Agent owns the plan and integration and publication decisions, whether execution is direct or delegated.
+Delegated Git mutations require an explicit grant naming operations, refs, ownership, and required pre-action evidence.
+Direct Git mutations require user authorization and the same scope and evidence checks.
 Passed permissions cannot increase authority.
 Preserve unrelated work and stop unexplained changes rather than overwrite them.

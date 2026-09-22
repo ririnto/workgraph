@@ -14,12 +14,31 @@ It injects advisory Main Agent and bounded-node context contracts.
 | `SessionStart: resume` | Unregistered, no additional context |
 | `SubagentStart` | Full bounded-node contract from `skills/subagent-context/SKILL.md` |
 
-Claude Code's native Agent and Workflow lifecycle owns execution state and completion notifications.
+Claude Code's native Agent, Workflow, and background Bash lifecycles own execution state and completion notifications.
 The Main Agent owns the plan, integration and publication decisions, and final user report.
-It performs architecture and design directly and delegates repository execution, including exploration and checks.
-By default, use Agent for one bounded outcome and Workflow when connected outcomes justify orchestration.
+It performs small or tightly coupled work directly and delegates when isolation, parallelism, or expertise improves the outcome.
+The native `Workflow` tool is available when exposed by the host; use it only within its authorization requirements.
+Use Agent for one delegated outcome and Workflow when connected outcomes justify orchestration.
 Honor explicit user surface requests when the host permits them.
 Parallel work must be independent and resource-disjoint.
+Inter-agent prompts, messages, steering, and results use English; user-facing explanations follow the requested language.
+
+For any authorized background tool, continue independent work or end the current turn immediately.
+Resume dependent work on the native completion notification, without polling or repeated waiting messages or thinking.
+This ends the turn, not the unfinished task, and applies to main agents and dispatched nodes alike.
+These contracts provide instructions, not runtime enforcement or a replacement scheduler.
+
+## Graph Engineering
+
+For connected work, represent dependencies in the existing plan instead of inventing a fixed multi-agent process.
+Nodes are bounded tasks, tools, checks, or decisions; edges name prerequisites, required results, or routing conditions.
+Start only ready nodes, isolate conflicting writes, and pass the context and evidence each successor needs.
+Use per-item pipelines and reserve full joins for consumers that require all branch results.
+Keep pending work distinct from verified completion, and give feedback loops a progress signal and finite exit conditions.
+Preserve valid work when replanning; do not rerun unaffected branches or assume more agents improve results.
+
+Workgraph applies task and coordination graph principles, not a graph database or a graph of private reasoning.
+It adds no graph runtime, durable recovery store, or framework dependency.
 
 ## Skills
 
@@ -96,4 +115,4 @@ workgraph/
 
 ## Design Sources
 
-See `THIRD_PARTY_NOTICES.md` for design sources and the attributed OpenAI prompt-guidance adaptation.
+See `THIRD_PARTY_NOTICES.md` for research papers, official design references, and attributed prompt-guidance adaptations.
