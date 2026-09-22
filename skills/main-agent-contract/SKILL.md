@@ -72,6 +72,10 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
   Run native Workflows in the background when supported.
   Await native completion notifications.
   Do not poll, sleep, or read active-task output to monitor progress.
+  When background work is pending and no independent work remains, end the current turn immediately.
+  Do not keep the turn alive with repeated thinking, wait messages, or tool calls.
+  Ending the turn is not abandoning the task or claiming completion.
+  Resume on the native completion notification.
   For background `Bash` executions, await native completion callbacks and use final results.
   Do not poll running commands or inspect intermediate output or logs to monitor progress.
   This includes `TaskOutput`, `Read`, shell commands, and status queries.
