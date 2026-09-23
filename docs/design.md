@@ -10,15 +10,14 @@ Keep those audiences separate so an installed plugin does not impose this reposi
 | --- | --- | --- |
 | `AGENTS.md` | Repository contributors | Local conventions and validation |
 | `README.md` | Plugin users | Installation and observable behavior |
-| `hooks/context/common.md` | Main agents and workers | Authority, language, asynchronous work, and evidence |
-| `hooks/context/main.md` | Main agents | Planning, dispatch, integration, and reporting |
-| `hooks/context/worker.md` | Dispatched agents | Assignment scope and result delivery |
-| `skills/*/SKILL.md` | Users invoking role instructions | User-only entry points that reference the context files |
+| `skills/shared.md` | Main agents and workers | Authority, language, asynchronous work, and evidence |
+| `skills/main-agent-contract/SKILL.md` | Main agents | User-only skill and maintained planning, dispatch, integration, and reporting rules |
+| `skills/subagent-context/SKILL.md` | Dispatched agents | User-only skill and maintained assignment scope and result delivery rules |
 | `docs/research.md` | Maintainers | Research evidence and design limits |
 | `THIRD_PARTY_NOTICES.md` | Maintainers and distributors | Attribution |
 
 All maintained files live in the repository.
-Only the context files enter a consumer's session through these hooks.
+Only the shared instructions and selected skill body enter a consumer's session through these hooks.
 The shared file owns behavior that applies to both roles.
 The injector supplies it with the selected role so neither agent must retrieve another file before following its instructions.
 
@@ -33,9 +32,13 @@ The command uses `CLAUDE_PLUGIN_ROOT` to locate the script.
 The script resolves Markdown paths against `import.meta.url`, independent of the working directory.
 
 The command accepts the host event name as its sole argument.
-For SessionStart, it combines `common.md` with `main.md`.
-For SubagentStart, it combines `common.md` with `worker.md`.
-It trims the files and separates them with one blank line.
+For SessionStart, it combines `skills/shared.md` with the body of `skills/main-agent-contract/SKILL.md`.
+For SubagentStart, it combines `skills/shared.md` with the body of `skills/subagent-context/SKILL.md`.
+It removes only the leading skill frontmatter block between standalone `---` lines.
+It accepts LF and CRLF line endings and preserves separators inside the body.
+It trims the shared instructions and role body and separates them with one blank line.
+The runtime strips the frontmatter delimiters without interpreting YAML values.
+The skill tests check the maintained metadata, and plugin validation checks the plugin configuration.
 It returns the result as `hookSpecificOutput.additionalContext` with the matching `hookEventName`.
 
 Both hook registrations omit a matcher.
@@ -47,21 +50,24 @@ Dispatch prompts must carry the constraints needed by a receiver whose context i
 
 The script reads all required files before producing stdout.
 It exits with code 2 for invalid arguments and code 1 for missing, unreadable, or empty files.
+Missing or unclosed skill frontmatter and empty skill bodies also exit with code 1.
 It reports the failing file without emitting partial instructions.
 Claude Code continues session and subagent startup after these hook errors.
 Workgraph cannot turn this context-loading hook into a permission gate.
 
 ## Keep One Implementation
 
-The context documents contain the behavioral rules without Skill frontmatter.
+Each role skill contains its maintained behavioral rules.
+The shared rules live once in `skills/shared.md`.
 The two role skills keep their names, descriptions, and role boundaries as explicit user entry points.
 Their frontmatter sets `disable-model-invocation: true` and `user-invocable: true`.
 Claude Code keeps them available to users while blocking model invocation and automatic skill preloading.
 
-Each skill directs the agent to read the common and role files through `${CLAUDE_PLUGIN_ROOT}` links.
+Each skill directs the agent to read `${CLAUDE_PLUGIN_ROOT}/skills/shared.md` when shared instructions are absent from context.
 Claude Code substitutes the plugin's installation path in skill Markdown.
-The links require the agent to read the files and do not embed another maintained copy of the rules.
-A failed read must stop application of an incomplete contract.
+The role body loads with the skill, while the shared link requires a read when hooks have not supplied it.
+An unavailable or empty shared file must stop application of an incomplete contract.
+Hook delivery includes both sources in full without depending on linked-file retrieval.
 Invocation cannot change role ownership or grant permissions.
 
 The plugin has one injector and one hook configuration for automatic context delivery.
@@ -93,11 +99,11 @@ A requested deliverable can retain its own language while the surrounding handof
 ## Verify The Boundaries
 
 `hooks/inject-context.test.mjs` checks the real command through child processes.
-It compares each emitted context with the exact common and role files.
-It checks invalid arguments and file errors.
+It compares each emitted context with the shared file and selected skill body, excluding frontmatter.
+It checks invalid arguments, file errors, missing or unclosed frontmatter, and empty skill bodies.
 It executes the registered shell commands from a path with spaces and an unrelated working directory.
 Its temporary directories contain disposable copies and receive cleanup after each test.
-The tests also check each skill's user-only frontmatter and links to the common and selected role files.
+The tests also check skill names, descriptions, user-only metadata, and manual-use references to the shared file.
 These checks establish the source contract rather than exercising Claude Code's interactive slash-command menu.
 
 Review prose for sentence completeness, line boundaries, conditions, and meaning.

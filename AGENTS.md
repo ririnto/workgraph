@@ -7,11 +7,11 @@ Complete authorized changes and relevant checks before returning a final result,
 ## Instruction Ownership
 
 Keep contributor conventions and validation commands here.
-Keep consumer behavior in `hooks/context/`.
-Place shared rules in `common.md` and role-specific rules in `main.md` or `worker.md`.
-Each hook output must contain the shared rules and exactly one role.
+Keep consumer behavior in `skills/`.
+Place shared rules in `skills/shared.md` and role-specific rules in each role's `SKILL.md` body.
+Each hook output must contain the shared rules and exactly one role without YAML frontmatter or required model file retrieval.
 Keep role skills user-only with `disable-model-invocation: true` and `user-invocable: true`.
-Reference the context files from each skill instead of copying their rules.
+Reference the shared file from each skill instead of copying its rules.
 Remove replaced paths and aliases without compatibility layers.
 
 Use `README.md` for installation and runtime behavior.

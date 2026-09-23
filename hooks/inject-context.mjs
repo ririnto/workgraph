@@ -7,19 +7,27 @@ const fail = (message, code) => {
   process.exit(code);
 };
 
-/** Read nonempty instructions relative to this module. */
+/** Read nonempty Skill prose, stripping only the leading frontmatter block. */
 const readContext = (name) => {
-  const file = new URL(`context/${name}.md`, import.meta.url);
-  let content;
   try {
-    content = readFileSync(file, "utf-8").trim();
-  } catch {
-    fail(`cannot read instruction file: ${name}.md`, 1);
+    const content = readFileSync(
+      new URL(`../skills/${name}`, import.meta.url),
+      "utf-8"
+    ).trim();
+    const body = name.endsWith("/SKILL.md")
+      ? content
+          .match(
+            /^---[\t ]*\r?\n[\s\S]*?\r?\n---[\t ]*(?:\r?\n|$)(?<body>[\s\S]*)$/u
+          )
+          ?.groups.body.trim()
+      : content;
+    if (!body) {
+      throw new Error("empty instructions or missing skill frontmatter");
+    }
+    return body;
+  } catch (error) {
+    fail(`cannot load instruction file ${name}: ${error.message}`, 1);
   }
-  if (!content) {
-    fail(`instruction file is empty: ${name}.md`, 1);
-  }
-  return content;
 };
 
 if (process.argv.length !== 3) {
@@ -29,14 +37,17 @@ const [event] = process.argv.slice(2);
 if (event !== "SessionStart" && event !== "SubagentStart") {
   fail(`unsupported hook event: ${event}`, 2);
 }
-const context = [
-  readContext("common"),
-  readContext(event === "SessionStart" ? "main" : "worker")
-].join("\n\n");
 process.stdout.write(
   `${JSON.stringify({
     hookSpecificOutput: {
-      additionalContext: context,
+      additionalContext: [
+        readContext("shared.md"),
+        readContext(
+          event === "SessionStart"
+            ? "main-agent-contract/SKILL.md"
+            : "subagent-context/SKILL.md"
+        )
+      ].join("\n\n"),
       hookEventName: event
     }
   })}\n`

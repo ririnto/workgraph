@@ -29,14 +29,14 @@ Contributors follow `AGENTS.md` when changing this repository.
 It contains writing conventions, implementation constraints, and validation commands.
 The plugin does not inject that file into another repository's session.
 
-Consumer sessions receive instructions from `hooks/context/`.
-The injector combines the shared rules with the current role.
+Consumer sessions receive instructions maintained in `skills/`.
+The injector combines `skills/shared.md` with the selected role's `SKILL.md` body and removes its YAML frontmatter.
 Users can reload either role through a user-only skill.
 
-| Event | Injected files | Recipient |
+| Event | Injected files under `skills/` | Recipient |
 | --- | --- | --- |
-| SessionStart | `common.md` and `main.md` | Main session |
-| SubagentStart | `common.md` and `worker.md` | Dispatched agent |
+| SessionStart | `shared.md` and `main-agent-contract/SKILL.md` | Main session |
+| SubagentStart | `shared.md` and `subagent-context/SKILL.md` | Dispatched agent |
 
 SessionStart covers startup, resume, clear, compact, and fork events supported by the host.
 The configuration uses no matcher filter for either hook.
@@ -54,10 +54,11 @@ Both skills retain their role names and set `disable-model-invocation: true` wit
 Claude Code exposes them to users and prevents model invocation or automatic skill preloading.
 The automatic hooks remain active without invoking either skill.
 
-Each skill directs the agent to read `common.md` and its role file through `${CLAUDE_PLUGIN_ROOT}` references.
-These are the same files that the hooks inject, so maintainers update each rule in one place.
+Each skill contains its role instructions and references the single shared source at `${CLAUDE_PLUGIN_ROOT}/skills/shared.md`.
+If the shared instructions are absent from context, the skill directs the agent to read them before continuing.
+The hooks already include the complete shared and role prose, so automatic delivery needs no extra file reads.
 Explicit invocation does not change a session's role or grant permissions.
-Skill links require file reads, so report unavailable files instead of applying an incomplete contract.
+Report an unavailable or empty shared file instead of applying an incomplete contract.
 
 ## Session Behavior
 
@@ -99,9 +100,11 @@ Development uses npm and the Node version range in `package.json`.
 Claude Code must support plugin command hooks and `additionalContext` for SessionStart and SubagentStart.
 
 The injector accepts one event name, either `SessionStart` or `SubagentStart`.
-It resolves context files from its own location and emits one JSON object on success.
+It resolves instruction files from its own location and emits one JSON object on success.
+It removes the leading `---`-delimited frontmatter block from the selected skill, preserving separators in the body.
 Invalid arguments exit with code 2.
-Missing, unreadable, or empty context files exit with code 1 and produce no context.
+Missing, unreadable, or empty instruction files exit with code 1 and produce no context.
+Missing or unclosed skill frontmatter and empty skill bodies also exit with code 1.
 These hook failures do not prevent Claude Code from starting a session or subagent.
 Inspect the hook error notice if instructions fail to load.
 

@@ -25,7 +25,7 @@ It warns against fixed itineraries, redundant repository maps, and approval rule
 We reviewed the user-supplied copies of both documents.
 These recommendations guide instruction design without changing model or API configuration.
 
-Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in the context files.
+Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
 The main agent chooses direct execution or delegation according to the task.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
@@ -80,7 +80,8 @@ This is product engineering guidance rather than a controlled evaluation of Work
 We keep common rules in one source and inject the role that needs them.
 We keep research and maintenance details available through paths instead of loading them into each consumer session.
 The dispatch includes missing constraints when a receiver's context is unknown.
-User-only role skills reference the same common and role files when users request them.
+User-only role skills contain the maintained role instructions and reference the single shared source in `skills/shared.md`.
+The hooks combine that source with the selected skill body, so automatic delivery needs no model file retrieval.
 Their descriptions stay outside automatic model context under Claude Code's invocation controls.
 
 ## Graph Engineering
@@ -178,5 +179,6 @@ Model behavior remains a separate verification target from JSON delivery.
 The [Claude Code skills reference](https://code.claude.com/docs/en/skills) documents `disable-model-invocation: true` and `user-invocable: true`.
 Together they allow user invocation while preventing model invocation and automatic skill preloading.
 The reference also documents `${CLAUDE_PLUGIN_ROOT}` substitution in skill Markdown for shared plugin resources.
-Workgraph uses links to its common and role files with explicit read instructions.
-Those links do not guarantee attachment or model adherence, so source checks cannot establish a successful interactive invocation.
+Workgraph keeps each role's instructions in its skill body and uses an explicit read instruction for the shared file.
+The read applies only when the shared instructions are absent from context, including manual use without prior hook delivery.
+Source checks verify metadata and references, but cannot establish successful interactive invocation or model adherence.
