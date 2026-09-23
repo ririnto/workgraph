@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "check": "run-p check:*",
+    "check:hooks": "node --test hooks/inject-context.test.mjs",
     "check:markdownlint-cli2": "markdownlint-cli2",
     "check:ultracite": "ultracite check",
     "fix": "run-p fix:*",

@@ -1,13 +1,12 @@
 {
-  "description": "Inject Workgraph contracts into main and subagent sessions.",
+  "description": "Load shared instructions and the current agent role.",
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|clear|compact",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" session-start",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" SessionStart",
             "timeout": 5
           }
         ]
@@ -18,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" subagent-start",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" SubagentStart",
             "timeout": 5
           }
         ]

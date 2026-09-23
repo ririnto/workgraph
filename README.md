@@ -1,118 +1,133 @@
 # Workgraph
 
-Workgraph is a zero-package-dependency Claude Code plugin.
-It injects advisory Main Agent and bounded-node context contracts.
-`.claude-plugin/plugin.json` is the version owner.
+Workgraph is a Claude Code plugin for coordinating engineering work.
+It injects shared behavior and role-specific instructions through native hooks.
+The hook runtime uses Node built-ins and needs no npm dependencies.
 
-## Session Behavior
+## Install
 
-| Event | Injected context |
-| --- | --- |
-| `SessionStart: startup` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
-| `SessionStart: clear` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
-| `SessionStart: compact` | Full Main Agent contract from `skills/main-agent-contract/SKILL.md` |
-| `SessionStart: resume` | Unregistered, no additional context |
-| `SubagentStart` | Full bounded-node contract from `skills/subagent-context/SKILL.md` |
-
-Claude Code's native Agent, Workflow, and background Bash lifecycles own execution state and completion notifications.
-The Main Agent owns the plan, integration and publication decisions, and final user report.
-It performs small or tightly coupled work directly and delegates when isolation, parallelism, or expertise improves the outcome.
-The native `Workflow` tool is available when exposed by the host; use it only within its authorization requirements.
-Use Agent for one delegated outcome and Workflow when connected outcomes justify orchestration.
-Honor explicit user surface requests when the host permits them.
-Parallel work must be independent and resource-disjoint.
-Inter-agent prompts, messages, steering, and results use English; user-facing explanations follow the requested language.
-
-For any authorized background tool, continue independent work or end the current turn immediately.
-Resume dependent work on the native completion notification, without polling or repeated waiting messages or thinking.
-This ends the turn, not the unfinished task, and applies to main agents and dispatched nodes alike.
-These contracts provide instructions, not runtime enforcement or a replacement scheduler.
-
-## Graph Engineering
-
-For connected work, represent dependencies in the existing plan instead of inventing a fixed multi-agent process.
-Nodes are bounded tasks, tools, checks, or decisions; edges name prerequisites, required results, or routing conditions.
-Start only ready nodes, isolate conflicting writes, and pass the context and evidence each successor needs.
-Use per-item pipelines and reserve full joins for consumers that require all branch results.
-Keep pending work distinct from verified completion, and give feedback loops a progress signal and finite exit conditions.
-Preserve valid work when replanning; do not rerun unaffected branches or assume more agents improve results.
-
-Workgraph applies task and coordination graph principles, not a graph database or a graph of private reasoning.
-It adds no graph runtime, durable recovery store, or framework dependency.
-
-## Skills
-
-- `main-agent-contract`: orchestration contract for the Main Agent.
-- `subagent-context`: execution contract for a bounded dispatch node.
-
-Each Skill is self-contained for hook delivery and direct use.
-Neither loads its sibling to recover authority, model-selection, completion, or reporting rules.
-
-## Requirements
-
-- Node.js 22.x LTS (Maintenance) or 24.x LTS (Active) for the plugin runtime.
-- Node matching `package.json` engines and npm for development, separate from the plugin runtime.
-- A Claude Code release that supports plugin-bundled synchronous `SessionStart` and `SubagentStart` command hooks with a Node runtime, the native Agent dispatch surface, and the native Workflow surface.
-
-Hook dispatch fails fast when Node is missing, the route is unknown, or the selected contract file is missing, unreadable, or empty.
-
-## Claude Code
-
-Add the marketplace:
+Add the marketplace and install the plugin:
 
 ```sh
 claude plugin marketplace add ririnto/workgraph
-```
-
-Install the plugin:
-
-```sh
 claude plugin install workgraph@workgraph
 ```
 
-Validate the local plugin:
-
-```sh
-claude plugin validate ./
-```
-
-Load the local plugin for one development session:
+For development, load the checkout in a new session:
 
 ```sh
 claude --plugin-dir ./
 ```
 
-Use `/hooks` to confirm that the `SessionStart` and `SubagentStart` handlers are active.
+Use `/hooks` to confirm that the SessionStart and SubagentStart handlers are active.
+An installed marketplace copy and a development checkout can contain different versions.
+Check the loaded plugin before evaluating changed instructions.
 
-## Layout
+## Instruction Boundaries
 
-```text
-workgraph/
-+-- .claude-plugin/
-|   +-- marketplace.json
-|   +-- plugin.json
-+-- hooks/
-|   +-- hooks.json
-|   +-- inject-context.mjs
-+-- rules/
-|   +-- no-box-drawing.ts
-+-- skills/
-|   +-- main-agent-contract/
-|   |   +-- SKILL.md
-|   +-- subagent-context/
-|       +-- SKILL.md
-+-- .editorconfig
-+-- .gitignore
-+-- .markdownlint-cli2.jsonc
-+-- LICENSE
-+-- README.md
-+-- THIRD_PARTY_NOTICES.md
-+-- oxlint.config.ts
-+-- oxfmt.config.ts
-+-- package-lock.json
-+-- package.json
+Contributors follow `AGENTS.md` when changing this repository.
+It contains writing conventions, implementation constraints, and validation commands.
+The plugin does not inject that file into another repository's session.
+
+Consumer sessions receive instructions from `hooks/context/`.
+The injector combines the shared rules with the current role.
+Users can reload either role through a user-only skill.
+
+| Event | Injected files | Recipient |
+| --- | --- | --- |
+| SessionStart | `common.md` and `main.md` | Main session |
+| SubagentStart | `common.md` and `worker.md` | Dispatched agent |
+
+SessionStart covers startup, resume, clear, compact, and fork events supported by the host.
+The configuration uses no matcher filter for either hook.
+Each output includes the common rules once and one role.
+The injector reads neither repository guidance nor research documents.
+
+## User-Only Skills
+
+Invoke a role skill when you want to reload its instructions:
+
+- Use `/workgraph:main-agent-contract` for the main session.
+- Use `/workgraph:subagent-context` for a bounded dispatch node.
+
+Both skills retain their role names and set `disable-model-invocation: true` with `user-invocable: true`.
+Claude Code exposes them to users and prevents model invocation or automatic skill preloading.
+The automatic hooks remain active without invoking either skill.
+
+Each skill directs the agent to read `common.md` and its role file through `${CLAUDE_PLUGIN_ROOT}` references.
+These are the same files that the hooks inject, so maintainers update each rule in one place.
+Explicit invocation does not change a session's role or grant permissions.
+Skill links require file reads, so report unavailable files instead of applying an incomplete contract.
+
+## Session Behavior
+
+The main agent owns the plan, integration decisions, and final report.
+It handles small or tightly coupled work and delegates independent tasks when coordination adds value.
+It honors requests to work without delegation.
+A worker completes the assigned task within its resource and permission limits.
+
+Agents honor the user's model choice within host limits.
+They name `haiku` by default and choose `sonnet` for work beyond its capability.
+They use `opus` only after a `sonnet` attempt fails because of capability limits.
+Other models, including `fable`, require user authorization for the task.
+A fork inherits its parent model, so agents use it only when that model satisfies the routing requirement.
+These instructions guide dispatch choices without changing host model settings.
+
+Agent-to-agent communication uses English, including dispatches, corrections, handoffs, and results.
+User-facing explanations and deliverables follow the requested language.
+The instructions call for complete sentences and sentence-level source line breaks in Markdown prose.
+
+The native Workflow tool is available in hosts that expose it.
+The main agent uses it when the user authorizes orchestration and connected tasks justify it.
+Workgraph follows the tool's opt-in requirements.
+A host without Workflow can still load the plugin and run tasks through its available tools.
+
+For background Agent, Workflow, Bash, and other asynchronous tools, agents continue independent work while results are pending.
+They end the current turn once no independent work remains and resume on the native completion notification.
+They leave the task open without repeated waiting messages, thinking, polling, or sleep calls.
+They use completion results and acceptance checks before reporting success.
+
+For connected tasks, agents track prerequisites, resource ownership, and acceptance evidence in the existing plan.
+They parallelize ready work, serialize conflicting writes, and limit retries through explicit progress and exit conditions.
+The host owns execution state and completion delivery.
+Workgraph supplies instructions and does not enforce model adherence or provide a scheduler.
+
+## Requirements And Errors
+
+Use Node.js 22 or 24 for hook execution.
+Development uses npm and the Node version range in `package.json`.
+Claude Code must support plugin command hooks and `additionalContext` for SessionStart and SubagentStart.
+
+The injector accepts one event name, either `SessionStart` or `SubagentStart`.
+It resolves context files from its own location and emits one JSON object on success.
+Invalid arguments exit with code 2.
+Missing, unreadable, or empty context files exit with code 1 and produce no context.
+These hook failures do not prevent Claude Code from starting a session or subagent.
+Inspect the hook error notice if instructions fail to load.
+
+## Development
+
+Install the pinned development tools:
+
+```sh
+npm ci
 ```
 
-## Design Sources
+Run the repository checks and validate the plugin directory and manifest:
 
-See `THIRD_PARTY_NOTICES.md` for research papers, official design references, and attributed prompt-guidance adaptations.
+```sh
+npm run check
+claude plugin validate ./
+claude plugin validate .claude-plugin/plugin.json
+```
+
+The check command runs Markdown lint, ultracite, and Node hook tests.
+The tests cover context composition, role separation, portable paths, error handling, and user-only skill metadata and references.
+They verify delivery rather than model behavior.
+The only version source is `.claude-plugin/plugin.json`.
+
+## Design And Sources
+
+Read [the design](docs/design.md) for file ownership and hook behavior.
+Read [the research notes](docs/research.md) for the evidence behind instruction choices and its limits.
+[Third-party notices](THIRD_PARTY_NOTICES.md) retain attribution for source projects and writing guidance.

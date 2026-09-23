@@ -1,96 +1,83 @@
-# Repository Guidelines
+# Workgraph Repository Instructions
 
-Workgraph is a standalone Claude Code plugin and single-plugin marketplace.
+These instructions apply to repository contributors and are not injected into consumer sessions.
+Follow explicit user requirements before repository defaults and skills, within host and safety constraints.
+Complete authorized changes and relevant checks before returning a final result, or report the specific blocker.
 
-## Task Guidance
+## Instruction Ownership
 
-Follow explicit user instructions over repository defaults and skills, within host and safety constraints.
-Read only instructions and references relevant to the affected paths and requested outcome.
-Keep one plan in the existing task context or the user's designated location.
-Define completion and required evidence before editing; continue authorized work until completion or a concrete blocker.
-Use direct execution for small or tightly coupled work and honor requests to work without delegation.
-Use Agent or the available native Workflow tool when authorized delegation improves the outcome.
-Keep graph planning proportional: identify dependencies, owned resources, evidence, and termination without adding a graph runtime.
-Use English for inter-agent prompts, messages, steering, and results; user-facing explanations follow the requested language.
-For any pending background tool, including Bash, continue independent work or end the turn and resume on native completion.
-Do not fill the wait with repeated thinking, status messages, polling, or tool calls.
+Keep contributor conventions and validation commands here.
+Keep consumer behavior in `hooks/context/`.
+Place shared rules in `common.md` and role-specific rules in `main.md` or `worker.md`.
+Each hook output must contain the shared rules and exactly one role.
+Keep role skills user-only with `disable-model-invocation: true` and `user-invocable: true`.
+Reference the context files from each skill instead of copying their rules.
+Remove replaced paths and aliases without compatibility layers.
 
-## Project Structure
+Use `README.md` for installation and runtime behavior.
+Read `docs/design.md` when changing instruction boundaries or hook delivery.
+Read `docs/research.md` when changing behavior based on external research.
+Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 
-- `.claude-plugin/` owns the marketplace and plugin manifests.
-  `plugin.json` is the only version owner.
-- `hooks/` owns runtime hook configuration and context injection.
-- `skills/` owns the portable Agent Skills that define Workgraph behavior, including the injected bounded-node contract.
-- `README.md` owns installation, use, and layout guidance.
-- `LICENSE` owns the MIT license text.
-- `THIRD_PARTY_NOTICES.md` owns attribution and pinned source metadata.
-- `.gitignore` owns local cache and scratch exclusions.
-- `.github/dependabot.yaml` owns the weekly npm dependency update schedule.
-  It groups coupled updates, ignores semver-major updates, and ignores 0.x semver-minor updates so a 0.x minor needs a reviewed manifest and lockfile change.
-- `.markdownlint-cli2.jsonc` owns the Markdown lint configuration.
-- `rules/` owns the `no-box-drawing` markdownlint custom rule.
-- `package.json` and `package-lock.json` own the Markdown and Oxlint toolchain dependency pins.
-  External requirement: the repo-wide lint baseline directive.
-- `oxlint.config.ts` and `oxfmt.config.ts` own the ultracite Oxlint+Oxfmt provider configuration.
+## Writing
 
-Preserve these named top-level components and their responsibilities.
-Adding, removing, or moving a top-level component requires updates to the architecture, consumers, and relevant documentation.
+Write maintained instructions, documentation, and messages to other agents in concise English.
+Use the user's requested language for user-facing explanations.
 
-## Code Style
+Use complete sentences in prose and list items, with one sentence per Markdown source line.
+Keep conditions and exceptions with their actions, and each paragraph focused on one idea.
+Split semicolon-linked independent clauses into separate sentences.
+Preserve required syntax in headings, tables, code, metadata, and exact quotations.
+Do not reflow Markdown to a fixed column width.
 
-Common rules apply to every language in this repository.
-Language-specific rules apply to their language only and live under their language heading.
-Write instruction and guidance content in concise English.
+Use direct verbs, concrete terms, and ASCII diagram characters.
+Remove filler and repetition without changing technical meaning or explicit requirements.
 
-Remove blank lines inside function bodies.
-Blank lines between declarations and lint-required spacing stay.
-Inline a single-use local only when evaluation order, evaluation count, exception timing, mutable snapshots, and closure capture are preserved.
-Explanations live in documentation comments on declarations, never as inline comments inside function bodies.
-Document every externally exposed declaration.
+## Implementation
 
-### TypeScript And JavaScript
+Use Node built-ins for the plugin runtime.
+Resolve bundled files from the executing module's location.
+Keep hook commands portable through `CLAUDE_PLUGIN_ROOT`.
+Emit context only after all required files load and contain text.
+Keep host permissions and task execution in the host.
 
-Prefer `const` for bindings that do not need reassignment.
-Prefer a function reference over a pass-through lambda when behavior and binding are identical.
-Use no named capture group when `match[0]` reads the same value.
-Use no trailing comma in TypeScript.
+Update consumers when replacing paths or interfaces, and remove the replaced implementation in the same change.
+Use Node and npm for development.
+Follow the Node engine range in `package.json`.
+Keep the dependency pins in `package-lock.json` consistent with the manifest.
 
-### YAML
-
-Use the `.yaml` extension for every maintained YAML file unless the consuming host or tool requires `.yml` (for example `.gitlab-ci.yml` at a GitLab repository root).
-Write sequences in block style.
-Keep a flow sequence only for an explicit empty sequence (`key: []`), because block style cannot express an empty sequence without turning it into null.
-
-## Versioning
-
-`.claude-plugin/plugin.json` is the only version owner.
-Use the `yyyy.mm.dd.seq` format.
-Do not add a second version source.
-Do not add a version to `marketplace.json`.
+Match the existing lint configuration.
+Use `const` for bindings that do not change.
+Keep explanations in declaration comments rather than comments inside function bodies.
+Leave no blank lines inside function bodies.
+Use no trailing commas in TypeScript.
+Use `.yaml` for maintained YAML files unless the consumer requires another extension.
+Use block sequences except for an explicit empty sequence.
 
 ## Validation
 
-- Run `claude plugin validate ./` after plugin changes.
-- Use `npm run check` as the read-only lint gate for Markdown and ultracite.
-- When hooks or injected contracts change, run the affected hook routes directly and inspect their emitted context.
-- Reuse passing evidence for unchanged inputs, configuration, and toolchain; a new commit hash alone does not invalidate it.
-- Run only affected checks; broaden or repeat them for changes, failures, or unresolved concerns.
-- Do not add tests that merely repeat low-impact prose or configuration changes.
-- Run `npm run fix` only when source changes are authorized.
+Select the narrowest applicable read-only gate.
 
-Use Node and npm for the development toolchain, not bun.
-`package.json` defines the supported development Node version.
+- Use `npm run check:markdownlint-cli2` for prose-only changes.
+- Use `npm run check:hooks` for changes confined to hook execution.
+- Use `npm run check` for mixed changes or repository-wide validation of Markdown, ultracite, and Node hook tests.
 
-## Boundaries
+After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
+For injected prose, also run the hook tests and inspect both emitted contexts.
+Confirm each contains common rules and one role, without repository guidance.
 
-Do not add a second marketplace, host adapter, compatibility surface, package manager, or runtime dependency without an external requirement.
-Do not add package manifests, lockfiles, scripts, release workflows, alternate harness manifests, tests, or evaluation trees without an external requirement.
-Do not commit work-item identifiers, review-system URLs, or private local environment details.
-Use repository-relative paths and portable examples in committed guidance and reports.
-Use branch names as the reference for work tracking, handoffs, and tracking content.
-Do not base tracking documents or links on fixed commit, file, or content hashes.
-The Main Agent owns the plan and integration and publication decisions, whether execution is direct or delegated.
-Delegated Git mutations require an explicit grant naming operations, refs, ownership, and required pre-action evidence.
-Direct Git mutations require user authorization and the same scope and evidence checks.
-Passed permissions cannot increase authority.
-Preserve unrelated work and stop unexplained changes rather than overwrite them.
+Review sentence completeness, line boundaries, and conditions.
+Report model adherence as unverified unless a behavioral evaluation supplies evidence.
+Reuse passing checks for unchanged inputs, configuration, and toolchain.
+Rerun or broaden checks only for changed inputs, failures, or unresolved concerns.
+Report exact commands, results, and unverified behavior.
+Run formatting fixes only within the authorized change.
+
+## Version And Publication
+
+Keep the version in `.claude-plugin/plugin.json` using `yyyy.mm.dd.seq`.
+Do not duplicate it in the marketplace or package manifest.
+Publish only to a user-authorized destination after inspecting the diff and required evidence.
+Preserve unrelated changes and stop on unexplained concurrent edits.
+Keep credentials, private environment details, and external work-item identifiers out of committed content.
+Use repository-relative paths and portable examples.

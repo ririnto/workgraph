@@ -1,89 +1,60 @@
 # Third-Party Notices
 
-Workgraph is an original synthesis that was developed after studying the following projects.
-
-No upstream source file is redistributed verbatim in this package.
+Workgraph contains instructions informed by the projects and documents listed here.
+It does not redistribute their source files verbatim.
+The [research notes](docs/research.md) identify the papers, official documents, reviewed sections, and limits behind current design choices.
 
 ## Superpowers
 
-- Project: `obra/superpowers`
-- Source revision: `44c9b2d6e889982ac18c27d05a19fefe335194e1`
-- License: MIT
-- Copyright: 2025 Jesse Vincent
-- Source: `https://github.com/obra/superpowers`
-
-The project informed the SessionStart bootstrap pattern, progressive Skill loading, and workflow-oriented packaging approach.
+We studied [obra/superpowers](https://github.com/obra/superpowers) at revision `44c9b2d6e889982ac18c27d05a19fefe335194e1`.
+The project uses the MIT license and credits Jesse Vincent, copyright 2025.
+It informed hook bootstrapping, scoped instruction loading, and task verification.
+Workgraph uses its own context documents and execution rules.
 
 ## Ponytail
 
-- Project: `DietrichGebert/ponytail`
-- Source revision: `16f29800fd2681bdf24f3eb4ccffe38be3baec6b`
-- License: MIT
-- Copyright: 2026 DietrichGebert
-- Source: `https://github.com/DietrichGebert/ponytail`
-
-The project informed implementation discipline.
+We studied [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) at revision `16f29800fd2681bdf24f3eb4ccffe38be3baec6b`.
+The project uses the MIT license and credits Dietrich Gebert, copyright 2026.
+It informed the preference for existing tools, limited abstractions, and the smallest sufficient implementation.
 
 ## Giver Architecture
 
-- Project: `sng2c/giver-architecture`
-- Source version: `v0.1.1`
-- Reference file: `giver-principles.md`
-- License: MIT, as declared by the package metadata
-- Author: sng2c
-- Source: `https://github.com/sng2c/giver-architecture`
+We studied [sng2c/giver-architecture](https://github.com/sng2c/giver-architecture) at version `v0.1.1`.
+Its package metadata declares the MIT license and names sng2c as the author.
+The `giver-principles.md` reference informed separating coordination messages from working material and passing relevant results to successors.
+Workgraph does not include its runtime or require its message schema.
 
-The reference informed the explicit steering and working-I/O partition, steering-only edge payloads, composed downstream history, result payloads without code bodies or test output, and cumulative breaking-change propagation.
+## OpenAI Guidance
 
-## OpenAI Prompt Guidance
+We reviewed the supplied copies of [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) and [Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md).
+These documents informed scoped autonomy, instruction priority, concise writing, progressive disclosure, and proportional verification.
+Workgraph adapts those recommendations without changing model or API configuration.
 
-- Guide: "Using GPT-6 Astra"
-- Source: <https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md>
-- Article: "Rethinking skills and prompts for GPT-6 Astra"
-- Publisher: OpenAI
-- Source: <https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md>
+## Anthropic Guidance
 
-These references informed concise activation descriptions, conditional workflows, proportional checks, and explicit authority and completion boundaries.
-This is an attributed adaptation, not a quotation or evidence of measured performance.
-Explicit user requirements and each contract's standalone authority rules remain binding.
+We reviewed the supplied copy of [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5).
+Its guidance informed completion behavior for unattended tasks and proportional progress updates.
+Workgraph does not set model effort or change host API settings.
+The [Claude Code skills reference](https://code.claude.com/docs/en/skills) defines user-only invocation and shared plugin file references.
 
-## Graph Engineering Research
+## Stop Slop
 
-- "Graph Engineering in the Era of LLM Agents: From Individual Intelligence to System Intelligence" (2026):
-  <https://arxiv.org/abs/2608.21156>
-  The survey informed the separation of task dependencies, agent coordination, and execution state.
-- "An LLM Compiler for Parallel Function Calling" (2023): <https://arxiv.org/abs/2312.04511>
-  Dependency-aware scheduling informed ready-node execution, independent parallel work, and result-driven replanning.
-- "Why Do Multi-Agent LLM Systems Fail?" (2025): <https://arxiv.org/abs/2503.13657>
-  The MAST taxonomy informed explicit termination, prevention of repeated steps, communication boundaries, and evidence-based completion.
-- "Towards a Science of Scaling Agent Systems" (2025): <https://arxiv.org/abs/2512.08296>
-  Task-dependent coordination costs informed direct execution and selective delegation rather than mandatory multi-agent expansion.
-- "Graph of Thoughts: Solving Elaborate Problems with Large Language Models" (2023): <https://arxiv.org/abs/2308.09687>
-  The paper distinguishes reasoning graphs from the task and coordination graphs used here.
-  Workgraph does not require exposing private reasoning or building thought graphs.
-- "GRADE: Graph Representation of LLM Agent Dependency and Execution" (2026): <https://arxiv.org/abs/2606.22741>
-  The abstract informed the distinction between observed dependencies, declared dependencies, and inferred relationships.
-  Execution order alone does not establish a dependency or prove graph quality.
-- "Verification-Aware Planning for Multi-Agent Systems" (EACL 2026): <https://aclanthology.org/2026.eacl-long.353/>
-  The abstract informed planning acceptance evidence alongside subtask dependencies and handoff requirements.
+We used [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) for prose editing.
+The local skill identifies Hardik Pandya as its author and declares the MIT license.
+It informed complete sentences, direct verbs, specific subjects, and removal of filler.
+The plugin does not bundle that skill.
 
-These papers inform design choices, not claims of measured Workgraph performance or guaranteed model compliance.
-Survey proposals and benchmark-specific findings are not universal runtime guarantees.
+## Research And Official Documentation
 
-## Workflow Design References
+The [research notes](docs/research.md) cite twelve papers and the official documentation used for context, graph, and verification decisions.
+They include studies with different findings about repository instructions.
+They distinguish abstract-level review from full-text review.
+The cited benchmark results do not establish Workgraph's performance or guarantee model adherence.
 
-- Anthropic, "Building effective agents": <https://www.anthropic.com/engineering/building-effective-agents>
-  Informed simple composable workflows, bounded feedback, and evidence from tools.
-- LangGraph, "Graph API overview": <https://docs.langchain.com/oss/python/langgraph/graph-api>
-  Informed node, edge, state, and termination distinctions without adopting its runtime.
-- LangChain, "3 Years of Graph Engineering with LangGraph":
-  <https://www.langchain.com/blog/3-years-of-graph-engineering-with-langgraph>
-  Informed conditional transitions, bounded cycles, and avoiding rigid graphs for open-ended work.
-- Microsoft Agent Framework, "Workflow Builder & Execution":
-  <https://learn.microsoft.com/en-us/agent-framework/concepts/workflows/builder-and-execution>
-  Informed explicit dependencies and synchronization costs; its superstep scheduler is not a Workgraph feature.
-- `context4ai/agent-graph`, "Graph Engineering for Agent Skills":
-  <https://github.com/context4ai/agent-graph/blob/main/docs/en/graph-engineering.md>
-  Informed scoped context, observable evidence, and the distinction between contracts and runtime enforcement.
-- `luxiaolei/graph-engineering`: <https://github.com/luxiaolei/graph-engineering>
-  Reviewed as a governed graph-contract approach; its profiles, artifacts, and execution infrastructure are not adopted.
+We also consulted [Semantic Line Breaks](https://sembr.org/) for Markdown source formatting.
+The user's sentence-level convention takes precedence over the specification's optional clause-level breaks.
+
+Earlier design research included [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) and [LangChain's graph engineering retrospective](https://www.langchain.com/blog/3-years-of-graph-engineering-with-langgraph).
+We also studied [context4ai/agent-graph](https://github.com/context4ai/agent-graph/blob/main/docs/en/graph-engineering.md) and [luxiaolei/graph-engineering](https://github.com/luxiaolei/graph-engineering).
+These sources informed discussion of context boundaries and graph execution.
+Workgraph does not bundle their code or adopt their runtime guarantees.
