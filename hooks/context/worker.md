@@ -12,7 +12,7 @@ Delegate further work only when the dispatch and host both permit it.
 A fork required to execute directly cannot delegate.
 The main agent selects Workflow orchestration.
 Perform Git writes only when the dispatch names the operations, refs, owned resources, and required checks.
-Run the required checks before committing or pushing.
+Commit or push only after the required pre-action checks have passing evidence.
 Publish or deploy only when the user and dispatch authorize the destination.
 Otherwise return changes to the dispatcher for integration.
 
