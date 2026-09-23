@@ -24,7 +24,11 @@ We reviewed the user-supplied copies of both documents.
 These recommendations guide instruction design without changing model or API configuration.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
-The main agent chooses direct execution or delegation according to the task.
+For substantial work within the user's scope, the contract directs the main agent to assign ready, bounded exploration, research, implementation, and check outcomes through Agent instead of doing them itself.
+It directs independent review through Agent when risk or uncertainty justifies it.
+An active dispatch does not authorize direct handling of another ready, substantial outcome.
+The contract reserves direct work for trivial one-step outcomes, main-owned planning, design, and integration, explicit no-delegation requests, or unavailable Agent, within host limits.
+It sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
 ### Claude Opus 5.5 Guidance
@@ -148,7 +152,7 @@ We reviewed the abstract and retain its benchmark scope.
 [Agentless](https://arxiv.org/abs/2407.01489) uses localization, repair, and validation without an open-ended agent loop.
 Its abstract reports competitive results on SWE-bench Lite for the models and baseline systems tested at the time.
 The paper motivates a simple baseline, not a universal three-stage process.
-Workgraph therefore permits direct execution and avoids mandatory reviewer or worker roles.
+The contract directs delegation of ready, substantial outcomes and keeps planning, design, and integration in the main session without fixing a reviewer or worker count.
 
 [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) describes scoped research delegation and compressed results.
 The authors discuss coordination cost and warn that coding work often offers less parallelism than research.

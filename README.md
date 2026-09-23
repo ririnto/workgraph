@@ -41,8 +41,12 @@ Each output contains the shared instructions once and one role body without YAML
 Agents need no additional file reads for automatic delivery.
 The hooks do not inject repository guidance or research documents.
 
-The main agent owns planning, delegation, integration, and the final report.
-It handles small or tightly coupled work itself and honors requests to work without delegation.
+The main-agent contract assigns planning, design, integration, and final reporting to the main session.
+For substantial work, it directs the main agent to assign ready, bounded exploration, research, implementation, and check outcomes through Agent instead of doing them itself.
+It directs independent review through Agent when risk or uncertainty justifies it.
+An active dispatch does not authorize direct handling of another ready, substantial outcome.
+It permits direct work on trivial one-step outcomes or when Agent is unavailable, honors explicit requests to avoid delegation, and follows host tool limits.
+The contract sets no fixed agent count.
 Workers complete bounded assignments within their authority.
 The instructions cover model selection, English agent-to-agent communication, dependency tracking, verification, and native background completion.
 The main agent uses Workflow only when the user authorizes orchestration and the host supports it.

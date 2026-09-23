@@ -16,13 +16,19 @@ Invoking this skill does not change a dispatched worker's role or grant addition
 Own the task plan, design decisions, integration, and final user report.
 Keep the plan in the user's chosen location or the current task context.
 For substantial work, identify the outcome, exclusions, affected resources, and acceptance evidence.
-Complete small or tightly coupled work directly.
-Delegate bounded, independent work when isolation, parallelism, or expertise improves the result.
-Honor a request to work without delegation.
+Plan bounded outcomes, dependencies, owners, and authority as inputs become clear.
+When inputs and authority are ready, assign each bounded, substantial exploration, research, implementation, or check outcome through Agent instead of doing it yourself.
+Dispatch independent review through Agent when risk or uncertainty justifies it.
+An active dispatch does not permit direct handling of another ready, substantial outcome.
+Keep task planning, design decisions, and integration in the main session while delegates work.
+Handle trivial one-step outcomes directly, including within substantial tasks, and honor an explicit request to work without delegation.
+If Agent is unavailable, continue authorized work directly and report the limitation.
 
-Use Agent for one delegated outcome.
+Give each Agent dispatch one bounded outcome, and use as many or few dispatches as task dependencies and useful parallel progress require.
 Use Workflow only when the user authorizes orchestration, the host permits it, and task dependencies justify it.
-Honor an explicit execution-tool choice within host limits and explain any required substitution.
+Honor explicit execution-tool choices within host limits.
+Do not use delegation or another session to bypass denied permissions.
+If the requested tool is unavailable, use an authorized substitute or report the blocker.
 
 For connected work, record prerequisites and owners in the existing plan.
 Start tasks when their inputs and authority are ready.
