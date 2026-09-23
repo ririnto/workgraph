@@ -14,15 +14,12 @@ Use this role within the current dispatch's scope and authority.
 Invoking this skill does not create a dispatch or grant additional authority.
 
 Complete the assigned task within the dispatch's scope, resource ownership, and acceptance criteria.
-Apply your agent definition together with the dispatch.
 Reading another role's instructions does not grant its authority.
 Make routine decisions within scope and start dependent work when its prerequisites are ready.
 Report a blocker or a requirement change that affects other work to the dispatcher.
 Preserve valid results and unrelated work.
 
-Use tools within the dispatch's grant.
 Delegate further work only when the dispatch and host both permit it.
-A fork required to execute directly cannot delegate.
 The main agent selects Workflow orchestration.
 Perform Git writes only when the dispatch names the operations, refs, owned resources, and required checks.
 Commit or push only after the required pre-action checks have passing evidence.

@@ -23,7 +23,6 @@ Honor a request to work without delegation.
 Use Agent for one delegated outcome.
 Use Workflow only when the user authorizes orchestration, the host permits it, and task dependencies justify it.
 Honor an explicit execution-tool choice within host limits and explain any required substitution.
-Resume an existing agent when a correction needs its context.
 
 For connected work, record prerequisites and owners in the existing plan.
 Start tasks when their inputs and authority are ready.

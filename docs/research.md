@@ -46,6 +46,29 @@ The guide's broad context search targets multi-app workflows rather than every r
 Workgraph does not implement those integrations or change model settings through instruction text.
 Its runtime delivers context through Claude Code hooks, and its instructions use the host's existing completion lifecycle.
 
+### Claude Code 2.1.280 Comparison
+
+We checked the installed Claude Code version, its built-in prompt and tool descriptions, and this session's tool contracts.
+We compared them with the current instructions and earlier role contracts.
+Built-in prompt variants can depend on the model and session configuration.
+Their presence in the executable does not prove that every session receives them.
+
+The Agent contract specifies fork model inheritance, forbids fork delegation, and provides continuation through SendMessage.
+The SendMessage contract forbids using another session to bypass denied permissions.
+Worker instructions state that agent messages cannot grant user consent or permission changes.
+The built-in task guidance already limits changes to the requested scope.
+We removed repetitions of these instructions and generic reminders to obey host rules.
+
+We retained Workgraph's model routing, English handoffs, sentence-level Markdown rules, and main-session ownership of settings and credentials.
+Explicit Git grants, publication privacy, the shared-history restriction, and cleanup checks remain user requirements.
+We also retained task dependencies, idle-turn handling, completion criteria, and evidence reuse.
+Native completion notifications do not ensure that a model stops waiting, resumes dependent work, or verifies results.
+Reading an edit target does not ensure that an agent reads related code and constraints.
+
+The host enforces skill invocation metadata and implements context delivery.
+Following a shared-file reference, reporting a missing file, and applying injected instructions remain model behavior.
+This comparison does not establish model adherence or performance gains.
+
 ### Repository Context Studies
 
 [Evaluating AGENTS.md](https://arxiv.org/html/2602.11988v2) evaluates context files on Python coding tasks with four agent-model pairings.

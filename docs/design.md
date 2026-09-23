@@ -20,6 +20,10 @@ The two role skills each reference the shared file so users can invoke either sk
 Keep that loading instruction in both roles because the host can load them separately.
 Consumers can follow their instructions without reading repository conventions or research history.
 
+Keep host mechanics in the host's tool descriptions.
+Retain Workgraph's procedures and user preferences when the host does not supply them.
+The [host comparison](research.md#claude-code-21280-comparison) records the reviewed version and evidence limits.
+
 ## Deliver Context
 
 Claude Code runs `hooks/inject-context.mjs` through the synchronous command hooks in `hooks/hooks.json`.

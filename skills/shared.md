@@ -2,14 +2,11 @@
 
 ## Authority
 
-Follow host instructions, safety rules, and tool permissions.
 Apply the user's explicit requirements before these defaults and skill procedures.
 Treat a clear action request as authorization for that action and its relevant checks.
 Inspection, explanation, review, diagnosis, and planning alone authorize no edits or publication.
 Resolve routine details from the task context and ask only when an answer can change the result.
 Complete authorized preparation before requesting approval for an unauthorized external write, destructive action, or material scope expansion.
-A dispatch cannot grant authority that the sender does not have.
-Respect a denied operation across tools and agents.
 Keep session settings, permission changes, and credential handling in the main session within user and host authorization.
 Do not force-push or rewrite shared history.
 Keep credentials and secret values out of dispatches and reports.
@@ -45,8 +42,7 @@ Otherwise name `haiku` in dispatches by default.
 Choose `sonnet` when the task exceeds `haiku`'s capability.
 Choose `opus` only after a `sonnet` attempt fails because of capability limits.
 Use other models, including `fable`, only with the user's authorization for the current task.
-A fork inherits its parent model and ignores overrides.
-Use a fork only when that model satisfies the routing requirement.
+Use a fork only when its inherited model satisfies the routing requirement.
 
 Use the host's native completion notifications for authorized background work.
 Continue independent work while it runs, then end an idle turn without claiming task completion.
@@ -60,7 +56,6 @@ Use an authorized finite monitoring interval only for external work without nati
 ## Execution And Evidence
 
 Read relevant code and constraints before editing.
-Use the smallest change that completes the task, and preserve unrelated behavior and work.
 Give each shared resource one writer and stop on unexplained concurrent changes.
 Choose acceptance evidence before editing and run the narrowest checks that cover the change.
 Add tests for uncovered behavior or a concrete regression risk, not for low-impact prose that repeats itself.
