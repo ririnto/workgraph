@@ -24,11 +24,19 @@ Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 Write maintained instructions, documentation, and messages to other agents in concise English.
 Use the user's requested language for user-facing explanations.
 
-Use complete sentences in prose and list items, with one sentence per Markdown source line.
-Keep conditions and exceptions with their actions, and each paragraph focused on one idea.
-Split semicolon-linked independent clauses into separate sentences.
-Preserve required syntax in headings, tables, code, metadata, and exact quotations.
+In all Markdown documents, use complete sentences in prose and list items, with one sentence per source line.
+Keep conditions and exceptions with their actions.
+Keep each paragraph focused on one idea.
+Do not join separate sentences with semicolons or substitute punctuation.
+Preserve required syntax in headings, code, metadata, and exact quotations.
+Table labels and fragments need no sentence punctuation.
+Use complete sentences and terminal punctuation for table explanations.
+For multiple items, a table may use successive rows with blank first cells and `- description` cells.
+Use that structure only when the items need separate rows.
 Do not reflow Markdown to a fixed column width.
+
+Apply Markdown lint and these prose rules to `.md` files.
+Ultracite's code rules do not apply to Markdown.
 
 Use direct verbs, concrete terms, and ASCII diagram characters.
 Remove filler and repetition without changing technical meaning or explicit requirements.

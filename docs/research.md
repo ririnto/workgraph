@@ -7,10 +7,8 @@ They distinguish research findings, product guidance, and local design decisions
 The cited studies use different tasks, models, and evaluation methods.
 Their results do not establish Workgraph performance or model adherence.
 
-The supplied OpenAI and Anthropic guides inform the rewrite of repository and session instructions.
-The other sources refine context boundaries, task dependencies, verification, and writing.
-Maintainers consult these notes when changing those behaviors.
-The hooks do not inject this document.
+Maintainers can use these sources when changing context boundaries, task dependencies, verification, or writing rules.
+See [the design](design.md) for delivery mechanics and [third-party notices](../THIRD_PARTY_NOTICES.md) for attribution.
 
 ## Prompt And Skill Design
 
@@ -77,12 +75,9 @@ The work motivates attention to context selection, but it does not measure curre
 It describes separating detailed subagent work from the lead agent's synthesis.
 This is product engineering guidance rather than a controlled evaluation of Workgraph.
 
-We keep common rules in one source and inject the role that needs them.
-We keep research and maintenance details available through paths instead of loading them into each consumer session.
-The dispatch includes missing constraints when a receiver's context is unknown.
-User-only role skills contain the maintained role instructions and reference the single shared source in `skills/shared.md`.
-The hooks combine that source with the selected skill body, so automatic delivery needs no model file retrieval.
-Their descriptions stay outside automatic model context under Claude Code's invocation controls.
+We apply focused context selection through the [shared and role boundaries](design.md#separate-the-audiences).
+Research and maintenance details stay outside consumer context.
+A dispatch must include missing constraints when the receiver's context is unknown.
 
 ## Graph Engineering
 
@@ -163,22 +158,17 @@ The papers provide coordination context but do not prove this prompt resolves th
 ## Writing And Host Contracts
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
-The user chose the stricter convention of one complete sentence per line and no semicolon-linked clauses.
-We preserve code, table, metadata, and quotation syntax while reviewing prose for complete conditions and actions.
+The user chose a stricter sentence-level convention for all documents, including table explanations.
+The [repository writing rules](../AGENTS.md#writing) record that choice and its syntax exceptions.
 
 [Stop Slop](https://github.com/hardikpandya/stop-slop) recommends direct verbs, specific subjects, and removal of formulaic writing.
 We use those principles during editing while retaining explicit requirements and technical conditions.
 Its style preferences do not override host contracts or the user's requested content.
 
-The [Claude Code hooks reference](https://code.claude.com/docs/en/hooks) defines the delivery interface.
-SessionStart and SubagentStart accept context through `hookSpecificOutput.additionalContext`.
-Those hooks do not block session or subagent creation on failure.
-We checked the event definitions and error behavior against the official reference.
-Model behavior remains a separate verification target from JSON delivery.
+We checked the event definitions and error behavior in the [Claude Code hooks reference](https://code.claude.com/docs/en/hooks).
+It defines context delivery for SessionStart and SubagentStart and confirms that failures do not block startup.
+We use that contract for [automatic delivery](design.md#deliver-context).
 
-The [Claude Code skills reference](https://code.claude.com/docs/en/skills) documents `disable-model-invocation: true` and `user-invocable: true`.
-Together they allow user invocation while preventing model invocation and automatic skill preloading.
-The reference also documents `${CLAUDE_PLUGIN_ROOT}` substitution in skill Markdown for shared plugin resources.
-Workgraph keeps each role's instructions in its skill body and uses an explicit read instruction for the shared file.
-The read applies only when the shared instructions are absent from context, including manual use without prior hook delivery.
-Source checks verify metadata and references, but cannot establish successful interactive invocation or model adherence.
+The [Claude Code skills reference](https://code.claude.com/docs/en/skills) documents user-only invocation controls and `${CLAUDE_PLUGIN_ROOT}` substitution in skill Markdown.
+We use those controls and a shared-file reference for [manual invocation](design.md#support-manual-invocation).
+Source and delivery checks cannot establish interactive invocation or model adherence.

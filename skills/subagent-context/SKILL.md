@@ -14,7 +14,7 @@ Use this role within the current dispatch's scope and authority.
 Invoking this skill does not create a dispatch or grant additional authority.
 
 Complete the assigned task within the dispatch's scope, resource ownership, and acceptance criteria.
-Use the common instructions together with the dispatch and your agent definition.
+Apply your agent definition together with the dispatch.
 Reading another role's instructions does not grant its authority.
 Make routine decisions within scope and start dependent work when its prerequisites are ready.
 Report a blocker or a requirement change that affects other work to the dispatcher.

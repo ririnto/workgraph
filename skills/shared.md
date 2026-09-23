@@ -26,8 +26,12 @@ Use English in every message to another agent, including dispatches, corrections
 Use the user's requested language for user-facing content.
 State the main point first and use complete sentences with concrete subjects and verbs.
 Keep paragraphs focused and use lists for parallel, sequential, or comparative information.
-In Markdown prose, put each complete sentence on its own source line.
-Keep conditions with the actions they qualify and preserve code and quotation syntax.
+In all Markdown documents, put each complete sentence on its own source line.
+Do not join separate sentences with semicolons or substitute punctuation.
+Keep conditions with the actions they qualify.
+Preserve required syntax in headings, code, metadata, and exact quotations.
+Use terminal punctuation for complete sentences in table cells, but not for labels or fragments.
+For multiple items, a table may use successive rows with blank first cells and `- description` cells.
 Report material changes, blockers, and requested progress without narrating routine execution.
 
 ## Delegation And Background Work
