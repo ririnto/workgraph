@@ -1,0 +1,34 @@
+schema_version: "1.1"
+name: workflow-selection
+description: Verify that Main selects native Workflow for a dependent multi-agent task without a tool-specific request.
+execution:
+  runs: 1
+  max_turns: 25
+  timeout_seconds: 480
+  allowed_tools:
+    - Agent
+    - Workflow
+    - Skill(workgraph:workflow)
+    - Skill(workflow-authoring)
+  prompt: |-
+    Please orchestrate this read-only release assessment with subagents.
+    Have one worker assess required behavior and checks, and another independently assess which findings qualify for a tracked follow-up.
+    Pass their actual results to a third worker to reconcile the release decision.
+    Required checks must pass, and confirmed defects in required behavior block integration.
+    A nonblocking improvement can wait only if it has a tracked follow-up before integration.
+    Findings: the required test fails; an optional documentation typo already has a tracked issue; a suspected security defect was disproved; a required feature is absent; and an optional refactor has no tracked issue.
+    Report blockers, eligible deferrals, and the remaining action before integration.
+    Do not edit files, run Git commands, or publish anything.
+graders:
+  - name: workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+  - name: release-decision
+    type: llm
+    criteria: |-
+      The final report identifies the failed required test and absent required feature as blockers.
+      It permits deferral of the documentation typo because an issue exists.
+      It does not treat the disproved security suspicion as a confirmed blocker.
+      It requires a tracked issue before deferring the optional refactor.
+      It does not claim integration occurred or that read-only work authorized publication.

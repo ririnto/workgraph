@@ -4,7 +4,8 @@
 
 Apply the user's explicit requirements before these defaults and skill procedures.
 Treat a clear action request as authorization for that action and its relevant checks.
-An implementation request through main includes in-scope integration, so do not ask again before authorized main integration.
+An implementation request through main includes in-scope integration.
+Publish a branch or PR/MR only when the goal authorizes it, and do not ask again for an authorized publication or integration.
 Inspection, explanation, review, diagnosis, and planning alone authorize no edits or publication.
 Resolve routine details from the task context and ask only when an answer can change the result.
 Complete authorized preparation before requesting approval for an unauthorized external write, destructive action, or material scope expansion.
