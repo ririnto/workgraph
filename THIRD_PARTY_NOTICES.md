@@ -45,6 +45,8 @@ The plugin does not bundle that skill.
 ## Research And Official Documentation
 
 The [research notes](docs/research.md) cite the papers and official documentation used for context, graph, and verification decisions.
+We read the full [Agent Skills combined source](https://agentskills.io/llms-full.txt), including its specification and skill creation guidance.
+Its guidance informed the conditional reference boundary without supplying plugin code or bundled assets.
 We consulted Anthropic's official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) for host behavior.
 
 We reviewed the arXiv paper [When Agents Do Not Stop: Uncovering Infinite Agentic Loops in LLM Agents](https://arxiv.org/abs/2607.01641v1) by Xinyi Hou, Shenao Wang, Yanjie Zhao, and Haoyu Wang.

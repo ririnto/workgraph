@@ -26,7 +26,8 @@ We reviewed the user-supplied copies of both documents.
 These recommendations guide instruction design without changing model or API configuration.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
-Each skill embeds the common rules with its role procedures, so a session receives one complete contract without extra file retrieval or a missing-file blocker.
+Each hook-delivered role skill embeds its common rules and role procedures, so a session receives one complete contract without extra file retrieval or a missing-file blocker.
+The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.
 Before graph construction, the main agent defines the intended outcome, exclusions, affected resources, and acceptance evidence.
 Use native Workflow when substantive stages have result dependencies or conditional successors that make graph coordination useful.
 Use host Agent for a single substantive stage, including independent parallel assignments.
@@ -52,7 +53,7 @@ These recommendations support Workgraph's completion and native-callback instruc
 
 The guide recommends removing unnecessary thinking instructions and measuring the effects of older prompt workarounds.
 Workgraph keeps actionable scope, authority, and evidence requirements rather than prescribing reasoning steps.
-Each role skill carries its full contract inline, so automatic or manual loading needs no extra file retrieval.
+Each hook-delivered role skill carries its full contract inline, so automatic or manual role loading needs no extra file retrieval.
 These prompt choices target both GPT-6 Astra and Claude Opus 5.5 without claiming measured improvements on either model.
 
 Effort settings, token limits, response-block parsing, progress-update display, and bounded automatic continuations belong to the host or API integration.
@@ -257,5 +258,9 @@ It defines context delivery for SessionStart and SubagentStart and confirms that
 We use that contract for [automatic delivery](design.md#deliver-context).
 
 The [Claude Code skills reference](https://code.claude.com/docs/en/skills) documents skill invocation controls and `${CLAUDE_PLUGIN_ROOT}` substitution in skill Markdown.
-We use the invocation controls for [manual invocation](design.md#support-manual-invocation), and self-contained skill bodies need no extra file reads for their contracts.
+We use the invocation controls for [manual invocation](design.md#support-manual-invocation), and the hook-delivered role bodies need no extra file reads for their contracts.
+The [Agent Skills specification](https://agentskills.io/specification) defines optional per-skill references and assets.
+The [Agent Skills best practices](https://agentskills.io/skill-creation/best-practices) recommend keeping core guidance inline and naming when to read a focused reference.
+We read the complete [combined Agent Skills source](https://agentskills.io/llms-full.txt) rather than a generated summary.
+A conditional delivery reference can reduce unrelated Workflow context, but no behavioral evaluation yet establishes that it improves model performance.
 Source and delivery checks cannot establish interactive invocation or model adherence.

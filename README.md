@@ -152,8 +152,11 @@ The Workflow skill keeps `user-invocable: true` and remains model-invocable for 
 Its description avoids routing implicit single-stage tasks to Workflow.
 The hooks operate without skill invocation.
 
-Each skill body is self-contained, so manual invocation needs no additional file retrieval.
-The Workflow skill carries the common rules with its own procedures and loads only the host's `workflow-authoring` guidance.
+Both role skill bodies remain self-contained, so automatic delivery and manual role invocation need no additional file retrieval.
+The Workflow skill keeps its core rules inline and loads the host's `workflow-authoring` guidance.
+For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.
+Read-only Workflow goals do not need that reference.
+The plugin includes no output assets or bundled helper scripts because its skills produce neither reusable files nor repeated script logic.
 Invocation does not change the session's role or grant permissions.
 
 ## Hook Errors
