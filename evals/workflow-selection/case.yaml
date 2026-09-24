@@ -17,18 +17,38 @@ execution:
     Required checks must pass, and confirmed defects in required behavior block integration.
     A nonblocking improvement can wait only if it has a tracked follow-up before integration.
     Findings: the required test fails; an optional documentation typo already has a tracked issue; a suspected security defect was disproved; a required feature is absent; and an optional refactor has no tracked issue.
+    The following tracker record is synthetic and covers the optional documentation typo.
+    Evidence: The sample guide says "instalation".
+    Scope: Correct that spelling in the sample guide.
+    Acceptance criteria: The spelling is corrected and Markdown lint passes.
+    Owner: docs-maintainer.
+    Next action: Correct the sample guide and run Markdown lint.
+    Report only after orchestration shows completed results for both assessments and their reconciliation.
     Report blockers, eligible deferrals, and the remaining action before integration.
+    Keep the assessments and reconciliation concise.
     Do not edit files, run Git commands, or publish anything.
 graders:
   - name: workflow-invoked
     type: tool_used
     tool: Workflow
     min: 1
+  - name: dependent-results
+    type: regex
+    target: trace
+    pattern: '"workflow_progress":\[[^\n]*?"type":"workflow_agent","index":1,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null"|")[^\n]+?"type":"workflow_agent","index":2,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null"|")[^\n]+?"type":"workflow_agent","index":3,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null"|")'
   - name: release-decision
     type: llm
+    focus: trace
     criteria: |-
+      Judge the observed trace and final report together.
+      Require progress evidence of both completed assessments and their completed reconciliation.
+      Require the reconciliation to use both assessment results, not an invented report.
+      Do not accept a completion notification or final claims without progress evidence.
       The final report identifies the failed required test and absent required feature as blockers.
-      It permits deferral of the documentation typo because an issue exists.
-      It does not treat the disproved security suspicion as a confirmed blocker.
+      It excludes the disproved security suspicion as a blocker.
       It requires a tracked issue before deferring the optional refactor.
-      It does not claim integration occurred or that read-only work authorized publication.
+      It defers the documentation typo only when the supplied tracker record supports the decision.
+      Require the supplied record to contain evidence, scope, acceptance criteria, a named owner, and a next action.
+      Fail if a record field is absent, even when the report does not defer the typo.
+      Judge the record by meaning rather than fixed wording.
+      The report does not claim integration occurred or that read-only work authorized publication.
