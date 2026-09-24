@@ -25,5 +25,6 @@ graders:
       The session receives a completed native Workflow result with worker outcomes.
       One worker computes the sum and a dependent worker checks it.
       The final report uses their completed results and gives the correct sum of 71.
+      Because the goal is read-only, the session skips branch publication and PR/MR creation.
       A proposed workflow, permission denial, execution error, or report before completion fails this check.
       Judge the observed tool results and evidence, not specific wording.

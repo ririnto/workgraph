@@ -120,10 +120,13 @@ Its abstract argues for explicit coordination as tasks become more interdependen
 A survey's proposed framework does not establish that every task needs several agents or a graph runtime.
 
 Workgraph represents connected, substantive work as a goal-dependent task graph in the current task plan.
+The main session defines or reuses the goal, scope, owners, authority, target branch, and acceptance evidence.
 Each bounded node names its operation, decision, or check, required inputs, expected outputs, owner, authority, and completion evidence.
 Edges identify results or conditions that gate later nodes, not chronology alone.
-The main session starts ready independent nodes in parallel when their writes do not conflict and joins branches only when a later node needs their results.
+The main session starts ready independent nodes in parallel when their writes do not conflict and passes actual results to successors.
 Exploration, planning, implementation, review, and integration are optional node types rather than a fixed itinerary.
+For authorized engineering delivery, branch/PR publication precedes PR-based independent review, and main integration follows required checks and resolution of confirmed blockers.
+Read-only and review-only goals do not acquire publication authority.
 The host retains ownership of task execution and execution state.
 
 [Graph of Thoughts](https://arxiv.org/abs/2308.09687) represents model-generated information as a graph for prompting and refinement.
@@ -215,6 +218,8 @@ Claude Code can cache completed agent results for a resumed run, but the documen
 Workgraph treats Workflow as an explicit host capability, not as a local scheduler or a required path for every task.
 The user-only `/workgraph:workflow` skill invokes native Workflow for a goal selected by the user.
 The main session resolves graph inputs and authority before a run, keeps agent permissions under host control, and revalidates evidence affected by changed inputs.
+For authorized delivery, it publishes the working branch and PR/MR before review, then integrates only after required checks and confirmed blockers are resolved.
+Read-only, research-only, and review-only goals skip new branch and PR/MR publication.
 An explicit Workflow request bypasses subjective task-size screening, while an unavailable tool must be reported without claiming a run.
 
 The official [subagent documentation](https://code.claude.com/docs/en/sub-agents) describes fresh contexts for non-fork subagents, skill loading, permissions, and model routing.

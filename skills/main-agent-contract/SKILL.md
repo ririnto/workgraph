@@ -39,15 +39,26 @@ Handle trivial one-step outcomes directly only when the user has not selected Wo
 Resolve conflicting explicit execution-tool requests before dispatch.
 
 For connected work, record prerequisites, owners, authority, and evidence in the existing plan.
-Send successors the conclusions and completion evidence they need.
+Send successors the actual conclusions and completion evidence they need.
 Join branches only when a later node needs their results.
 Keep valid results when requirements change, and continue unaffected tasks when one branch fails.
-Before main integrates delegated changes, require relevant repository checks to pass and obtain independent review using that repository's method.
-Treat reviewer findings as candidates, and verify each against the requirements, affected code, or executable checks.
-Resolve confirmed blocking findings before integration.
+
+For an authorized engineering-delivery goal, delegate bounded implementation and check outcomes.
+Inspect changed files and required evidence in main before committing and pushing the working branch.
+Create or update a PR/MR targeting the authorized branch, and reuse an existing PR/MR for the goal.
+Treat publication as a review handoff, not as main integration.
+Start independent review only after publication, using the PR/MR and its current changes as input.
+Follow the consumer repository's review method.
+Treat review results as candidate findings and verify each against requirements, source, or executable checks.
+Route confirmed findings to bounded fixes on the same branch, publish the fixes, and review affected changes again.
+Reuse unaffected passing evidence.
+Set a finite review/fix limit and stop sooner when a round makes no progress or a concrete blocker prevents work.
+Integrate only after required checks pass and confirmed review blockers are resolved.
+Respect host and forge protections, then verify the authorized target branch contains the integrated changes.
+Do not ask again for publication or integration that the user already authorized.
+For read-only, research-only, or review-only goals, omit implementation, new branch publication, new PR/MR creation, and integration.
+Use an existing PR/MR as input for review, and do not infer publication authority from an inspection-only request.
 Report findings without supporting evidence as unverified, not as confirmed defects.
-Reuse passing evidence when affected inputs, configuration, and toolchain remain unchanged.
-Set a finite review or fix limit and stop earlier when a round makes no progress.
 Use the host's execution state without inventing a scheduler, executor, or recovery guarantee.
 
 Review the changed files and acceptance evidence before integration.

@@ -64,20 +64,41 @@ These instructions guide agents but do not guarantee model adherence.
 
 ## Goal-Driven Work
 
-Most tasks need only the nodes and checks that serve their goal.
-A typo fix can stay in the main session, while connected work can use a graph of bounded outcomes.
+Use only the nodes and checks that serve the goal.
+Reuse existing facts and plans, and skip exploration or planning when they already answer the relevant questions.
+Keep the goal, scope, owners, authority, integration branch, and acceptance evidence in main.
 
 Request a goal through the Workflow entry point without prescribing an itinerary.
 
 ```text
-/workgraph:workflow Fix the parser failure and integrate the reviewed changes into main.
+/workgraph:workflow Fix the parser's escaped-quote bug, publish a PR for review, and integrate it into main.
 ```
 
 An explicit request to use Workflow in ordinary conversation selects the same tool through the main-agent contract.
+Build dependencies from actual results or conditions, not progress-phase labels.
+Pass predecessor results to successors, run ready independent outcomes in parallel, and serialize conflicting writes.
+Keep planning, design decisions, publication, and integration in main.
 
-A request to implement a goal through main includes authorized, in-scope integration and relevant checks, so the agent must not ask for that approval again.
-An inspection-only or review-only request does not authorize edits.
-Do not require every goal to include exploration, planning, implementation, review, or integration as separate nodes.
+For authorized engineering delivery, delegate bounded implementation and checks.
+Main inspects changed files and evidence, commits and pushes the working branch, then creates or updates a PR/MR targeting the authorized branch.
+Reuse an existing PR/MR for the goal.
+Branch and PR/MR publication requests review and does not integrate changes.
+Start independent review only after publication, using the PR/MR and its current changes as input.
+Use the consumer repository's review method.
+Verify review candidates before routing confirmed blockers to bounded fixes on the same branch.
+Publish fixes and review affected changes again, while reusing unaffected passing evidence.
+Bound review/fix rounds and stop sooner on no progress or a concrete blocker.
+Integrate only after required checks pass and confirmed review blockers are resolved.
+Respect host and forge protections, then verify the target branch update.
+Do not ask again for publication or integration already authorized by the goal.
+
+Read-only, research-only, and review-only goals skip implementation, new branch publication, PR/MR creation, and integration.
+Use an existing PR/MR as the input for reviewing that artifact.
+Inspection-only requests do not grant publication authority.
+
+In the example goal, a parser-fix node and a separate regression-test node can start in parallel from the known reproduction and agreed behavior.
+Their results gate parser checks, passing checks gate branch publication and PR creation, and the published PR's current changes gate independent review.
+Confirmed blockers gate same-branch fixes, while resolved blockers and passing checks gate main integration.
 
 Claude Code supports dynamically composed workflows and reusable plugin Workflow scripts.
 Workflow availability depends on the host version, plan, and configuration.
@@ -85,7 +106,7 @@ The host controls Workflow launch and agent permission prompts.
 By default, the host discovers reusable scripts from the plugin-root `workflows/` directory and exposes included scripts under namespaced commands.
 Workgraph ships no reusable Workflow scripts.
 The user-only `/workgraph:workflow` skill loads the `workflow-authoring` guidance and calls native Workflow with a goal-specific graph.
-The skill does not define a fixed itinerary or replace main-session planning and integration.
+The skill does not define a fixed itinerary or replace main-session planning, publication, or integration.
 Workflow scripts cannot request design input midway through a run, but the host still enforces its agent permissions.
 A resumed workflow may reuse saved agent results, which do not prove that source files or check inputs remain unchanged.
 

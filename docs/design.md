@@ -50,17 +50,19 @@ Dispatch prompts must carry the constraints needed by a receiver whose context i
 
 ## Compose Work Through The Host
 
-Workgraph keeps dynamic task-graph planning in the main session.
-Each node describes a bounded operation, decision, or check with inputs, outputs, owner, authority, and completion evidence.
-Edges describe results or conditions that gate later nodes, not execution order alone.
-The main session starts ready independent work in parallel, serializes conflicting writes, and joins branches only when a later node needs their results.
-It chooses useful node types for the goal rather than requiring an exploration-to-integration sequence.
+Workgraph keeps goal definition, scope, authority, acceptance evidence, and dynamic graph planning in the main session.
+Reuse existing facts and plans, and skip exploration or planning nodes when those facts already answer the goal.
+Each node describes a bounded operation, decision, or check with required inputs, expected outputs, owner, authority, and completion evidence.
+Edges identify results or conditions that gate later nodes, not execution order alone.
+The main session starts ready independent nodes in parallel, serializes conflicting writes, and joins branches only when a later node needs their results.
+Pass actual predecessor results and evidence to successor nodes.
+Choose useful node types for the goal rather than requiring an exploration-to-integration sequence.
 Workgraph defines no scheduler, executor, or shared task store.
 
 Claude Code can execute dynamically composed Workflow scripts and, by default, discovers reusable plugin scripts from the plugin-root `workflows/` directory.
 The host exposes included scripts as namespaced slash commands, but Workgraph ships no reusable Workflow scripts.
 The user-only `/workgraph:workflow` skill loads workflow-authoring guidance and invokes native Workflow with a goal-specific graph.
-The main agent keeps task planning and authorized integration in the main session.
+The main agent keeps planning, design decisions, publication, and integration in the main session.
 Without an explicit Workflow request, Agent remains the default and task complexity alone does not opt into Workflow.
 When the user explicitly selects Workflow, the main agent uses it if the host supports it without a subjective graph-size or overhead threshold.
 If the selected tool is unavailable, the main agent reports that it did not run instead of silently substituting Agent.
@@ -68,7 +70,25 @@ The host can still request agent tool permissions during a Workflow run, but the
 The main session must resolve required scope and authority before launching the run.
 An agent prompt cannot grant tool permissions or enlarge the user's authorization.
 
-A Workflow pipeline can run each item's dependent stages without a global barrier.
+### Publish, Review, And Integrate
+
+For authorized engineering delivery, delegate implementation and checks, then inspect returned files and evidence in main.
+Commit and push the working branch before creating or updating a PR/MR that targets the authorized branch.
+Reuse an existing PR/MR for the goal.
+Treat branch and PR/MR publication as a review handoff, not as main integration.
+Start independent review only after publication, and provide the PR/MR with its current changes as input.
+Use the consumer repository's review method.
+Verify candidate findings before sending confirmed blockers to bounded fixes on the same branch.
+Publish fixes and review affected changes again, while reusing unaffected passing evidence.
+Bound review/fix rounds and stop sooner when a round makes no progress or a concrete blocker prevents work.
+Integrate only after required checks pass and confirmed review blockers are resolved.
+Respect host and forge protections, then verify the authorized target branch update.
+
+Read-only, research-only, and review-only goals omit implementation, new branch publication, PR/MR creation, and integration.
+Review an existing PR/MR from that artifact and its current changes.
+Do not infer publication authority from an inspection-only request.
+
+A Workflow pipeline can run dependent nodes without a global barrier.
 Its agents may return `null` or fail, and the main session must report missing results as incomplete instead of treating them as an all-clear.
 When the host resumes a Workflow, it may replay saved agent results.
 That result cache does not prove that source files, repository state, or check inputs remain unchanged.
