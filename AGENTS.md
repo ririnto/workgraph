@@ -74,6 +74,11 @@ After plugin configuration changes, run `claude plugin validate ./` and `claude 
 For injected prose, also run the hook tests and inspect both emitted contexts.
 Confirm each contains common rules and one role, without repository guidance.
 
+For Workflow invocation changes, run `claude plugin eval ./ --case workflow-invocation --runs 1 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
+This behavioral check uses real agents and requires a host with Workflow enabled.
+Keep evaluation reports local and outside the repository with `--output-dir`.
+Inspect tool results because an attempted invocation alone does not prove successful execution.
+
 Review sentence completeness, line boundaries, and conditions.
 Report model adherence as unverified unless a behavioral evaluation supplies evidence.
 Reuse passing checks for unchanged inputs, configuration, and toolchain.

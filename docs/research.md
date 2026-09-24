@@ -25,12 +25,14 @@ These recommendations guide instruction design without changing model or API con
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
 Before graph construction, the main agent defines the intended outcome, exclusions, affected resources, and acceptance evidence.
-For each ready, bounded, substantial exploration, research, implementation, review, or check outcome, it uses host Agent by default.
-It uses native Workflow instead only when the user authorizes orchestration, the host supports it, and graph dependencies justify scripted coordination.
-When Workflow cannot run, the main agent uses Agent when available before handling delegated work directly.
+For each ready, bounded, substantial exploration, research, implementation, review, or check outcome, it uses host Agent by default unless the user explicitly selects Workflow or requests no delegation.
+An explicit Workflow selection takes precedence over a subjective graph-size or overhead judgment when the host supports the tool.
+Without explicit Workflow selection, task complexity alone does not opt into Workflow.
+If explicitly selected Workflow is unavailable, the main agent reports that it did not run instead of silently substituting Agent.
 It requires independent review before main integration.
 An active dispatch does not authorize direct handling of another ready, substantial outcome.
-The contract reserves direct work for main-owned planning, design, integration, and final reporting, trivial one-step outcomes, explicit no-delegation requests, or cases where no delegation tool is usable.
+The contract reserves direct work for main-owned planning, design, integration, and final reporting, trivial one-step outcomes when Workflow is not selected, explicit no-delegation requests, or cases where no delegation tool is usable.
+Conflicting explicit execution-tool requests require resolution before dispatch.
 It sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
@@ -211,7 +213,9 @@ The papers provide coordination context but do not prove this prompt resolves th
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) describes plugin-root workflow discovery, namespaced commands, host permissions, the lack of mid-run user input, and session resume.
 Claude Code can cache completed agent results for a resumed run, but the documentation does not promise that source files or check inputs stayed unchanged.
 Workgraph treats Workflow as an explicit host capability, not as a local scheduler or a required path for every task.
-Its instructions require the main session to resolve graph inputs and authority before a run, keep agent permissions under host control, and revalidate evidence affected by changed inputs.
+The user-only `/workgraph:workflow` skill invokes native Workflow for a goal selected by the user.
+The main session resolves graph inputs and authority before a run, keeps agent permissions under host control, and revalidates evidence affected by changed inputs.
+An explicit Workflow request bypasses subjective task-size screening, while an unavailable tool must be reported without claiming a run.
 
 The official [subagent documentation](https://code.claude.com/docs/en/sub-agents) describes fresh contexts for non-fork subagents, skill loading, permissions, and model routing.
 A dispatch must carry the scope and evidence needed by a worker whose context is fresh.

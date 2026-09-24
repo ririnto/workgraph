@@ -11,7 +11,8 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | `skills/shared.md` | Both agent roles | Agents follow shared authority, communication, delegation, background work, and evidence requirements. |
 | `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow planning, dispatch, integration, and reporting procedures. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow assignment scope, permitted operations, and result delivery requirements. |
-| Claude Code Workflow tool | Main session | The host runs an explicitly authorized workflow when task dependencies justify scripted coordination. |
+| `skills/workflow/SKILL.md` | Main session | The user-only skill invokes native Workflow for an explicitly selected goal. |
+| Claude Code Workflow tool | Main session | The host runs an explicitly selected workflow while enforcing its permissions. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
 | `THIRD_PARTY_NOTICES.md` | Distributors | Distributors retain third-party attribution. |
 
@@ -57,9 +58,12 @@ It chooses useful node types for the goal rather than requiring an exploration-t
 Workgraph defines no scheduler, executor, or shared task store.
 
 Claude Code can execute dynamically composed Workflow scripts and, by default, discovers reusable plugin scripts from the plugin-root `workflows/` directory.
-The host exposes included scripts as namespaced slash commands, but Workgraph currently ships no predefined Workflow command.
-A future reusable subgraph remains an optional capability and does not replace goal-specific graph planning.
-The main agent uses Workflow only when the user authorizes orchestration, the host supports it, and the dependency structure justifies scripted coordination.
+The host exposes included scripts as namespaced slash commands, but Workgraph ships no reusable Workflow scripts.
+The user-only `/workgraph:workflow` skill loads workflow-authoring guidance and invokes native Workflow with a goal-specific graph.
+The main agent keeps task planning and authorized integration in the main session.
+Without an explicit Workflow request, Agent remains the default and task complexity alone does not opt into Workflow.
+When the user explicitly selects Workflow, the main agent uses it if the host supports it without a subjective graph-size or overhead threshold.
+If the selected tool is unavailable, the main agent reports that it did not run instead of silently substituting Agent.
 The host can still request agent tool permissions during a Workflow run, but the script cannot ask the user for design input between steps.
 The main session must resolve required scope and authority before launching the run.
 An agent prompt cannot grant tool permissions or enlarge the user's authorization.
@@ -76,13 +80,13 @@ The host controls these mechanics, while Workgraph retains task decomposition an
 
 ## Support Manual Invocation
 
-Each role's skill body contains its procedures and a link to `${CLAUDE_PLUGIN_ROOT}/skills/shared.md`.
-Claude Code substitutes the plugin's installation path in skill Markdown.
-The role directs the agent to read that file when the shared instructions are absent from context.
-An unavailable or empty shared file requires a blocker report rather than an incomplete contract.
+Each role skill links to `${CLAUDE_PLUGIN_ROOT}/skills/shared.md` and directs the agent to read it when the shared instructions are absent from context.
+The Workflow skill uses the shared instructions and main-agent contract from SessionStart without requesting duplicate file reads.
+Claude Code substitutes the plugin's installation path in role-reload skill Markdown.
+An unavailable or empty shared file blocks role reloading rather than producing an incomplete contract.
 
 The [user-only invocation settings](../README.md#user-only-skills) control skill loading, not role ownership or permissions.
-Automatic hooks read the same sources without invoking the skills or relying on model file retrieval.
+Automatic hooks read the shared and role sources without invoking the skills or relying on model file retrieval.
 Keep one injector and one hook configuration without replaced routes, aliases, or fallback implementations.
 
 ## Verify Delivery And Behavior

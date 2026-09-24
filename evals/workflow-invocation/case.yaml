@@ -1,0 +1,29 @@
+schema_version: "1.1"
+name: workflow-invocation
+description: Verify that an explicit Workflow request produces a completed native run.
+execution:
+  runs: 1
+  max_turns: 20
+  timeout_seconds: 240
+  allowed_tools:
+    - Workflow
+    - Skill(workflow-authoring)
+  prompt: |-
+    /workgraph:workflow Verify a calculation without editing files or running Git commands.
+    Have one worker add 17, 23, and 31.
+    Pass the result and original numbers to a second worker for an independent check.
+    Use no more than these two workers.
+    Report the checked sum after the Workflow finishes.
+graders:
+  - name: workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+  - name: workflow-completed
+    type: llm
+    criteria: |-
+      The session receives a completed native Workflow result with worker outcomes.
+      One worker computes the sum and a dependent worker checks it.
+      The final report uses their completed results and gives the correct sum of 71.
+      A proposed workflow, permission denial, execution error, or report before completion fails this check.
+      Judge the observed tool results and evidence, not specific wording.

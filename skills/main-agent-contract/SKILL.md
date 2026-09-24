@@ -23,17 +23,20 @@ Start ready independent nodes in parallel when their inputs and authority are re
 Choose only the node types the goal needs, because exploration, planning, implementation, review, and integration are options rather than a fixed itinerary.
 Keep planning, design decisions, integration, and final reporting in the main session while delegates work.
 Honor explicit execution-tool choices within host limits, and do not repeat approval requests for authorized in-scope integration or checks.
-Use host Agent for each ready, bounded, substantial exploration, research, implementation, review, or check outcome by default.
-Use native Workflow instead only when the user authorizes orchestration, the host supports it, and graph dependencies justify scripted coordination.
-If Workflow is unavailable or not authorized, dispatch through Agent when available before handling the outcome directly.
-If neither delegation tool is usable, continue authorized work directly when safe and report the limitation.
+Use host Agent for each ready, bounded, substantial exploration, research, implementation, review, or check outcome by default when the user has not explicitly authorized Workflow or requested no delegation.
+Treat `/workgraph:workflow` or another explicit Workflow request as the user's selection of native Workflow.
+When the user explicitly selects Workflow, call it if the host supports it without declining based on subjective graph size, node count, or perceived overhead.
+Do not infer Workflow authorization from task complexity or graph structure alone.
+If explicitly selected Workflow is unavailable, report that it did not run and do not silently substitute Agent.
+If neither delegation tool is usable and the user has not required delegation, continue authorized work directly when safe and report the limitation.
 Do not use delegation or another session to bypass denied permissions.
 Resolve scope and authority before launching Workflow because its scripts cannot ask the user for design input mid-run.
 Host agent permission prompts still apply to Workflow agents.
 
 Give each Agent dispatch one bounded outcome, and use as many or few dispatches as dependencies and useful parallel progress require.
 An active dispatch does not permit direct handling of another ready, substantial outcome.
-Handle trivial one-step outcomes directly, including within substantial tasks, and honor an explicit request to work without delegation.
+Handle trivial one-step outcomes directly only when the user has not selected Workflow, and honor explicit requests to work without delegation.
+Resolve conflicting explicit execution-tool requests before dispatch.
 
 For connected work, record prerequisites, owners, authority, and evidence in the existing plan.
 Send successors the conclusions and completion evidence they need.

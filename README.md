@@ -50,10 +50,13 @@ Exploration, planning, implementation, review, and integration are possible node
 Workers complete bounded assignments within their authority.
 Before main integrates delegated changes, it requires relevant repository checks to pass and obtains independent review using that repository's method.
 The instructions also cover model routing, evidence reuse, bounded feedback loops, English handoffs, and native completion notifications.
-The main agent delegates each ready, bounded, substantial exploration, research, implementation, review, or check outcome through host Agent by default.
-It uses native Workflow instead only when the user authorizes orchestration, the host supports it, and graph dependencies justify scripted coordination.
-If Workflow cannot run, the main agent uses Agent when available before handling delegated work directly.
-Direct main work is limited to planning, design, integration, final reporting, trivial outcomes, explicit no-delegation requests, or cases where neither delegation tool is usable.
+The main agent delegates each ready, bounded, substantial exploration, research, implementation, review, or check outcome through host Agent by default when the user has neither selected Workflow nor explicitly requested no delegation.
+An explicit request for Workflow takes precedence over that default, and the main agent calls it when the host supports it without a subjective graph-size, node-count, or overhead test.
+Without an explicit Workflow request, task complexity alone does not opt into Workflow.
+If explicitly selected Workflow is unavailable, the main agent reports that it did not run and does not silently substitute Agent.
+Direct main work is limited to planning, design, integration, final reporting, trivial outcomes when Workflow is not selected, explicit no-delegation requests, or cases where neither delegation tool is usable.
+An explicit Workflow request overrides the trivial-outcome shortcut but does not expand the user's authority.
+Resolve conflicting explicit execution-tool requests before dispatch.
 
 Read the [shared instructions](skills/shared.md) for rules that apply to both roles.
 The role files in the table contain their work procedures.
@@ -64,43 +67,44 @@ These instructions guide agents but do not guarantee model adherence.
 Most tasks need only the nodes and checks that serve their goal.
 A typo fix can stay in the main session, while connected work can use a graph of bounded outcomes.
 
-A natural request can describe the goal without prescribing an itinerary.
+Request a goal through the Workflow entry point without prescribing an itinerary.
 
 ```text
-Implement the parser failure fix through main.
-Build a task graph from actual result dependencies.
-Give each node clear inputs, outputs, owner, authority, and completion evidence.
-Start ready independent work in parallel and serialize conflicting writes.
-Use the consumer repository's checks and review method before main integration.
-Use Workflow to coordinate the bounded outcomes in this goal.
+/workgraph:workflow Fix the parser failure and integrate the reviewed changes into main.
 ```
+
+An explicit request to use Workflow in ordinary conversation selects the same tool through the main-agent contract.
 
 A request to implement a goal through main includes authorized, in-scope integration and relevant checks, so the agent must not ask for that approval again.
 An inspection-only or review-only request does not authorize edits.
 Do not require every goal to include exploration, planning, implementation, review, or integration as separate nodes.
 
-Claude Code supports dynamic workflows and reusable plugin workflow scripts.
-Workflow availability depends on the host version, plan, and configuration, and its use requires opt-in.
-The host controls launch and agent permission prompts.
-By default, the host discovers plugin scripts from the plugin-root `workflows/` directory and exposes included scripts under namespaced commands.
-Workgraph currently ships no predefined workflow command.
-A future Workgraph subgraph remains optional and complements goal-specific graph composition.
+Claude Code supports dynamically composed workflows and reusable plugin Workflow scripts.
+Workflow availability depends on the host version, plan, and configuration.
+The host controls Workflow launch and agent permission prompts.
+By default, the host discovers reusable scripts from the plugin-root `workflows/` directory and exposes included scripts under namespaced commands.
+Workgraph ships no reusable Workflow scripts.
+The user-only `/workgraph:workflow` skill loads the `workflow-authoring` guidance and calls native Workflow with a goal-specific graph.
+The skill does not define a fixed itinerary or replace main-session planning and integration.
 Workflow scripts cannot request design input midway through a run, but the host still enforces its agent permissions.
 A resumed workflow may reuse saved agent results, which do not prove that source files or check inputs remain unchanged.
 
 ## User-Only Skills
 
-Invoke a role skill to reload its instructions.
+Invoke a user-only skill to load its instructions or explicitly select Workflow.
 
 - Use `/workgraph:main-agent-contract` for the main session.
 - Use `/workgraph:subagent-context` for a dispatched agent.
+- Use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
 
-Both skills set `disable-model-invocation: true` and `user-invocable: true`.
+All three skills set `disable-model-invocation: true` and `user-invocable: true`.
 Claude Code exposes them to users and prevents model invocation or automatic skill preloading.
 The hooks operate without skill invocation.
 
-Each skill references the shared instructions and directs the agent to read them if they are absent from context.
-If that file is unavailable or empty, report the blocker instead of applying an incomplete contract.
+The role-reload skills reference the shared instructions and direct the agent to read them if they are absent from context.
+The Workflow skill uses the shared instructions and main-agent contract already delivered by SessionStart.
+It loads the host's `workflow-authoring` guidance without rereading Workgraph's contracts.
+If a role-reload skill cannot load required shared instructions, report the blocker instead of applying an incomplete contract.
 Invocation does not change the session's role or grant permissions.
 
 ## Hook Errors
