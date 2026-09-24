@@ -8,18 +8,16 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | --- | --- | --- |
 | `AGENTS.md` | Contributors | Contributors follow repository conventions, validation, and publication requirements. |
 | `README.md` | Plugin users | Users find installation instructions, hook behavior, manual invocation, and errors here. |
-| `skills/shared.md` | Both agent roles | Agents follow shared authority, communication, delegation, background work, and evidence requirements. |
-| `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow planning, dispatch, integration, and reporting procedures. |
-| `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow assignment scope, permitted operations, and result delivery requirements. |
-| `skills/workflow/SKILL.md` | Main session | The user-invocable skill invokes native Workflow for explicit requests or graph-suitable work. |
+| `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow the common rules and the planning, dispatch, integration, and reporting procedures in one self-contained body. |
+| `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow the common rules and the assignment scope, permitted operations, and result delivery requirements in one self-contained body. |
+| `skills/workflow/SKILL.md` | Main session | The user-invocable skill carries the common rules and invokes native Workflow for explicit requests or graph-suitable work. |
 | Claude Code Workflow tool | Main session | The host runs the selected workflow while enforcing its permissions. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
 | `THIRD_PARTY_NOTICES.md` | Distributors | Distributors retain third-party attribution. |
 
 Keep each rule in the source responsible for its audience.
 Use links for supporting explanations instead of copying procedures across documents.
-The two role skills each reference the shared file so users can invoke either skill without prior hook delivery.
-Keep that loading instruction in both roles because the host can load them separately.
+Each skill embeds the common rules with its role procedures, so users can invoke any skill without prior hook delivery or extra file retrieval.
 Consumers can follow their instructions without reading repository conventions or research history.
 
 Keep host mechanics in the host's tool descriptions.
@@ -36,10 +34,10 @@ The script accepts one argument, `SessionStart` or `SubagentStart`.
 It selects the corresponding role shown in the [README](../README.md#automatic-instructions).
 It removes the leading skill frontmatter block between standalone `---` lines without interpreting YAML values.
 It accepts LF and CRLF line endings and preserves separators inside the body.
-It trims the shared instructions and role body and joins them with one blank line.
+It trims the selected role body and emits it alone.
 It emits one JSON object containing `hookSpecificOutput.additionalContext` and the matching `hookEventName`.
 
-The script reads all required files before producing stdout.
+The script reads the selected instruction file before producing stdout.
 On a file or frontmatter error, it identifies the failing file without emitting partial instructions.
 The [README](../README.md#hook-errors) lists exit codes and the effect on startup.
 This context-loading hook cannot enforce permissions.
@@ -65,13 +63,13 @@ Workgraph defines no scheduler, executor, or shared task store.
 
 Claude Code can execute dynamically composed Workflow scripts and, by default, discovers reusable plugin scripts from the plugin-root `workflows/` directory.
 The host exposes included scripts as namespaced slash commands, but Workgraph ships no reusable Workflow scripts.
-The user-invocable `/workgraph:workflow` skill loads workflow-authoring guidance and invokes native Workflow for explicit Workflow requests or graph-suitable work.
-Its description avoids routing simple bounded tasks to Workflow.
+The user-invocable `/workgraph:workflow` skill loads workflow-authoring guidance and invokes native Workflow for explicit requests or dependent multi-stage work.
+Its description avoids routing implicit single-stage work to Workflow.
 The main agent keeps planning, design decisions, publication, and integration in the main session.
 The host requires user opt-in to multi-agent orchestration before native Workflow can run.
-Within that authorization, Main selects Workflow when actual dependencies or useful independent parallel work make graph coordination more appropriate, without a separate tool-specific request.
-Use Agent for bounded, substantial outcomes when graph coordination adds no value.
-Honor explicit Workflow selection whenever the host supports it, without a subjective graph-size or overhead test.
+Within that authorization, Main selects Workflow for substantive stages connected by results or conditions, without a separate tool-specific request.
+Use Agent for a single substantive stage, including independent parallel assignments, instead of inventing display-only phases.
+Honor explicit Workflow selection whenever the host supports it, even for one stage.
 If explicit selection is unavailable, report that Workflow did not run and do not silently substitute Agent.
 If an implicit selection is unavailable, report the limitation and use Agent for bounded outcomes only when safe.
 The host can still request agent tool permissions during a Workflow run, but the script cannot ask the user for design input between steps.
@@ -111,7 +109,9 @@ Do not infer publication authority from an inspection-only request.
 
 A Workflow pipeline can run dependent nodes without a global barrier.
 Its agents may return `null` or fail, and the main session must report missing results as incomplete instead of treating them as an all-clear.
-When the host resumes a Workflow, it may replay saved agent results.
+For dependent follow-up work, append a substantive phase to the saved script and resume it after the prior run exits.
+Keep earlier prompts, cache-keyed options, and call order unchanged to replay valid completed results.
+Editing an earlier prompt reruns that call and subsequent calls, while changing only display phase labels does not create a dependency or invalidate the cache.
 That result cache does not prove that source files, repository state, or check inputs remain unchanged.
 Reuse check evidence only while the relevant files, inputs, configuration, and toolchain remain the same.
 
@@ -121,24 +121,22 @@ The host controls these mechanics, while Workgraph retains task decomposition an
 
 ## Support Manual Invocation
 
-Each role skill links to `${CLAUDE_PLUGIN_ROOT}/skills/shared.md` and directs the agent to read it when the shared instructions are absent from context.
-The Workflow skill uses the shared instructions and main-agent contract from SessionStart without requesting duplicate file reads.
-Claude Code substitutes the plugin's installation path in role-reload skill Markdown.
-An unavailable or empty shared file blocks role reloading rather than producing an incomplete contract.
+Each skill body is self-contained: the common rules and the role procedures live in the same file.
+Manual invocation therefore needs no additional file retrieval and no substituted plugin paths.
 
 The [skill invocation settings](../README.md#skill-invocation) control skill loading, not role ownership or permissions.
-Automatic hooks read the shared and role sources without invoking the skills or relying on model file retrieval.
+Automatic hooks read the selected role source without invoking the skills or relying on model file retrieval.
 Keep one injector and one hook configuration without replaced routes, aliases, or fallback implementations.
 
 ## Verify Delivery And Behavior
 
 `hooks/inject-context.test.mjs` uses Node's test runner and child processes to check the real command.
-It compares each emitted context with the shared file and selected role body, excluding frontmatter and unrelated files.
+It compares each emitted context with the selected role body, excluding frontmatter and unrelated files.
 It covers invalid arguments, file errors, missing or unclosed frontmatter, and empty skill bodies.
 It executes the registered shell commands from a path with spaces and an unrelated working directory.
 Each test removes its disposable plugin copies.
 
-The tests also check skill names, descriptions, user-only metadata, and manual-use references to the shared file.
+The tests also check skill names, descriptions, and user-only metadata.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
 Plugin validation checks configuration rather than model behavior.
 Use the validation commands and prose review requirements in [AGENTS.md](../AGENTS.md#validation).

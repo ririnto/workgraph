@@ -47,26 +47,26 @@ const copyPlugin = (t) => {
 };
 
 for (const [event, name, description] of roles) {
-  test(`${event}: injects shared instructions and only the selected skill body`, () => {
+  test(`${event}: injects only the selected self-contained skill body`, () => {
     const result = runHook([event]);
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stderr, "");
     assert.deepEqual(JSON.parse(result.stdout), {
       hookSpecificOutput: {
-        additionalContext: [
-          readFileSync(new URL("shared.md", skills), "utf-8").trim(),
-          readFileSync(new URL(`${name}/SKILL.md`, skills), "utf-8")
-            .split(/^---$/mu)
-            .slice(2)
-            .join("---")
-            .trim()
-        ].join("\n\n"),
+        additionalContext: readFileSync(
+          new URL(`${name}/SKILL.md`, skills),
+          "utf-8"
+        )
+          .split(/^---$/mu)
+          .slice(2)
+          .join("---")
+          .trim(),
         hookEventName: event
       }
     });
   });
 
-  test(`${name}: user-only skill includes its role and references the shared source`, () => {
+  test(`${name}: user-only skill contains a self-contained role`, () => {
     const [prefix, frontmatter, body] = readFileSync(
       new URL(`${name}/SKILL.md`, skills),
       "utf-8"
@@ -78,19 +78,13 @@ for (const [event, name, description] of roles) {
       "disable-model-invocation: true",
       "user-invocable: true"
     ]);
-    assert.deepEqual(
-      [
-        ...body.matchAll(/\]\(\$\{CLAUDE_PLUGIN_ROOT\}\/(?<path>[^)]*)\)/gu)
-      ].map((match) => match.groups.path),
-      ["skills/shared.md"]
-    );
-    assert.ok(readFileSync(new URL("shared.md", skills), "utf-8").trim());
+    assert.ok(body.trim());
     assert.match(body, /^# Workgraph (?:Main Agent|Worker)$/mu);
     assert.match(body, /Invoking this skill does not/u);
   });
 }
 
-test("configured hooks load relocated skills without filtering sources or agent types", (t) => {
+test("configured hooks load relocated role skills without filtering agent types", (t) => {
   const root = copyPlugin(t);
   const config = JSON.parse(
     readFileSync(new URL("hooks.json", import.meta.url), "utf-8")
@@ -99,8 +93,6 @@ test("configured hooks load relocated skills without filtering sources or agent 
     "SessionStart",
     "SubagentStart"
   ]);
-  const shared = "# Shared instructions\n\nUse the relocated shared rules.";
-  writeFileSync(path.join(root, "skills", "shared.md"), shared);
   for (const [event, name] of roles) {
     assert.equal(config.hooks[event].length, 1);
     const [entry] = config.hooks[event];
@@ -128,7 +120,7 @@ test("configured hooks load relocated skills without filtering sources or agent 
       assert.equal(result.stderr, "");
       assert.deepEqual(JSON.parse(result.stdout), {
         hookSpecificOutput: {
-          additionalContext: `${shared}\n\n${selected.replaceAll("\n", newline)}`,
+          additionalContext: selected.replaceAll("\n", newline),
           hookEventName: event
         }
       });
@@ -146,29 +138,28 @@ test("invalid arguments produce no context", () => {
 });
 
 for (const [event, name] of roles) {
-  for (const file of ["shared.md", `${name}/SKILL.md`]) {
-    test(`${event} ${file}: missing, empty, or unreadable instructions produce no partial output`, (t) => {
-      const root = copyPlugin(t);
-      const target = path.join(root, "skills", file);
-      const copiedScript = path.join(root, "hooks", "inject-context.mjs");
-      rmSync(target);
-      const missing = runHook([event], copiedScript);
-      assert.equal(missing.status, 1);
-      assert.equal(missing.stdout, "");
-      assert.ok(missing.stderr.includes(file));
-      writeFileSync(target, " \n\t\n");
-      const empty = runHook([event], copiedScript);
-      assert.equal(empty.status, 1);
-      assert.equal(empty.stdout, "");
-      assert.ok(empty.stderr.includes(file));
-      rmSync(target);
-      mkdirSync(target);
-      const unreadable = runHook([event], copiedScript);
-      assert.equal(unreadable.status, 1);
-      assert.equal(unreadable.stdout, "");
-      assert.ok(unreadable.stderr.includes(file));
-    });
-  }
+  const file = `${name}/SKILL.md`;
+  test(`${event} ${file}: missing, empty, or unreadable instructions produce no partial output`, (t) => {
+    const root = copyPlugin(t);
+    const target = path.join(root, "skills", file);
+    const copiedScript = path.join(root, "hooks", "inject-context.mjs");
+    rmSync(target);
+    const missing = runHook([event], copiedScript);
+    assert.equal(missing.status, 1);
+    assert.equal(missing.stdout, "");
+    assert.ok(missing.stderr.includes(file));
+    writeFileSync(target, " \n\t\n");
+    const empty = runHook([event], copiedScript);
+    assert.equal(empty.status, 1);
+    assert.equal(empty.stdout, "");
+    assert.ok(empty.stderr.includes(file));
+    rmSync(target);
+    mkdirSync(target);
+    const unreadable = runHook([event], copiedScript);
+    assert.equal(unreadable.status, 1);
+    assert.equal(unreadable.stdout, "");
+    assert.ok(unreadable.stderr.includes(file));
+  });
 
   test(`${name}: missing frontmatter, unclosed frontmatter, or empty prose produces no partial output`, (t) => {
     const root = copyPlugin(t);

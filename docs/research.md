@@ -17,18 +17,21 @@ See [the design](design.md) for delivery mechanics and [third-party notices](../
 [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) recommends action within the user's scope.
 It calls for explicit completion criteria, clear instruction priority, and checks proportional to the change.
 It also recommends concise writing and delegation rules that match the host.
+It warns that unclear or conflicting guidance in skills and files such as `AGENTS.md` can pause work, and recommends auditing every loaded instruction source.
 
 [Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md) recommends short activation descriptions and progressive disclosure.
 It warns against fixed itineraries, redundant repository maps, and approval rules that block authorized work.
+It recommends contextual pointers to documents instead of required reads before each edit, and notes that repository skills guide agents on different models.
 We reviewed the user-supplied copies of both documents.
 These recommendations guide instruction design without changing model or API configuration.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
+Each skill embeds the common rules with its role procedures, so a session receives one complete contract without extra file retrieval or a missing-file blocker.
 Before graph construction, the main agent defines the intended outcome, exclusions, affected resources, and acceptance evidence.
-Use native Workflow when actual dependencies or useful independent parallel work make graph coordination more appropriate than direct work or Agent.
-Use host Agent for bounded, substantial outcomes when graph coordination adds no value.
-Honor explicit Workflow selection whenever the host supports it, without a subjective graph-size or overhead judgment.
-Do not choose Workflow from task size alone when no useful dependency or parallel work exists.
+Use native Workflow when substantive stages have result dependencies or conditional successors that make graph coordination useful.
+Use host Agent for a single substantive stage, including independent parallel assignments.
+Do not add display-only phases to justify Workflow selection.
+Honor explicit Workflow selection whenever the host supports it, even for one stage.
 If explicit Workflow selection is unavailable, report that it did not run instead of silently substituting Agent.
 If an implicit Workflow selection is unavailable, report the limitation and use Agent for bounded outcomes only when safe.
 For authorized delivery, one full independent review follows PR publication, and only verified blockers require code changes before integration.
@@ -49,7 +52,7 @@ These recommendations support Workgraph's completion and native-callback instruc
 
 The guide recommends removing unnecessary thinking instructions and measuring the effects of older prompt workarounds.
 Workgraph keeps actionable scope, authority, and evidence requirements rather than prescribing reasoning steps.
-Repository guidance retains local conventions and conditional references instead of repeating the consumer contract or requiring extra skill loading.
+Each role skill carries its full contract inline, so automatic or manual loading needs no extra file retrieval.
 These prompt choices target both GPT-6 Astra and Claude Opus 5.5 without claiming measured improvements on either model.
 
 Effort settings, token limits, response-block parsing, progress-update display, and bounded automatic continuations belong to the host or API integration.
@@ -78,7 +81,7 @@ Native completion notifications do not ensure that a model stops waiting, resume
 Reading an edit target does not ensure that an agent reads related code and constraints.
 
 The host enforces skill invocation metadata and implements context delivery.
-Following a shared-file reference, reporting a missing file, and applying injected instructions remain model behavior.
+Applying injected instructions remains model behavior.
 This comparison does not establish model adherence or performance gains.
 
 ### Repository Context Studies
@@ -110,7 +113,7 @@ The work motivates attention to context selection, but it does not measure curre
 It describes separating detailed subagent work from the lead agent's synthesis.
 This is product engineering guidance rather than a controlled evaluation of Workgraph.
 
-We apply focused context selection through the [shared and role boundaries](design.md#separate-the-audiences).
+We apply focused context selection through the [role and audience boundaries](design.md#separate-the-audiences).
 Research and maintenance details stay outside consumer context.
 A dispatch must include missing constraints when the receiver's context is unknown.
 
@@ -225,10 +228,12 @@ The papers provide coordination context but do not prove this prompt resolves th
 ### Claude Code Workflow And Subagent Contracts
 
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) describes plugin-root workflow discovery, namespaced commands, host permissions, the lack of mid-run user input, and session resume.
-Claude Code can cache completed agent results for a resumed run, but the documentation does not promise that source files or check inputs stayed unchanged.
+Claude Code can replay completed agent calls when a saved script resumes with unchanged prompts and cache-keyed options.
+Changing an earlier prompt reruns that agent and subsequent calls, so append dependent follow-up phases instead of rewriting valid earlier work.
+The documentation does not promise that source files or check inputs stayed unchanged.
 Workgraph treats Workflow as a host capability, not as a local scheduler or a required path for every task.
-The user-invocable `/workgraph:workflow` skill invokes native Workflow for explicit Workflow requests or graph-suitable work.
-Its description avoids routing simple bounded tasks to Workflow.
+The user-invocable `/workgraph:workflow` skill invokes native Workflow for explicit requests or dependent multi-stage work.
+Its description avoids routing implicit single-stage work to Workflow.
 The main session resolves graph inputs and authority before a run, keeps agent permissions under host control, and revalidates evidence affected by changed inputs.
 For authorized delivery, it uses a separate working branch and publishes the PR/MR before review, then integrates only after required checks and verified blockers are resolved.
 Read-only, research-only, and review-only goals skip new branch and PR/MR publication.
@@ -252,5 +257,5 @@ It defines context delivery for SessionStart and SubagentStart and confirms that
 We use that contract for [automatic delivery](design.md#deliver-context).
 
 The [Claude Code skills reference](https://code.claude.com/docs/en/skills) documents skill invocation controls and `${CLAUDE_PLUGIN_ROOT}` substitution in skill Markdown.
-We use those controls and a shared-file reference for [manual invocation](design.md#support-manual-invocation).
+We use the invocation controls for [manual invocation](design.md#support-manual-invocation), and self-contained skill bodies need no extra file reads for their contracts.
 Source and delivery checks cannot establish interactive invocation or model adherence.
