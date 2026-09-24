@@ -7,9 +7,9 @@ user-invocable: true
 
 # Workgraph Workflow
 
-Use this skill only in the main session.
-If dispatched as a worker, return the request to main without starting Workflow.
-Treat an explicit Workflow request or an authorized multi-stage goal with result dependencies or conditional successors as a selection of native Workflow.
+Only the main session starts native Workflow.
+A worker completes a bounded assignment despite a relayed Workflow request.
+Without a bounded assignment, the worker returns a direct start request to main.
 Use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
 Preserve every other scope, authority, and execution constraint from the user's request.
 Resolve any conflict between Workflow selection and another execution constraint before calling the tool.
@@ -91,11 +91,6 @@ Report exact check commands, observed failures, limitations, and unverified beha
 Delete completed local or origin feature branches only within the cleanup grant, after default-branch integration and ancestry proof.
 Remove only clean worktrees created for this change, within the cleanup grant.
 
-## Load Workflow Guidance
-
-Load the `workflow-authoring` skill before constructing a Workflow script.
-Follow its current tool API, script syntax, permission, pipeline, and resume guidance.
-
 ## Plan In Main
 
 Keep the goal, exclusions, scope, owners, authority, integration branch, and acceptance evidence in the main session.
@@ -131,7 +126,6 @@ Ask only when the unavailable tool blocks the goal or when a decision can change
 ## Build The Goal Graph
 
 Use the delivery units and acceptance evidence already defined in the main-session plan.
-Connect nodes only through actual results or conditions.
 
 For authorized engineering delivery, keep publication and integration in main and within the user's authorization.
 Gate publication on accepted changes and required checks, then gate one full independent review on the published PR/MR and its current changes.

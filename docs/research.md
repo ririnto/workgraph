@@ -28,19 +28,7 @@ These recommendations guide instruction design without changing model or API con
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
 Each hook-delivered role skill embeds its common rules and role procedures, so a session receives one complete contract without extra file retrieval or a missing-file blocker.
 The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.
-Before graph construction, the main agent defines the intended outcome, exclusions, affected resources, and acceptance evidence.
-Use native Workflow when substantive stages have result dependencies or conditional successors that make graph coordination useful.
-Use host Agent for a single substantive stage, including independent parallel assignments.
-Do not add display-only phases to justify Workflow selection.
-Honor explicit Workflow selection whenever the host supports it, even for one stage.
-If explicit Workflow selection is unavailable, report that it did not run instead of silently substituting Agent.
-If an implicit Workflow selection is unavailable, report the limitation and use Agent for bounded outcomes only when safe.
-For authorized delivery, one full independent review follows PR publication, and only verified blockers require code changes before integration.
-Verified nonblocking follow-ups require a bounded authorized tracker record before integration.
-An active dispatch does not authorize direct handling of another ready, substantial outcome.
-The contract reserves direct work for main-owned planning, design, publication, integration, and final reporting, trivial one-step outcomes when Workflow is not selected, explicit no-delegation requests, or cases where no delegation tool is usable.
-Conflicting explicit execution-tool requests require resolution before dispatch.
-It sets no fixed agent count.
+The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
 ### Claude Opus 5.5 Guidance
@@ -127,21 +115,6 @@ Its abstract argues for explicit coordination as tasks become more interdependen
 A survey's proposed framework does not establish that every task needs several agents or a graph runtime.
 
 Workgraph represents connected, substantive work as a goal-dependent task graph in the current task plan.
-The main session defines or reuses the goal, scope, owners, authority, source and target branches, and acceptance evidence.
-Broad goals become cohesive, independently verifiable, main-targeted delivery units with one owner and clear acceptance evidence.
-Keep tightly coupled tasks together when splitting them would harm independent verification or mergeability.
-Avoid tiny phases and stacked PRs that require repeated rebases.
-Each bounded node names its operation, decision, or check, required inputs, expected outputs, owner, authority, and completion evidence.
-Edges identify results or conditions that gate later nodes, not chronology alone.
-The main session starts ready independent nodes in parallel when their writes do not conflict and passes actual results to successors.
-Exploration, planning, implementation, review, and integration are optional node types rather than a fixed itinerary.
-For each authorized delivery unit, publish from a working branch, run one full independent review after PR creation, and integrate only after required checks and verified blockers are resolved.
-Re-review blocker fixes with the same reviewer and limit review to affected changes.
-Record each eligible nonblocking follow-up in the authorized long-term issue tracker before integration with its evidence, scope, acceptance criteria, named owner, and next action.
-Defer the follow-up work until after the target branch update.
-Avoid repeated target syncs or rebases unless a conflict or invalidated evidence requires them.
-Verify the target branch update as the delivery finish condition.
-Read-only and review-only goals do not acquire publication authority.
 The host retains ownership of task execution and execution state.
 
 [Graph of Thoughts](https://arxiv.org/abs/2308.09687) represents model-generated information as a graph for prompting and refinement.
@@ -177,7 +150,7 @@ We reviewed the abstract and retain its benchmark scope.
 [Agentless](https://arxiv.org/abs/2407.01489) uses localization, repair, and validation without an open-ended agent loop.
 Its abstract reports competitive results on SWE-bench Lite for the models and baseline systems tested at the time.
 The paper motivates a simple baseline, not a universal three-stage process.
-The contract directs delegation of ready, substantial outcomes and keeps planning, design, and integration in the main session without fixing a reviewer or worker count.
+The role contract delegates ready, substantial outcomes without fixing a reviewer or worker count.
 
 [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) describes scoped research delegation and compressed results.
 The authors discuss coordination cost and warn that coding work often offers less parallelism than research.
@@ -233,12 +206,7 @@ Claude Code can replay completed agent calls when a saved script resumes with un
 Changing an earlier prompt reruns that agent and subsequent calls, so append dependent follow-up phases instead of rewriting valid earlier work.
 The documentation does not promise that source files or check inputs stayed unchanged.
 Workgraph treats Workflow as a host capability, not as a local scheduler or a required path for every task.
-The user-invocable `/workgraph:workflow` skill invokes native Workflow for explicit requests or dependent multi-stage work.
-Its description avoids routing implicit single-stage work to Workflow.
 The main session resolves graph inputs and authority before a run, keeps agent permissions under host control, and revalidates evidence affected by changed inputs.
-For authorized delivery, it uses a separate working branch and publishes the PR/MR before review, then integrates only after required checks and verified blockers are resolved.
-Read-only, research-only, and review-only goals skip new branch and PR/MR publication.
-Explicit Workflow requests bypass subjective task-size screening, while an unavailable tool is reported without claiming a run.
 
 The official [subagent documentation](https://code.claude.com/docs/en/sub-agents) describes fresh contexts for non-fork subagents, skill loading, permissions, and model routing.
 A dispatch must carry the scope and evidence needed by a worker whose context is fresh.

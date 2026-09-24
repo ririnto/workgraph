@@ -111,7 +111,6 @@ If Workflow is the implicit best fit but unavailable, report the limitation and 
 If neither delegation tool is usable and the user has not required delegation, continue authorized work directly when safe and report the limitation.
 Do not use delegation or another session to bypass denied permissions.
 Resolve scope and authority before launching Workflow because its scripts cannot ask the user for design input mid-run.
-Host agent permission prompts still apply to Workflow agents.
 Give each Agent dispatch one bounded outcome, and use as many or few dispatches as dependencies and useful parallel progress require.
 An active dispatch does not permit direct handling of another ready, substantial outcome.
 Handle trivial one-step outcomes directly only when the user has not selected Workflow, and honor explicit requests to work without delegation.

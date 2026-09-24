@@ -13,7 +13,7 @@ Use this role within the current dispatch's scope and authority.
 Invoking this skill does not create a dispatch or grant additional authority.
 Complete the assigned task within the dispatch's scope, resource ownership, and acceptance criteria.
 Reading another role's instructions does not grant its authority.
-Make routine decisions within scope and start dependent work when its prerequisites are ready.
+Make routine decisions within scope and proceed with dependent steps when their prerequisites are ready.
 Report a blocker or a requirement change that affects other work to the dispatcher.
 Preserve valid results and unrelated work.
 
@@ -54,7 +54,10 @@ Report material changes, blockers, and requested progress without narrating rout
 
 ### Delegation And Background Work
 
-Give every authorized delegate a self-contained assignment with scope, inputs, resource ownership, authority, output, acceptance evidence, and cleanup requirements.
+By default, complete the assigned task yourself without dispatching more agents.
+Further subdelegation is allowed only when the current dispatch explicitly grants it and the host permits it.
+When both conditions hold, apply these safeguards.
+Give every delegate a self-contained assignment with scope, inputs, resource ownership, authority, output, acceptance evidence, and cleanup requirements.
 Name permitted Git operations, refs, ownership limits, and required pre-action checks before delegating a Git write.
 Parallelize independent work within host capacity and serialize writes to shared resources.
 Honor the user's model choice within host limits.
@@ -80,23 +83,20 @@ Choose acceptance evidence before editing and run the narrowest checks that cove
 Add tests for uncovered behavior or a concrete regression risk, not for low-impact prose that repeats itself.
 Reuse passing checks while their inputs, configuration, and toolchain remain unchanged.
 Rerun checks affected by new changes, failures, or unresolved concerns.
-Treat a missing Workflow result as unknown, and a failed result as failed.
-A resumed Workflow may replay saved agent results, but its cache does not prove that source files, repository state, or check inputs remain unchanged.
 Continue until the requested outcome is complete or a concrete blocker prevents progress.
-Apply corrections without discarding valid work, authorization, or active delegations.
+Apply corrections without discarding valid work or authorization.
 Use tool results and checks rather than another agent's success claim as evidence.
 Before retrying an interrupted write, check its partial effects.
 Limit feedback loops with a progress signal, finite retries, and an exit condition.
 Retry failed work only when changed inputs or new evidence can improve the result.
 Report the concrete failure or blocker when progress stops or the retry limit is reached.
 Report exact check commands, observed failures, limitations, and unverified behavior.
-Delete completed local or origin feature branches only within the cleanup grant, after default-branch integration and ancestry proof.
 Remove only clean worktrees created for this change, within the cleanup grant.
 
 ## Delegation And Git
 
-Delegate further work only when the dispatch and host both permit it.
-The main agent selects Workflow orchestration.
+Do not select or start Workflow.
+Complete a bounded assignment despite a relayed Workflow request, and return a direct start request to main only when no bounded assignment exists.
 Perform Git writes only when the dispatch names the operations, refs, owned resources, and required checks.
 Commit or push only after the required pre-action checks have passing evidence.
 Publish or deploy only when the user and dispatch authorize the destination.

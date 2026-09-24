@@ -75,7 +75,6 @@ Request a goal through the Workflow entry point without prescribing an itinerary
 /workgraph:workflow Fix the parser's escaped-quote bug, publish a PR for review, and integrate it into main.
 ```
 
-An explicit Workflow request selects the native tool, and the main-agent contract also selects it for useful multi-stage dependencies.
 Build dependencies from actual results or conditions, not progress-phase labels.
 Pass predecessor results to successors, run ready independent outcomes in parallel, and serialize conflicting writes.
 Keep planning, design decisions, publication, and integration in main.
@@ -127,9 +126,11 @@ Workflow availability depends on the host version, plan, and configuration.
 The host requires user opt-in to multi-agent orchestration before Workflow can run.
 After that opt-in, Main can select Workflow without a separate tool-specific request.
 The host controls Workflow launch and agent permission prompts.
+A Workflow run may relay the main session's `/workgraph:workflow` invocation to a dispatched agent together with a bounded computed task.
+The dispatched agent should complete that assigned task within its authority instead of launching another Workflow or returning it unworked.
 By default, the host discovers reusable scripts from the plugin-root `workflows/` directory and exposes included scripts under namespaced commands.
 Workgraph ships no reusable Workflow scripts.
-The user-invocable `/workgraph:workflow` skill loads `workflow-authoring` guidance and calls native Workflow with a goal-specific graph.
+The user-invocable `/workgraph:workflow` skill calls native Workflow with a goal-specific graph, loading the host-required `workflow-authoring` guidance.
 Its description targets explicit Workflow requests and dependent multi-stage goals without routing implicit single-stage work.
 It does not define a fixed itinerary or replace main-session planning, publication, or integration.
 Workflow scripts cannot request design input midway through a run, but the host still enforces its agent permissions.
@@ -149,11 +150,10 @@ Invoke Workflow when the user asks for it or substantive dependent stages make i
 
 The role-reload skills set `disable-model-invocation: true` and `user-invocable: true`.
 The Workflow skill keeps `user-invocable: true` and remains model-invocable for explicit Workflow requests and multi-stage dependent work.
-Its description avoids routing implicit single-stage tasks to Workflow.
 The hooks operate without skill invocation.
 
 Both role skill bodies remain self-contained, so automatic delivery and manual role invocation need no additional file retrieval.
-The Workflow skill keeps its core rules inline and loads the host's `workflow-authoring` guidance.
+The Workflow skill keeps its core rules inline.
 For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.
 Read-only Workflow goals do not need that reference.
 The plugin includes no output assets or bundled helper scripts because its skills produce neither reusable files nor repeated script logic.
