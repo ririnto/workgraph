@@ -141,12 +141,15 @@ Do not infer publication or integration authority from an inspection-only goal.
 
 ## Continue A Workflow
 
-When authorized follow-up work depends on completed results, inspect the prior run's journal and revalidate its inputs.
-Append a substantive follow-up phase to the saved script, then resume it with the same `scriptPath` and the prior `resumeFromRunId` after that run exits.
-Keep valid earlier agent prompts, cache-keyed options, and call order unchanged so completed results can replay from cache.
-Editing an earlier prompt or cache-keyed option reruns that call and subsequent calls, even when later prompts are unchanged.
-Change stale or incorrect inputs deliberately and rerun affected work instead of preserving an invalid cache entry.
-If the host cannot resume the run, give verified predecessor results to a new authorized segment rather than claiming cached reuse.
+For follow-up work, inspect the completed run's journal and revalidate its inputs.
+Keep completed `agent()` calls unchanged and append a substantive follow-up phase to the saved script.
+Pass earlier result variables into new agent prompts when needed.
+New agents do not receive cached results automatically.
+After the run exits, resume with the same `scriptPath` and the prior `resumeFromRunId` to reuse unchanged results.
+Changing a completed call's prompt, cache-keyed options, or order invalidates its cache.
+The host reruns that call and all later calls.
+Change stale or incorrect inputs deliberately and rerun affected work instead of preserving an invalid result.
+If the host cannot resume, pass verified predecessor results to a new authorized segment without claiming cached reuse.
 
 ## Verify And Integrate
 

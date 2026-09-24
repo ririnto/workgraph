@@ -134,9 +134,11 @@ The user-invocable `/workgraph:workflow` skill calls native Workflow with a goal
 Its description targets explicit Workflow requests and dependent multi-stage goals without routing implicit single-stage work.
 It does not define a fixed itinerary or replace main-session planning, publication, or integration.
 Workflow scripts cannot request design input midway through a run, but the host still enforces its agent permissions.
-For dependent follow-up work, append a substantive phase to the saved script and resume with its `scriptPath` and prior `resumeFromRunId`.
-Keep valid earlier agent prompts and options unchanged to reuse completed results.
-Editing an earlier prompt reruns that call and subsequent calls.
+For dependent follow-up work, keep completed calls unchanged and append a substantive phase to the saved script.
+Pass earlier result variables into new agent prompts when they need those results.
+Resume with the same `scriptPath` and prior `resumeFromRunId` to reuse completed results.
+Editing a completed call's prompt, cache-keyed options, or order invalidates its cache.
+The host reruns that call and all later calls.
 Revalidate source files and check inputs before relying on cached results.
 
 ## Skill Invocation
