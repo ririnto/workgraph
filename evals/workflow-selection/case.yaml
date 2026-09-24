@@ -35,7 +35,7 @@ graders:
   - name: dependent-results
     type: regex
     target: trace
-    pattern: '"workflow_progress":\[[^\n]*?"index":1,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null")[^\n]+?"index":2,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null")[^\n]+?"index":3,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null")'
+    pattern: '"workflow_progress":\[[^\n]*?"index":1,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null"|")[^\n]+?"index":2,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null"|")[^\n]+?"index":3,[^\n]*?"state":"done"[^\n]*?"resultPreview":"(?!null"|")'
   - name: release-decision
     type: llm
     focus: trace
