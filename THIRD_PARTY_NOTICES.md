@@ -45,6 +45,13 @@ The plugin does not bundle that skill.
 ## Research And Official Documentation
 
 The [research notes](docs/research.md) cite the papers and official documentation used for context, graph, and verification decisions.
+We consulted Anthropic's official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) for host behavior.
+
+We reviewed the arXiv paper [When Agents Do Not Stop: Uncovering Infinite Agentic Loops in LLM Agents](https://arxiv.org/abs/2607.01641v1) by Xinyi Hou, Shenao Wang, Yanjie Zhao, and Haoyu Wang.
+We reviewed the arXiv paper [Are LLMs Reliable Code Reviewers? Systematic Overcorrection in Requirement Conformance Judgement](https://arxiv.org/abs/2603.00539v1) by Haolin Jin and Huaming Chen.
+We reviewed the arXiv paper [Rethinking the Value of Agent-Generated Tests for LLM-Based Software Engineering Agents](https://arxiv.org/abs/2602.07900v2) by Zhi Chen, Zhensu Sun, Yuling Shi, Chao Peng, Xiaodong Gu, David Lo, and Lingxiao Jiang.
+These references inform research notes and do not supply Workgraph code or prove its performance.
+
 We also consulted [Semantic Line Breaks](https://sembr.org/) for Markdown source formatting.
 
 Earlier design research included [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) and [LangChain's graph engineering retrospective](https://www.langchain.com/blog/3-years-of-graph-engineering-with-langgraph).

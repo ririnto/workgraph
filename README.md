@@ -41,20 +41,52 @@ Each output contains the shared instructions once and one role body without YAML
 Agents need no additional file reads for automatic delivery.
 The hooks do not inject repository guidance or research documents.
 
-The main-agent contract assigns planning, design, integration, and final reporting to the main session.
-For substantial work, it directs the main agent to assign ready, bounded exploration, research, implementation, and check outcomes through Agent instead of doing them itself.
-It directs independent review through Agent when risk or uncertainty justifies it.
-An active dispatch does not authorize direct handling of another ready, substantial outcome.
-It permits direct work on trivial one-step outcomes or when Agent is unavailable, honors explicit requests to avoid delegation, and follows host tool limits.
-The contract sets no fixed agent count.
+The main-agent contract keeps planning, design decisions, integration, and final reporting in the main session.
+It uses a goal-dependent task graph when dependencies make coordination useful.
+Each node names its operation, inputs, outputs, owner, authority, and completion evidence.
+Edges represent result dependencies or conditions, not chronology.
+The main agent starts ready independent work in parallel when writes do not conflict and serializes conflicting writes.
+Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
 Workers complete bounded assignments within their authority.
-The instructions cover model selection, English agent-to-agent communication, dependency tracking, verification, and native background completion.
-The main agent uses Workflow only when the user authorizes orchestration and the host supports it.
-Hosts without Workflow can use their available tools.
+Before main integrates delegated changes, it requires relevant repository checks to pass and obtains independent review using that repository's method.
+The instructions also cover model routing, evidence reuse, bounded feedback loops, English handoffs, and native completion notifications.
+The main agent delegates each ready, bounded, substantial exploration, research, implementation, review, or check outcome through host Agent by default.
+It uses native Workflow instead only when the user authorizes orchestration, the host supports it, and graph dependencies justify scripted coordination.
+If Workflow cannot run, the main agent uses Agent when available before handling delegated work directly.
+Direct main work is limited to planning, design, integration, final reporting, trivial outcomes, explicit no-delegation requests, or cases where neither delegation tool is usable.
 
 Read the [shared instructions](skills/shared.md) for rules that apply to both roles.
 The role files in the table contain their work procedures.
 These instructions guide agents but do not guarantee model adherence.
+
+## Goal-Driven Work
+
+Most tasks need only the nodes and checks that serve their goal.
+A typo fix can stay in the main session, while connected work can use a graph of bounded outcomes.
+
+A natural request can describe the goal without prescribing an itinerary.
+
+```text
+Implement the parser failure fix through main.
+Build a task graph from actual result dependencies.
+Give each node clear inputs, outputs, owner, authority, and completion evidence.
+Start ready independent work in parallel and serialize conflicting writes.
+Use the consumer repository's checks and review method before main integration.
+Use Workflow to coordinate the bounded outcomes in this goal.
+```
+
+A request to implement a goal through main includes authorized, in-scope integration and relevant checks, so the agent must not ask for that approval again.
+An inspection-only or review-only request does not authorize edits.
+Do not require every goal to include exploration, planning, implementation, review, or integration as separate nodes.
+
+Claude Code supports dynamic workflows and reusable plugin workflow scripts.
+Workflow availability depends on the host version, plan, and configuration, and its use requires opt-in.
+The host controls launch and agent permission prompts.
+By default, the host discovers plugin scripts from the plugin-root `workflows/` directory and exposes included scripts under namespaced commands.
+Workgraph currently ships no predefined workflow command.
+A future Workgraph subgraph remains optional and complements goal-specific graph composition.
+Workflow scripts cannot request design input midway through a run, but the host still enforces its agent permissions.
+A resumed workflow may reuse saved agent results, which do not prove that source files or check inputs remain unchanged.
 
 ## User-Only Skills
 

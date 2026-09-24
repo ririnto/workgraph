@@ -15,30 +15,39 @@ Invoking this skill does not change a dispatched worker's role or grant addition
 
 Own the task plan, design decisions, integration, and final user report.
 Keep the plan in the user's chosen location or the current task context.
-For substantial work, identify the outcome, exclusions, affected resources, and acceptance evidence.
-Plan bounded outcomes, dependencies, owners, and authority as inputs become clear.
-When inputs and authority are ready, assign each bounded, substantial exploration, research, implementation, or check outcome through Agent instead of doing it yourself.
-Dispatch independent review through Agent when risk or uncertainty justifies it.
-An active dispatch does not permit direct handling of another ready, substantial outcome.
-Keep task planning, design decisions, and integration in the main session while delegates work.
-Handle trivial one-step outcomes directly, including within substantial tasks, and honor an explicit request to work without delegation.
-If Agent is unavailable, continue authorized work directly and report the limitation.
-
-Give each Agent dispatch one bounded outcome, and use as many or few dispatches as task dependencies and useful parallel progress require.
-Use Workflow only when the user authorizes orchestration, the host permits it, and task dependencies justify it.
-Honor explicit execution-tool choices within host limits.
+For substantial goals, define the intended outcome, exclusions, affected resources, and acceptance evidence before constructing a task graph.
+Use a task graph when dependencies make coordination useful.
+Define each bounded node's operation, decision, or check, required inputs, expected outputs, owner, authority, and completion evidence.
+Connect nodes only when a result or condition gates another node, not because one step happened first.
+Start ready independent nodes in parallel when their inputs and authority are ready, and serialize conflicting writes.
+Choose only the node types the goal needs, because exploration, planning, implementation, review, and integration are options rather than a fixed itinerary.
+Keep planning, design decisions, integration, and final reporting in the main session while delegates work.
+Honor explicit execution-tool choices within host limits, and do not repeat approval requests for authorized in-scope integration or checks.
+Use host Agent for each ready, bounded, substantial exploration, research, implementation, review, or check outcome by default.
+Use native Workflow instead only when the user authorizes orchestration, the host supports it, and graph dependencies justify scripted coordination.
+If Workflow is unavailable or not authorized, dispatch through Agent when available before handling the outcome directly.
+If neither delegation tool is usable, continue authorized work directly when safe and report the limitation.
 Do not use delegation or another session to bypass denied permissions.
-If the requested tool is unavailable, use an authorized substitute or report the blocker.
+Resolve scope and authority before launching Workflow because its scripts cannot ask the user for design input mid-run.
+Host agent permission prompts still apply to Workflow agents.
 
-For connected work, record prerequisites and owners in the existing plan.
-Start tasks when their inputs and authority are ready.
-Send successors the conclusions and evidence they need.
+Give each Agent dispatch one bounded outcome, and use as many or few dispatches as dependencies and useful parallel progress require.
+An active dispatch does not permit direct handling of another ready, substantial outcome.
+Handle trivial one-step outcomes directly, including within substantial tasks, and honor an explicit request to work without delegation.
+
+For connected work, record prerequisites, owners, authority, and evidence in the existing plan.
+Send successors the conclusions and completion evidence they need.
+Join branches only when a later node needs their results.
 Keep valid results when requirements change, and continue unaffected tasks when one branch fails.
-Require every branch's result only when the next task depends on all branches.
-Use the host's execution state without inventing a scheduler or recovery guarantee.
+Before main integrates delegated changes, require relevant repository checks to pass and obtain independent review using that repository's method.
+Treat reviewer findings as candidates, and verify each against the requirements, affected code, or executable checks.
+Resolve confirmed blocking findings before integration.
+Report findings without supporting evidence as unverified, not as confirmed defects.
+Reuse passing evidence when affected inputs, configuration, and toolchain remain unchanged.
+Set a finite review or fix limit and stop earlier when a round makes no progress.
+Use the host's execution state without inventing a scheduler, executor, or recovery guarantee.
 
 Review the changed files and acceptance evidence before integration.
-Use independent review when risk or uncertainty justifies it.
 Inspect the staged diff before committing.
 Publish only to a destination the user authorized, and preserve unrelated work and shared history.
 Finish with the outcome, check results, and material limitations.

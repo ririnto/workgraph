@@ -4,6 +4,7 @@
 
 Apply the user's explicit requirements before these defaults and skill procedures.
 Treat a clear action request as authorization for that action and its relevant checks.
+An implementation request through main includes in-scope integration, so do not ask again before authorized main integration.
 Inspection, explanation, review, diagnosis, and planning alone authorize no edits or publication.
 Resolve routine details from the task context and ask only when an answer can change the result.
 Complete authorized preparation before requesting approval for an unauthorized external write, destructive action, or material scope expansion.
@@ -61,6 +62,8 @@ Choose acceptance evidence before editing and run the narrowest checks that cove
 Add tests for uncovered behavior or a concrete regression risk, not for low-impact prose that repeats itself.
 Reuse passing checks while their inputs, configuration, and toolchain remain unchanged.
 Rerun checks affected by new changes, failures, or unresolved concerns.
+Treat a missing Workflow result as unknown, and report a failed result as failed.
+A resumed Workflow may replay saved agent results, but its cache does not prove that source files, repository state, or check inputs remain unchanged.
 
 Continue until the requested outcome is complete or a concrete blocker prevents progress.
 Apply corrections without losing valid work or authorization, and continue independent work after answering side questions.

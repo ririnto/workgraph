@@ -11,6 +11,7 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | `skills/shared.md` | Both agent roles | Agents follow shared authority, communication, delegation, background work, and evidence requirements. |
 | `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow planning, dispatch, integration, and reporting procedures. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow assignment scope, permitted operations, and result delivery requirements. |
+| Claude Code Workflow tool | Main session | The host runs an explicitly authorized workflow when task dependencies justify scripted coordination. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
 | `THIRD_PARTY_NOTICES.md` | Distributors | Distributors retain third-party attribution. |
 
@@ -45,6 +46,33 @@ This context-loading hook cannot enforce permissions.
 The host determines which Agent or Workflow executions emit hook events.
 Do not assume that every orchestration system creates a Claude Code subagent.
 Dispatch prompts must carry the constraints needed by a receiver whose context is unknown.
+
+## Compose Work Through The Host
+
+Workgraph keeps dynamic task-graph planning in the main session.
+Each node describes a bounded operation, decision, or check with inputs, outputs, owner, authority, and completion evidence.
+Edges describe results or conditions that gate later nodes, not execution order alone.
+The main session starts ready independent work in parallel, serializes conflicting writes, and joins branches only when a later node needs their results.
+It chooses useful node types for the goal rather than requiring an exploration-to-integration sequence.
+Workgraph defines no scheduler, executor, or shared task store.
+
+Claude Code can execute dynamically composed Workflow scripts and, by default, discovers reusable plugin scripts from the plugin-root `workflows/` directory.
+The host exposes included scripts as namespaced slash commands, but Workgraph currently ships no predefined Workflow command.
+A future reusable subgraph remains an optional capability and does not replace goal-specific graph planning.
+The main agent uses Workflow only when the user authorizes orchestration, the host supports it, and the dependency structure justifies scripted coordination.
+The host can still request agent tool permissions during a Workflow run, but the script cannot ask the user for design input between steps.
+The main session must resolve required scope and authority before launching the run.
+An agent prompt cannot grant tool permissions or enlarge the user's authorization.
+
+A Workflow pipeline can run each item's dependent stages without a global barrier.
+Its agents may return `null` or fail, and the main session must report missing results as incomplete instead of treating them as an all-clear.
+When the host resumes a Workflow, it may replay saved agent results.
+That result cache does not prove that source files, repository state, or check inputs remain unchanged.
+Reuse check evidence only while the relevant files, inputs, configuration, and toolchain remain the same.
+
+The official [Workflow documentation](https://code.claude.com/docs/en/workflows) describes plugin discovery, execution limits, permissions, and resume behavior.
+The official [subagent documentation](https://code.claude.com/docs/en/sub-agents) describes worker contexts, skills, permissions, and model routing.
+The host controls these mechanics, while Workgraph retains task decomposition and evidence policies.
 
 ## Support Manual Invocation
 

@@ -24,10 +24,13 @@ We reviewed the user-supplied copies of both documents.
 These recommendations guide instruction design without changing model or API configuration.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
-For substantial work within the user's scope, the contract directs the main agent to assign ready, bounded exploration, research, implementation, and check outcomes through Agent instead of doing them itself.
-It directs independent review through Agent when risk or uncertainty justifies it.
+Before graph construction, the main agent defines the intended outcome, exclusions, affected resources, and acceptance evidence.
+For each ready, bounded, substantial exploration, research, implementation, review, or check outcome, it uses host Agent by default.
+It uses native Workflow instead only when the user authorizes orchestration, the host supports it, and graph dependencies justify scripted coordination.
+When Workflow cannot run, the main agent uses Agent when available before handling delegated work directly.
+It requires independent review before main integration.
 An active dispatch does not authorize direct handling of another ready, substantial outcome.
-The contract reserves direct work for trivial one-step outcomes, main-owned planning, design, and integration, explicit no-delegation requests, or unavailable Agent, within host limits.
+The contract reserves direct work for main-owned planning, design, integration, and final reporting, trivial one-step outcomes, explicit no-delegation requests, or cases where no delegation tool is usable.
 It sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
@@ -114,10 +117,12 @@ A dispatch must include missing constraints when the receiver's context is unkno
 Its abstract argues for explicit coordination as tasks become more interdependent.
 A survey's proposed framework does not establish that every task needs several agents or a graph runtime.
 
-Workgraph uses a task graph in the existing plan for connected work.
-Nodes identify bounded operations, decisions, or checks.
-Edges identify the required results and routing conditions.
-The host retains ownership of execution state.
+Workgraph represents connected, substantive work as a goal-dependent task graph in the current task plan.
+Each bounded node names its operation, decision, or check, required inputs, expected outputs, owner, authority, and completion evidence.
+Edges identify results or conditions that gate later nodes, not chronology alone.
+The main session starts ready independent nodes in parallel when their writes do not conflict and joins branches only when a later node needs their results.
+Exploration, planning, implementation, review, and integration are optional node types rather than a fixed itinerary.
+The host retains ownership of task execution and execution state.
 
 [Graph of Thoughts](https://arxiv.org/abs/2308.09687) represents model-generated information as a graph for prompting and refinement.
 We reviewed its abstract to distinguish that approach from a task dependency graph.
@@ -177,12 +182,41 @@ Its abstract describes persistent memory, compensation, and independent validati
 It motivates checking partial effects before retrying a write.
 Workgraph does not implement transactions, automatic compensation, or durable recovery.
 
+### Bounded Feedback And Review Evidence
+
+[When Agents Do Not Stop: Uncovering Infinite Agentic Loops in LLM Agents](https://arxiv.org/abs/2607.01641v1) studies unbounded feedback paths in agent systems.
+The authors report 68 confirmed failures across 47 repositories among 6,549 examined repositories.
+These are findings from the paper's sample, not Workgraph results.
+The study motivates bounded review and repair loops with a no-progress exit, but it does not measure this policy's effect in Workgraph.
+
+[Are LLMs Reliable Code Reviewers? Systematic Overcorrection in Requirement Conformance Judgement](https://arxiv.org/abs/2603.00539v1) reports false rejection of correct small Python programs.
+The authors also report that requests for explanations and suggested fixes sometimes worsen review judgments.
+The study does not establish that reviewer errors are independent across agents.
+Workgraph therefore treats a reviewer claim as a candidate, requires concrete source or check evidence from verification, and reports missing evidence as unverified.
+
+[Rethinking the Value of Agent-Generated Tests for LLM-Based Software Engineering Agents](https://arxiv.org/abs/2602.07900v2) examines agent-generated tests on SWE-bench Verified.
+Its prompt intervention did not significantly change final outcomes when it changed the volume of generated tests.
+That result does not show that repository-required checks can be skipped.
+Workgraph keeps required checks in the consumer repository's validation process.
+
 The explicit idle-turn rule addresses the user's observed repeated waiting behavior.
 Agents continue independent work or end the turn until a native completion notification arrives.
 This rule applies to background Bash as well as agent tools.
 The papers provide coordination context but do not prove this prompt resolves the observed behavior.
 
 ## Writing And Host Contracts
+
+### Claude Code Workflow And Subagent Contracts
+
+The official [Workflow documentation](https://code.claude.com/docs/en/workflows) describes plugin-root workflow discovery, namespaced commands, host permissions, the lack of mid-run user input, and session resume.
+Claude Code can cache completed agent results for a resumed run, but the documentation does not promise that source files or check inputs stayed unchanged.
+Workgraph treats Workflow as an explicit host capability, not as a local scheduler or a required path for every task.
+Its instructions require the main session to resolve graph inputs and authority before a run, keep agent permissions under host control, and revalidate evidence affected by changed inputs.
+
+The official [subagent documentation](https://code.claude.com/docs/en/sub-agents) describes fresh contexts for non-fork subagents, skill loading, permissions, and model routing.
+A dispatch must carry the scope and evidence needed by a worker whose context is fresh.
+The host enforces tool permissions and model substitutions, while Workgraph instructions preserve user intent and prohibit permission bypass.
+These host documents describe product behavior, not measured Workgraph performance or model adherence.
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
 The user chose a stricter sentence-level convention for all documents, including table explanations.
