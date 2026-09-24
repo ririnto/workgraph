@@ -120,6 +120,11 @@ Resolve conflicting explicit execution-tool requests before dispatch.
 
 For connected work, record prerequisites, owners, authority, and evidence in the existing plan.
 Send successors the actual conclusions and completion evidence they need.
+For Workflow follow-ups, keep completed calls unchanged and append a substantive phase to the saved script.
+Pass prior result variables into new agent prompts when needed.
+Resume the saved script to reuse those results.
+Editing a completed call's prompt, cache-keyed options, or order invalidates its cache.
+The host reruns that call and all later calls.
 Join branches only when a later node needs their results.
 Keep valid results when requirements change, and continue unaffected tasks when one branch fails.
 
