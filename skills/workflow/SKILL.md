@@ -133,28 +133,17 @@ Ask only when the unavailable tool blocks the goal or when a decision can change
 Use the delivery units and acceptance evidence already defined in the main-session plan.
 Connect nodes only through actual results or conditions.
 
-For authorized engineering delivery, make implementation and check nodes return changed files and check evidence.
-Start independent nodes together and serialize conflicting writes.
-Make main-owned branch/PR publication depend on accepted changes and required checks.
-Make one full independent review depend on the published PR/MR and its current changes.
-Make finding verification depend on that review result, using the main-session contract's blocker criteria.
-Create a same-branch fix node only for a confirmed blocker.
-Make the same PR/MR update depend on that fix, then run a scoped re-review of affected changes with the same reviewer.
-Reuse unaffected checks and do not add recurring target-sync nodes.
-Sync or rebase only when a conflict or changed target invalidates relevant evidence.
-
-Represent each accepted nonblocking deferral as a tracker-record result with evidence, scope, acceptance criteria, owner, and next action.
-Make its registration gate integration, and schedule follow-up implementation only after the target branch update.
-Make main integration depend on passing required checks, resolved blockers, and recorded follow-ups.
-Verify the target branch update as the delivery finish condition rather than stopping at PR creation.
+For authorized engineering delivery, keep publication and integration in main and within the user's authorization.
+Gate publication on accepted changes and required checks, then gate one full independent review on the published PR/MR and its current changes.
+Verify findings against the main-session blocker criteria, fix confirmed blockers through the same PR/MR, and re-review only affected changes before integration.
+Record accepted nonblocking follow-ups before integration.
+Integrate only after required checks pass, blockers resolve, and follow-ups register, then verify the target branch update.
+Reuse unaffected checks and sync or rebase only when a conflict or changed target invalidates relevant evidence.
+Read `references/delivery.md` before building an authorized engineering-delivery graph for its detailed node mapping.
 
 For read-only, research-only, or review-only goals, omit implementation, new publication, and integration nodes.
 Pass an existing PR/MR and its current changes to a review node when the goal concerns that artifact.
 Do not infer publication or integration authority from an inspection-only goal.
-
-For example, a known parser regression can let a parser-fix node and separate regression-test node start in parallel.
-Their outputs gate checks, which gate PR publication, which gates one full review and blocker verification.
-Only a verified blocker opens a same-branch fix and scoped re-review path before main integration.
 
 ## Continue A Workflow
 

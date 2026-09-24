@@ -17,7 +17,9 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 
 Keep each rule in the source responsible for its audience.
 Use links for supporting explanations instead of copying procedures across documents.
-Each skill embeds the common rules with its role procedures, so users can invoke any skill without prior hook delivery or extra file retrieval.
+Each skill embeds the common rules and the instructions needed to select its role and execution path.
+The two hook-delivered role bodies remain complete without prior hook delivery or extra file retrieval.
+The Workflow skill can load its own focused reference for authorized engineering delivery without changing hook output.
 Consumers can follow their instructions without reading repository conventions or research history.
 
 Keep host mechanics in the host's tool descriptions.
@@ -121,8 +123,11 @@ The host controls these mechanics, while Workgraph retains task decomposition an
 
 ## Support Manual Invocation
 
-Each skill body is self-contained: the common rules and the role procedures live in the same file.
-Manual invocation therefore needs no additional file retrieval and no substituted plugin paths.
+Each hook-delivered role body is self-contained: the common rules and role procedures live in the same file.
+Manual role invocation therefore needs no additional file retrieval or substituted plugin paths.
+The Workflow skill keeps its common rules and execution gates inline.
+It loads `skills/workflow/references/delivery.md` only when authorized engineering delivery requires its detailed graph pattern.
+No asset or helper script exists without a concrete output or repeated operation that needs one.
 
 The [skill invocation settings](../README.md#skill-invocation) control skill loading, not role ownership or permissions.
 Automatic hooks read the selected role source without invoking the skills or relying on model file retrieval.
