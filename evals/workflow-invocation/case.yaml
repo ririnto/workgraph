@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: workflow-invocation
-description: Verify that an explicit Workflow request produces a completed native run.
+description: Verify that an explicit Workflow request completes a native run.
 execution:
   runs: 1
   max_turns: 20
@@ -9,11 +9,11 @@ execution:
     - Workflow
     - Skill(workflow-authoring)
   prompt: |-
-    /workgraph:workflow Verify a calculation without editing files or running Git commands.
+    Please use native Claude Code Workflow to verify a calculation without editing files or running Git commands.
     Have one worker add 17, 23, and 31.
     Pass the result and original numbers to a second worker for an independent check.
     Use no more than these two workers.
-    Report the checked sum after the Workflow finishes.
+    Report the checked sum after both workers finish.
 graders:
   - name: workflow-invoked
     type: tool_used

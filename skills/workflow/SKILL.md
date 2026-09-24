@@ -1,8 +1,7 @@
 ---
 name: workflow
-description: Use when the user explicitly asks to orchestrate a goal with Claude Code Workflow, including by invoking `/workgraph:workflow`.
+description: Use for authorized multi-agent work with dependencies or useful parallel outcomes, or when the user requests Workflow.
 argument-hint: "[goal]"
-disable-model-invocation: true
 user-invocable: true
 ---
 
@@ -10,7 +9,7 @@ user-invocable: true
 
 Use this skill only in the main session.
 If dispatched as a worker, return the request to main without starting Workflow.
-Treat `/workgraph:workflow` as an explicit request to orchestrate the goal through native Workflow.
+Treat an explicit Workflow request or an authorized multi-agent goal with useful dependencies or parallel outcomes as a selection of native Workflow.
 Use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
 Preserve every other scope, authority, and execution constraint from the user's request.
 Resolve any conflict between Workflow selection and another execution constraint before calling the tool.
@@ -41,41 +40,43 @@ Keep planning, design decisions, publication, and integration in the main sessio
 
 Call the native Workflow tool for each ready graph segment after defining its scope, dependencies, owners, authority, and evidence.
 Do not stop after drafting a script or offering to run it.
-Do not decline an explicit Workflow request based on subjective graph size, node count, or perceived overhead.
+Use Workflow when real dependencies or independent parallel outcomes make graph coordination appropriate, even without an explicit request.
+Honor explicit Workflow requests whenever the host supports the tool, regardless of subjective graph size or node count.
 Keep every node within the user's authorization and host permissions.
 Do not use Workflow or its agents to bypass a denied permission or expand the user's authority.
 
-If the native Workflow tool is unavailable, report that the requested orchestration did not run.
-Do not claim a run or silently substitute Agent or direct execution.
-Ask how to proceed when the unavailable tool blocks the requested goal.
+If the native Workflow tool is unavailable, report that it did not run.
+For an explicit Workflow request, do not silently substitute Agent or direct execution.
+For an implicit selection, continue with Agent only when it can safely deliver bounded outcomes, and report the Workflow limitation.
+Ask only when the unavailable tool blocks the goal or when a decision can change scope or authority.
 
-## Authorized Engineering Delivery
+## Build The Goal Graph
 
-For an authorized engineering-delivery goal, delegate bounded implementation and check outcomes.
-After workers finish, inspect the changed files and required evidence in the main session.
-When they meet scope and acceptance criteria, commit and push the working branch, then create or update a PR/MR targeting the authorized branch.
-Reuse an existing PR/MR for the goal.
-Treat branch and PR/MR publication as a handoff for review, not as main integration.
+Use the delivery units and acceptance evidence already defined in the main-session plan.
+Connect nodes only through actual results or conditions.
 
-Start independent review only after the PR/MR exists.
-Give each review node the published PR/MR and its current changes, and use the repository's review method.
-Treat review comments as candidate findings.
-Verify each candidate against requirements, source, or executable checks before routing confirmed findings to a bounded fix on the same branch.
-Publish fixes through that branch and PR/MR, then review affected changes again.
-Reuse unaffected passing evidence.
-Set a finite review/fix limit and stop sooner when a round makes no progress or a concrete blocker prevents work.
+For authorized engineering delivery, make implementation and check nodes return changed files and check evidence.
+Start independent nodes together and serialize conflicting writes.
+Make main-owned branch/PR publication depend on accepted changes and required checks.
+Make one full independent review depend on the published PR/MR and its current changes.
+Make finding verification depend on that review result, using the main-session contract's blocker criteria.
+Create a same-branch fix node only for a confirmed blocker.
+Make the same PR/MR update depend on that fix, then run a scoped re-review of affected changes with the same reviewer.
+Reuse unaffected checks and do not add recurring target-sync nodes.
+Sync or rebase only when a conflict or changed target invalidates relevant evidence.
 
-Integrate from main only after required checks pass and confirmed review blockers are resolved.
-Respect host and forge protections, then verify that the authorized target branch contains the integrated changes.
-Do not ask again for publication or integration that the user already authorized.
+Represent each accepted nonblocking deferral as a tracker-record result with evidence, scope, acceptance criteria, owner, and next action.
+Make its registration gate integration, and schedule follow-up implementation only after the target branch update.
+Make main integration depend on passing required checks, resolved blockers, and recorded follow-ups.
+Verify the target branch update as the delivery finish condition rather than stopping at PR creation.
 
-For read-only, research-only, or review-only goals, omit implementation, branch publication, new PR/MR creation, and integration.
-Use an existing PR/MR and its current changes as input when reviewing that artifact.
-Do not infer publication authority from a request to inspect or review.
+For read-only, research-only, or review-only goals, omit implementation, new publication, and integration nodes.
+Pass an existing PR/MR and its current changes to a review node when the goal concerns that artifact.
+Do not infer publication or integration authority from an inspection-only goal.
 
-For example, a known parser regression can let a parser-fix node and a separate regression-test node start in parallel.
-Their results gate the parser checks, and passing checks gate main's branch and PR/MR publication.
-The published PR/MR gates independent review, confirmed blockers gate same-branch fixes, and resolved blockers plus passing checks gate main integration.
+For example, a known parser regression can let a parser-fix node and separate regression-test node start in parallel.
+Their outputs gate checks, which gate PR publication, which gates one full review and blocker verification.
+Only a verified blocker opens a same-branch fix and scoped re-review path before main integration.
 
 ## Verify And Integrate
 
