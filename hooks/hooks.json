@@ -1,5 +1,5 @@
 {
-  "description": "Load shared instructions and the current agent role.",
+  "description": "Load the selected self-contained agent role.",
   "hooks": {
     "SessionStart": [
       {

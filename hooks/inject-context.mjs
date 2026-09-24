@@ -7,26 +7,24 @@ const fail = (message, code) => {
   process.exit(code);
 };
 
-/** Read nonempty Skill prose, stripping only the leading frontmatter block. */
+/** Read the selected skill body, stripping its leading frontmatter block. */
 const readContext = (name) => {
   try {
     const content = readFileSync(
-      new URL(`../skills/${name}`, import.meta.url),
+      new URL(`../skills/${name}/SKILL.md`, import.meta.url),
       "utf-8"
     ).trim();
-    const body = name.endsWith("/SKILL.md")
-      ? content
-          .match(
-            /^---[\t ]*\r?\n[\s\S]*?\r?\n---[\t ]*(?:\r?\n|$)(?<body>[\s\S]*)$/u
-          )
-          ?.groups.body.trim()
-      : content;
+    const body = content
+      .match(
+        /^---[\t ]*\r?\n[\s\S]*?\r?\n---[\t ]*(?:\r?\n|$)(?<body>[\s\S]*)$/u
+      )
+      ?.groups.body.trim();
     if (!body) {
       throw new Error("empty instructions or missing skill frontmatter");
     }
     return body;
   } catch (error) {
-    fail(`cannot load instruction file ${name}: ${error.message}`, 1);
+    fail(`cannot load instruction file ${name}/SKILL.md: ${error.message}`, 1);
   }
 };
 
@@ -40,14 +38,9 @@ if (event !== "SessionStart" && event !== "SubagentStart") {
 process.stdout.write(
   `${JSON.stringify({
     hookSpecificOutput: {
-      additionalContext: [
-        readContext("shared.md"),
-        readContext(
-          event === "SessionStart"
-            ? "main-agent-contract/SKILL.md"
-            : "subagent-context/SKILL.md"
-        )
-      ].join("\n\n"),
+      additionalContext: readContext(
+        event === "SessionStart" ? "main-agent-contract" : "subagent-context"
+      ),
       hookEventName: event
     }
   })}\n`

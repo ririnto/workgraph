@@ -8,10 +8,10 @@ Complete authorized changes and relevant checks before returning a final result,
 
 Keep contributor conventions and validation commands here.
 Keep consumer behavior in `skills/`.
-Place shared rules in `skills/shared.md` and role-specific rules in each role's `SKILL.md` body.
-Each hook output must contain the shared rules and exactly one role without YAML frontmatter or required model file retrieval.
-Keep role skills user-only with `disable-model-invocation: true` and `user-invocable: true`.
-Reference the shared file from each skill instead of copying its rules.
+Make each role's `SKILL.md` self-contained with its common and role-specific rules inline.
+Each hook output must contain only the selected role's nonempty body without YAML frontmatter or required model file retrieval.
+Keep Main Agent and Worker skills user-only with `disable-model-invocation: true` and `user-invocable: true`.
+Keep Workflow model-invocable.
 Remove replaced paths and aliases without compatibility layers.
 
 Use `README.md` for installation and runtime behavior.
@@ -72,7 +72,7 @@ Select the narrowest applicable read-only gate.
 
 After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
 For injected prose, also run the hook tests and inspect both emitted contexts.
-Confirm each contains common rules and one role, without repository guidance.
+Confirm each contains one selected, self-contained role body without repository guidance.
 
 For Workflow invocation changes, run `claude plugin eval ./ --case workflow-invocation --runs 1 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
 This behavioral check uses real agents and requires a host with Workflow enabled.
