@@ -125,6 +125,8 @@ Workgraph does not request private reasoning traces or construct a thought graph
 
 [An LLM Compiler for Parallel Function Calling](https://arxiv.org/abs/2312.04511) separates planning, task dispatch, and execution.
 Its abstract describes parallel function calls and task-specific latency, cost, and accuracy results.
+The full text reports planner overhead exceeding half the latency on one task and a slower result on WebShop.
+It also reports a task that required replanning because intermediate results determined its dependencies.
 We apply the dependency principle by starting ready nodes and serializing conflicting writes.
 The reported benchmark gains do not predict Workgraph's gains.
 
@@ -135,11 +137,24 @@ We reviewed the abstract rather than independently evaluating its graph metrics.
 
 The [LangGraph Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api) provides a concrete node, edge, state, and execution model.
 [Microsoft's workflow documentation](https://learn.microsoft.com/en-us/agent-framework/concepts/workflows/builder-and-execution) describes executor connections and synchronization.
-These references inform scheduling vocabulary.
+[Apache Airflow's task documentation](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/tasks.html) distinguishes upstream dependencies from data transfer between tasks.
+Its tasks run independently and do not pass information by default.
+These references inform scheduling vocabulary, but Workgraph must pass actual results to dependent agents.
 Their runtime, persistence, and recovery guarantees belong to those products.
 Workgraph adopts none of their runtime components.
 
+[GPTSwarm](https://arxiv.org/abs/2402.16823) optimizes graph edges between language agents.
+Its Mini Crosswords results show that dense and random graphs underperform its optimized graph.
+Those task-specific results support choosing meaningful edges rather than linking every agent.
+[ADaPT](https://arxiv.org/abs/2311.05772) decomposes tasks when the executor cannot complete them.
+Its benchmark improvements support as-needed decomposition, not prebuilding speculative phases for Workgraph.
+
 ### Coordination Costs
+
+[Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) recommends starting with the simplest design and adding complexity only when outcomes improve.
+It distinguishes predefined workflow paths from agents that choose their own actions.
+The [OpenAI Agents SDK orchestration guide](https://openai.github.io/openai-agents-python/multi_agent/) shows independent parallel agents alongside code-controlled orchestration.
+Neither guide measures Claude Code Agent against native Workflow for this plugin.
 
 [Towards a Science of Scaling Agent Systems](https://arxiv.org/abs/2512.08296) compares coordination architectures across agentic benchmarks.
 Its abstract reports benefits on decomposable tasks and degradation on sequential planning tasks.
@@ -156,6 +171,12 @@ The role contract delegates ready, substantial outcomes without fixing a reviewe
 The authors discuss coordination cost and warn that coding work often offers less parallelism than research.
 We use bounded dispatches and pass conclusions with evidence references.
 The article's research-task gains do not establish coding-task gains.
+
+[More Agents Is All You Need](https://arxiv.org/abs/2402.05120) reports gains from independent sampling and voting on reasoning benchmarks.
+Its token cost rises with agent count, and its setup does not test delegated coding workers.
+This supports testing independent fan-out as a simpler baseline, not assuming more agents improve every task.
+Workgraph's selection of Workflow for identified dependent or follow-up stages is a user preference informed by these sources.
+The sources do not establish that this routing improves Workgraph outcomes.
 
 ## Verification And Recovery
 

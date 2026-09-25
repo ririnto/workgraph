@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: workflow-follow-up
+description: Verify implicit Workflow selection when an identified conditional follow-up agent may not run.
+execution:
+  runs: 1
+  max_turns: 20
+  timeout_seconds: 300
+  allowed_tools:
+    - Agent
+    - Workflow
+    - Skill(workgraph:workflow)
+    - Skill(workflow-authoring)
+  prompt: |-
+    Please orchestrate a read-only timeout assessment with subagents.
+    Have one worker check whether C1, C2, or C3 lacks a required timeout.
+    If that worker finds a missing timeout, have a follow-up worker use its actual findings to assess release impact.
+    If no timeout is missing, do not dispatch the follow-up worker.
+    Input facts: C1, C2, and C3 each have a required timeout.
+    Assess only these supplied facts; no project files or additional evidence exist.
+    Report the blocker IDs and whether the follow-up was needed.
+    Do not edit files, run Git commands, or publish anything.
+graders:
+  - name: workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+  - name: conditional-result
+    type: llm
+    focus: trace
+    criteria: |-
+      Inspect the actual tool results and final report, not only the Workflow invocation.
+      Require one completed Workflow worker to assess all three timeout inputs and return no missing timeouts.
+      Require the Workflow script to condition follow-up dispatch on that worker's returned findings.
+      No follow-up worker runs because all three timeouts are present.
+      The final report gives no blocker IDs and says no follow-up was needed.
+      Do not accept a proposed Workflow, an execution error, or a report before worker completion.
+      The report does not claim edits or publication.
