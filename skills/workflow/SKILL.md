@@ -1,6 +1,6 @@
 ---
 name: workflow
-description: Use for authorized multi-stage work with result dependencies or conditional successors, or when the user requests Workflow.
+description: Use when delegated stages depend on prior results, a follow-up agent is expected, or the user requests Workflow.
 argument-hint: "[goal]"
 user-invocable: true
 ---
@@ -109,17 +109,17 @@ Keep planning, design decisions, publication, and integration in the main sessio
 
 ## Run Workflow
 
-Call the native Workflow tool for each ready graph segment after defining its scope, dependencies, owners, authority, and evidence.
+For implicit selection, use Workflow when a delegated agent needs another agent's result or an identified in-scope follow-up agent may need it.
+For independent assessments that Main combines into a final report, use host Agent, including parallel assignments.
+Do not invent a follow-up or add display-only phases to justify implicit Workflow selection.
+Honor explicit Workflow requests even for one stage when the host supports the tool.
+Call native Workflow after defining scope, dependencies, owners, authority, and evidence.
 Do not stop after drafting a script or offering to run it.
-For implicit selection, use Workflow when separate substantive stages have result dependencies or conditional successors.
-Route a single substantive stage through host Agent, including independent parallel assignments, unless the user explicitly selected Workflow.
-Do not add display-only phases to justify Workflow selection.
-Honor explicit Workflow requests whenever the host supports the tool, regardless of subjective graph size or node count.
 Keep every node within the user's authorization and host permissions.
 Do not use Workflow or its agents to bypass a denied permission or expand the user's authority.
 
 If the native Workflow tool is unavailable, report that it did not run.
-For an explicit Workflow request, do not silently substitute Agent or direct execution.
+For an explicit Workflow request, do not silently substitute Agent or direct execution when Workflow is unavailable.
 For an implicit selection, continue with Agent only when it can safely deliver bounded outcomes, and report the Workflow limitation.
 Ask only when the unavailable tool blocks the goal or when a decision can change scope or authority.
 

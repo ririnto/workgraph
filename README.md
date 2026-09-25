@@ -50,14 +50,15 @@ Exploration, planning, implementation, review, and integration are possible node
 Workers complete bounded assignments within their authority.
 For authorized delivery, the main agent publishes a working branch and PR/MR before one full independent review, then integrates after required checks and confirmed blockers are resolved.
 The instructions also cover evidence reuse, bounded feedback loops, English handoffs, and native completion notifications.
-The main agent selects native Workflow for authorized multi-stage work with result dependencies or conditional successors, even without a tool-specific request.
-It uses host Agent for a single substantive stage, including independent parallel assignments.
-It does not add display-only phases to justify Workflow.
-An explicit Workflow request selects native Workflow whenever the host supports it, even for one stage.
-If explicitly selected Workflow is unavailable, report that it did not run and do not silently substitute Agent.
-For an implicit Workflow selection, report unavailability and use Agent only when it can safely deliver bounded outcomes.
-Direct main work is limited to planning, design, publication, integration, final reporting, trivial outcomes when Workflow is not selected, explicit no-delegation requests, or cases where neither delegation tool is usable.
-An explicit Workflow request overrides the trivial-outcome shortcut but does not expand the user's authority.
+The main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
+One stage qualifies when its result may trigger an identified in-scope follow-up agent.
+Main uses host Agent for independent assessments that it combines in its own final report.
+A possible future task alone does not qualify.
+An explicit Workflow request selects native Workflow even for one stage because user instructions override these routing defaults.
+Main does not add display-only phases to justify implicit Workflow selection.
+If explicitly selected Workflow is unavailable, Main reports the failure without silently substituting Agent.
+For an implicit Workflow selection, Main reports unavailability and uses Agent only when it can safely deliver bounded outcomes.
+Direct main work covers planning, design, publication, integration, final reporting, trivial outcomes when Workflow is not selected, explicit no-delegation requests, or unavailable delegation tools.
 Resolve conflicting explicit execution-tool requests before dispatch.
 
 Each role file in the table carries the common rules and that role's procedures in one self-contained body.
@@ -130,8 +131,8 @@ A Workflow run may relay the main session's `/workgraph:workflow` invocation to 
 The dispatched agent should complete that assigned task within its authority instead of launching another Workflow or returning it unworked.
 By default, the host discovers reusable scripts from the plugin-root `workflows/` directory and exposes included scripts under namespaced commands.
 Workgraph ships no reusable Workflow scripts.
-The user-invocable `/workgraph:workflow` skill calls native Workflow with a goal-specific graph, loading the host-required `workflow-authoring` guidance.
-Its description targets explicit Workflow requests and dependent multi-stage goals without routing implicit single-stage work.
+The user-invocable `/workgraph:workflow` skill calls native Workflow for explicit requests or suitable graphs, loading the host-required `workflow-authoring` guidance.
+Its description targets explicit requests, dependent stages, and identified follow-up stages.
 It does not define a fixed itinerary or replace main-session planning, publication, or integration.
 Workflow scripts cannot request design input midway through a run, but the host still enforces its agent permissions.
 For dependent follow-up work, keep completed calls unchanged and append a substantive phase to the saved script.
@@ -144,14 +145,14 @@ Revalidate source files and check inputs before relying on cached results.
 ## Skill Invocation
 
 Use the role skills to reload their instructions when needed.
-Invoke Workflow when the user asks for it or substantive dependent stages make it the better execution path.
+Invoke Workflow when the user asks for it or dependent stages or an identified in-scope follow-up make it appropriate.
 
 - Use `/workgraph:main-agent-contract` for the main session.
 - Use `/workgraph:subagent-context` for a dispatched agent.
 - Use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
 
 The role-reload skills set `disable-model-invocation: true` and `user-invocable: true`.
-The Workflow skill keeps `user-invocable: true` and remains model-invocable for explicit Workflow requests and multi-stage dependent work.
+The Workflow skill keeps `user-invocable: true` and remains model-invocable for explicit requests and graph-suitable work.
 The hooks operate without skill invocation.
 
 Both role skill bodies remain self-contained, so automatic delivery and manual role invocation need no additional file retrieval.
