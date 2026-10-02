@@ -25,6 +25,14 @@ It recommends contextual pointers to documents instead of required reads before 
 We reviewed the user-supplied copies of both documents.
 These recommendations guide instruction design without changing model or API configuration.
 
+The OpenAI [Build skills guide](https://learn.chatgpt.com/docs/build-skills.md) recommends instructions over scripts unless deterministic behavior or external tooling is needed.
+The guide does not choose host tools for Workgraph tasks.
+The [Codex subagent guide](https://learn.chatgpt.com/docs/agent-configuration/subagents.md) recommends stating whether to wait for agents and what output to return.
+It does not set a minimum timeout or guarantee a native wait tool.
+Workgraph applies a local user preference to favor suitable native host tools and name any authorized fallback's capability gap.
+Its optional five-minute-or-longer native wait applies only when the host supports it and no independent useful work remains.
+This policy does not replace completion callbacks or change Workflow routing.
+
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
 Each hook-delivered role skill embeds its common rules and role procedures, so a session receives one complete contract without extra file retrieval or a missing-file blocker.
 The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.

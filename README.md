@@ -50,6 +50,10 @@ Exploration, planning, implementation, review, and integration are possible node
 Workers complete bounded assignments within their authority.
 For authorized delivery, the main agent publishes a working branch and PR/MR before one full independent review, then integrates after required checks and confirmed blockers are resolved.
 The instructions also cover evidence reuse, bounded feedback loops, English handoffs, and native completion notifications.
+Both role contracts prefer suitable native host tools and allow fallbacks only for an unavailable or insufficient capability.
+They require the agent to name that capability gap and preserve the user's tool choice and authority.
+Main may use a supported native wait tool for subagent results after independent work ends, with a timeout of at least five minutes.
+The host still controls interruption, timeout, and completion notification behavior.
 The main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
 One stage qualifies when its result may trigger an identified in-scope follow-up agent.
 Main uses host Agent for independent assessments that it combines in its own final report.

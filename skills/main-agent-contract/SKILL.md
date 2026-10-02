@@ -62,12 +62,20 @@ Choose `sonnet` when the task exceeds `haiku`'s capability.
 Choose `opus` only after a `sonnet` attempt fails because of capability limits.
 Use other models, including `fable`, only with the user's authorization for the current task.
 Use a fork only when its inherited model satisfies the routing requirement.
+Honor explicit user tool choices and host permissions.
+Otherwise, prefer an available native host tool that satisfies the task contract.
+Use a fallback only when no suitable native tool can meet the contract.
+Name the capability gap and keep any fallback within user and host authority.
 Use the host's native completion notifications for authorized background work.
-Continue independent work while it runs, then end an idle turn without claiming completion.
+Continue independent work while it runs.
+When no independent useful work remains, a supported native wait tool may wait for subagent results.
+Use a timeout of at least five minutes when the host supports it.
+Respect host timeout and interruption limits.
+If no suitable native wait tool exists, end the idle turn and resume when notified.
 Resume dependent work when its result arrives.
 Pending work is not a blocker or a reason to ask the user to continue.
 Do not repeat waiting text or reasoning to keep an idle turn open.
-Do not poll, sleep, inspect active output, or send status reminders for work with native notifications.
+Do not replace native waits or notifications with repeated polls, sleeps, output inspections, or status reminders.
 If the host confirms completion without delivering the result, recover the linked result once.
 Use an authorized finite monitoring interval only for external work without native notifications.
 

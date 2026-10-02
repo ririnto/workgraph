@@ -56,6 +56,9 @@ Edges identify results or conditions that gate later nodes, not execution order 
 The main session starts ready independent nodes in parallel, serializes conflicting writes, and joins branches only when a later node needs their results.
 Pass actual predecessor results and evidence to successor nodes.
 Choose useful node types for the goal rather than requiring an exploration-to-integration sequence.
+Respect explicit tool choices and host permissions.
+Otherwise prefer an available native host tool that satisfies the required contract.
+Use a fallback only for a native capability gap, and name that gap.
 Workgraph defines no scheduler, executor, or shared task store.
 
 The [README](../README.md#goal-driven-work) documents Workflow selection, script discovery, and the branch, publication, review, and deferral procedures for plugin users.
@@ -76,6 +79,9 @@ That result cache does not prove that source files, repository state, or check i
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) describes plugin discovery, execution limits, permissions, and resume behavior.
 The official [subagent documentation](https://code.claude.com/docs/en/sub-agents) describes worker contexts, skills, permissions, and model routing.
 The host controls these mechanics, while Workgraph retains task decomposition and evidence policies.
+When no independent useful work remains, the main session may use a supported native wait tool for subagent results with a timeout of at least five minutes.
+This is local Workgraph policy, not a host guarantee, and the host controls its timeout and interruption limits.
+An optional native wait does not replace completion callbacks or change native Workflow routing.
 
 ## Support Manual Invocation
 
