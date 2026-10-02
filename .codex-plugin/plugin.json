@@ -1,0 +1,5 @@
+{
+  "name": "workgraph",
+  "skills": "./skills",
+  "hooks": "./hooks/codex-hooks.json"
+}

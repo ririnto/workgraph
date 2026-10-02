@@ -1,46 +1,82 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-/** Report hook errors without emitting partial context. */
+/**
+ * Report hook errors without emitting partial context.
+ */
 const fail = (message, code) => {
   console.error(`inject-context: ${message}`);
   process.exit(code);
 };
 
-/** Read the selected skill body, stripping its leading frontmatter block. */
-const readContext = (name) => {
+/**
+ * Resolve and load required text before emitting any context.
+ */
+const readInstruction = (file, stripFrontmatter) => {
   try {
-    const content = readFileSync(
-      new URL(`../skills/${name}/SKILL.md`, import.meta.url),
-      "utf-8"
-    ).trim();
-    const body = content
-      .match(
-        /^---[\t ]*\r?\n[\s\S]*?\r?\n---[\t ]*(?:\r?\n|$)(?<body>[\s\S]*)$/u
-      )
-      ?.groups.body.trim();
-    if (!body) {
-      throw new Error("empty instructions or missing skill frontmatter");
+    const source = realpathSync(
+      fileURLToPath(new URL(`../skills/${file}`, import.meta.url))
+    );
+    const content = readFileSync(source, "utf-8");
+    const text = content.replace(/^\uFEFF/u, "");
+    const frontmatter = stripFrontmatter
+      ? text.match(/^---\s*\n(?<frontmatter>[\s\S]*?)---\s*\n?/u)
+      : undefined;
+    const body = stripFrontmatter
+      ? frontmatter && text.slice(frontmatter[0].length)
+      : content;
+    if (!body?.trim()) {
+      throw new Error(
+        "empty instructions or missing required skill frontmatter"
+      );
     }
-    return body;
+    return { body, content, source };
   } catch (error) {
-    fail(`cannot load instruction file ${name}/SKILL.md: ${error.message}`, 1);
+    fail(`cannot load instruction file ${file}: ${error.message}`, 1);
   }
 };
 
-if (process.argv.length !== 3) {
-  fail("expected exactly one hook event", 2);
+if (process.argv.length !== 4) {
+  fail("expected exactly one hook event and one host", 2);
 }
-const [event] = process.argv.slice(2);
+const [event, host] = process.argv.slice(2);
 if (event !== "SessionStart" && event !== "SubagentStart") {
   fail(`unsupported hook event: ${event}`, 2);
 }
+if (host !== "claude" && host !== "codex") {
+  fail(`unsupported host: ${host}`, 2);
+}
+const role =
+  event === "SessionStart" ? "main-agent-contract" : "subagent-context";
+const skill = readInstruction(`${role}/SKILL.md`, true);
+const reference =
+  event === "SessionStart"
+    ? readInstruction(`main-agent-contract/references/${host}-models.md`, false)
+    : undefined;
+const skillContext =
+  host === "claude"
+    ? `Workgraph instructions loaded from ${skill.source}.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body}`
+    : `Workgraph instructions loaded from ${skill.source}.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${role}</name>\n<path>${skill.source}</path>\n${skill.content}\n</skill>`;
 process.stdout.write(
   `${JSON.stringify({
     hookSpecificOutput: {
-      additionalContext: readContext(
-        event === "SessionStart" ? "main-agent-contract" : "subagent-context"
-      ),
+      additionalContext: reference
+        ? `${skillContext}\n\nWorkgraph ${host} model guidance loaded from ${reference.source}.\nThe complete reference content is already loaded below.\n\n${
+            host === "claude"
+              ? reference.content
+                  .replace(/^\uFEFF/u, "")
+                  .replaceAll("\r\n", "\n")
+                  .replace(/\r$/u, "")
+                  .split("\n")
+                  .map(
+                    (line, index) => `${index + 1}\t${line.replace(/\r$/u, "")}`
+                  )
+                  .join("\n")
+              : reference.content
+          }`
+        : skillContext,
       hookEventName: event
     }
   })}\n`

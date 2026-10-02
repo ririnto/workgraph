@@ -1,17 +1,17 @@
 # Workgraph
 
-Workgraph is a Claude Code plugin for coordinating engineering work.
-It delivers one agent role's complete instructions through native hooks.
+Workgraph supplies engineering coordination skills and hooks for Claude Code and Codex.
+It delivers the selected agent role and environment-specific model guidance through native hooks.
 The runtime uses Node built-ins and needs no npm dependencies.
 Workgraph supplies instructions, not a scheduler or permission system.
 The host controls task execution, model settings, and completion notifications.
 
 ## Install
 
-Use Node.js 22 or 24 for hook execution.
+Use Node.js 18 or later for hook execution.
 Claude Code must support plugin command hooks and `additionalContext` for SessionStart and SubagentStart.
 
-Add the marketplace and install the plugin.
+For Claude Code, add the marketplace and install the plugin.
 
 ```sh
 claude plugin marketplace add ririnto/workgraph
@@ -28,16 +28,30 @@ Use `/hooks` to confirm that the SessionStart and SubagentStart handlers are act
 An installed marketplace copy and a development checkout can contain different versions.
 Check the loaded plugin before evaluating changed instructions.
 
+For Codex, install or enable the repository through a host that supports native plugin lifecycle hooks.
+Codex selects `.codex-plugin/plugin.json`, which declares `hooks/codex-hooks.json` and the shared skills directory.
+The Codex handlers use `PLUGIN_ROOT` and disable context spill with `additionalContextLimit: 0`.
+Use the host's normal plugin activation and trust controls.
+The inspected Codex source supports this configuration, while activation in the installed desktop host remains unverified.
+The Codex descriptor omits a version because `.claude-plugin/plugin.json` remains the sole maintained release version.
+Codex uses its installation default for an omitted version rather than inheriting the Claude version.
+
 ## Automatic Instructions
 
 | Event | Recipient | Instructions |
 | --- | --- | --- |
-| SessionStart | Main session | The hook injects the `skills/main-agent-contract/SKILL.md` body without frontmatter. |
-| SubagentStart | Dispatched agent | The hook injects the `skills/subagent-context/SKILL.md` body without frontmatter. |
+| SessionStart | Main session | The hook injects the Main role and its matching environment model reference, with their actual source paths. |
+| SubagentStart | Dispatched agent | The hook injects the Worker role and its actual source path, without model references. |
 
 SessionStart covers startup, resume, clear, compact, and fork events supported by the host.
 Neither hook filters events with a matcher.
-Each output contains exactly one self-contained role body without YAML frontmatter.
+Each output identifies the selected skill source and states which complete content is already loaded.
+Main also receives the selected host reference with its source path.
+Claude Code receives the native Skill text with its base directory and frontmatter-stripped body, preserving trailing whitespace.
+Codex receives the native `<skill>` text with its qualified name, source path, and complete file, including YAML frontmatter.
+Claude references use native Read line numbering, while Codex references preserve raw file text.
+Separate metadata identifies complete content already loaded by the hook.
+These text fragments match native loading, but the host still delivers them through its hook message envelope.
 Agents need no additional file reads for automatic delivery.
 The hooks do not inject repository guidance or research documents.
 
@@ -49,11 +63,8 @@ The main agent starts ready independent work in parallel when writes do not conf
 Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
 Workers complete bounded assignments within their authority.
 For authorized delivery, the main agent publishes a working branch and PR/MR before one full independent review, then integrates after required checks and confirmed blockers are resolved.
-The instructions also cover evidence reuse, bounded feedback loops, English handoffs, and native completion notifications.
-Both role contracts prefer suitable native host tools and allow fallbacks only for an unavailable or insufficient capability.
-They require the agent to name that capability gap and preserve the user's tool choice and authority.
-Main may use a supported native wait tool for subagent results after independent work ends, with a timeout of at least four minutes.
-The host still controls interruption, timeout, and completion notification behavior.
+The instructions also cover evidence freshness, bounded feedback, English handoffs, and ownership-safe cleanup.
+The host supplies tool usage, model controls, and background execution mechanics.
 The main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
 One stage qualifies when its result may trigger an identified in-scope follow-up agent.
 Main uses host Agent for independent assessments that it combines in its own final report.
@@ -67,13 +78,14 @@ Resolve conflicting explicit execution-tool requests before dispatch.
 
 Each role file in the table carries the common rules and that role's procedures in one self-contained body.
 These instructions guide agents but do not guarantee model adherence.
-For Codex work, the local default prefers available `gpt-6.1-sol` with effort matched to the task.
-Simple queries, conversions, and extraction use `low`.
-Ordinary development, review, and document analysis use `medium`.
-Complex debugging, algorithms, and architecture use `high`.
-Use `xhigh` or `max` only after evaluation justifies them for unusually hard mathematics, science, or long agent work.
-Never select the highest effort automatically.
-Explicit model choices, effort settings, configured fallbacks, and host limits take precedence.
+Main's [Codex reference](skills/main-agent-contract/references/codex-models.md) covers Luna, Sol, and Astra.
+Its [Claude Code reference](skills/main-agent-contract/references/claude-models.md) covers Haiku, Sonnet, Opus, and Fable.
+Both references order families from routine work to more complex work and assign effort by model and workload.
+Astra and Fable require the user's explicit request.
+Assignments record requested settings and report resolved settings only when the host supplies them.
+Claude hooks add no Codex model guidance, and Worker hooks add neither model reference.
+Forked workers can inherit Main's model guidance through parent history.
+Detailed model support, benchmarks, and workload reports remain in [maintainer research](docs/research.md#model-effort-and-cost).
 
 ## Goal-Driven Work
 
@@ -133,25 +145,12 @@ In the example goal, a parser-fix node and a separate regression-test node can s
 Their results gate parser checks, passing checks gate publication from a working branch to a PR/MR, and the published PR gates one full review.
 Confirmed blockers gate same-branch fixes and scoped re-review, while passing checks and tracked deferrals gate main integration.
 
-Claude Code supports dynamically composed workflows and reusable plugin Workflow scripts.
-Workflow availability depends on the host version, plan, and configuration.
-The host requires user opt-in to multi-agent orchestration before Workflow can run.
-After that opt-in, Main can select Workflow without a separate tool-specific request.
-The host controls Workflow launch and agent permission prompts.
-A Workflow run may relay the main session's `/workgraph:workflow` invocation to a dispatched agent together with a bounded computed task.
-The dispatched agent should complete that assigned task within its authority instead of launching another Workflow or returning it unworked.
-By default, the host discovers reusable scripts from the plugin-root `workflows/` directory and exposes included scripts under namespaced commands.
+The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.
-The user-invocable `/workgraph:workflow` skill calls native Workflow for explicit requests or suitable graphs, loading the host-required `workflow-authoring` guidance.
-Its description targets explicit requests, dependent stages, and identified follow-up stages.
-It does not define a fixed itinerary or replace main-session planning, publication, or integration.
-Workflow scripts cannot request design input midway through a run, but the host still enforces its agent permissions.
-For dependent follow-up work, keep completed calls unchanged and append a substantive phase to the saved script.
-Pass earlier result variables into new agent prompts when they need those results.
-Resume with the same `scriptPath` and prior `resumeFromRunId` to reuse completed results.
-Editing a completed call's prompt, cache-keyed options, or order invalidates its cache.
-The host reruns that call and all later calls.
-Revalidate source files and check inputs before relying on cached results.
+The `/workgraph:workflow` skill selects native Workflow for explicit requests or suitable dependency graphs.
+Its description targets dependent stages and identified follow-up stages without imposing an itinerary.
+Workers complete relayed bounded assignments without starting another Workflow.
+Main revalidates source files and check inputs before relying on replayed results.
 
 ## Skill Invocation
 
@@ -162,16 +161,17 @@ Invoke Workflow when the user asks for it or dependent stages or an identified i
 - Use `/workgraph:subagent-context` for a dispatched agent.
 - Use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
 
-The role-reload skills set `disable-model-invocation: true` and `user-invocable: true`.
-The Workflow skill keeps `user-invocable: true` and remains model-invocable for explicit requests and graph-suitable work.
+All skills remain user-invocable and model-invocable.
+Invocation does not change the current session's role or dispatch authority.
 The hooks operate without skill invocation.
 
-Both role skill bodies remain self-contained, so automatic delivery and manual role invocation need no additional file retrieval.
+Automatic delivery includes the required environment reference for Main.
+Manual Main loading can read the active host's reference when model selection is needed.
+Worker hooks load no model reference, and the dispatch supplies any authorized subdelegation settings.
 The Workflow skill keeps its core rules inline.
 For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.
 Read-only Workflow goals do not need that reference.
 The plugin includes no output assets or bundled helper scripts because its skills produce neither reusable files nor repeated script logic.
-Invocation does not change the session's role or grant permissions.
 
 ## Hook Errors
 
@@ -184,6 +184,10 @@ Inspect the hook error notice if instructions fail to load.
 ## Development
 
 Use npm and the Node version range in `package.json` for development.
+The development tools require Node.js 24.15 or later within major version 24.
+This development requirement is separate from the Node.js 18 minimum for hook execution.
+Plugin evaluation relocates `HOME` into its sandbox.
+If a Node version-manager shim fails there, prepend the installed Node binary's directory to the evaluator's `PATH`.
 Install the pinned development tools.
 
 ```sh
