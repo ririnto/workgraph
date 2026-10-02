@@ -69,7 +69,7 @@ Name the capability gap and keep any fallback within user and host authority.
 Use the host's native completion notifications for authorized background work.
 Continue independent work while it runs.
 When no independent useful work remains, a supported native wait tool may wait for subagent results.
-Use a timeout of at least five minutes when the host supports it.
+Use a timeout of at least four minutes when the host supports it.
 Respect host timeout and interruption limits.
 If no suitable native wait tool exists, end the idle turn and resume when notified.
 Resume dependent work when its result arrives.

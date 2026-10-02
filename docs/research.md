@@ -30,7 +30,7 @@ The guide does not choose host tools for Workgraph tasks.
 The [Codex subagent guide](https://learn.chatgpt.com/docs/agent-configuration/subagents.md) recommends stating whether to wait for agents and what output to return.
 It does not set a minimum timeout or guarantee a native wait tool.
 Workgraph applies a local user preference to favor suitable native host tools and name any authorized fallback's capability gap.
-Its optional five-minute-or-longer native wait applies only when the host supports it and no independent useful work remains.
+Its optional native wait of at least four minutes applies only when the host supports it and no independent useful work remains.
 This policy does not replace completion callbacks or change Workflow routing.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.

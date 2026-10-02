@@ -79,7 +79,7 @@ That result cache does not prove that source files, repository state, or check i
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) describes plugin discovery, execution limits, permissions, and resume behavior.
 The official [subagent documentation](https://code.claude.com/docs/en/sub-agents) describes worker contexts, skills, permissions, and model routing.
 The host controls these mechanics, while Workgraph retains task decomposition and evidence policies.
-When no independent useful work remains, the main session may use a supported native wait tool for subagent results with a timeout of at least five minutes.
+When no independent useful work remains, the main session may use a supported native wait tool for subagent results with a timeout of at least four minutes.
 This is local Workgraph policy, not a host guarantee, and the host controls its timeout and interruption limits.
 An optional native wait does not replace completion callbacks or change native Workflow routing.
 

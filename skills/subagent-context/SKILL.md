@@ -73,7 +73,7 @@ Name the capability gap and keep any fallback within dispatch, user, and host au
 Use the host's native completion notifications for authorized background work.
 Continue independent work while it runs.
 If subdelegation is authorized and no independent work remains, a supported native wait tool may wait for agent results.
-Use a timeout of at least five minutes when the host supports it.
+Use a timeout of at least four minutes when the host supports it.
 Respect host timeout and interruption limits.
 If no suitable native wait tool exists, yield and resume when notified.
 Resume dependent work when its result arrives.

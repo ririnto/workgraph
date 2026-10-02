@@ -52,7 +52,7 @@ For authorized delivery, the main agent publishes a working branch and PR/MR bef
 The instructions also cover evidence reuse, bounded feedback loops, English handoffs, and native completion notifications.
 Both role contracts prefer suitable native host tools and allow fallbacks only for an unavailable or insufficient capability.
 They require the agent to name that capability gap and preserve the user's tool choice and authority.
-Main may use a supported native wait tool for subagent results after independent work ends, with a timeout of at least five minutes.
+Main may use a supported native wait tool for subagent results after independent work ends, with a timeout of at least four minutes.
 The host still controls interruption, timeout, and completion notification behavior.
 The main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
 One stage qualifies when its result may trigger an identified in-scope follow-up agent.
