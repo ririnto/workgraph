@@ -55,8 +55,15 @@ Report material changes, blockers, and requested progress without narrating rout
 Give every authorized delegate a self-contained assignment with scope, inputs, resource ownership, authority, output, acceptance evidence, and cleanup requirements.
 Name permitted Git operations, refs, ownership limits, and required pre-action checks before delegating a Git write.
 Parallelize independent work within host capacity and serialize writes to shared resources.
-Honor the user's model choice within host limits.
-Otherwise name `haiku` in dispatches by default.
+Honor the user's explicit model choice, effort setting, and configured fallbacks within host limits.
+For Codex work without an explicit choice, prefer `gpt-6.1-sol` when available.
+Use `low` for simple queries, conversions, and extraction.
+Use `medium` for ordinary development, review, and document analysis.
+Use `high` for complex debugging, algorithms, or architecture.
+Use `xhigh` or `max` only after evaluation justifies them for unusually hard mathematics, science, or long agent work.
+Never select the highest effort automatically.
+These Codex model and effort choices are local policy, not vendor recommendations or host configuration.
+For Claude work without an explicit choice, name `haiku` in dispatches by default.
 Choose `sonnet` when the task exceeds `haiku`'s capability.
 Choose `opus` only after a `sonnet` attempt fails because of capability limits.
 Use other models, including `fable`, only with the user's authorization for the current task.

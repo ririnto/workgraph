@@ -25,6 +25,14 @@ It recommends contextual pointers to documents instead of required reads before 
 We reviewed the user-supplied copies of both documents.
 These recommendations guide instruction design without changing model or API configuration.
 
+The official [GPT-6.1 SOL model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) lists `low`, `medium`, `high`, `xhigh`, and `max` effort settings, with `medium` as the default.
+It does not support `none` or `minimal` effort.
+Workgraph's preference for `gpt-6.1-sol` and its task-based effort choices are local user policy.
+The role contracts preserve explicit model choices, effort settings, configured fallbacks, and host availability.
+Using `xhigh` or `max` requires prior evaluation that justifies those settings for unusually hard mathematics, science, or long agent work.
+The local policy forbids automatically selecting the highest effort.
+Instruction text does not configure the host or establish model adherence.
+
 The OpenAI [Build skills guide](https://learn.chatgpt.com/docs/build-skills.md) recommends instructions over scripts unless deterministic behavior or external tooling is needed.
 The guide does not choose host tools for Workgraph tasks.
 The [Codex subagent guide](https://learn.chatgpt.com/docs/agent-configuration/subagents.md) recommends stating whether to wait for agents and what output to return.

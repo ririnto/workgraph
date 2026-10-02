@@ -67,6 +67,13 @@ Resolve conflicting explicit execution-tool requests before dispatch.
 
 Each role file in the table carries the common rules and that role's procedures in one self-contained body.
 These instructions guide agents but do not guarantee model adherence.
+For Codex work, the local default prefers available `gpt-6.1-sol` with effort matched to the task.
+Simple queries, conversions, and extraction use `low`.
+Ordinary development, review, and document analysis use `medium`.
+Complex debugging, algorithms, and architecture use `high`.
+Use `xhigh` or `max` only after evaluation justifies them for unusually hard mathematics, science, or long agent work.
+Never select the highest effort automatically.
+Explicit model choices, effort settings, configured fallbacks, and host limits take precedence.
 
 ## Goal-Driven Work
 
