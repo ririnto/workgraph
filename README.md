@@ -33,8 +33,9 @@ Codex selects `.codex-plugin/plugin.json`, which declares `hooks/codex-hooks.jso
 The Codex handlers use `PLUGIN_ROOT` and disable context spill with `additionalContextLimit: 0`.
 Use the host's normal plugin activation and trust controls.
 The inspected Codex source supports this configuration, while activation in the installed desktop host remains unverified.
-The Codex descriptor omits a version because `.claude-plugin/plugin.json` remains the sole maintained release version.
-Codex uses its installation default for an omitted version rather than inheriting the Claude version.
+Both host descriptors declare the same release version.
+Each host reads its own descriptor, so neither version declaration replaces the other.
+Follow [Version Updates](#version-updates) when publishing changes.
 
 ## Automatic Instructions
 
@@ -199,3 +200,46 @@ It identifies the checks for prose, hook execution, and plugin configuration cha
 Read [the design](docs/design.md) for delivery mechanics, instruction ownership, and test coverage.
 Read [the research notes](docs/research.md) for source evidence and its limits.
 [Third-party notices](THIRD_PARTY_NOTICES.md) record attribution.
+
+## Version Updates
+
+Maintain one release number in both host descriptors.
+
+| File | Field |
+| --- | --- |
+| `.claude-plugin/plugin.json` | `version` |
+| `.codex-plugin/plugin.json` | `version` |
+
+Use `yyyy.mm.dd.seq`, with `01` for the first release of a day.
+Increment the sequence for another release that day.
+Update both fields together when publishing plugin changes.
+
+Claude Code reads the plugin manifest version before an optional marketplace entry version.
+Its marketplace-level version describes the catalog, not the plugin release.
+Workgraph omits both marketplace version fields because its plugin manifest supplies the release number.
+The private development package also needs no version.
+See the [Claude marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-entries) for these field definitions.
+
+Codex selects its own descriptor instead of the Claude descriptor.
+It does not inherit the Claude version when its selected descriptor omits one.
+Both declarations are therefore required for the same explicit release number across these hosts.
+
+1. Set the same new release number in both host descriptors.
+2. Run the applicable checks from [AGENTS.md](AGENTS.md), including both plugin validators.
+3. Inspect the complete diff and confirm both version fields match.
+4. Commit the changes and versions together.
+5. Push the authorized distribution branch and confirm the remote contains the commit.
+
+A working-branch push reaches installed users only when their marketplace source tracks that branch.
+Follow the authorized repository release process to update the distribution branch.
+
+For an installed Claude marketplace copy, update the plugin after publication.
+
+```sh
+claude plugin update workgraph@workgraph
+```
+
+Run `/reload-plugins` or start a new session to load the downloaded version.
+Local development directories load current files on reload or session startup without requiring a version change.
+See the [Claude loading reference](https://code.claude.com/docs/en/plugins/loading#versions-and-updates) for cache and update behavior.
+For Codex, use the host's plugin update controls and start a new session after updating.

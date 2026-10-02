@@ -92,8 +92,9 @@ Run formatting fixes only within the authorized change.
 
 ## Version And Publication
 
-Keep the version in `.claude-plugin/plugin.json` using `yyyy.mm.dd.seq`.
-Do not duplicate it in the marketplace or package manifest.
+Keep matching versions in both host plugin manifests using `yyyy.mm.dd.seq`.
+Follow the release procedure in `README.md`.
+Omit version fields from the marketplace and private package manifest.
 Publish only to a user-authorized destination after inspecting the diff and required evidence.
 Preserve unrelated changes and stop on unexplained concurrent edits.
 Keep credentials, private environment details, and external work-item identifiers out of committed content.
