@@ -3,6 +3,7 @@
 ## Orchestration
 
 Use available native delegation tools for independent and dependent assignments.
+When only delegated results remain, use the native agent wait tool with a 240000 ms timeout.
 Codex does not provide Claude Code's native Workflow tool.
 
 ## Model Selection

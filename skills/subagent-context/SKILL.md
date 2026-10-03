@@ -38,7 +38,7 @@ For granted subdelegation, use the dispatch's model, effort, resource ownership,
 ### Assignment And Evidence
 
 Give each shared resource one writer.
-End an idle turn when only native notifications remain, without claiming completion.
+Without a native agent wait tool, end an idle turn when only completion notifications remain, without claiming completion.
 Revalidate source files, repository state, and check inputs before relying on replayed agent results.
 Check partial effects before retrying interrupted writes.
 Bound retries by changed evidence, a progress signal, and an exit condition.

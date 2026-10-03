@@ -377,9 +377,10 @@ Its prompt intervention did not significantly change final outcomes when it chan
 That result does not show that repository-required checks can be skipped.
 Workgraph keeps required checks in the consumer repository's validation process.
 
-The explicit idle-turn rule addresses the user's observed repeated waiting behavior.
-Agents continue independent work or end the turn until a native completion notification arrives.
-This rule applies to background Bash as well as agent tools.
+The waiting rules address the user's observed repeated waiting behavior.
+Codex Main uses the native agent wait tool with the user's requested four-minute timeout when only delegated results remain.
+Without a native agent wait tool, agents end an idle turn until a completion notification arrives.
+This idle-turn rule also applies to background Bash.
 The papers provide coordination context but do not prove this prompt resolves the observed behavior.
 
 ## Writing And Host Contracts
