@@ -125,7 +125,10 @@ for (const [event, name] of roles) {
     assert.match(frontmatter, new RegExp(`^name: ${name}$`, "mu"));
     assert.match(frontmatter, /^user-invocable: true$/mu);
     assert.ok(body.trim());
-    assert.match(body, /^# Workgraph (?:Main Agent|Worker)$/mu);
+    assert.equal(
+      body.match(/^# (?<heading>.+)$/mu)?.groups?.heading,
+      event === "SessionStart" ? "Main Agent Contract" : "Subagent Context"
+    );
     assert.match(body, /Invoking this skill does not/u);
   });
 }

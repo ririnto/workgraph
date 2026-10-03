@@ -4,7 +4,7 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
 user-invocable: true
 ---
 
-# Workgraph Worker
+# Subagent Context
 
 ## Role And Authority
 

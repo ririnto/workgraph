@@ -7,6 +7,7 @@
           {
             "type": "command",
             "command": "node \"${PLUGIN_ROOT}/hooks/inject-context.mjs\" SessionStart codex",
+            "statusMessage": "Main Agent Contract",
             "timeout": 5,
             "additionalContextLimit": 0
           }
@@ -19,6 +20,7 @@
           {
             "type": "command",
             "command": "node \"${PLUGIN_ROOT}/hooks/inject-context.mjs\" SubagentStart codex",
+            "statusMessage": "Subagent Context",
             "timeout": 5,
             "additionalContextLimit": 0
           }
