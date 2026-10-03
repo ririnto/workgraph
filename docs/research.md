@@ -53,7 +53,7 @@ Use suitable native host tools and name any authorized fallback's capability gap
 The role skills leave native waiting and completion mechanics to the host.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
-Each hook delivers the selected role and, for Main, the active host's model reference without model-side retrieval.
+Each hook delivers the selected role and, for Main, the active host's orchestration and model reference without model-side retrieval.
 The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.
 The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
@@ -68,7 +68,7 @@ These recommendations support Workgraph's completion and native-callback instruc
 
 The guide recommends removing unnecessary thinking instructions and measuring the effects of older prompt workarounds.
 Workgraph keeps actionable scope, authority, and evidence requirements rather than prescribing reasoning steps.
-Role procedures remain inline, while Main model guidance loads only for the active environment.
+Role procedures remain inline, while Main orchestration and model guidance load only for the active environment.
 We have not measured these prompt choices in Workgraph on the selected models.
 
 We fetched the official [Claude Fable 5.1](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1.md) and [Claude Sonnet 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5.md) prompting guides.
@@ -174,7 +174,7 @@ We reviewed the official [Claude Code skills documentation](https://code.claude.
 Claude uses descriptions to select skills and supports user-only invocation through frontmatter.
 The Agent Skills guidance recommends clear activation conditions, focused bodies, and conditional references.
 The specification recommends fewer than 500 lines per body and one level of references.
-Workgraph keeps role rules inline and injects the matching model reference during Main startup.
+Workgraph keeps role rules inline and injects the matching host reference during Main startup.
 The hook names loaded source paths so the model can locate references and recognize content already present.
 All three skills remain user-invocable and model-invocable.
 Their bodies define role and scope boundaries independently of invocation metadata.
@@ -201,6 +201,7 @@ GitHub references use branches or tags so maintainers can inspect the current im
 | Notifications, no polling, fresh-context briefing, and checking delegated changes. | Installed Claude Code Agent tool descriptions provide these instructions in their foreground and background variants. | Retain resource ownership and acceptance criteria instead of repeating Agent usage. |
 | Reading an existing file before writing it. | Installed Claude Code Write tool descriptions require the read in both regular and lean variants. | Remove the repeated read-before-edit rule. |
 | Workflow opt-in, native authoring, journals, resume identifiers, cache invalidation, and later-call reruns. | Installed Claude Code Workflow descriptions and their native authoring reference define these mechanics. | Remove the repeated continuation recipe. |
+| Native delegation without Claude Code Workflow. | Codex's [tool registration](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/spec_plan.rs) registers agent lifecycle and messaging tools. | Keep Workflow selection in the Claude reference and use native delegation in Codex. |
 | Peer messages cannot grant permission or bypass denied actions. | Installed Claude Code SendMessage descriptions and peer-message reminders define these restrictions. | Remove repeated permission-laundering warnings. |
 
 Codex [renders captured model instructions](https://github.com/openai/codex/blob/main/codex-rs/prompts/src/model_instructions.rs).
@@ -330,7 +331,7 @@ The article's research-task gains do not establish coding-task gains.
 [More Agents Is All You Need](https://arxiv.org/abs/2402.05120) reports gains from independent sampling and voting on reasoning benchmarks.
 Its token cost rises with agent count, and its setup does not test delegated coding workers.
 This supports testing independent fan-out as a simpler baseline, not assuming more agents improve every task.
-Workgraph selects Workflow for identified dependent or follow-up stages.
+In Claude Code, Workgraph selects Workflow for identified dependent or follow-up stages.
 The sources do not establish that this routing improves Workgraph outcomes.
 
 ## Verification And Recovery

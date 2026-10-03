@@ -1,4 +1,17 @@
-# Claude Code Model Selection
+# Claude Code Guidance
+
+## Orchestration
+
+Use native Workflow when an assigned or identified in-scope follow-up agent needs another agent's result.
+Use host Agent for independent assignments whose results Main combines.
+A request to orchestrate subagents does not establish result dependencies.
+Do not count a speculative future task as a follow-up agent.
+Treat `/workgraph:workflow` or another explicit Workflow request as the user's tool choice, even for one stage.
+Do not add display-only phases to justify implicit Workflow selection.
+If implicitly selected Workflow is unavailable, report the limitation.
+Use Agent for bounded outcomes only when it can safely meet the task contract.
+
+## Model Selection
 
 Choose a supported model for the task's difficulty.
 Use each family's current model guidance and workload evidence to adjust these effort starting points.

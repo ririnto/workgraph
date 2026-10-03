@@ -53,17 +53,17 @@ const role =
 const skill = readInstruction(`${role}/SKILL.md`, true);
 const reference =
   event === "SessionStart"
-    ? readInstruction(`main-agent-contract/references/${host}-models.md`, false)
+    ? readInstruction(`main-agent-contract/references/${host}.md`, false)
     : undefined;
 const skillContext =
   host === "claude"
-    ? `Workgraph instructions loaded from ${skill.source}.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body}`
-    : `Workgraph instructions loaded from ${skill.source}.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${role}</name>\n<path>${skill.source}</path>\n${skill.content}\n</skill>`;
+    ? `Workgraph instructions loaded from ${skill.source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body}`
+    : `Workgraph instructions loaded from ${skill.source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${role}</name>\n<path>${skill.source}</path>\n${skill.content}\n</skill>`;
 process.stdout.write(
   `${JSON.stringify({
     hookSpecificOutput: {
       additionalContext: reference
-        ? `${skillContext}\n\nWorkgraph ${host} model guidance loaded from ${reference.source}.\nThe complete reference content is already loaded below.\n\n${
+        ? `${skillContext}\n\nWorkgraph ${host} guidance loaded from ${reference.source}.\nThe complete reference content is already loaded below.\n\n${
             host === "claude"
               ? reference.content
                   .replace(/^\uFEFF/u, "")

@@ -9,8 +9,8 @@ Complete authorized changes and relevant checks before returning a final result,
 Keep contributor conventions and validation commands here.
 Keep consumer behavior in `skills/`.
 Keep role procedures self-contained in each role's `SKILL.md`.
-Keep environment-specific model guidance in Main Agent references, and inject only the selected host's reference.
-Add no model guidance in Worker hook output.
+Keep host-specific orchestration and model guidance in Main Agent references, and inject only the selected host's reference.
+Add no host reference in Worker hook output.
 Identify each loaded source by its actual file path and state which complete content is already present.
 Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
 Load every selected file before emitting context, without requiring model retrieval during hook startup.

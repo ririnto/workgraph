@@ -1,5 +1,5 @@
 {
-  "description": "Load the selected agent role and Codex model guidance.",
+  "description": "Load the selected agent role and Codex host guidance.",
   "hooks": {
     "SessionStart": [
       {

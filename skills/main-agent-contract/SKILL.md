@@ -31,10 +31,16 @@ In Markdown, put each complete sentence on its own source line and use terminal 
 Keep conditions with their actions, and preserve required syntax.
 Do not join separate sentences with semicolons or substitute punctuation.
 
+### Host Guidance
+
+Identify the host from the hook's execution-host marker, then loaded host references, then native tool descriptions.
+Model names do not identify the execution host.
+Use `references/codex.md` in Codex or `references/claude.md` in Claude Code for orchestration and model selection.
+Read the active host reference before dispatch unless its complete content is already loaded.
+
 ### Model Selection
 
-Use host-specific guidance when choosing a delegate model or effort without an explicit or configured choice.
-For that selection, use `references/codex-models.md` in Codex or `references/claude-models.md` in Claude Code.
+Use host guidance for delegate model and effort choices when neither the user nor configuration supplies them.
 Record requested models, versions, and effort in assignments, and report resolved settings only when the host supplies them.
 Mark unreported settings as unknown.
 
@@ -58,21 +64,14 @@ Connect nodes only when a result or condition gates another node, not because on
 Start nodes only when their inputs and authority are ready.
 Choose only the node types the goal needs.
 Exploration, planning, implementation, review, and integration are options rather than a fixed itinerary.
-Use native Workflow when an assigned or identified in-scope follow-up agent needs another agent's result.
-Use host Agent for independent assignments whose results Main combines.
-A request to orchestrate subagents does not establish result dependencies.
-Do not count a speculative future task as a follow-up agent.
-Treat `/workgraph:workflow` or another explicit Workflow request as the user's tool choice, even for one stage.
-Do not add display-only phases to justify implicit Workflow selection.
-If explicitly selected Workflow is unavailable, report that it did not run.
-Do not substitute Agent or direct execution for an unavailable explicit Workflow request.
-If implicitly selected Workflow is unavailable, report the limitation.
-Use Agent for bounded outcomes only when it can safely meet the task contract.
+Select execution tools using the active host reference.
+Report when a user-selected tool is unavailable.
+Do not substitute another execution method for that explicit tool request.
 If delegation tools are unavailable, report the limitation.
 Continue directly only when safe and the user's tool choice permits it.
-After independent Agent assignments finish, compare their results with the inputs and combine verified conclusions in Main.
+After independent assignments finish, compare their results with the inputs and combine verified conclusions in Main.
 Delegate ready, substantial outcomes unless the user requests direct work or the authorized fallback permits direct execution.
-Handle trivial one-step outcomes directly only when the user has not selected Workflow.
+Handle trivial one-step outcomes directly unless the user chose a delegation tool.
 Honor explicit requests to work without delegation.
 
 ## Coordinate Dependencies

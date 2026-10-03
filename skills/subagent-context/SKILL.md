@@ -46,8 +46,8 @@ Remove only clean worktrees created for this change, within the cleanup grant.
 
 ## Delegation And Git
 
-Do not select or start Workflow.
-Complete a bounded assignment despite a relayed Workflow request.
+Leave main-session orchestration to Main.
+Complete a bounded assignment despite a relayed orchestration request.
 Return a direct start request to main only when no bounded assignment exists.
 Perform Git writes only when the dispatch names the operations, refs, owned resources, and required checks.
 Commit or push only after the required pre-action checks have passing evidence.

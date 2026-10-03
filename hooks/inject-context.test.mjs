@@ -55,18 +55,16 @@ const expectedOutput = (event, host, rootSkills = skills) => {
   const content = readFileSync(source, "utf-8");
   const context =
     host === "claude"
-      ? `Workgraph instructions loaded from ${source}.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${content.replace(/^\uFEFF/u, "").replace(/^---\s*\n(?<frontmatter>[\s\S]*?)---\s*\n?/u, "")}`
-      : `Workgraph instructions loaded from ${source}.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`;
+      ? `Workgraph instructions loaded from ${source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${content.replace(/^\uFEFF/u, "").replace(/^---\s*\n(?<frontmatter>[\s\S]*?)---\s*\n?/u, "")}`
+      : `Workgraph instructions loaded from ${source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`;
   const reference =
     event === "SessionStart"
-      ? realpathSync(
-          path.join(rootSkills, name, "references", `${host}-models.md`)
-        )
+      ? realpathSync(path.join(rootSkills, name, "references", `${host}.md`))
       : undefined;
   return {
     hookSpecificOutput: {
       additionalContext: reference
-        ? `${context}\n\nWorkgraph ${host} model guidance loaded from ${reference}.\nThe complete reference content is already loaded below.\n\n${
+        ? `${context}\n\nWorkgraph ${host} guidance loaded from ${reference}.\nThe complete reference content is already loaded below.\n\n${
             host === "claude"
               ? readFileSync(reference, "utf-8")
                   .replace(/^\uFEFF/u, "")
@@ -101,6 +99,20 @@ for (const [event, name] of roles) {
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
       assert.deepEqual(JSON.parse(result.stdout), expectedOutput(event, host));
+      assert.match(
+        result.stdout,
+        new RegExp(
+          `The active execution host is ${host === "claude" ? "Claude Code" : "Codex"}\\.`,
+          "u"
+        )
+      );
+      assert.doesNotMatch(
+        result.stdout,
+        new RegExp(
+          `The active execution host is ${host === "claude" ? "Codex" : "Claude Code"}\\.`,
+          "u"
+        )
+      );
     });
   }
 
@@ -151,7 +163,7 @@ test("configured Claude hooks load relocated skills and references with LF or CR
             "skills",
             "main-agent-contract",
             "references",
-            `${host}-models.md`
+            `${host}.md`
           ),
           `\n# Only ${host}\n\nUse ${host} guidance.\n`.replaceAll(
             "\n",
@@ -199,7 +211,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
           "skills",
           "main-agent-contract",
           "references",
-          `${host}-models.md`
+          `${host}.md`
         ),
         guidance
       );
@@ -215,11 +227,11 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
           : `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${raw}\n</skill>`;
       const reference =
         event === "SessionStart"
-          ? `\n\nWorkgraph ${host} model guidance loaded from ${realpathSync(path.join(root, "skills", name, "references", `${host}-models.md`))}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`
+          ? `\n\nWorkgraph ${host} guidance loaded from ${realpathSync(path.join(root, "skills", name, "references", `${host}.md`))}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`
           : "";
       assert.deepEqual(JSON.parse(result.stdout), {
         hookSpecificOutput: {
-          additionalContext: `Workgraph instructions loaded from ${source}.\n${host === "claude" ? "The complete skill body is already loaded below, without YAML frontmatter." : "The complete skill file is already loaded below, including YAML frontmatter."}\n\n${fragment}${reference}`,
+          additionalContext: `Workgraph instructions loaded from ${source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded below, without YAML frontmatter." : "The complete skill file is already loaded below, including YAML frontmatter."}\n\n${fragment}${reference}`,
           hookEventName: event
         }
       });
@@ -231,7 +243,7 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
   const root = copyPlugin(t);
   for (const file of [
     "main-agent-contract/SKILL.md",
-    "main-agent-contract/references/claude-models.md"
+    "main-agent-contract/references/claude.md"
   ]) {
     const target = path.join(root, "skills", file);
     const source = `${target}.source`;
@@ -285,7 +297,7 @@ test("configured Codex hooks load complete relocated skill files without a conte
   }
 });
 
-test("main loads only the selected host's model reference", (t) => {
+test("main loads only the selected host reference", (t) => {
   const root = copyPlugin(t);
   for (const host of hosts) {
     const unselected = host === "claude" ? "codex" : "claude";
@@ -294,7 +306,7 @@ test("main loads only the selected host's model reference", (t) => {
       "skills",
       "main-agent-contract",
       "references",
-      `${unselected}-models.md`
+      `${unselected}.md`
     );
     const content = readFileSync(target, "utf-8");
     rmSync(target);
@@ -307,11 +319,36 @@ test("main loads only the selected host's model reference", (t) => {
       JSON.parse(result.stdout),
       expectedOutput("SessionStart", host, path.join(root, "skills"))
     );
+    const context = JSON.parse(result.stdout).hookSpecificOutput
+      .additionalContext;
+    if (host === "codex") {
+      assert.match(
+        context,
+        /native delegation tools for independent and dependent assignments/u
+      );
+      assert.doesNotMatch(context, /Use native Workflow|Use host Agent/u);
+    } else {
+      assert.match(context, /Use native Workflow/u);
+      assert.match(context, /Use host Agent/u);
+    }
     writeFileSync(target, content);
   }
 });
 
-test("worker hooks append neither host's model reference", (t) => {
+test("common Main excludes Claude routing and Workflow discovery is Claude-scoped", () => {
+  assert.doesNotMatch(
+    readFileSync(path.join(skills, "main-agent-contract", "SKILL.md"), "utf-8"),
+    /Workflow|host Agent/u
+  );
+  const [, metadata, body] = readFileSync(
+    path.join(skills, "workflow", "SKILL.md"),
+    "utf-8"
+  ).split(/^---$/mu);
+  assert.match(metadata, /Use in the Claude Code main session/u);
+  assert.match(body, /In Codex, report that native Workflow did not run/u);
+});
+
+test("worker hooks append no host reference", (t) => {
   const root = copyPlugin(t);
   rmSync(path.join(root, "skills", "main-agent-contract", "references"), {
     recursive: true
@@ -326,7 +363,7 @@ test("worker hooks append neither host's model reference", (t) => {
       JSON.parse(result.stdout),
       expectedOutput("SubagentStart", host, path.join(root, "skills"))
     );
-    assert.doesNotMatch(result.stdout, /model guidance loaded from/u);
+    assert.doesNotMatch(result.stdout, /guidance loaded from/u);
   }
 });
 
@@ -385,9 +422,9 @@ for (const [event, name] of roles) {
 }
 
 for (const host of hosts) {
-  test(`${host}: missing, empty, or unreadable model reference produces no partial output`, (t) => {
+  test(`${host}: missing, empty, or unreadable host reference produces no partial output`, (t) => {
     const root = copyPlugin(t);
-    const file = `main-agent-contract/references/${host}-models.md`;
+    const file = `main-agent-contract/references/${host}.md`;
     const target = path.join(root, "skills", file);
     const copiedScript = path.join(root, "hooks", "inject-context.mjs");
     rmSync(target);

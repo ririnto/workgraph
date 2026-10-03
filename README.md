@@ -1,7 +1,7 @@
 # Workgraph
 
 Workgraph supplies engineering coordination skills and hooks for Claude Code and Codex.
-It delivers the selected agent role and environment-specific model guidance through native hooks.
+It delivers the selected agent role and host-specific orchestration and model guidance through native hooks.
 The runtime uses Node built-ins and needs no npm dependencies.
 Workgraph supplies instructions, not a scheduler or permission system.
 The host controls task execution, model settings, and completion notifications.
@@ -41,12 +41,13 @@ Follow [Version Updates](#version-updates) when publishing changes.
 
 | Event | Recipient | Instructions |
 | --- | --- | --- |
-| SessionStart | Main session | The hook injects the Main role and its matching environment model reference, with their actual source paths. |
-| SubagentStart | Dispatched agent | The hook injects the Worker role and its actual source path, without model references. |
+| SessionStart | Main session | The hook injects the Main role and its matching host reference, with their actual source paths. |
+| SubagentStart | Dispatched agent | The hook injects the Worker role and its actual source path, without host references. |
 
 SessionStart covers startup, resume, clear, compact, and fork events supported by the host.
 Neither hook filters events with a matcher.
 Each output identifies the selected skill source and states which complete content is already loaded.
+Each hook names the execution host so agents can distinguish it from the selected model family.
 Main also receives the selected host reference with its source path.
 Claude Code receives the native Skill text with its base directory and frontmatter-stripped body, preserving trailing whitespace.
 Codex receives the native `<skill>` text with its qualified name, source path, and complete file, including YAML frontmatter.
@@ -66,26 +67,32 @@ Workers complete bounded assignments within their authority.
 For authorized delivery, the main agent publishes a working branch and PR/MR before one full independent review, then integrates after required checks and confirmed blockers are resolved.
 The instructions also cover evidence freshness, bounded feedback, English handoffs, and ownership-safe cleanup.
 The host supplies tool usage, model controls, and background execution mechanics.
-The main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
+In Claude Code, the main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
 One stage qualifies when its result may trigger an identified in-scope follow-up agent.
-Main uses host Agent for independent assessments that it combines in its own final report.
+Claude Main uses host Agent for independent assessments that it combines in its own final report.
 A possible future task alone does not qualify.
 An explicit Workflow request selects native Workflow even for one stage because user instructions override these routing defaults.
 Main does not add display-only phases to justify implicit Workflow selection.
 If explicitly selected Workflow is unavailable, Main reports the failure without silently substituting Agent.
 For an implicit Workflow selection, Main reports unavailability and uses Agent only when it can safely deliver bounded outcomes.
-Direct main work covers planning, design, publication, integration, final reporting, trivial outcomes when Workflow is not selected, explicit no-delegation requests, or unavailable delegation tools.
+These Workflow selection rules apply to Claude Code.
+Codex uses its available native delegation tools for independent and dependent assignments.
+Codex Main coordinates dependencies and passes verified predecessor results to successors.
+Codex does not provide Claude Code's native Workflow tool.
+For an explicit Workflow request in Codex, Main reports that it did not run and preserves the requested tool choice.
+Direct main work covers planning, design, publication, integration, final reporting, trivial outcomes without an explicit delegation-tool choice, explicit no-delegation requests, or unavailable delegation tools.
 Resolve conflicting explicit execution-tool requests before dispatch.
 
 Each role file in the table carries the common rules and that role's procedures in one self-contained body.
 These instructions guide agents but do not guarantee model adherence.
-Main's [Codex reference](skills/main-agent-contract/references/codex-models.md) covers Luna, Sol, and Astra.
-Its [Claude Code reference](skills/main-agent-contract/references/claude-models.md) covers Haiku, Sonnet, Opus, and Fable.
+Main's [Codex reference](skills/main-agent-contract/references/codex.md) covers Luna, Sol, and Astra.
+Its [Claude Code reference](skills/main-agent-contract/references/claude.md) covers Haiku, Sonnet, Opus, and Fable.
 Both references order families from routine work to more complex work and assign effort by model and workload.
 Astra and Fable require the user's explicit request.
 Assignments record requested settings and report resolved settings only when the host supplies them.
-Claude hooks add no Codex model guidance, and Worker hooks add neither model reference.
-Forked workers can inherit Main's model guidance through parent history.
+Each Main hook loads only its host's orchestration and model guidance.
+Worker hooks add no host reference.
+Forked workers can inherit Main's host guidance through parent history.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](docs/research.md#model-effort-and-cost).
 
 ## Goal-Driven Work
@@ -94,7 +101,7 @@ Use only the nodes and checks that serve the goal.
 Reuse existing facts and plans, and skip exploration or planning when they already answer the relevant questions.
 Keep the goal, scope, owners, authority, working branch, target branch, and acceptance evidence in main.
 
-Request a goal through the Workflow entry point without prescribing an itinerary.
+In Claude Code, request a goal through the Workflow entry point without prescribing an itinerary.
 
 ```text
 /workgraph:workflow Fix the parser's escaped-quote bug, publish a PR for review, and integrate it into main.
@@ -148,7 +155,7 @@ Confirmed blockers gate same-branch fixes and scoped re-review, while passing ch
 
 The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.
-The `/workgraph:workflow` skill selects native Workflow for explicit requests or suitable dependency graphs.
+The `/workgraph:workflow` skill selects Claude Code's native Workflow for explicit requests or suitable dependency graphs.
 Its description targets dependent stages and identified follow-up stages without imposing an itinerary.
 Workers complete relayed bounded assignments without starting another Workflow.
 Main revalidates source files and check inputs before relying on replayed results.
@@ -156,19 +163,20 @@ Main revalidates source files and check inputs before relying on replayed result
 ## Skill Invocation
 
 Use the role skills to reload their instructions when needed.
-Invoke Workflow when the user asks for it or dependent stages or an identified in-scope follow-up make it appropriate.
+In Claude Code, invoke Workflow for user requests, dependent stages, or an identified in-scope follow-up.
 
 - Use `/workgraph:main-agent-contract` for the main session.
 - Use `/workgraph:subagent-context` for a dispatched agent.
-- Use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
+- In Claude Code, use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
 
 All skills remain user-invocable and model-invocable.
 Invocation does not change the current session's role or dispatch authority.
 The hooks operate without skill invocation.
 
 Automatic delivery includes the required environment reference for Main.
-Manual Main loading can read the active host's reference when model selection is needed.
-Worker hooks load no model reference, and the dispatch supplies any authorized subdelegation settings.
+Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
+Worker hooks load no host reference, and the dispatch supplies any authorized subdelegation settings.
+The Workflow skill reports unavailability and stops when invoked in Codex.
 The Workflow skill keeps its core rules inline.
 For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.
 Read-only Workflow goals do not need that reference.

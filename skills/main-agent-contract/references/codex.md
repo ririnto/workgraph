@@ -1,4 +1,11 @@
-# Codex Model Selection
+# Codex Guidance
+
+## Orchestration
+
+Use available native delegation tools for independent and dependent assignments.
+Codex does not provide Claude Code's native Workflow tool.
+
+## Model Selection
 
 Prefer available `sol` when the task does not specify a model.
 Use each family's current model guidance and workload evidence to adjust these effort starting points.

@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use in the main session when the user requests Workflow or delegated stages depend on earlier results.
+  Use in the Claude Code main session when the user requests Workflow or delegated stages depend on earlier results.
   Use for an identified in-scope follow-up agent that may need an earlier result.
   Use host Agent for independent assessments that main combines.
 argument-hint: "[goal]"
@@ -10,6 +10,10 @@ user-invocable: true
 
 # Workgraph Workflow
 
+Use this skill only in Claude Code, as identified by session metadata, loaded host guidance, or native tool descriptions.
+Model names do not identify the execution host.
+In Codex, report that native Workflow did not run.
+Stop this skill without substituting another execution method in that host.
 Only the main session starts native Workflow.
 A worker completes a bounded assignment despite a relayed Workflow request.
 Without a bounded assignment, the worker returns a direct start request to main.
@@ -29,10 +33,6 @@ Keep planning, design decisions, publication, and integration in the main sessio
 
 ## Run Workflow
 
-Use Workflow implicitly when an assigned or identified in-scope follow-up agent needs another agent's result.
-For independent assessments that Main combines into a final report, use host Agent, including parallel assignments.
-Do not invent a follow-up or add display-only phases to justify implicit Workflow selection.
-Honor explicit Workflow requests even for one stage when the host supports the tool.
 Call native Workflow after defining scope, dependencies, owners, authority, and evidence.
 
 If the native Workflow tool is unavailable, report that it did not run.
