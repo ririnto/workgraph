@@ -28,7 +28,7 @@ Host references supply task defaults and escalation conditions without requiring
 Worker model selection stays in the dispatch, without a model-policy reference.
 The hooks provide the selected role and, for Main, the matching environment reference before the model begins work.
 Workflow adds Claude Code graph-specific operations after the Main contract.
-Its delivery reference supplies node inputs, outputs, and follow-up fields without restating that contract.
+Its delivery reference maps authorized engineering operations to node inputs and outputs.
 Consumers can follow their instructions without reading repository conventions or research history.
 
 Keep host mechanics in the host's tool descriptions.
@@ -113,7 +113,7 @@ Each role keeps its own procedures inline.
 Manual Main invocation reads the active host reference before dispatch unless its complete content is already loaded.
 The hook already supplies that reference during automatic Main delivery.
 Worker needs no other role or host reference.
-Workflow keeps its execution gates inline and uses the existing Main scope.
+Workflow uses the current goal's operational inputs and verifies returned evidence.
 It loads `skills/workflow/references/delivery.md` only when authorized engineering delivery requires its detailed graph pattern.
 No asset or helper script exists without a concrete output or repeated operation that needs one.
 
