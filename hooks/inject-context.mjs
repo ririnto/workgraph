@@ -32,7 +32,11 @@ const readInstruction = (file, stripFrontmatter) => {
       : content;
     if (
       (stripFrontmatter &&
-        (lines[0].trim() !== "---" || closingFrontmatterLine < 2)) ||
+        (lines[0].trim() !== "---" ||
+          closingFrontmatterLine < 1 ||
+          !lines
+            .slice(1, closingFrontmatterLine)
+            .some((line) => line.trim()))) ||
       !body.trim()
     ) {
       throw new Error(

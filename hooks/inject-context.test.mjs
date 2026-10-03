@@ -469,6 +469,7 @@ for (const [event, name] of roles) {
     for (const source of [
       "# No frontmatter\n\nRole instructions.",
       "---\n---\n# Empty frontmatter\n",
+      "---\n \t\n---\n# Whitespace frontmatter\n",
       `---\nname: ${name}\n`,
       `---\nname: ${name}\n--- trailing text\n# Role\n`,
       `---\nname: ${name}\n---`,
