@@ -126,7 +126,8 @@ Push only the working branch for PR delivery, and never push task changes direct
 Use named branch references and the current PR diff, not fixed commit hashes.
 
 For authorized delivery, delegate bounded implementation and checks.
-Main inspects changed files and evidence, commits and pushes the working branch, then creates or updates a PR/MR targeting the authorized branch.
+Main inspects changed files and evidence before committing and pushing the working branch.
+It then creates or updates a PR/MR targeting the authorized branch.
 Reuse an existing PR/MR for the unit.
 Treat publication as a review handoff, not as main integration.
 Run one full independent review after publication, using the PR/MR and its current changes as input.
@@ -137,8 +138,9 @@ Only confirmed blockers require code changes before integration.
 After a blocker fix, update the same PR/MR and ask the same reviewer to re-review only affected changes.
 Reuse unaffected passing checks.
 
-Defer a nonblocking finding only when it is noncritical, does not affect required behavior, acceptance, correctness, or safety, and required checks pass.
-Before integration, register each deferred bounded follow-up in the authorized long-term issue tracker with evidence, scope, acceptance criteria, a named owner, and a next action.
+Defer only noncritical findings that do not affect required behavior, acceptance, correctness, or safety, after required checks pass.
+Before integration, register each deferred bounded follow-up in the authorized long-term issue tracker.
+Include evidence, scope, acceptance criteria, a named owner, and a next action.
 Reuse or update an existing tracker item when possible.
 Defer follow-up implementation until after the target branch is updated.
 If tracker access is not authorized or available, do not integrate with an untracked deferral.
