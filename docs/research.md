@@ -379,6 +379,15 @@ Workgraph keeps required checks in the consumer repository's validation process.
 
 The waiting rules address the user's observed repeated waiting behavior.
 Codex Main calls `wait_agent` with `timeout_ms: 240000` when only delegated results remain.
+Codex Main uses `functions.wait` with `yield_time_ms: 240000` when waiting for a yielded `functions.exec` cell.
+The [wait input schema](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_spec.rs) identifies `yield_time_ms` and a ten-second default.
+The [wait handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_handler.rs) uses that fixed default when the argument is omitted.
+The [configuration schema](https://github.com/openai/codex/blob/main/codex-rs/features/src/feature_configs.rs) exposes no wait-default or wait-minimum setting.
+Its `default_exec_yield_time_ms` setting controls the initial exec call, not later wait calls.
+The [Codex configuration default](https://github.com/openai/codex/blob/main/codex-rs/core/src/config/mod.rs) is thirty seconds for that initial exec call.
+The [runtime](https://github.com/openai/codex/blob/main/codex-rs/code-mode-runtime/src/service.rs) accepts a per-call duration, adds grace, and applies any host session cap.
+Completion or interruption can return before the requested duration.
+Codex Main passes these wait durations in assignments so Workers receive them without a separate host reference.
 The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
 The official [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21277) records its removal in version 2.1.277.
 The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
