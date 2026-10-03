@@ -380,6 +380,7 @@ Workgraph keeps required checks in the consumer repository's validation process.
 The waiting rules address the user's observed repeated waiting behavior.
 Codex Main uses the native agent wait tool with the user's requested four-minute timeout when only delegated results remain.
 The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
+The official [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21277) records its removal in version 2.1.277.
 The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
 We found no active `TaskOutput` registration or input schema in that executable.
 Its background Agent instructions prohibit polling and sleeping while waiting for completion notifications.
