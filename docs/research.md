@@ -29,7 +29,7 @@ These recommendations guide instruction design without changing model or API con
 
 The fetched [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) lists `low`, `medium`, `high`, `xhigh`, and `max` effort settings, with `medium` as the default.
 It does not support `none` or `minimal` effort.
-Workgraph selects `gpt-6.1-sol` when available and assigns effort by task type.
+Workgraph delegates clear tasks to Luna and uses Sol when stronger judgment is required.
 We confirm supported settings from the model page and maintain the task mapping in Main's Codex reference.
 Workgraph's selection defaults apply only when no explicit or configured setting exists.
 Main's Codex reference gates Sol effort above high on comparable-task evidence for difficult mathematics, science, or long agent work.

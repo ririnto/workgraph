@@ -16,7 +16,7 @@ Compare Luna `high` through `max` with Sol `medium` or `high` for required quali
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `luna` | Simple exploration, extraction, and quick sweeps | Use `low`. |
+| `luna` | Simple exploration and extraction | Use `low`. |
 | | Coding, debugging, refactoring, and code review | Use `xhigh` or `max`. |
 | | Other clear analysis and agentic work | Use `medium` or `high`, increasing effort when required reasoning justifies it. |
 | `sol` | Simple queries, conversions, and extraction | Use `low`. |
