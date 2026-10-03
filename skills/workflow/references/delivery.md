@@ -1,17 +1,14 @@
-# Authorized Engineering Delivery
+# Engineering Delivery Nodes
 
-Use this mapping to build a graph for an authorized engineering-delivery goal.
+| Node | Required inputs | Result |
+| --- | --- | --- |
+| Implementation | Bounded scope, owned files, agreed behavior | Changes and implementation evidence |
+| Verification | Changed behavior, relevant existing checks | Check commands, observed results, and evidence limits |
+| Publication in main | Accepted changes, required check evidence, working branch, target branch | Published branch and PR/MR |
+| Independent review | Published PR/MR, current changes, acceptance criteria | Findings with source evidence |
+| Blocker fix | Confirmed finding, affected files, same branch and PR/MR | Fix and scoped review evidence |
+| Deferral registration | Accepted nonblocking finding, authorized tracker | Follow-up record |
+| Integration in main | Passing checks, resolved blockers, registered follow-ups | Target branch update and verification |
 
-- Define implementation and check nodes with their required inputs, expected outputs, owners, and acceptance evidence.
-- Return changed files and check evidence from each node.
-- Start ready independent nodes in parallel and serialize conflicting writes.
-- Gate main-owned branch or PR/MR publication on accepted changes and passing required checks.
-- Gate one full independent review on the published PR/MR and its current changes.
-- Verify findings against the main-session contract's blocker criteria.
-- Create a same-branch fix node only for a confirmed blocker, then update the same PR/MR and request a scoped re-review of affected changes from the same reviewer.
-- Reuse unaffected checks and avoid recurring target-sync nodes.
-- Sync or rebase only when a conflict or changed target invalidates relevant evidence.
-- For each accepted nonblocking deferral, return a tracker record with evidence, scope, acceptance criteria, owner, and next action.
-- Gate integration on tracker registration, and schedule follow-up implementation only after the target branch update.
-- Make main integration depend on passing required checks, resolved blockers, and recorded follow-ups.
-- Verify the target branch update as the delivery finish condition.
+A follow-up record contains evidence, scope, acceptance criteria, a named owner, and a next action.
+A scoped review identifies the affected changes and the earlier finding it reassesses.

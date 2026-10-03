@@ -8,10 +8,14 @@ Complete authorized changes and relevant checks before returning a final result,
 
 Keep contributor conventions and validation commands here.
 Keep consumer behavior in `skills/`.
-Make each role's `SKILL.md` self-contained with its common and role-specific rules inline.
-Each hook output must contain only the selected role's nonempty body without YAML frontmatter or required model file retrieval.
-Keep Main Agent and Worker skills user-only with `disable-model-invocation: true` and `user-invocable: true`.
-Keep Workflow model-invocable.
+Keep role procedures self-contained in each role's `SKILL.md`.
+Keep host-specific orchestration and model guidance in Main Agent references, and inject only the selected host's reference.
+Add no host reference in Worker hook output.
+Identify each loaded source by its actual file path and state which complete content is already present.
+Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
+Load every selected file before emitting context, without requiring model retrieval during hook startup.
+Keep all skills model-invocable and user-invocable.
+Keep Workflow focused on its lower-level operation without repeating the Main contract.
 Remove replaced paths and aliases without compatibility layers.
 
 Use `README.md` for installation and runtime behavior.
@@ -43,9 +47,9 @@ Remove filler and repetition without changing technical meaning or explicit requ
 
 ## Implementation
 
-Use Node built-ins for the plugin runtime.
+Use Node built-ins compatible with Node.js 18 and later for the plugin runtime.
 Resolve bundled files from the executing module's location.
-Keep hook commands portable through `CLAUDE_PLUGIN_ROOT`.
+Keep hook commands portable through the selected host's plugin-root variable.
 Emit context only after all required files load and contain text.
 Keep host permissions and task execution in the host.
 
@@ -71,8 +75,8 @@ Select the narrowest applicable read-only gate.
 - Use `npm run check` for mixed changes or repository-wide validation of Markdown, ultracite, and Node hook tests.
 
 After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
-For injected prose, also run the hook tests and inspect both emitted contexts.
-Confirm each contains one selected, self-contained role body without repository guidance.
+For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.
+Confirm the selected role and host reference appear without repository guidance or the other host's model policy.
 
 For Workflow invocation changes, run `claude plugin eval ./ --case workflow-invocation --runs 1 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
 This behavioral check uses real agents and requires a host with Workflow enabled.
@@ -88,8 +92,9 @@ Run formatting fixes only within the authorized change.
 
 ## Version And Publication
 
-Keep the version in `.claude-plugin/plugin.json` using `yyyy.mm.dd.seq`.
-Do not duplicate it in the marketplace or package manifest.
+Keep matching versions in both host plugin manifests using `yyyy.mm.dd.seq`.
+Follow the release procedure in `README.md`.
+Omit version fields from the marketplace and private package manifest.
 Publish only to a user-authorized destination after inspecting the diff and required evidence.
 Preserve unrelated changes and stop on unexplained concurrent edits.
 Keep credentials, private environment details, and external work-item identifiers out of committed content.

@@ -25,6 +25,7 @@ execution:
     Next action: Correct the sample guide and run Markdown lint.
     Report only after orchestration shows completed results for both assessments and their reconciliation.
     Report blockers, eligible deferrals, and the remaining action before integration.
+    Preserve evidence, scope, acceptance criteria, owner, and next action in reported tracker records and proposed follow-up requirements.
     Keep the assessments and reconciliation concise.
     Do not edit files, run Git commands, or publish anything.
 graders:
