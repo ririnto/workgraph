@@ -2,8 +2,11 @@
 
 ## Orchestration
 
-Use `timeout: 240000` for foreground Bash commands unless the task requires another duration.
+Prefer `timeout: 240000` for foreground Bash commands.
 Set background command timeouts from the required execution duration.
+Consider available `Monitor` for command output or external events that require action.
+For requested fixed loops, prefer `/loop 4m` unless the task needs another interval.
+For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` calls when the task permits.
 Use native Workflow when an assigned or identified in-scope follow-up agent needs another agent's result.
 Use host Agent for independent assignments whose results Main combines.
 A request to orchestrate subagents does not establish result dependencies.

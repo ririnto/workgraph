@@ -382,13 +382,14 @@ test("workers load selected execution guidance without Main model or orchestrati
       assert.match(result.stdout, /yield_time_ms.{0,20}240000/u);
       assert.doesNotMatch(
         result.stdout,
-        /foreground Bash|background duration/u
+        /foreground Bash|background duration|Monitor/u
       );
     } else {
       assert.match(result.stdout, /subagent-context\/references\/claude\.md/u);
       assert.match(result.stdout, /Bash/u);
       assert.match(result.stdout, /timeout.{0,20}240000/u);
       assert.match(result.stdout, /background/iu);
+      assert.match(result.stdout, /Monitor/u);
       assert.doesNotMatch(result.stdout, /functions\.wait|wait_agent/u);
     }
   }

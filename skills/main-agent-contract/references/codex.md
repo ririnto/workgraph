@@ -3,8 +3,8 @@
 ## Orchestration
 
 Use available native delegation tools for independent and dependent assignments.
-When only delegated results remain, call `wait_agent` with `timeout_ms: 240000`.
-When waiting for a yielded `functions.exec` cell, call `functions.wait` with `yield_time_ms: 240000`.
+When only delegated results remain, prefer `wait_agent` with `timeout_ms: 240000`.
+When waiting for a yielded `functions.exec` cell, prefer `yield_time_ms: 240000` in `functions.wait` calls.
 Codex does not provide Claude Code's native Workflow tool.
 
 ## Model Selection
