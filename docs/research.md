@@ -379,6 +379,16 @@ Workgraph keeps required checks in the consumer repository's validation process.
 
 The waiting rules address the user's observed repeated waiting behavior.
 Codex Main uses the native agent wait tool with the user's requested four-minute timeout when only delegated results remain.
+The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
+The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
+We found no active `TaskOutput` registration or input schema in that executable.
+Its background Agent instructions prohibit polling and sleeping while waiting for completion notifications.
+Its fork Agent instructions also prohibit reading or tailing agent output files while waiting for those notifications.
+Workflow also delivers completion through a task notification.
+Claude Code therefore supplies no equivalent blocking agent wait with a four-minute timeout in this version.
+Reading a background command's output file does not wait for an agent or provide a wait timeout.
+Keep these Claude Agent restrictions separate from Codex's native wait policy.
+The injected skills do not repeat restrictions already supplied by native tools.
 Without a native agent wait tool, agents end an idle turn until a completion notification arrives.
 This idle-turn rule also applies to background Bash.
 The papers provide coordination context but do not prove this prompt resolves the observed behavior.
