@@ -7,7 +7,7 @@ Codex does not provide Claude Code's native Workflow tool.
 
 ## Model Selection
 
-Use `luna` for most coding, review, document analysis, and bounded agentic work.
+Use `luna` for clear tasks, including development, review, document analysis, and multistep agentic work.
 Use `sol` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Use each family's current model guidance and workload evidence to adjust these effort starting points.
 Do not select the highest effort automatically.
@@ -16,10 +16,9 @@ Compare Luna `high` through `max` with Sol `medium` or `high` for required quali
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `luna` | Simple queries, conversions, and extraction | Use `low`. |
-| | Routine development, review, and document analysis | Use `medium`. |
-| | Multistep coding and reasoning | Start at `high`. |
-| | Harder coding and reasoning | Use `xhigh` or `max` when required quality gains justify added cost. |
+| `luna` | Simple exploration, extraction, and quick sweeps | Use `low`. |
+| | Coding, debugging, refactoring, and code review | Use `xhigh` or `max`. |
+| | Other clear analysis and agentic work | Use `medium` or `high`, increasing effort when required reasoning justifies it. |
 | `sol` | Simple queries, conversions, and extraction | Use `low`. |
 | | Ordinary development, review, and document analysis | Use `medium`. |
 | | Complex debugging, algorithms, and architecture | Use `high`. |

@@ -138,10 +138,12 @@ DeepSWE uses mini-swe-agent and an alias from a job before Astra's public releas
 These differences prevent an isolated comparison with native Codex or Claude Code results.
 Rounded score changes do not establish statistical significance or gains on every workload.
 
-Luna's lower token rates and gains through max support broader coding, review, and bounded agentic assignments.
+Luna's lower token rates and gains through max support broader coding, review, and agentic assignments with clear requirements.
 The [official model-selection guide](https://developers.openai.com/api/docs/guides/model-selection.md) includes Luna xhigh for constrained problem-solving and multi-app work.
 Workgraph selects Sol when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Step count alone does not require Sol.
+Workgraph uses Luna xhigh or max for coding, debugging, refactoring, and code review.
+It reserves Luna low for simple exploration and extraction.
 These sources do not establish equivalent Luna and Sonnet performance across workloads.
 
 Practitioner evidence supplements these broad benchmarks with specific failure conditions.

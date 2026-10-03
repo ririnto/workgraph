@@ -86,7 +86,8 @@ Resolve conflicting explicit execution-tool requests before dispatch.
 Each role file in the table carries the common rules and that role's procedures in one self-contained body.
 These instructions guide agents but do not guarantee model adherence.
 Main's [Codex reference](skills/main-agent-contract/references/codex.md) covers Luna, Sol, and Astra.
-Codex assigns most coding, review, document analysis, and bounded agentic work to Luna, with Sol for stronger judgment.
+Codex assigns clear tasks to Luna, including multistep work, with Sol for stronger judgment.
+Luna uses xhigh or max for coding and low for simple exploration or extraction.
 Its [Claude Code reference](skills/main-agent-contract/references/claude.md) covers Haiku, Sonnet, Opus, and Fable.
 Both references order families from routine work to more complex work and assign effort by model and workload.
 Astra and Fable require the user's explicit request.
