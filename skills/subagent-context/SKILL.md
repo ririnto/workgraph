@@ -30,6 +30,11 @@ In Markdown, put each complete sentence on its own source line and use terminal 
 Keep conditions with their actions, and preserve required syntax.
 Do not join separate sentences with semicolons or substitute punctuation.
 
+### Host Guidance
+
+Use `references/codex.md` in Codex or `references/claude.md` in Claude Code for execution timing.
+Read the active host reference before execution unless its complete content is already loaded.
+
 ### Further Delegation
 
 Complete the assignment without subdelegation unless the dispatch grants it.

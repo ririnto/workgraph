@@ -42,13 +42,14 @@ Follow [Version Updates](#version-updates) when publishing changes.
 | Event | Recipient | Instructions |
 | --- | --- | --- |
 | SessionStart | Main session | The hook injects the Main role and its matching host reference, with their actual source paths. |
-| SubagentStart | Dispatched agent | The hook injects the Worker role and its actual source path, without host references. |
+| SubagentStart | Dispatched agent | The hook injects the Worker role and its matching execution reference, with their actual source paths. |
 
 SessionStart covers startup, resume, clear, compact, and fork events supported by the host.
 Neither hook filters events with a matcher.
 Each output identifies the selected skill source and states which complete content is already loaded.
 Each hook names the execution host so agents can distinguish it from the selected model family.
-Main also receives the selected host reference with its source path.
+Each role receives its selected host reference with its source path.
+Worker references contain execution timing without Main orchestration or model guidance.
 Claude Code receives the native Skill text with its base directory and frontmatter-stripped body, preserving trailing whitespace.
 Codex receives the native `<skill>` text with its qualified name, source path, and complete file, including YAML frontmatter.
 Claude references use native Read line numbering, while Codex references preserve raw file text.
@@ -92,8 +93,8 @@ Its [Claude Code reference](skills/main-agent-contract/references/claude.md) cov
 Both references order families from routine work to more complex work and assign effort by model and workload.
 Astra and Fable require the user's explicit request.
 Assignments record requested settings and report resolved settings only when the host supplies them.
-Each Main hook loads only its host's orchestration and model guidance.
-Worker hooks add no host reference.
+Each Main hook loads only its host's execution, orchestration, and model guidance.
+Worker hooks load their own execution references without Main orchestration or model policy.
 Forked workers can inherit Main's host guidance through parent history.
 The references supply task defaults and escalation conditions without requiring session-level model comparisons or benchmark evaluations.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](docs/research.md#model-effort-and-cost).
@@ -176,9 +177,10 @@ All skills remain user-invocable and model-invocable.
 Invocation does not change the current session's role or dispatch authority.
 The hooks operate without skill invocation.
 
-Automatic delivery includes the required environment reference for Main.
+Automatic delivery includes each role's required environment reference.
 Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
-Worker hooks load no host reference, and the dispatch supplies any authorized subdelegation settings.
+Manual Worker loading reads its active host reference unless the hook already supplied its complete content.
+The dispatch supplies any authorized subdelegation settings.
 The Workflow skill reports unavailability and stops when invoked in Codex.
 The Workflow skill keeps its core rules inline.
 For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.

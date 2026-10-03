@@ -57,27 +57,22 @@ const expectedOutput = (event, host, rootSkills = skills) => {
     host === "claude"
       ? `Workgraph instructions loaded from ${source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${content.replace(/^\uFEFF/u, "").replace(/^---\s*\n(?<frontmatter>[\s\S]*?)---\s*\n?/u, "")}`
       : `Workgraph instructions loaded from ${source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`;
-  const reference =
-    event === "SessionStart"
-      ? realpathSync(path.join(rootSkills, name, "references", `${host}.md`))
-      : undefined;
+  const reference = realpathSync(
+    path.join(rootSkills, name, "references", `${host}.md`)
+  );
   return {
     hookSpecificOutput: {
-      additionalContext: reference
-        ? `${context}\n\nWorkgraph ${host} guidance loaded from ${reference}.\nThe complete reference content is already loaded below.\n\n${
-            host === "claude"
-              ? readFileSync(reference, "utf-8")
-                  .replace(/^\uFEFF/u, "")
-                  .replaceAll("\r\n", "\n")
-                  .replace(/\r$/u, "")
-                  .split("\n")
-                  .map(
-                    (line, index) => `${index + 1}\t${line.replace(/\r$/u, "")}`
-                  )
-                  .join("\n")
-              : readFileSync(reference, "utf-8")
-          }`
-        : context,
+      additionalContext: `${context}\n\nWorkgraph ${host} guidance loaded from ${reference}.\nThe complete reference content is already loaded below.\n\n${
+        host === "claude"
+          ? readFileSync(reference, "utf-8")
+              .replace(/^\uFEFF/u, "")
+              .replaceAll("\r\n", "\n")
+              .replace(/\r$/u, "")
+              .split("\n")
+              .map((line, index) => `${index + 1}\t${line.replace(/\r$/u, "")}`)
+              .join("\n")
+          : readFileSync(reference, "utf-8")
+      }`,
       hookEventName: event
     }
   };
@@ -94,7 +89,7 @@ const assertFileFailure = (result, file) => {
 
 for (const [event, name] of roles) {
   for (const host of hosts) {
-    test(`${event} ${host}: injects the exact selected body and host reference`, () => {
+    test(`${event} ${host}: injects the exact selected body and role-specific host reference`, () => {
       const result = runHook([event, host]);
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
@@ -161,13 +156,7 @@ test("configured Claude hooks load relocated skills and references with LF or CR
       );
       for (const host of hosts) {
         writeFileSync(
-          path.join(
-            root,
-            "skills",
-            "main-agent-contract",
-            "references",
-            `${host}.md`
-          ),
+          path.join(root, "skills", name, "references", `${host}.md`),
           `\n# Only ${host}\n\nUse ${host} guidance.\n`.replaceAll(
             "\n",
             newline
@@ -209,13 +198,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
     writeFileSync(path.join(root, "skills", name, "SKILL.md"), raw);
     for (const host of hosts) {
       writeFileSync(
-        path.join(
-          root,
-          "skills",
-          "main-agent-contract",
-          "references",
-          `${host}.md`
-        ),
+        path.join(root, "skills", name, "references", `${host}.md`),
         guidance
       );
       const source = realpathSync(path.join(root, "skills", name, "SKILL.md"));
@@ -228,10 +211,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
         host === "claude"
           ? `Base directory for this skill: ${path.dirname(source)}\n\n${body}`
           : `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${raw}\n</skill>`;
-      const reference =
-        event === "SessionStart"
-          ? `\n\nWorkgraph ${host} guidance loaded from ${realpathSync(path.join(root, "skills", name, "references", `${host}.md`))}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`
-          : "";
+      const reference = `\n\nWorkgraph ${host} guidance loaded from ${realpathSync(path.join(root, "skills", name, "references", `${host}.md`))}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`;
       assert.deepEqual(JSON.parse(result.stdout), {
         hookSpecificOutput: {
           additionalContext: `Workgraph instructions loaded from ${source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded below, without YAML frontmatter." : "The complete skill file is already loaded below, including YAML frontmatter."}\n\n${fragment}${reference}`,
@@ -246,7 +226,11 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
   const root = copyPlugin(t);
   for (const file of [
     "main-agent-contract/SKILL.md",
-    "main-agent-contract/references/claude.md"
+    "main-agent-contract/references/claude.md",
+    "main-agent-contract/references/codex.md",
+    "subagent-context/SKILL.md",
+    "subagent-context/references/codex.md",
+    "subagent-context/references/claude.md"
   ]) {
     const target = path.join(root, "skills", file);
     const source = `${target}.source`;
@@ -254,15 +238,19 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
     rmSync(target);
     symlinkSync(source, target);
   }
-  const result = runHook(
-    ["SessionStart", "claude"],
-    path.join(root, "hooks", "inject-context.mjs")
-  );
-  assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(
-    JSON.parse(result.stdout),
-    expectedOutput("SessionStart", "claude", path.join(root, "skills"))
-  );
+  for (const [event] of roles) {
+    for (const host of hosts) {
+      const result = runHook(
+        [event, host],
+        path.join(root, "hooks", "inject-context.mjs")
+      );
+      assert.equal(result.status, 0, result.stderr);
+      assert.deepEqual(
+        JSON.parse(result.stdout),
+        expectedOutput(event, host, path.join(root, "skills"))
+      );
+    }
+  }
 });
 
 test("configured Codex hooks load complete relocated skill files without a context limit", (t) => {
@@ -300,43 +288,59 @@ test("configured Codex hooks load complete relocated skill files without a conte
   }
 });
 
-test("main loads only the selected host reference", (t) => {
-  const root = copyPlugin(t);
-  for (const host of hosts) {
-    const unselected = host === "claude" ? "codex" : "claude";
-    const target = path.join(
-      root,
-      "skills",
-      "main-agent-contract",
-      "references",
-      `${unselected}.md`
-    );
-    const content = readFileSync(target, "utf-8");
-    rmSync(target);
-    const result = runHook(
-      ["SessionStart", host],
-      path.join(root, "hooks", "inject-context.mjs")
-    );
-    assert.equal(result.status, 0, result.stderr);
-    assert.deepEqual(
-      JSON.parse(result.stdout),
-      expectedOutput("SessionStart", host, path.join(root, "skills"))
-    );
-    const context = JSON.parse(result.stdout).hookSpecificOutput
-      .additionalContext;
-    if (host === "codex") {
-      assert.match(
-        context,
-        /native delegation tools for independent and dependent assignments/u
+for (const [event, name] of roles) {
+  test(`${name}: loads only the selected role and host reference`, (t) => {
+    const root = copyPlugin(t);
+    const otherRole =
+      name === "main-agent-contract"
+        ? "subagent-context"
+        : "main-agent-contract";
+    rmSync(path.join(root, "skills", otherRole, "references"), {
+      recursive: true
+    });
+    for (const host of hosts) {
+      const unselected = host === "claude" ? "codex" : "claude";
+      const target = path.join(
+        root,
+        "skills",
+        name,
+        "references",
+        `${unselected}.md`
       );
-      assert.doesNotMatch(context, /Use native Workflow|Use host Agent/u);
-    } else {
-      assert.match(context, /Use native Workflow/u);
-      assert.match(context, /Use host Agent/u);
+      const content = readFileSync(target, "utf-8");
+      rmSync(target);
+      const result = runHook(
+        [event, host],
+        path.join(root, "hooks", "inject-context.mjs")
+      );
+      assert.equal(result.status, 0, result.stderr);
+      assert.deepEqual(
+        JSON.parse(result.stdout),
+        expectedOutput(event, host, path.join(root, "skills"))
+      );
+      const context = JSON.parse(result.stdout).hookSpecificOutput
+        .additionalContext;
+      assert.doesNotMatch(
+        context,
+        new RegExp(
+          `${otherRole}/references|${name}/references/${unselected}\\.md`,
+          "u"
+        )
+      );
+      if (event === "SessionStart" && host === "codex") {
+        assert.match(
+          context,
+          /native delegation tools for independent and dependent assignments/u
+        );
+        assert.doesNotMatch(context, /Use native Workflow|Use host Agent/u);
+      } else if (event === "SessionStart") {
+        assert.match(context, /Use native Workflow/u);
+        assert.match(context, /Use host Agent/u);
+      }
+      writeFileSync(target, content);
     }
-    writeFileSync(target, content);
-  }
-});
+  });
+}
 
 test("common Main excludes Claude routing and Workflow discovery is Claude-scoped", () => {
   assert.doesNotMatch(
@@ -351,7 +355,7 @@ test("common Main excludes Claude routing and Workflow discovery is Claude-scope
   assert.match(body, /In Codex, report that native Workflow did not run/u);
 });
 
-test("worker hooks append no host reference", (t) => {
+test("workers load selected execution guidance without Main model or orchestration policy", (t) => {
   const root = copyPlugin(t);
   rmSync(path.join(root, "skills", "main-agent-contract", "references"), {
     recursive: true
@@ -366,7 +370,27 @@ test("worker hooks append no host reference", (t) => {
       JSON.parse(result.stdout),
       expectedOutput("SubagentStart", host, path.join(root, "skills"))
     );
-    assert.doesNotMatch(result.stdout, /guidance loaded from/u);
+    assert.doesNotMatch(
+      result.stdout,
+      /main-agent-contract|luna|astra|gpt-6|GLM|model selection|Workflow|host Agent|native delegation tools/iu
+    );
+    if (host === "codex") {
+      assert.match(result.stdout, /subagent-context\/references\/codex\.md/u);
+      assert.match(result.stdout, /wait_agent/u);
+      assert.match(result.stdout, /timeout_ms.{0,20}240000/u);
+      assert.match(result.stdout, /functions\.wait/u);
+      assert.match(result.stdout, /yield_time_ms.{0,20}240000/u);
+      assert.doesNotMatch(
+        result.stdout,
+        /foreground Bash|background duration/u
+      );
+    } else {
+      assert.match(result.stdout, /subagent-context\/references\/claude\.md/u);
+      assert.match(result.stdout, /Bash/u);
+      assert.match(result.stdout, /timeout.{0,20}240000/u);
+      assert.match(result.stdout, /background/iu);
+      assert.doesNotMatch(result.stdout, /functions\.wait|wait_agent/u);
+    }
   }
 });
 
@@ -424,18 +448,20 @@ for (const [event, name] of roles) {
   });
 }
 
-for (const host of hosts) {
-  test(`${host}: missing, empty, or unreadable host reference produces no partial output`, (t) => {
-    const root = copyPlugin(t);
-    const file = `main-agent-contract/references/${host}.md`;
-    const target = path.join(root, "skills", file);
-    const copiedScript = path.join(root, "hooks", "inject-context.mjs");
-    rmSync(target);
-    assertFileFailure(runHook(["SessionStart", host], copiedScript), file);
-    writeFileSync(target, " \n\t\n");
-    assertFileFailure(runHook(["SessionStart", host], copiedScript), file);
-    rmSync(target);
-    mkdirSync(target);
-    assertFileFailure(runHook(["SessionStart", host], copiedScript), file);
-  });
+for (const [event, name] of roles) {
+  for (const host of hosts) {
+    test(`${name} ${host}: missing, empty, or unreadable host reference produces no partial output`, (t) => {
+      const root = copyPlugin(t);
+      const file = `${name}/references/${host}.md`;
+      const target = path.join(root, "skills", file);
+      const copiedScript = path.join(root, "hooks", "inject-context.mjs");
+      rmSync(target);
+      assertFileFailure(runHook([event, host], copiedScript), file);
+      writeFileSync(target, " \n\t\n");
+      assertFileFailure(runHook([event, host], copiedScript), file);
+      rmSync(target);
+      mkdirSync(target);
+      assertFileFailure(runHook([event, host], copiedScript), file);
+    });
+  }
 }

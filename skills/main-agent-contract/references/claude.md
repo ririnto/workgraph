@@ -2,6 +2,8 @@
 
 ## Orchestration
 
+Use `timeout: 240000` for foreground Bash commands unless the task requires another duration.
+Set background command timeouts from the required execution duration.
 Use native Workflow when an assigned or identified in-scope follow-up agent needs another agent's result.
 Use host Agent for independent assignments whose results Main combines.
 A request to orchestrate subagents does not establish result dependencies.

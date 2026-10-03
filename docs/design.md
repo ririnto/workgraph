@@ -10,7 +10,7 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | `README.md` | Plugin users | Users find installation instructions, hook behavior, manual invocation, and errors here. |
 | `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow the common rules and the planning, dispatch, integration, and reporting procedures in one self-contained body. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow the common rules and the assignment scope, permitted operations, and result delivery requirements in one self-contained body. |
-| Main host references | Main agents | Each selected reference supplies its host's execution-tool routing and model guidance. |
+| Role host references | Main and Worker agents | Each selected reference supplies execution timing, while Main references also supply orchestration and model guidance. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds graph-specific procedures after Main and invokes native Workflow for explicit requests or graph-suitable work. |
 | Claude Code Workflow tool | Main session | The host runs the selected workflow while enforcing its permissions. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
@@ -26,7 +26,8 @@ Role bodies contain no benchmark scores, prices, or source lists.
 Main orchestration and model policy use separate Codex and Claude Code references.
 Host references supply task defaults and escalation conditions without requiring model comparisons or benchmark evaluations during consumer sessions.
 Worker model selection stays in the dispatch, without a model-policy reference.
-The hooks provide the selected role and, for Main, the matching environment reference before the model begins work.
+Each role has separate host references because Main and Worker load at different execution stages.
+The hooks provide the selected role and its matching environment reference before the model begins work.
 Workflow adds Claude Code graph-specific operations after the Main contract.
 Its delivery reference maps authorized engineering operations to node inputs and outputs.
 Consumers can follow their instructions without reading repository conventions or research history.
@@ -58,8 +59,8 @@ It accepts LF and CRLF line endings and preserves separators inside the body.
 Claude references follow native full-file Read normalization and line numbering, including a final empty line.
 Codex references preserve raw file text, as ordinary file-read stdout does.
 Separate metadata identifies the complete loaded content and its actual path.
-For Main, it also loads the matching host reference and identifies that source path.
-For Worker, it loads no host reference.
+For each role, it also loads the matching host reference and identifies that source path.
+Worker references contain execution timing without Main orchestration or model guidance.
 This guarantee covers new hook output, not context inherited from a parent session.
 Codex full-history forks can retain Main's hook context before receiving the Worker hook.
 It emits one JSON object containing `hookSpecificOutput.additionalContext` and the matching `hookEventName`.
@@ -112,13 +113,14 @@ Keep tool routing in each host reference and task-graph ownership in the common 
 Each role keeps its own procedures inline.
 Manual Main invocation reads the active host reference before dispatch unless its complete content is already loaded.
 The hook already supplies that reference during automatic Main delivery.
-Worker needs no other role or host reference.
+Manual Worker invocation reads its active host reference unless its complete content is already loaded.
+Worker needs no other role's instructions.
 Workflow uses the current goal's operational inputs and verifies returned evidence.
 It loads `skills/workflow/references/delivery.md` only when authorized engineering delivery requires its detailed graph pattern.
 No asset or helper script exists without a concrete output or repeated operation that needs one.
 
 The [skill invocation settings](../README.md#skill-invocation) control skill loading, not role ownership or permissions.
-Automatic hooks read the selected role and Main host reference without invoking skills or requiring model-side retrieval.
+Automatic hooks read the selected role and its host reference without invoking skills or requiring model-side retrieval.
 Keep one injector and one configuration per host, without runtime host detection or fallback implementations.
 
 ## Verify Delivery And Behavior

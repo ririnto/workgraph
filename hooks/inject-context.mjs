@@ -51,10 +51,7 @@ if (host !== "claude" && host !== "codex") {
 const role =
   event === "SessionStart" ? "main-agent-contract" : "subagent-context";
 const skill = readInstruction(`${role}/SKILL.md`, true);
-const reference =
-  event === "SessionStart"
-    ? readInstruction(`main-agent-contract/references/${host}.md`, false)
-    : undefined;
+const reference = readInstruction(`${role}/references/${host}.md`, false);
 const skillContext =
   host === "claude"
     ? `Workgraph instructions loaded from ${skill.source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body}`
@@ -62,21 +59,17 @@ const skillContext =
 process.stdout.write(
   `${JSON.stringify({
     hookSpecificOutput: {
-      additionalContext: reference
-        ? `${skillContext}\n\nWorkgraph ${host} guidance loaded from ${reference.source}.\nThe complete reference content is already loaded below.\n\n${
-            host === "claude"
-              ? reference.content
-                  .replace(/^\uFEFF/u, "")
-                  .replaceAll("\r\n", "\n")
-                  .replace(/\r$/u, "")
-                  .split("\n")
-                  .map(
-                    (line, index) => `${index + 1}\t${line.replace(/\r$/u, "")}`
-                  )
-                  .join("\n")
-              : reference.content
-          }`
-        : skillContext,
+      additionalContext: `${skillContext}\n\nWorkgraph ${host} guidance loaded from ${reference.source}.\nThe complete reference content is already loaded below.\n\n${
+        host === "claude"
+          ? reference.content
+              .replace(/^\uFEFF/u, "")
+              .replaceAll("\r\n", "\n")
+              .replace(/\r$/u, "")
+              .split("\n")
+              .map((line, index) => `${index + 1}\t${line.replace(/\r$/u, "")}`)
+              .join("\n")
+          : reference.content
+      }`,
       hookEventName: event
     }
   })}\n`

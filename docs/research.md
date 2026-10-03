@@ -53,7 +53,8 @@ Use suitable native host tools and name any authorized fallback's capability gap
 The role skills leave native waiting and completion mechanics to the host.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
-Each hook delivers the selected role and, for Main, the active host's orchestration and model reference without model-side retrieval.
+Each hook delivers the selected role and its active host reference without model-side retrieval.
+Worker references contain execution timing without Main orchestration or model policy.
 The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.
 The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
@@ -379,7 +380,7 @@ Workgraph keeps required checks in the consumer repository's validation process.
 
 The waiting rules address the user's observed repeated waiting behavior.
 Codex Main calls `wait_agent` with `timeout_ms: 240000` when only delegated results remain.
-Codex Main uses `functions.wait` with `yield_time_ms: 240000` when waiting for a yielded `functions.exec` cell.
+Codex Main and Worker use `functions.wait` with `yield_time_ms: 240000` when waiting for a yielded `functions.exec` cell.
 The [wait input schema](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_spec.rs) identifies `yield_time_ms` and a ten-second default.
 The [wait handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_handler.rs) uses that fixed default when the argument is omitted.
 The [configuration schema](https://github.com/openai/codex/blob/main/codex-rs/features/src/feature_configs.rs) exposes no wait-default or wait-minimum setting.
@@ -387,7 +388,16 @@ Its `default_exec_yield_time_ms` setting controls the initial exec call, not lat
 The [Codex configuration default](https://github.com/openai/codex/blob/main/codex-rs/core/src/config/mod.rs) is thirty seconds for that initial exec call.
 The [runtime](https://github.com/openai/codex/blob/main/codex-rs/code-mode-runtime/src/service.rs) accepts a per-call duration, adds grace, and applies any host session cap.
 Completion or interruption can return before the requested duration.
-Codex Main passes these wait durations in assignments so Workers receive them without a separate host reference.
+Each role loads its own execution reference so Worker waiting does not depend on Main forwarding instructions.
+The [child configuration](https://github.com/openai/codex/blob/main/codex-rs/core/src/agent/child_config.rs) inherits the parent's effective configuration.
+That includes the exec yield default, but existing sessions can retain their earlier configuration snapshot.
+Claude Code's [foreground timeout controls](https://code.claude.com/docs/en/env-vars) use `BASH_DEFAULT_TIMEOUT_MS` and `BASH_MAX_TIMEOUT_MS`.
+The installed Claude Code 2.1.288 resolves the same foreground default for Main and subagent Bash calls.
+We set the foreground default to four minutes while retaining the native ten-minute ceiling for explicit requests.
+Foreground timeout normally moves an unfinished command to the background when the host permits background execution.
+The [background execution limit](https://code.claude.com/docs/en/tools-reference#time-limit-for-background-commands) is separate from that transition.
+An explicit background command's timeout can stop the command when its background deadline applies.
+We keep that execution duration separate from the four-minute foreground default.
 The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
 The official [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21277) records its removal in version 2.1.277.
 The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
