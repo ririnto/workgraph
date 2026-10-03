@@ -378,7 +378,7 @@ That result does not show that repository-required checks can be skipped.
 Workgraph keeps required checks in the consumer repository's validation process.
 
 The waiting rules address the user's observed repeated waiting behavior.
-Codex Main uses the native agent wait tool with the user's requested four-minute timeout when only delegated results remain.
+Codex Main calls `wait_agent` with `timeout_ms: 240000` when only delegated results remain.
 The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
 The official [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21277) records its removal in version 2.1.277.
 The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
