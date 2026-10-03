@@ -87,7 +87,7 @@ Each role file in the table carries the common rules and that role's procedures 
 These instructions guide agents but do not guarantee model adherence.
 Main's [Codex reference](skills/main-agent-contract/references/codex.md) covers Luna, Sol, and Astra.
 Codex assigns clear tasks to Luna, including multistep work, with Sol for stronger judgment.
-Luna uses xhigh or max for coding and low for simple exploration or extraction.
+Luna uses xhigh for coding, max for harder coding tasks, and low for simple exploration or extraction.
 Its [Claude Code reference](skills/main-agent-contract/references/claude.md) covers Haiku, Sonnet, Opus, and Fable.
 Both references order families from routine work to more complex work and assign effort by model and workload.
 Astra and Fable require the user's explicit request.
@@ -95,6 +95,7 @@ Assignments record requested settings and report resolved settings only when the
 Each Main hook loads only its host's orchestration and model guidance.
 Worker hooks add no host reference.
 Forked workers can inherit Main's host guidance through parent history.
+The references supply task defaults and escalation conditions without requiring session-level model comparisons or benchmark evaluations.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](docs/research.md#model-effort-and-cost).
 
 ## Goal-Driven Work

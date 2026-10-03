@@ -32,9 +32,9 @@ It does not support `none` or `minimal` effort.
 Workgraph delegates clear tasks to Luna and uses Sol when stronger judgment is required.
 We confirm supported settings from the model page and maintain the task mapping in Main's Codex reference.
 Workgraph's selection defaults apply only when no explicit or configured setting exists.
-Main's Codex reference gates Sol effort above high on comparable-task evidence for difficult mathematics, science, or long agent work.
-That evaluation must show improved required outcomes.
-Workgraph selects effort from evidence for the exact model and workload.
+Main's host references supply task defaults and escalation conditions without requiring comparisons or evaluations during consumer sessions.
+Sol, Sonnet, and Opus efforts above high remain available through explicit or configured choices.
+Maintainers use model-specific benchmark and workload evidence when revising these defaults.
 Instruction text does not configure the host or establish model adherence.
 
 OpenAI's [model-selection guide](https://developers.openai.com/api/docs/guides/model-selection.md) gives different effort starting points for Luna, Sol, and Astra.
