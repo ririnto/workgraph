@@ -49,6 +49,8 @@ Mark unreported settings as unknown.
 Name each assignment's inputs, owned resources, authority, output, acceptance evidence, and cleanup requirements.
 Name permitted Git operations, refs, ownership limits, and pre-action checks before delegating a Git write.
 Give each shared resource one writer.
+When unexpected changes appear, ask an exploration agent to briefly identify their source.
+If a running agent made the changes within its assignment, account for them and continue the task.
 End an idle turn when only native notifications remain, without claiming completion.
 Revalidate source files, repository state, and check inputs before relying on replayed agent results.
 Check partial effects before retrying interrupted writes.
