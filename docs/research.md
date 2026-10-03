@@ -29,12 +29,12 @@ These recommendations guide instruction design without changing model or API con
 
 The fetched [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) lists `low`, `medium`, `high`, `xhigh`, and `max` effort settings, with `medium` as the default.
 It does not support `none` or `minimal` effort.
-Workgraph selects `gpt-6.1-sol` when available and assigns effort by task type.
+Workgraph delegates clear tasks to Luna and uses Sol when stronger judgment is required.
 We confirm supported settings from the model page and maintain the task mapping in Main's Codex reference.
 Workgraph's selection defaults apply only when no explicit or configured setting exists.
-Main's Codex reference gates Sol effort above high on comparable-task evidence for difficult mathematics, science, or long agent work.
-That evaluation must show improved required outcomes.
-Workgraph selects effort from evidence for the exact model and workload.
+Main's host references supply task defaults and escalation conditions without requiring comparisons or evaluations during consumer sessions.
+Sol, Sonnet, and Opus efforts above high remain available through explicit or configured choices.
+Maintainers use model-specific benchmark and workload evidence when revising these defaults.
 Instruction text does not configure the host or establish model adherence.
 
 OpenAI's [model-selection guide](https://developers.openai.com/api/docs/guides/model-selection.md) gives different effort starting points for Luna, Sol, and Astra.
@@ -137,6 +137,14 @@ Its Sonnet release article identifies a prerelease structured-output bug and pla
 DeepSWE uses mini-swe-agent and an alias from a job before Astra's public release.
 These differences prevent an isolated comparison with native Codex or Claude Code results.
 Rounded score changes do not establish statistical significance or gains on every workload.
+
+Luna's lower token rates and gains through max support broader coding, review, and agentic assignments with clear requirements.
+The [official model-selection guide](https://developers.openai.com/api/docs/guides/model-selection.md) includes Luna xhigh for constrained problem-solving and multi-app work.
+Workgraph selects Sol when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
+Step count alone does not require Sol.
+Workgraph uses Luna xhigh or max for coding, debugging, refactoring, and code review.
+It reserves Luna low for simple exploration and extraction.
+These sources do not establish equivalent Luna and Sonnet performance across workloads.
 
 Practitioner evidence supplements these broad benchmarks with specific failure conditions.
 The Sol coding study reaches its small sample's score ceiling.

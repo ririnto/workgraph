@@ -7,22 +7,20 @@ Codex does not provide Claude Code's native Workflow tool.
 
 ## Model Selection
 
-Prefer available `sol` when the task does not specify a model.
-Use each family's current model guidance and workload evidence to adjust these effort starting points.
-Do not select the highest effort automatically.
+Use `luna` for clear tasks, including development, review, document analysis, and multistep agentic work.
+Use `sol` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `astra` only at the user's explicit request.
-Compare Luna's higher efforts with Sol `medium` or `high` when switching could improve required quality, cost, or latency.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `luna` | Narrow extraction or routine coding | Use `low` for extraction and `medium` for routine coding. |
-| | Multistep work | Start at `high`. |
-| | Harder work | Evaluate `xhigh` or `max` when required quality gains justify added cost. |
+| `luna` | Simple exploration and extraction | Use `low`. |
+| | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
+| | Other clear analysis and agentic work | Use `medium`, or `high` for harder tasks. |
 | `sol` | Simple queries, conversions, and extraction | Use `low`. |
 | | Ordinary development, review, and document analysis | Use `medium`. |
 | | Complex debugging, algorithms, and architecture | Use `high`. |
-| `astra` | Bounded work | Start at `low`. |
-| | Difficult terminal repairs or agentic work | Compare `medium` and `xhigh` before testing `max`. |
+| `astra` | Bounded work | Use `low`. |
+| | Difficult terminal repairs or agentic work | Use `medium`, or `xhigh` for harder tasks. |
+| | The hardest reasoning | Use `max`. |
 
-For difficult mathematics, science, or long agent work, select Sol effort above `high` only after comparable-task evaluation.
-Require quality gains that justify latency and cost over lower effort.
+Leave Sol `xhigh` and `max` to explicit or configured choices.

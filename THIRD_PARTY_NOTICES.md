@@ -50,6 +50,7 @@ Their benchmark results retain the task, harness, effort, and pricing limits des
 
 [Artificial Analysis](https://artificialanalysis.ai/methodology/intelligence-benchmarking) supplies the composite effort curves and terminal comparisons.
 [Datacurve's DeepSWE](https://deepswe.datacurve.ai/blog/deepswe) supplies the Astra terminal benchmark and public aggregate artifact.
+[AI Coding Daily](https://aicodingdaily.com/model/gpt-6-luna), by Povilas Korop, supplies the Luna coding effort comparison.
 The [model evidence record](docs/model-effort-evidence.md) links their methods and states configuration and cost limits.
 
 We consulted original reports from [Joonlab](https://github.com/joonlab/gpt-6.1-sol-benchmark), [Dyad](https://github.com/dyad-sh/dyad), and [GitDiagram](https://github.com/ahmedkhaleel2004/gitdiagram).

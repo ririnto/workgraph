@@ -24,6 +24,7 @@ Workflow adds its operation to the Main session without repeating those common r
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
 Main orchestration and model policy use separate Codex and Claude Code references.
+Host references supply task defaults and escalation conditions without requiring model comparisons or benchmark evaluations during consumer sessions.
 Worker model selection stays in the dispatch, without a model-policy reference.
 The hooks provide the selected role and, for Main, the matching environment reference before the model begins work.
 Workflow adds Claude Code graph-specific operations after the Main contract.

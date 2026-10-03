@@ -4,13 +4,13 @@
 
 This record compares public evidence for seven exact models.
 No local Workgraph test establishes model quality.
-The six multi-task effort tables supply the main comparisons.
+The multi-task effort comparisons supply the main evidence.
 The smaller workload studies supply supporting evidence and limits.
 These results describe the authors' tasks, harnesses, and settings.
 Use their methods and limits when choosing comparable local experiments.
 Read [the research notes](research.md#model-effort-and-cost) for supported controls, official defaults, host settings, and pricing.
 The selection implications below are workload-specific judgments.
-We have not evaluated Workgraph adherence or established universal effort rankings.
+Workgraph behavior checks do not establish universal model-effort rankings.
 
 ### Shared Measurement Limits
 
@@ -43,10 +43,52 @@ The output column covers the whole index run, rather than output per task.
 | xhigh | 35 | 0.04 | 69M |
 | max | 38 | 0.07 | 140M |
 
-Max adds three rounded index points over xhigh at 75% more estimated cost.
-Its median first-answer latency is 124.2 seconds, versus xhigh at 20.86 seconds.
+Max adds three rounded index points over xhigh at about 61% more estimated cost, using unrounded source prices.
+Its median first-answer latency is 132.77 seconds, versus xhigh at 22.23 seconds.
 These latency measurements describe answer arrival, rather than task completion time.
 The none variant scores 18 at $0.01 per task, so measured cost does not rise at every effort transition.
+
+### Coding Effort Comparisons
+
+The same release comparison publishes separate coding-component results.
+These terminal cost estimates differ from the composite index costs above.
+
+| Effort | Terminal-Bench 4.0 pass rate | SciCode pass rate | Estimated terminal dollars per task |
+| --- | ---: | ---: | ---: |
+| low | 0.00% | 46.88% | 0.00545 |
+| medium | 2.53% | 50.93% | 0.07157 |
+| high | 4.55% | 50.35% | 0.12040 |
+| xhigh | 8.08% | 51.74% | 0.19818 |
+| max | 12.63% | 54.63% | 0.23621 |
+
+Max improves both scores over xhigh, while estimated terminal cost rises about 19%.
+SciCode's high score falls below medium, so the component gains are not monotonic across all settings.
+The [methodology](https://artificialanalysis.ai/methodology/intelligence-benchmarking) uses 288 SciCode subproblems with three repeats and a 300-second executor timeout.
+These terminal and scientific Python tasks do not measure general repository review or refactoring.
+The release page supplies no paired outcomes or Luna-specific terminal confidence intervals.
+
+### Repository Coding Suite
+
+[AI Coding Daily's Luna comparison](https://aicodingdaily.com/model/gpt-6-luna) reports an 80-point coding suite using Codex CLI.
+The suite includes Laravel, React TypeScript, bug finding, PHP import and synchronization, Flutter bank feeds, and Go shipping quotes.
+
+| Setting | Total points out of 80 | Average API dollars per prompt | Average seconds per prompt |
+| --- | ---: | ---: | ---: |
+| Luna medium | 43.74 | 0.01 | 133 |
+| Luna high | 53.04 | 0.01 | 231 |
+| Luna xhigh | 56.40 | 0.03 | 608 |
+| Luna max | 59.07 | 0.03 | 663 |
+| Sonnet medium | 60.54 | 0.20 | 58 |
+| Sol medium | 67.09 | 0.14 | 233 |
+| Sol high | 68.10 | 0.22 | 446 |
+
+Luna max approaches Sonnet medium's total score on this suite, with lower estimated cost and longer runtime.
+Sonnet uses Claude Code, while Luna and Sol use Codex CLI.
+These results describe model-and-harness configurations rather than isolated model performance.
+The [linked methodology](https://aicodingdaily.com/article/llm-coding-leaderboard-my-methodology-and-scoring-formulas) describes an older 40-point suite and five attempts per behavior project.
+It does not document repeat and scoring details for the added React and bug-finding components.
+The component scores do not all rise with effort, and rounded costs conceal smaller differences.
+This suite supports Luna xhigh and max for coding without establishing equivalent performance across workloads.
 
 ### Diagram Generation And Coding
 
@@ -57,11 +99,15 @@ The final low and Fast configuration used eight fresh calls across four reposito
 It produced eight valid outputs with no recoveries and a median duration of 6.97 seconds.
 Complete cold calls cost $0.004764, excluding cancellations and repairs.
 Changed fixtures and service tiers prevent an isolated low-versus-medium conclusion.
+The final comparison also changes the model from GPT-5.6 Luna medium to GPT-6 Luna low with Fast mode.
+Structural graph validity does not establish dependency accuracy.
 
 [ElectricityBench's week 40 record](https://electricitybench.com/models/codex-cli-gpt-6-luna/) uses Codex CLI 0.157.1 at medium.
 It reports 11 of 15 real coding tasks, 57% capability, and a 64-second median duration.
 The capability score differs from the real-task pass fraction.
 The authors keep outputs private, and earlier GPT-5.6 results concern another release.
+The [real-world suite](https://electricitybench.com/suites/real-world@v3/) uses one repeat and reports two of five hardest tasks solved.
+It supplies no controlled high, xhigh, or max comparison.
 
 For bounded diagram generation, evaluate the complete deployment configuration with fresh fixtures and recovery costs.
 Use the composite curve to budget Luna escalation, then test the target task's required quality.
