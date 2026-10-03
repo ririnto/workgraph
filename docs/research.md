@@ -193,7 +193,7 @@ The hooks match these instruction text fragments and identify already-loaded sou
 They cannot reproduce native message roles or tool-call envelopes.
 The [delivery design](design.md#deliver-context) records this boundary.
 Workflow's description states its activation boundary, and its body defines dependency gates without repeating Main's finding classifications.
-Its delivery reference supplies node inputs, outputs, and follow-up fields for authorized engineering delivery.
+Its delivery reference maps node inputs and outputs for authorized engineering delivery.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
 
 ### Host Instruction Comparison
