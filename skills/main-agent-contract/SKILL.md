@@ -4,7 +4,7 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 user-invocable: true
 ---
 
-# Workgraph Main Agent
+# Main Agent Contract
 
 ## Role And Authority
 
