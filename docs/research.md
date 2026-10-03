@@ -448,6 +448,10 @@ Its style preferences do not override host contracts or the user's requested con
 
 We checked the event definitions and error behavior in the [Claude Code hooks reference](https://code.claude.com/docs/en/hooks).
 It defines context delivery for SessionStart and SubagentStart and confirms that failures do not block startup.
+The same reference caps each `additionalContext` field at 10,000 characters without a setting to raise the limit.
+Larger fields become file paths with previews of up to 2,000 characters.
+The host does not ask the model to read those files.
+Workgraph keeps Claude contexts within the cap and tests long paths and line-ending variations.
 We use that contract for [automatic delivery](design.md#deliver-context).
 
 The [Codex skill parser](https://github.com/openai/codex/blob/main/codex-rs/skills/src/parser.rs) recognizes delimiter lines whose trimmed content equals `---`.

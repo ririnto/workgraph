@@ -69,6 +69,8 @@ Native Skill and Read message envelopes differ from hook envelopes, despite matc
 Codex delivers hook context as a developer message, while native Skill instructions use a user message.
 Claude wraps SessionStart context in a system reminder, while native Skill and Read use their tool and user messages.
 The hook cannot change those roles or fabricate native tool calls.
+Claude Code spills fields over 10,000 characters to files without requesting a read.
+Keep each Claude context within that limit so the host delivers its complete instructions inline.
 
 The script reads every selected instruction file before producing stdout.
 On a file or frontmatter error, it identifies the failing file without emitting partial instructions.
@@ -130,6 +132,7 @@ Keep one injector and one configuration per host, without runtime host detection
 It checks exact role content, loaded source paths, host reference selection, and exclusion of unrelated files.
 It covers invalid arguments, role and reference file errors, invalid frontmatter, and empty selected content.
 It executes the registered shell commands from a path with spaces and an unrelated working directory.
+It checks Claude's inline limit with complete instructions, long plugin paths, and LF or CRLF line endings.
 Each test removes its disposable plugin copies.
 
 The tests also check skill names, descriptions, and invocation metadata.

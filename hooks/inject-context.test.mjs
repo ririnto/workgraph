@@ -94,6 +94,13 @@ for (const [event, name] of roles) {
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
       assert.deepEqual(JSON.parse(result.stdout), expectedOutput(event, host));
+      if (host === "claude") {
+        assert.ok(
+          JSON.parse(result.stdout).hookSpecificOutput.additionalContext
+            .length <= 10_000,
+          "Claude must receive the complete context without host spilling"
+        );
+      }
       assert.match(
         result.stdout,
         new RegExp(
@@ -127,6 +134,54 @@ for (const [event, name] of roles) {
     assert.match(body, /Invoking this skill does not/u);
   });
 }
+
+test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
+  const root = path.join(copyPlugin(t), "a".repeat(100), "b".repeat(100));
+  mkdirSync(path.join(root, "hooks"), { recursive: true });
+  copyFileSync(script, path.join(root, "hooks", "inject-context.mjs"));
+  cpSync(skills, path.join(root, "skills"), { recursive: true });
+  for (const newline of ["\n", "\r\n"]) {
+    for (const [event, name] of roles) {
+      const content = readFileSync(
+        path.join(skills, name, "SKILL.md"),
+        "utf-8"
+      );
+      writeFileSync(
+        path.join(root, "skills", name, "SKILL.md"),
+        content.replaceAll("\n", newline)
+      );
+      writeFileSync(
+        path.join(root, "skills", name, "references", "claude.md"),
+        readFileSync(
+          path.join(skills, name, "references", "claude.md"),
+          "utf-8"
+        ).replaceAll("\n", newline)
+      );
+      const result = runHook(
+        [event, "claude"],
+        path.join(root, "hooks", "inject-context.mjs")
+      );
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(result.stderr, "");
+      const output = JSON.parse(result.stdout);
+      assert.deepEqual(
+        output,
+        expectedOutput(
+          event,
+          "claude",
+          path.join(root, "skills"),
+          content
+            .slice(content.indexOf("\n---\n") + 5)
+            .replaceAll("\n", newline)
+        )
+      );
+      assert.ok(
+        output.hookSpecificOutput.additionalContext.length <= 10_000,
+        `Claude ${event} exceeds its inline context limit`
+      );
+    }
+  }
+});
 
 test("configured Claude hooks load relocated skills and references with LF or CRLF", (t) => {
   const root = copyPlugin(t);

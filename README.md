@@ -56,6 +56,7 @@ Claude references use native Read line numbering, while Codex references preserv
 Separate metadata identifies complete content already loaded by the hook.
 These text fragments match native loading, but the host still delivers them through its hook message envelope.
 Agents need no additional file reads for automatic delivery.
+Claude hook contexts stay within its 10,000-character inline limit, including tested path and line-ending variations.
 The hooks do not inject repository guidance or research documents.
 
 The main-agent contract keeps planning, design decisions, publication, integration, and final reporting in the main session.
