@@ -384,7 +384,7 @@ They prefer `functions.wait` with `yield_time_ms: 240000` when waiting for a yie
 Four minutes is the user's recommended starting point, not a required duration or execution limit.
 The [wait input schema](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_spec.rs) identifies `yield_time_ms` and a ten-second default.
 The [wait handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_handler.rs) uses that fixed default when the argument is omitted.
-The [configuration schema](https://github.com/openai/codex/blob/main/codex-rs/features/src/feature_configs.rs) exposes no wait-default or wait-minimum setting.
+The [configuration schema](https://github.com/openai/codex/blob/main/codex-rs/features/src/feature_configs.rs) exposes no default or minimum for Code Mode `functions.wait` yield timing.
 Its `default_exec_yield_time_ms` setting controls the initial exec call, not later wait calls.
 The [Codex configuration default](https://github.com/openai/codex/blob/main/codex-rs/core/src/config/mod.rs) is thirty seconds for that initial exec call.
 The [runtime](https://github.com/openai/codex/blob/main/codex-rs/code-mode-runtime/src/service.rs) accepts a per-call duration, adds grace, and applies any host session cap.
@@ -449,6 +449,11 @@ Its style preferences do not override host contracts or the user's requested con
 We checked the event definitions and error behavior in the [Claude Code hooks reference](https://code.claude.com/docs/en/hooks).
 It defines context delivery for SessionStart and SubagentStart and confirms that failures do not block startup.
 We use that contract for [automatic delivery](design.md#deliver-context).
+
+The [Codex skill parser](https://github.com/openai/codex/blob/main/codex-rs/skills/src/parser.rs) recognizes delimiter lines whose trimmed content equals `---`.
+Workgraph uses that boundary rule without interpreting or repairing YAML values.
+Inline dashes remain in frontmatter, while indented delimiter lines end it.
+Claude receives the remaining text, and Codex retains the complete original skill file.
 
 The [Claude Code skills reference](https://code.claude.com/docs/en/skills) documents skill invocation controls and `${CLAUDE_PLUGIN_ROOT}` substitution in skill Markdown.
 We use the invocation controls for [manual invocation](design.md#support-manual-invocation), and the hook-delivered role bodies need no extra file reads for their contracts.

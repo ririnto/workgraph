@@ -48,14 +48,14 @@ const copyPlugin = (t) => {
 /**
  * Assert the complete output, including exact source paths and loaded text.
  */
-const expectedOutput = (event, host, rootSkills = skills) => {
+const expectedOutput = (event, host, rootSkills = skills, body = "") => {
   const name =
     event === "SessionStart" ? "main-agent-contract" : "subagent-context";
   const source = realpathSync(path.join(rootSkills, name, "SKILL.md"));
   const content = readFileSync(source, "utf-8");
   const context =
     host === "claude"
-      ? `Workgraph instructions loaded from ${source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${content.replace(/^\uFEFF/u, "").replace(/^---\s*\n(?<frontmatter>[\s\S]*?)---\s*\n?/u, "")}`
+      ? `Workgraph instructions loaded from ${source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${body || content.slice(content.indexOf("\n---\n") + 5)}`
       : `Workgraph instructions loaded from ${source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`;
   const reference = realpathSync(
     path.join(rootSkills, name, "references", `${host}.md`)
@@ -147,12 +147,17 @@ test("configured Claude hooks load relocated skills and references with LF or CR
     assert.equal(hook.async, undefined);
     assert.ok(hook.command.endsWith(`${event} claude`));
     for (const newline of ["\n", "\r\n"]) {
-      writeFileSync(
-        path.join(root, "skills", name, "SKILL.md"),
-        `---\nname: ${name}\ndescription: |\n  Keep --- in metadata.\n---\n\n# Relocated ${event}\n\nUse the copied skill.\n\n---\n\nKeep body separators.\n`.replaceAll(
+      const body =
+        `\n# Relocated ${event}\n\nUse the copied skill.\n\n---\n\nKeep body separators.\n`.replaceAll(
           "\n",
           newline
-        )
+        );
+      writeFileSync(
+        path.join(root, "skills", name, "SKILL.md"),
+        `---\nname: ${name}\ndescription: |\n  Keep --- in metadata.\n  Keep inline dashes ---\n---\n`.replaceAll(
+          "\n",
+          newline
+        ) + body
       );
       for (const host of hosts) {
         writeFileSync(
@@ -173,7 +178,7 @@ test("configured Claude hooks load relocated skills and references with LF or CR
       assert.equal(result.stderr, "");
       assert.deepEqual(
         JSON.parse(result.stdout),
-        expectedOutput(event, "claude", path.join(root, "skills"))
+        expectedOutput(event, "claude", path.join(root, "skills"), body)
       );
       const codex = runHook(
         [event, "codex"],
@@ -182,7 +187,7 @@ test("configured Claude hooks load relocated skills and references with LF or CR
       assert.equal(codex.status, 0, codex.stderr);
       assert.deepEqual(
         JSON.parse(codex.stdout),
-        expectedOutput(event, "codex", path.join(root, "skills"))
+        expectedOutput(event, "codex", path.join(root, "skills"), body)
       );
     }
   }
@@ -342,6 +347,38 @@ for (const [event, name] of roles) {
   });
 }
 
+test("Codex delimiter lines retain the remaining text in each host's fragment", (t) => {
+  const root = copyPlugin(t);
+  for (const [event, name] of roles) {
+    for (const newline of ["\n", "\r\n"]) {
+      const body =
+        `  Remaining metadata text.\n---\n\n# Role\nKeep body spaces. \t\n`.replaceAll(
+          "\n",
+          newline
+        );
+      writeFileSync(
+        path.join(root, "skills", name, "SKILL.md"),
+        ` \t--- \t\nname: ${name}\ndescription: |\n  First metadata line.\n  --- \t\n`.replaceAll(
+          "\n",
+          newline
+        ) + body
+      );
+      for (const host of hosts) {
+        const result = runHook(
+          [event, host],
+          path.join(root, "hooks", "inject-context.mjs")
+        );
+        assert.equal(result.status, 0, result.stderr);
+        assert.equal(result.stderr, "");
+        assert.deepEqual(
+          JSON.parse(result.stdout),
+          expectedOutput(event, host, path.join(root, "skills"), body)
+        );
+      }
+    }
+  }
+});
+
 test("common Main excludes Claude routing and Workflow discovery is Claude-scoped", () => {
   assert.doesNotMatch(
     readFileSync(path.join(skills, "main-agent-contract", "SKILL.md"), "utf-8"),
@@ -431,7 +468,9 @@ for (const [event, name] of roles) {
     const root = copyPlugin(t);
     for (const source of [
       "# No frontmatter\n\nRole instructions.",
+      "---\n---\n# Empty frontmatter\n",
       `---\nname: ${name}\n`,
+      `---\nname: ${name}\n--- trailing text\n# Role\n`,
       `---\nname: ${name}\n---`,
       `---\nname: ${name}\n---\n \t\n`
     ]) {
