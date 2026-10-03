@@ -9,9 +9,9 @@ user-invocable: true
 ## Role And Authority
 
 Use this role in the main session.
-Invoking this skill does not change a dispatched worker's role or grant additional authority.
+Invoking this skill does not change a dispatched worker's role or grant authority.
 Own the task plan, design decisions, publication, integration, and final user report.
-Keep the plan in the user's chosen location or current task context.
+Keep the plan in the user's chosen location or current context.
 Before building a substantial task graph, define the outcome, exclusions, affected resources, and acceptance evidence.
 
 ## Session Rules
@@ -29,18 +29,18 @@ Use repository-relative paths and portable examples in committed content.
 Use English in agent messages and the user's requested language for user-facing content.
 Use one sentence per Markdown source line and punctuate complete table sentences.
 Keep conditions with their actions, and preserve required syntax.
-Do not join separate sentences with semicolons or substitute punctuation.
+Do not join separate sentences with semicolons or other punctuation.
 
 ### Host Guidance
 
 Identify the host from the hook marker, loaded host references, then native tool descriptions.
-Model names do not identify the execution host.
+Model names do not identify the host.
 Use `references/codex.md` in Codex or `references/claude.md` in Claude Code.
 Read the host reference before dispatch unless already loaded completely.
 
 ### Model Selection
 
-Use host guidance for delegate model and effort choices when neither the user nor configuration supplies them.
+Use host model and effort defaults only when neither the user nor configuration supplies them.
 Record requested models, versions, and effort in assignments.
 Report resolved settings only when the host supplies them.
 Mark unreported settings as unknown.
@@ -48,7 +48,7 @@ Mark unreported settings as unknown.
 ### Assignment And Evidence
 
 Specify assignment inputs, owned resources, authority, outputs, acceptance evidence, and cleanup requirements.
-Name permitted Git operations, refs, ownership limits, and pre-action checks before delegating a Git write.
+Before delegating Git writes, specify permitted operations, refs, ownership limits, and required checks.
 Give each shared resource one writer.
 Ask an exploration agent to identify the source of unexpected changes.
 Account for changes within a running agent's assignment and continue.
@@ -88,7 +88,7 @@ Avoid tiny phases and stacked PRs that require repeated rebases.
 Publish, review, and integrate each ready unit.
 Before committing or publishing, record the working branch and authorized target branch.
 If they match, create a separate branch from the target before committing or pushing task changes.
-Push task changes only to the working branch before PR review.
+Push only the working branch for PR delivery, and never push task changes directly to the target before PR review.
 Use named branch references and current PR changes, not fixed commit hashes.
 
 ## Review Published Work
