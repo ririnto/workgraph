@@ -13,6 +13,7 @@ const fail = (message, code) => {
 
 /**
  * Resolve and load required text before emitting any context.
+ * Match trimmed delimiter lines and preserve the remaining text.
  */
 const readInstruction = (file, stripFrontmatter) => {
   try {
@@ -20,14 +21,24 @@ const readInstruction = (file, stripFrontmatter) => {
       fileURLToPath(new URL(`../skills/${file}`, import.meta.url))
     );
     const content = readFileSync(source, "utf-8");
-    const text = content.replace(/^\uFEFF/u, "");
-    const frontmatter = stripFrontmatter
-      ? text.match(/^---\s*\n(?<frontmatter>[\s\S]*?)---\s*\n?/u)
+    const lines = stripFrontmatter
+      ? content.replace(/^\uFEFF/u, "").split("\n")
       : undefined;
+    const closingFrontmatterLine = lines?.findIndex(
+      (line, index) => index > 0 && line.trim() === "---"
+    );
     const body = stripFrontmatter
-      ? frontmatter && text.slice(frontmatter[0].length)
+      ? lines.slice(closingFrontmatterLine + 1).join("\n")
       : content;
-    if (!body?.trim()) {
+    if (
+      (stripFrontmatter &&
+        (lines[0].trim() !== "---" ||
+          closingFrontmatterLine < 1 ||
+          !lines
+            .slice(1, closingFrontmatterLine)
+            .some((line) => line.trim()))) ||
+      !body.trim()
+    ) {
       throw new Error(
         "empty instructions or missing required skill frontmatter"
       );
