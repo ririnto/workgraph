@@ -14,6 +14,7 @@ Split broad goals into cohesive, independently verifiable units with acceptance 
 Keep coupled work together when splitting prevents independent verification or mergeability.
 Avoid tiny phases and stacked PRs that require repeated rebases.
 Publish, review, and integrate each ready unit within granted authority.
+Proceed with publication and integration already authorized by the goal without requesting renewed approval.
 Use the user's specified base branch, otherwise retain the recorded base or use the current branch.
 Without a base, confirm the active development branch.
 Record working and authorized base branches before branch creation, commits, or publication.
@@ -24,7 +25,8 @@ Use named branch references and current PR changes, not fixed commit hashes.
 ## Check Before Publication
 
 Inspect changed files and required evidence before publishing to the authorized base.
-Before publishing a branch, delegate a brief diff scan for exposed user environment details to an exploration agent.
+Before each branch push, delegate a brief diff scan for exposed user environment details to an exploration agent.
+Reuse a scan only while its diff remains unchanged.
 Treat this scan as exploration, without a code review.
 Require file locations and the type of exposure, or a clear no-findings result.
 Inspect flagged content and remove exposed details before pushing the branch.

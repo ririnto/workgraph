@@ -57,6 +57,7 @@ Separate metadata identifies complete content already loaded by the hook.
 These text fragments match native loading, but the host still delivers them through its hook message envelope.
 Agents need no additional file reads for the injected role and host guidance.
 For repository changes or delivery, Main reads the conditional [Delivery skill](skills/delivery/SKILL.md) before starting changes.
+Both roles read conditional Writing, Instruction Authoring, and Development skills when their task requires those procedures.
 Claude hook contexts stay within its 10,000-character inline limit, including tested path and line-ending variations.
 The hooks do not inject repository guidance or research documents.
 
@@ -123,7 +124,7 @@ The [Delivery skill](skills/delivery/SKILL.md) defines branch selection, publica
 Main uses the user's specified base branch, otherwise retains the recorded base or uses the current branch.
 Without a base, Main confirms the active development branch before starting changes.
 Main records the base before creating a working branch and retains it through delivery.
-Before publishing the branch, an exploration agent scans the diff for exposed user environment details.
+Before each branch push, an exploration agent scans the diff for exposed user environment details.
 Main resolves any exposure before pushing.
 Main requests one full independent review after PR/MR creation for maintainers, and before creation for other contributors.
 Main fixes confirmed blockers and records permitted deferrals before integrating into the authorized base.
@@ -145,6 +146,9 @@ In Claude Code, invoke Workflow for user requests, dependent stages, or an ident
 - Use `/workgraph:main-agent-contract` for the main session.
 - Use `/workgraph:subagent-context` for a dispatched agent.
 - Use `/workgraph:delivery` in Main for repository changes or authorized publication and integration.
+- Use `/workgraph:writing` for prose and Markdown drafting, editing, or review.
+- Use `/workgraph:instruction-authoring` for skills, `AGENTS.md`, role instructions, and related references.
+- Use `/workgraph:development` for code changes or review, loading only the relevant language references.
 - In Claude Code, use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
 
 All skills remain user-invocable and model-invocable.
@@ -152,8 +156,8 @@ Invocation does not change the current session's role or dispatch authority.
 The hooks operate without skill invocation.
 
 Automatic delivery includes each role's required environment reference.
-Hooks do not inject Delivery.
-Main resolves its conditional Delivery link from the loaded skill's source directory.
+Hooks do not inject conditional task skills.
+Each role resolves its conditional skill links from the loaded role's source directory.
 Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
 Manual Worker loading reads its active host reference unless the hook already supplied its complete content.
 The dispatch supplies any authorized subdelegation settings.
@@ -162,6 +166,12 @@ The Workflow skill keeps its core rules inline.
 For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.
 Read-only Workflow goals do not need that reference.
 The plugin includes no output assets or bundled helper scripts because its skills produce neither reusable files nor repeated script logic.
+
+Writing combines Stop Slop prose guidance with sentence-level Markdown formatting and table rules.
+Instruction Authoring governs audience, loading boundaries, conditional references, and validation for reusable instructions.
+Development contains shared code style and focused references for Java, Kotlin, TypeScript, JavaScript, Python, Go, Rust, and shell.
+Target repository rules and lint take precedence over Development's defaults.
+These skills apply to both Main and Worker without adding orchestration or model policy to Worker.
 
 ## Hook Errors
 

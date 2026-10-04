@@ -66,7 +66,8 @@ We used [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) for 
 We read its complete skill and the `phrases.md`, `structures.md`, and `examples.md` references.
 The local skill identifies Hardik Pandya as its author and declares the MIT license.
 It informed direct verbs, specific subjects, and removal of filler.
-The plugin does not bundle that skill.
+The Writing skill adapts that guidance and adds Workgraph's Markdown sentence and table rules.
+The plugin does not redistribute the source skill or its reference files verbatim.
 
 ## Research And Official Documentation
 

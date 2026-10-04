@@ -27,9 +27,8 @@ Use repository-relative paths and portable examples in committed content.
 ### Communication
 
 Use English in agent messages and the user's requested language for user-facing content.
-Use one sentence per Markdown source line and punctuate complete table sentences.
-Keep conditions with their actions, and preserve required syntax.
-Do not join separate sentences with semicolons or other punctuation.
+For prose or Markdown work, read [Writing](../writing/SKILL.md) before drafting, editing, or reviewing text.
+For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) before creating, editing, or reviewing them.
 
 ### Host Guidance
 
@@ -84,6 +83,7 @@ Keep valid results after requirement changes and continue unaffected tasks after
 ## Repository Work
 
 For repository changes or delivery, read [delivery](../delivery/SKILL.md) before edits, branch creation, implementation dispatch, commits, or publication.
+For code changes or review, read [Development](../development/SKILL.md) and its relevant language references before working on source.
 For read-only, research-only, or review-only goals, omit implementation, new branch publication, new PR/MR creation, and integration.
 Review existing PRs/MRs without inferring publication authority from inspection requests.
 Report unsupported findings as unverified.
