@@ -116,7 +116,8 @@ Main selects the user's specified base branch, otherwise retains the recorded ba
 Without a base, Main confirms the active development branch.
 Main records both branches before branch creation and keeps the base for publication, integration, and cleanup.
 Before branch publication, Main delegates a brief environment-detail scan of the diff to an exploration agent.
-Main uses the scan's findings before pushing, then requests the separate independent review after publication.
+Main uses the scan's findings before pushing.
+Main requests independent review after PR/MR creation for maintainers, and before creation for other contributors.
 Claude Code's main session must resolve required scope and authority before launching a Workflow run.
 An agent prompt cannot grant tool permissions or enlarge the user's authorization.
 The host may relay the user's `/workgraph:workflow` invocation to a dispatched agent together with a bounded computed task.

@@ -29,16 +29,19 @@ Treat this scan as exploration, without a code review.
 Require file locations and the type of exposure, or a clear no-findings result.
 Inspect flagged content and remove exposed details before pushing the branch.
 
-## Review Published Work
+## Review And Publish
 
+Use project roles or the user's statement to determine whether the user maintains the project.
+Run one full independent review per delivery unit.
+For a project maintainer, create the PR/MR first and review its current changes.
+Otherwise, review the working branch's complete changes before creating the PR/MR.
 Reuse an existing PR/MR for the unit.
-Treat publication as the review handoff, not as integration.
-Run one full independent review after publication using the PR/MR and its current changes.
 Follow the consumer repository's review method.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.
 Fix blockers before integration when they violate acceptance, required behavior, correctness, safety, or required checks.
 Only confirmed blockers require code changes before integration.
-Publish blocker fixes on the same branch and request the same reviewer's assessment of affected changes only.
+Keep blocker fixes on the same working branch and update its existing PR/MR, if any.
+Request the same reviewer's assessment of affected changes only.
 
 ## Defer And Integrate
 

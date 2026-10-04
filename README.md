@@ -67,7 +67,9 @@ Edges represent result dependencies or conditions, not chronology.
 The main agent starts ready independent work in parallel when writes do not conflict and serializes conflicting writes.
 Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
 Workers complete bounded assignments within their authority.
-For authorized delivery, the main agent publishes a working branch and PR/MR before one full independent review, then integrates after required checks and confirmed blockers are resolved.
+For maintainers, Main requests independent review after PR/MR creation.
+For other contributors, Main requests that review before PR/MR creation.
+Main integrates after required checks pass and confirmed blockers are resolved.
 The instructions also cover evidence freshness, bounded feedback, English handoffs, and ownership-safe cleanup.
 The host supplies tool usage, model controls, and background execution mechanics.
 In Claude Code, the main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
@@ -122,7 +124,8 @@ Main uses the user's specified base branch, otherwise retains the recorded base 
 Without a base, Main confirms the active development branch before starting changes.
 Main records the base before creating a working branch and retains it through delivery.
 Before publishing the branch, an exploration agent scans the diff for exposed user environment details.
-Main resolves any exposure before pushing, then requests one full independent review of the published PR/MR.
+Main resolves any exposure before pushing.
+Main requests one full independent review after PR/MR creation for maintainers, and before creation for other contributors.
 Main fixes confirmed blockers and records permitted deferrals before integrating into the authorized base.
 Selecting a base branch does not grant publication, integration, or cleanup authority.
 Read-only goals retain their inspection scope.
