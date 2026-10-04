@@ -143,13 +143,17 @@ Main revalidates source files and check inputs before relying on replayed result
 Use the role skills to reload their instructions when needed.
 In Claude Code, invoke Workflow for user requests, dependent stages, or an identified in-scope follow-up.
 
-- Use `/workgraph:main-agent-contract` for the main session.
-- Use `/workgraph:subagent-context` for a dispatched agent.
-- Use `/workgraph:delivery` in Main for repository changes or authorized publication and integration.
-- Use `/workgraph:writing` for prose and Markdown drafting, editing, or review.
-- Use `/workgraph:instruction-authoring` for skills, `AGENTS.md`, role instructions, and related references.
-- Use `/workgraph:development` for code changes or review, loading only the relevant language references.
-- In Claude Code, use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
+Claude Code uses slash commands, while Codex uses dollar-prefixed skill names.
+
+| Claude Code | Codex | Purpose |
+| --- | --- | --- |
+| `/workgraph:main-agent-contract` | `$workgraph:main-agent-contract` | Load the main session's role. |
+| `/workgraph:subagent-context` | `$workgraph:subagent-context` | Load a dispatched agent's role. |
+| `/workgraph:delivery` | `$workgraph:delivery` | Load repository delivery procedures in Main. |
+| `/workgraph:writing` | `$workgraph:writing` | Load prose and Markdown guidance for drafting, editing, or review. |
+| `/workgraph:instruction-authoring` | `$workgraph:instruction-authoring` | Load guidance for skills, `AGENTS.md`, role instructions, and related references. |
+| `/workgraph:development` | `$workgraph:development` | Load code guidance and select the relevant language references. |
+| `/workgraph:workflow` | Unavailable | Request native Workflow in Claude Code. |
 
 All skills remain user-invocable and model-invocable.
 Invocation does not change the current session's role or dispatch authority.
