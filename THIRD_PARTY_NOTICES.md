@@ -10,6 +10,7 @@ This document records attribution and prior sources.
 We studied [obra/superpowers](https://github.com/obra/superpowers) on its `main` branch.
 The project uses the MIT license and credits Jesse Vincent, copyright 2025.
 It informed hook bootstrapping, scoped instruction loading, and task verification.
+We reviewed its [branch-finishing skill](https://github.com/obra/superpowers/blob/main/skills/finishing-a-development-branch/SKILL.md) for conditional delivery loading.
 Workgraph uses its own context documents and execution rules.
 We reviewed the [using-superpowers skill](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md) and [Codex tool reference](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/references/codex-tools.md) on its `main` branch.
 We used their host adapters to review tool names and model allowlists, retaining the current host's fork rules where they differ.

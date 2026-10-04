@@ -447,6 +447,35 @@ test("common Main excludes Claude routing and Workflow discovery is Claude-scope
   assert.match(body, /In Codex, report that native Workflow did not run/u);
 });
 
+test("Main resolves conditional Delivery from relocated source without injecting it", (t) => {
+  const root = copyPlugin(t);
+  const main = path.join(root, "skills", "main-agent-contract", "SKILL.md");
+  const [, metadata, body] = readFileSync(
+    path.resolve(
+      path.dirname(main),
+      readFileSync(main, "utf-8").match(/\[delivery\]\((?<file>[^)]+)\)/u)
+        ?.groups?.file
+    ),
+    "utf-8"
+  ).split(/^---$/mu);
+  assert.match(metadata, /^name: delivery$/mu);
+  assert.match(metadata, /^description: .+$/mu);
+  assert.match(metadata, /^user-invocable: true$/mu);
+  assert.ok(body.trim());
+  for (const host of hosts) {
+    const result = runHook(
+      ["SessionStart", host],
+      path.join(root, "hooks", "inject-context.mjs")
+    );
+    assert.equal(result.status, 0, result.stderr);
+    assert.doesNotMatch(result.stdout, /# Repository Delivery/u);
+    assert.deepEqual(
+      JSON.parse(result.stdout),
+      expectedOutput("SessionStart", host, path.join(root, "skills"))
+    );
+  }
+});
+
 test("workers load selected execution guidance without Main model or orchestration policy", (t) => {
   const root = copyPlugin(t);
   rmSync(path.join(root, "skills", "main-agent-contract", "references"), {

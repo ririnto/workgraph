@@ -8,7 +8,8 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | --- | --- | --- |
 | `AGENTS.md` | Contributors | Contributors follow repository conventions, validation, and publication requirements. |
 | `README.md` | Plugin users | Users find installation instructions, hook behavior, manual invocation, and errors here. |
-| `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow the common rules and the planning, dispatch, integration, and reporting procedures in one self-contained body. |
+| `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow role authority, planning, dispatch, reporting, and conditional skill routing. |
+| `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and branch cleanup procedures. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow the common rules and the assignment scope, permitted operations, and result delivery requirements in one self-contained body. |
 | Role host references | Main and Worker agents | Each selected reference supplies execution timing, while Main references also supply orchestration and model guidance. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds graph-specific procedures after Main and invokes native Workflow for explicit requests or graph-suitable work. |
@@ -20,6 +21,8 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 Keep each rule in the source responsible for its audience.
 Use links for supporting explanations instead of copying procedures across documents.
 Main and Worker embed their applicable role rules.
+Main loads Delivery before repository edits, branch creation, implementation dispatch, commits, or publication.
+Hooks do not inject this conditional skill.
 Workflow adds its operation to the Main session without repeating those common rules.
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
@@ -95,8 +98,25 @@ Pass actual predecessor results and evidence to successor nodes.
 Choose useful node types for the goal rather than requiring an exploration-to-integration sequence.
 Workgraph defines no scheduler, executor, or shared task store.
 
+Main can use LaTeX when notation makes dependencies or readiness conditions clearer.
+For example, let $i$ denote implementation, $t$ regression tests, $v$ verification, and $p$ publication.
+
+$$
+V = \{i, t, v, p\}, \qquad
+E = \{(i,v), (t,v), (v,p)\}.
+$$
+
+Main can run $i$ and $t$ in parallel when their writes do not conflict.
+Main starts $v$ after accepting both results and starts $p$ after passing checks and the environment-detail scan.
+This example does not require the same nodes for other goals.
+
 The [README](../README.md#goal-driven-work) documents Workflow selection, script discovery, and the branch, publication, review, and deferral procedures for plugin users.
-The `skills/` role bodies remain the operational source for those procedures.
+The [Delivery skill](../skills/delivery/SKILL.md) contains the operational delivery procedures for both hosts.
+Main selects the user's specified base branch, otherwise retains the recorded base or selects the current branch.
+Without a base, Main confirms the active development branch.
+Main records both branches before branch creation and keeps the base for publication, integration, and cleanup.
+Before branch publication, Main delegates a brief environment-detail scan of the diff to an exploration agent.
+Main uses the scan's findings before pushing, then requests the separate independent review after publication.
 Claude Code's main session must resolve required scope and authority before launching a Workflow run.
 An agent prompt cannot grant tool permissions or enlarge the user's authorization.
 The host may relay the user's `/workgraph:workflow` invocation to a dispatched agent together with a bounded computed task.
@@ -114,6 +134,9 @@ Keep tool routing in each host reference and task-graph ownership in the common 
 ## Support Manual Invocation
 
 Each role keeps its own procedures inline.
+Main reads Delivery when repository changes or delivery require its procedures.
+Inspection-only tasks do not require Delivery.
+Main resolves the linked file from its loaded skill directory, regardless of the working directory.
 Manual Main invocation reads the active host reference before dispatch unless its complete content is already loaded.
 The hook already supplies that reference during automatic Main delivery.
 Manual Worker invocation reads its active host reference unless its complete content is already loaded.

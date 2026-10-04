@@ -55,7 +55,8 @@ Codex receives the native `<skill>` text with its qualified name, source path, a
 Claude references use native Read line numbering, while Codex references preserve raw file text.
 Separate metadata identifies complete content already loaded by the hook.
 These text fragments match native loading, but the host still delivers them through its hook message envelope.
-Agents need no additional file reads for automatic delivery.
+Agents need no additional file reads for the injected role and host guidance.
+For repository changes or delivery, Main reads the conditional [Delivery skill](skills/delivery/SKILL.md) before starting changes.
 Claude hook contexts stay within its 10,000-character inline limit, including tested path and line-ending variations.
 The hooks do not inject repository guidance or research documents.
 
@@ -104,61 +105,27 @@ Detailed model support, benchmarks, and workload reports remain in [maintainer r
 
 Use only the nodes and checks that serve the goal.
 Reuse existing facts and plans, and skip exploration or planning when they already answer the relevant questions.
-Keep the goal, scope, owners, authority, working branch, target branch, and acceptance evidence in main.
+Keep the goal, scope, owners, authority, working branch, base branch, and acceptance evidence in Main.
 
 In Claude Code, request a goal through the Workflow entry point without prescribing an itinerary.
 
 ```text
-/workgraph:workflow Fix the parser's escaped-quote bug, publish a PR for review, and integrate it into main.
+/workgraph:workflow Fix the parser's escaped-quote bug, publish a PR for review, and integrate it into the base branch.
 ```
 
 Build dependencies from actual results or conditions, not progress-phase labels.
 Pass predecessor results to successors, run ready independent outcomes in parallel, and serialize conflicting writes.
-Keep planning, design decisions, publication, and integration in main.
+Keep planning, design decisions, publication, and integration in Main.
 
-For broad goals, split work into cohesive, independently verifiable, main-targeted delivery units with clear acceptance evidence and one accountable owner.
-Keep tightly coupled work together when splitting it would prevent independent verification or mergeability.
-Avoid tiny phases and stacked PRs that require repeated rebases.
-Publish, review, and integrate each ready unit promptly instead of accumulating an oversized PR.
-
-Before committing or publishing task changes, record the working branch and authorized target branch.
-If they match, create a separate working branch from the target first.
-Push only the working branch for PR delivery, and never push task changes directly to the target before PR review.
-Use named branch references and the current PR diff, not fixed commit hashes.
-
-For authorized delivery, delegate bounded implementation and checks.
-Main inspects changed files and evidence before committing and pushing the working branch.
-It then creates or updates a PR/MR targeting the authorized branch.
-Reuse an existing PR/MR for the unit.
-Treat publication as a review handoff, not as main integration.
-Run one full independent review after publication, using the PR/MR and its current changes as input.
-Use the consumer repository's review method.
-Verify candidates against requirements, source, and checks, then classify confirmed findings.
-Fix confirmed blockers before integration when they affect acceptance, required behavior, correctness, safety, or required checks.
-Only confirmed blockers require code changes before integration.
-After a blocker fix, update the same PR/MR and ask the same reviewer to re-review only affected changes.
-Reuse unaffected passing checks.
-
-Defer only noncritical findings that do not affect required behavior, acceptance, correctness, or safety, after required checks pass.
-Before integration, register each deferred bounded follow-up in the authorized long-term issue tracker.
-Include evidence, scope, acceptance criteria, a named owner, and a next action.
-Reuse or update an existing tracker item when possible.
-Defer follow-up implementation until after the target branch is updated.
-If tracker access is not authorized or available, do not integrate with an untracked deferral.
-
-Avoid repeated target syncs or rebases unless a conflict or invalidated evidence requires one.
-Bound blocker-fix and scoped re-review rounds, and stop sooner on no progress or a concrete blocker.
-Respect host and forge protections, then verify the target branch update.
-Treat that verified update as the delivery finish condition, not PR creation.
-Do not ask again for publication or integration already authorized by the goal.
-
-Read-only, research-only, and review-only goals skip implementation, new branch publication, PR/MR creation, and integration.
-Use an existing PR/MR as input when reviewing that artifact.
-Inspection-only requests do not grant publication authority.
-
-In the example goal, a parser-fix node and a separate regression-test node can start in parallel from the known reproduction and agreed behavior.
-Their results gate parser checks, passing checks gate publication from a working branch to a PR/MR, and the published PR gates one full review.
-Confirmed blockers gate same-branch fixes and scoped re-review, while passing checks and tracked deferrals gate main integration.
+The [Delivery skill](skills/delivery/SKILL.md) defines branch selection, publication, review, deferral, integration, and branch cleanup.
+Main uses the user's specified base branch, otherwise retains the recorded base or uses the current branch.
+Without a base, Main confirms the active development branch before starting changes.
+Main records the base before creating a working branch and retains it through delivery.
+Before publishing the branch, an exploration agent scans the diff for exposed user environment details.
+Main resolves any exposure before pushing, then requests one full independent review of the published PR/MR.
+Main fixes confirmed blockers and records permitted deferrals before integrating into the authorized base.
+Selecting a base branch does not grant publication, integration, or cleanup authority.
+Read-only goals retain their inspection scope.
 
 The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.
@@ -174,6 +141,7 @@ In Claude Code, invoke Workflow for user requests, dependent stages, or an ident
 
 - Use `/workgraph:main-agent-contract` for the main session.
 - Use `/workgraph:subagent-context` for a dispatched agent.
+- Use `/workgraph:delivery` in Main for repository changes or authorized publication and integration.
 - In Claude Code, use `/workgraph:workflow` when explicitly requesting native Workflow for a goal.
 
 All skills remain user-invocable and model-invocable.
@@ -181,6 +149,8 @@ Invocation does not change the current session's role or dispatch authority.
 The hooks operate without skill invocation.
 
 Automatic delivery includes each role's required environment reference.
+Hooks do not inject Delivery.
+Main resolves its conditional Delivery link from the loaded skill's source directory.
 Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
 Manual Worker loading reads its active host reference unless the hook already supplied its complete content.
 The dispatch supplies any authorized subdelegation settings.

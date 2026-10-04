@@ -56,6 +56,7 @@ Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills
 Each hook delivers the selected role and its active host reference without model-side retrieval.
 Worker references contain execution timing without Main orchestration or model policy.
 The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.
+Main loads the separate Delivery skill for repository changes or delivery, while hooks retain role and host guidance.
 The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
@@ -173,6 +174,8 @@ Record requested settings and report resolved settings only when the host suppli
 Follow the current tool contract for fork inheritance and override support.
 
 We reviewed Superpowers' [using-superpowers skill](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md) and [Codex tool reference](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/references/codex-tools.md) on its `main` branch.
+Its separate [branch-finishing skill](https://github.com/obra/superpowers/blob/main/skills/finishing-a-development-branch/SKILL.md) informed the conditional Delivery boundary.
+We retain Workgraph's authorization, check reuse, and independent review rules rather than its fixed menu and full-suite rerun.
 Its host adapters informed use of current tool names and model allowlists.
 We retained the current host's fork contract where its override rules conflict with that reference.
 Superpowers supplies no model-performance evidence for this comparison.
