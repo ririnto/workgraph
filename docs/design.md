@@ -102,8 +102,8 @@ Main can use LaTeX when notation makes dependencies or readiness conditions clea
 For example, let $i$ denote implementation, $t$ regression tests, $v$ verification, and $p$ publication.
 
 $$
-V = \{i, t, v, p\}, \qquad
-E = \{(i,v), (t,v), (v,p)\}.
+V = \lbrace i, t, v, p\rbrace, \qquad
+E = \lbrace (i,v), (t,v), (v,p)\rbrace.
 $$
 
 Main can run $i$ and $t$ in parallel when their writes do not conflict.
