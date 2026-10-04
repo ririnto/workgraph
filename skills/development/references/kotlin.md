@@ -37,6 +37,7 @@ Represent optional behavior through explicit strategies when composition require
 ## Strings And Paths
 
 Use raw strings for regular expressions, JSON fixtures, and multiline code text.
+Use `trimIndent()` for multiline code text only when its result matches the intended indentation and newline data.
 Preserve indentation, newline data, interpolation, and trailing newlines when changing string form.
 Prefer direct string helpers, then `String.toRegex()` when a regular expression is required.
 Keep `java.nio.file.Path` as the path type and prefer supported `kotlin.io.path` operations.
