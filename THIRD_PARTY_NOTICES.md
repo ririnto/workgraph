@@ -10,6 +10,7 @@ This document records attribution and prior sources.
 We studied [obra/superpowers](https://github.com/obra/superpowers) on its `main` branch.
 The project uses the MIT license and credits Jesse Vincent, copyright 2025.
 It informed hook bootstrapping, scoped instruction loading, and task verification.
+We reviewed its [branch-finishing skill](https://github.com/obra/superpowers/blob/main/skills/finishing-a-development-branch/SKILL.md) for conditional delivery loading.
 Workgraph uses its own context documents and execution rules.
 We reviewed the [using-superpowers skill](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md) and [Codex tool reference](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/references/codex-tools.md) on its `main` branch.
 We used their host adapters to review tool names and model allowlists, retaining the current host's fork rules where they differ.
@@ -65,7 +66,8 @@ We used [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) for 
 We read its complete skill and the `phrases.md`, `structures.md`, and `examples.md` references.
 The local skill identifies Hardik Pandya as its author and declares the MIT license.
 It informed direct verbs, specific subjects, and removal of filler.
-The plugin does not bundle that skill.
+The Writing skill adapts that guidance and adds Workgraph's Markdown sentence and table rules.
+The plugin does not redistribute the source skill or its reference files verbatim.
 
 ## Research And Official Documentation
 

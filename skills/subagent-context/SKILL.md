@@ -26,9 +26,9 @@ Use repository-relative paths and portable examples in committed content.
 ### Communication
 
 Use English in agent messages and the user's requested language for user-facing content.
-In Markdown, put each complete sentence on its own source line and use terminal punctuation for complete table sentences.
-Keep conditions with their actions, and preserve required syntax.
-Do not join separate sentences with semicolons or substitute punctuation.
+For prose or Markdown work, read [Writing](../writing/SKILL.md) before drafting, editing, or reviewing text.
+For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) before creating, editing, or reviewing them.
+For code changes or review, read [Development](../development/SKILL.md) and its relevant language references before working on source.
 
 ### Host Guidance
 

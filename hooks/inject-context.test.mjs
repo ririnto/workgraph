@@ -188,10 +188,10 @@ test("configured Claude hooks load relocated skills and references with LF or CR
   const config = JSON.parse(
     readFileSync(new URL("hooks.json", import.meta.url), "utf-8")
   );
-  assert.deepEqual(Object.keys(config.hooks).toSorted(), [
-    "SessionStart",
-    "SubagentStart"
-  ]);
+  assert.deepEqual(
+    new Set(Object.keys(config.hooks)),
+    new Set(["SessionStart", "SubagentStart"])
+  );
   for (const [event, name] of roles) {
     assert.equal(config.hooks[event].length, 1);
     const [entry] = config.hooks[event];
@@ -318,10 +318,10 @@ test("configured Codex hooks load complete relocated skill files without a conte
   const config = JSON.parse(
     readFileSync(new URL("codex-hooks.json", import.meta.url), "utf-8")
   );
-  assert.deepEqual(Object.keys(config.hooks).toSorted(), [
-    "SessionStart",
-    "SubagentStart"
-  ]);
+  assert.deepEqual(
+    new Set(Object.keys(config.hooks)),
+    new Set(["SessionStart", "SubagentStart"])
+  );
   for (const [event] of roles) {
     assert.equal(config.hooks[event].length, 1);
     const [entry] = config.hooks[event];
@@ -445,6 +445,52 @@ test("common Main excludes Claude routing and Workflow discovery is Claude-scope
   ).split(/^---$/mu);
   assert.match(metadata, /Use in the Claude Code main session/u);
   assert.match(body, /In Codex, report that native Workflow did not run/u);
+});
+
+test("roles resolve conditional skills from relocated sources without injecting them", (t) => {
+  const root = copyPlugin(t);
+  for (const [event, name] of roles) {
+    const source = path.join(root, "skills", name, "SKILL.md");
+    const linked = [
+      ...readFileSync(source, "utf-8").matchAll(
+        /\]\((?<file>\.\.\/[^)]+\/SKILL\.md)\)/gu
+      )
+    ].map((match) => path.resolve(path.dirname(source), match.groups.file));
+    assert.deepEqual(
+      new Set(linked.map((file) => path.basename(path.dirname(file)))),
+      new Set(
+        event === "SessionStart"
+          ? ["delivery", "development", "instruction-authoring", "writing"]
+          : ["development", "instruction-authoring", "writing"]
+      )
+    );
+    for (const file of linked) {
+      const [, metadata, body] = readFileSync(file, "utf-8").split(/^---$/mu);
+      assert.match(
+        metadata,
+        new RegExp(`^name: ${path.basename(path.dirname(file))}$`, "mu")
+      );
+      assert.match(metadata, /^description: .+$/mu);
+      assert.match(metadata, /^user-invocable: true$/mu);
+      assert.ok(body.trim());
+      for (const host of hosts) {
+        const result = runHook(
+          [event, host],
+          path.join(root, "hooks", "inject-context.mjs")
+        );
+        assert.equal(result.status, 0, result.stderr);
+        assert.ok(
+          !JSON.parse(
+            result.stdout
+          ).hookSpecificOutput.additionalContext.includes(body)
+        );
+        assert.deepEqual(
+          JSON.parse(result.stdout),
+          expectedOutput(event, host, path.join(root, "skills"))
+        );
+      }
+    }
+  }
 });
 
 test("workers load selected execution guidance without Main model or orchestration policy", (t) => {

@@ -27,9 +27,8 @@ Use repository-relative paths and portable examples in committed content.
 ### Communication
 
 Use English in agent messages and the user's requested language for user-facing content.
-Use one sentence per Markdown source line and punctuate complete table sentences.
-Keep conditions with their actions, and preserve required syntax.
-Do not join separate sentences with semicolons or other punctuation.
+For prose or Markdown work, read [Writing](../writing/SKILL.md) before drafting, editing, or reviewing text.
+For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) before creating, editing, or reviewing them.
 
 ### Host Guidance
 
@@ -56,7 +55,6 @@ Without native agent waiting, end idle turns awaiting only notifications, withou
 Validate source files, repository state, and check inputs before using replayed results.
 Check partial effects before retrying interrupted writes.
 Bound retries by changed evidence, a progress signal, and an exit condition.
-Delete feature branches only within granted cleanup, after default-branch integration and ancestry proof.
 Remove only clean task-created worktrees within granted cleanup.
 
 ## Choose Orchestration
@@ -64,6 +62,8 @@ Remove only clean task-created worktrees within granted cleanup.
 Use a task graph when dependencies make coordination useful.
 Define each bounded node's operation, inputs, outputs, owner, authority, and completion evidence.
 Connect nodes only when a result or condition gates a successor.
+Use Mermaid or LaTeX graph notation when it clarifies dependencies or node readiness.
+Verify each diagram or formula with its target renderer before delivery.
 Start nodes only when their inputs and authority are ready.
 Choose only node types the goal needs, without a fixed itinerary.
 Report unavailable user-selected tools or delegation tools.
@@ -80,41 +80,10 @@ Send successors the conclusions and completion evidence they need.
 Join branches only when a later node needs their results.
 Keep valid results after requirement changes and continue unaffected tasks after branch failures.
 
-## Plan Delivery Units
+## Repository Work
 
-Split broad goals into cohesive, independently verifiable units with acceptance evidence and one accountable owner.
-Keep coupled work together when splitting prevents independent verification or mergeability.
-Avoid tiny phases and stacked PRs that require repeated rebases.
-Publish, review, and integrate each ready unit.
-Before committing or publishing, record the working branch and authorized target branch.
-If they match, create a separate branch from the target before committing or pushing task changes.
-Push only the working branch for PR delivery, and never push task changes directly to the target before PR review.
-Use named branch references and current PR changes, not fixed commit hashes.
-
-## Review Published Work
-
-In Main, inspect changed files and required evidence before publishing to the authorized target.
-Reuse an existing PR/MR for the unit.
-Treat publication as the review handoff, not as integration.
-Run one full independent review after publication using the PR/MR and its current changes.
-Follow the consumer repository's review method.
-Verify review candidates against requirements, source, or checks, then classify confirmed findings.
-Fix blockers before integration when they violate acceptance, required behavior, correctness, safety, or required checks.
-Only confirmed blockers require code changes before integration.
-Publish blocker fixes on the same branch and request the same reviewer's assessment of affected changes only.
-
-## Defer And Integrate
-
-After required checks pass, defer only noncritical findings that do not affect required behavior, acceptance, correctness, or safety.
-Before integration, register each deferred follow-up in the authorized long-term issue tracker.
-Include evidence, scope, acceptance criteria, a named owner, and a next action.
-Reuse or update an existing tracker item when possible.
-Without authorized, available tracker access, do not integrate with untracked deferrals.
-Implement deferred follow-ups only after updating the target branch.
-Repeat target syncs or rebases only for conflicts or invalidated evidence.
-Set a finite fix/re-review limit and stop sooner without progress or when a concrete blocker prevents work.
-Integrate after required checks pass, confirmed blockers are resolved, and deferred follow-ups are recorded.
-Finish delivery by verifying the authorized target branch update.
+For repository changes or delivery, read [delivery](../delivery/SKILL.md) before edits, branch creation, implementation dispatch, commits, or publication.
+For code changes or review, read [Development](../development/SKILL.md) and its relevant language references before working on source.
 For read-only, research-only, or review-only goals, omit implementation, new branch publication, new PR/MR creation, and integration.
 Review existing PRs/MRs without inferring publication authority from inspection requests.
 Report unsupported findings as unverified.
