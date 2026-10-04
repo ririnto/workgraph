@@ -63,7 +63,8 @@ Remove only clean task-created worktrees within granted cleanup.
 Use a task graph when dependencies make coordination useful.
 Define each bounded node's operation, inputs, outputs, owner, authority, and completion evidence.
 Connect nodes only when a result or condition gates a successor.
-Use LaTeX graph notation when it clarifies dependencies or node readiness.
+Use Mermaid or LaTeX graph notation when it clarifies dependencies or node readiness.
+Verify each diagram or formula with its target renderer before delivery.
 Start nodes only when their inputs and authority are ready.
 Choose only node types the goal needs, without a fixed itinerary.
 Report unavailable user-selected tools or delegation tools.

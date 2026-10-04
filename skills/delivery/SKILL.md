@@ -33,8 +33,17 @@ Inspect flagged content and remove exposed details before pushing the branch.
 
 Use project roles or the user's statement to determine whether the user maintains the project.
 Run one full independent review per delivery unit.
-For a project maintainer, create the PR/MR first and review its current changes.
-Otherwise, review the working branch's complete changes before creating the PR/MR.
+Select the review order from the user's project role.
+
+```mermaid
+flowchart TD
+    M{User maintains the project?}
+    M -->|Yes| P[Create PR or MR]
+    P --> R[Independent review of current PR or MR changes]
+    M -->|No| W[Independent review of complete working-branch changes]
+    W --> C[Create PR or MR]
+```
+
 Reuse an existing PR/MR for the unit.
 Follow the consumer repository's review method.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.

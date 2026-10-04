@@ -118,6 +118,29 @@ Main records both branches before branch creation and keeps the base for publica
 Before branch publication, Main delegates a brief environment-detail scan of the diff to an exploration agent.
 Main uses the scan's findings before pushing.
 Main requests independent review after PR/MR creation for maintainers, and before creation for other contributors.
+
+The graph below shows conditional loading and review timing for authorized repository delivery.
+Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.
+
+```mermaid
+flowchart TD
+    H[Hook: Main role and host reference] --> T{Repository changes or delivery?}
+    T -->|No| S[Continue within the current scope]
+    T -->|Yes| D[Read Delivery skill]
+    D --> B[Record base and working branches]
+    B --> C[Prepare changes and required evidence]
+    C --> E[Exploration agent scans diff for environment details]
+    E --> F[Resolve exposures and push working branch]
+    F --> M{Project maintainer?}
+    M -->|Yes| P[Create PR or MR]
+    P --> R[Independent review of PR or MR]
+    M -->|No| W[Independent review of working branch]
+    W --> Q[Resolve blockers and create PR or MR]
+    R --> G[Verify integration gates]
+    Q --> G
+    G --> I[Integrate and verify base branch update]
+```
+
 Claude Code's main session must resolve required scope and authority before launching a Workflow run.
 An agent prompt cannot grant tool permissions or enlarge the user's authorization.
 The host may relay the user's `/workgraph:workflow` invocation to a dispatched agent together with a bounded computed task.
