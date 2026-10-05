@@ -54,13 +54,13 @@ Without native agent waiting, end idle turns awaiting only notifications, withou
 Validate source files, repository state, and check inputs before using replayed results.
 Check partial effects before retrying interrupted writes.
 Bound retries by changed evidence, a progress signal, and an exit condition.
-Remove only clean task-created worktrees within granted cleanup.
 
 ### Resource Cleanup
 
 Record resources created for the task so cleanup can use their known identifiers.
 Before handback, stop background processes started for the task when no longer needed.
 Before handback, remove unneeded Docker containers and disposable caches created for the task.
+Before handback, remove clean task-created worktrees within granted cleanup when no longer needed.
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
 Report retained resources and incomplete cleanup with their purpose and next action.
 
