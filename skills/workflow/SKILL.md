@@ -14,8 +14,6 @@ Model names do not identify the execution host.
 In Codex, report that native Workflow did not run.
 Stop this skill without substituting another execution method in that host.
 Only the main session starts native Workflow.
-A worker completes a bounded assignment despite a relayed Workflow request.
-Without a bounded assignment, the worker returns a direct start request to main.
 Use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
 
 ## Prepare The Run
@@ -23,7 +21,7 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 Use the current goal, scope, owners, authority, dependencies, and acceptance evidence as run inputs.
 Map prerequisite outputs to successor inputs.
 Start ready independent nodes in parallel and serialize conflicting writes.
-Read `references/delivery.md` when building an authorized engineering-delivery graph.
+For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
 Use the goal's acceptance evidence as the terminal output for every graph.
 
 ## Run Workflow
