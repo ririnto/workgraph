@@ -188,9 +188,12 @@ The Agent Skills guidance recommends clear activation conditions, focused bodies
 The specification recommends fewer than 500 lines per body and one level of references.
 Workgraph keeps role rules inline and injects each role's matching host reference during startup.
 Delivery remains conditional, with its route in Main.
+Main and Worker route prose, instruction design, and source work to bundled task skills.
+Those skills retain their own procedures and conditional language references.
 Consumer references remain inside their owning plugin so installation and activation do not depend on another plugin.
 The hook names loaded source paths so the model can locate references and recognize content already present.
 All skills remain user-invocable and model-invocable.
+Claude defaults `user-invocable` to `true`, so Workgraph omits that redundant frontmatter field.
 Their bodies define role and scope boundaries independently of invocation metadata.
 Claude's installed Skill loader strips YAML, preserves trailing body whitespace, and prepends a base-directory line.
 Its Read tool normalizes file text and adds tab-separated line numbers, including a final empty line.

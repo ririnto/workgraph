@@ -1,7 +1,6 @@
 ---
 name: delivery
 description: Use in the main session for repository changes or authorized branch publication and integration.
-user-invocable: true
 ---
 
 # Repository Delivery

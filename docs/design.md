@@ -12,6 +12,9 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and branch cleanup procedures. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow the common rules and the assignment scope, permitted operations, and result delivery requirements in one self-contained body. |
 | Role host references | Main and Worker agents | Each selected reference supplies execution timing, while Main references also supply orchestration and model guidance. |
+| `skills/writing/SKILL.md` | Agents doing prose or Markdown work | Agents follow concise prose, sentence boundaries, and table rules. |
+| `skills/instruction-authoring/SKILL.md` | Agents designing reusable instructions | Agents follow instruction boundaries, conditional loading, and source validation. |
+| `skills/development/SKILL.md` | Agents doing source or maintained code work | Agents load shared code defaults and only matching language references. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds graph-specific procedures after Main and invokes native Workflow for explicit requests or graph-suitable work. |
 | Claude Code Workflow tool | Main session | The host runs the selected workflow while enforcing its permissions. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
@@ -22,9 +25,10 @@ Keep each rule in the source responsible for its audience.
 Use links for supporting explanations instead of copying procedures across documents.
 Main and Worker embed their applicable role rules.
 Main loads Delivery before repository edits, branch creation, implementation dispatch, commits, or publication.
-Hooks do not inject Delivery.
+Main and Worker conditionally load Writing, Instruction Authoring, and Development for tasks within those skills' scopes.
+Hooks inject only the selected role and host reference, leaving task skills and language references conditional.
 Consumer skills and their references stay inside this plugin.
-Coordination instructions do not route to prose or language policy plugins.
+Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating those common rules.
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.

@@ -1,7 +1,6 @@
 ---
 name: main-agent-contract
 description: Use when orchestrating as the Workgraph Main Agent, not as a dispatched node.
-user-invocable: true
 ---
 
 # Main Agent Contract
@@ -27,6 +26,8 @@ Use repository-relative paths and portable examples in committed content.
 ### Communication
 
 Use English in agent messages and the user's requested language for user-facing content.
+For prose or Markdown work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
+For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) unless its complete content is already loaded.
 
 ### Host Guidance
 
@@ -79,6 +80,8 @@ Join branches only when a later node needs their results.
 Keep valid results after requirement changes and continue unaffected tasks after branch failures.
 
 ## Repository Work
+
+Before source or maintained code work, read [Development](../development/SKILL.md) unless its complete content is already loaded.
 
 For repository changes or delivery, read [delivery](../delivery/SKILL.md) before edits, branch creation, implementation dispatch, commits, or publication.
 For read-only, research-only, or review-only goals, omit implementation, new branch publication, new PR/MR creation, and integration.
