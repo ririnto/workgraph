@@ -133,9 +133,9 @@ Read-only goals retain their inspection scope.
 
 Main records concise validation summaries in authorized PR/MR descriptions or comments.
 Local evidence stays temporary and excludes dependency trees, build caches, and redundant logs.
-After every delivery unit merges, Main removes task-owned evidence whose required results are recorded in PR/MR discussions.
-Main retains evidence for unresolved failures, recovery, or explicit retention requirements and reports its owner and purpose.
-Main sessions coordinate cleanup ownership before deleting shared evidence.
+Main and Worker delete task-owned evidence after recording required results when no active work or retention requirement needs it.
+They retain evidence needed for active checks, unresolved failures, recovery, or explicit retention requirements.
+They confirm cleanup ownership before deleting shared evidence.
 
 The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.

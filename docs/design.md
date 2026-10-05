@@ -128,9 +128,9 @@ Main requests independent review after PR/MR creation for maintainers, and befor
 
 Delivery keeps durable validation summaries in authorized PR/MR descriptions or comments.
 Main and Worker treat local evidence as temporary and exclude dependency trees, build caches, and redundant logs.
-Main removes task-owned evidence after all delivery units merge and required results reach the PR/MR discussion.
-Main retains evidence needed for unresolved failures, recovery, or explicit retention requirements.
-Main sessions coordinate ownership before deleting shared evidence.
+Each role deletes task-owned evidence after recording required results when no active work or retention requirement needs it.
+Each role retains evidence needed for active checks, unresolved failures, recovery, or explicit retention requirements.
+Each role confirms ownership before deleting shared evidence.
 
 The graph below shows conditional loading and review timing for authorized repository delivery.
 Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.
