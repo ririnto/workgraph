@@ -47,6 +47,14 @@ Check partial effects before retrying interrupted writes.
 Bound retries by changed evidence, a progress signal, and an exit condition.
 Remove only clean worktrees created for this change, within the cleanup grant.
 
+### Resource Cleanup
+
+Record resources created for the assignment so cleanup can use their known identifiers.
+Before handback, stop background processes started for the assignment when no longer needed.
+Before handback, remove unneeded Docker containers and disposable caches created for the assignment.
+Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
+Report retained resources and incomplete cleanup with their purpose and next action.
+
 ## Source Work
 
 Before source or maintained code work, read [Development](../development/SKILL.md) unless its complete content is already loaded.
