@@ -126,6 +126,12 @@ Before each branch push, Main delegates a brief environment-detail scan of the d
 Main uses the scan's findings before pushing.
 Main requests independent review after PR/MR creation for maintainers, and before creation for other contributors.
 
+Delivery keeps durable validation summaries in authorized PR/MR descriptions or comments.
+Main and Worker treat local evidence as temporary and exclude dependency trees, build caches, and redundant logs.
+Main removes task-owned evidence after all delivery units merge and required results reach the PR/MR discussion.
+Main retains evidence needed for unresolved failures, recovery, or explicit retention requirements.
+Main sessions coordinate ownership before deleting shared evidence.
+
 The graph below shows conditional loading and review timing for authorized repository delivery.
 Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.
 

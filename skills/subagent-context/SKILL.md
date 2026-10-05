@@ -53,6 +53,8 @@ Bound retries by changed evidence, a progress signal, and an exit condition.
 ### Resource Cleanup
 
 Record resources created for the assignment so cleanup can use their known identifiers.
+Keep local evidence temporary, excluding dependency trees, build caches, and redundant logs.
+Return concise check results to Main instead of creating a persistent evidence archive.
 Before handback, stop background processes started for the assignment when no longer needed.
 Before handback, remove unneeded Docker containers and disposable caches created for the assignment.
 Before handback, remove clean assignment-created worktrees within granted cleanup when no longer needed.

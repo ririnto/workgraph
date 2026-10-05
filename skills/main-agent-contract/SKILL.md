@@ -62,6 +62,7 @@ Bound retries by changed evidence, a progress signal, and an exit condition.
 ### Resource Cleanup
 
 Record resources created for the task so cleanup can use their known identifiers.
+Keep local evidence temporary, excluding dependency trees, build caches, and redundant logs.
 Before handback, stop background processes started for the task when no longer needed.
 Before handback, remove unneeded Docker containers and disposable caches created for the task.
 Before handback, remove clean task-created worktrees within granted cleanup when no longer needed.
