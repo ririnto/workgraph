@@ -55,7 +55,7 @@ const expectedOutput = (event, host, rootSkills = skills, body = "") => {
   const content = readFileSync(source, "utf-8");
   const context =
     host === "claude"
-      ? `Workgraph instructions loaded from ${source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${body || content.slice(content.indexOf("\n---\n") + 5)}`
+      ? `Workgraph instructions loaded from ${source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${(body || content.slice(content.indexOf("\n---\n") + 5)).trimStart()}`
       : `Workgraph instructions loaded from ${source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`;
   const reference = realpathSync(
     path.join(rootSkills, name, "references", `${host}.md`)
@@ -254,7 +254,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
   const guidance =
     "\uFEFF# Guidance\r\n\r\nKeep spaces. \t\r\nTerminal lone CR.\r\n\r";
   for (const [event, name] of roles) {
-    const raw = `\uFEFF---\r\nname: ${name}\r\n---\r\n${body}`;
+    const raw = `\uFEFF---\r\nname: ${name}\r\n---\r\n\r\n \t\r\n  ${body}`;
     writeFileSync(path.join(root, "skills", name, "SKILL.md"), raw);
     for (const host of hosts) {
       writeFileSync(
@@ -402,7 +402,7 @@ for (const [event, name] of roles) {
   });
 }
 
-test("Codex delimiter lines retain the remaining text in each host's fragment", (t) => {
+test("Codex delimiter lines preserve raw files and remove Claude body prefixes", (t) => {
   const root = copyPlugin(t);
   for (const [event, name] of roles) {
     for (const newline of ["\n", "\r\n"]) {
