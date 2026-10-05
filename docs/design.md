@@ -136,6 +136,7 @@ Main and Worker treat local evidence as temporary and exclude dependency trees, 
 Each role deletes task-owned evidence after recording required results when no active work or retention requirement needs it.
 Each role retains evidence needed for active checks, unresolved failures, recovery, or explicit retention requirements.
 Each role confirms ownership before deleting shared evidence.
+Each role inspects its background processes and descendants before handback, stops unused processes, and verifies termination.
 
 The graph below shows conditional loading and review timing for authorized repository delivery.
 Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.

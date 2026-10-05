@@ -65,7 +65,8 @@ Record resources created for the task so cleanup can use their known identifiers
 Keep local evidence temporary, excluding dependency trees, build caches, and redundant logs.
 Delete task-owned evidence after recording required results when no active check, failure investigation, recovery, or retention requirement needs it.
 Confirm cleanup ownership before deleting shared evidence.
-Before handback, stop background processes started for the task when no longer needed.
+Before handback, inspect running background processes and descendants against the recorded task resources.
+Stop task-owned processes when no longer needed and verify termination.
 Before handback, remove unneeded Docker containers and disposable caches created for the task.
 Before handback, remove clean task-created worktrees within granted cleanup when no longer needed.
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.

@@ -57,7 +57,8 @@ Keep local evidence temporary, excluding dependency trees, build caches, and red
 Delete task-owned evidence after recording required results when no active check, failure investigation, recovery, or retention requirement needs it.
 Confirm cleanup ownership before deleting shared evidence.
 Return concise check results to Main instead of creating a persistent evidence archive.
-Before handback, stop background processes started for the assignment when no longer needed.
+Before handback, inspect running background processes and descendants against the recorded assignment resources.
+Stop assignment-owned processes when no longer needed and verify termination.
 Before handback, remove unneeded Docker containers and disposable caches created for the assignment.
 Before handback, remove clean assignment-created worktrees within granted cleanup when no longer needed.
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.

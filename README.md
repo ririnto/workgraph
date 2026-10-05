@@ -136,6 +136,7 @@ Local evidence stays temporary and excludes dependency trees, build caches, and 
 Main and Worker delete task-owned evidence after recording required results when no active work or retention requirement needs it.
 They retain evidence needed for active checks, unresolved failures, recovery, or explicit retention requirements.
 They confirm cleanup ownership before deleting shared evidence.
+Before handback, both roles inspect owned background processes and descendants, stop unused processes, and verify termination.
 
 The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.
