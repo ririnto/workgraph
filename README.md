@@ -136,6 +136,7 @@ Local evidence stays temporary and excludes dependency trees, build caches, and 
 Main and Worker delete task-owned evidence after recording required results when no active work or retention requirement needs it.
 They retain evidence needed for active checks, unresolved failures, recovery, or explicit retention requirements.
 They confirm cleanup ownership before deleting shared evidence.
+Before handback, both roles inspect owned background processes and descendants, stop unused processes, and verify termination.
 
 The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.
@@ -162,6 +163,7 @@ Claude Code uses slash commands, while Codex uses dollar-prefixed skill names.
 | `/workgraph:writing` | `$workgraph:writing` | Load prose and Markdown guidance. |
 | `/workgraph:instruction-authoring` | `$workgraph:instruction-authoring` | Load reusable instruction design guidance. |
 | `/workgraph:development` | `$workgraph:development` | Load coding guidance and matching language references. |
+| Not applicable | `$workgraph:codex-scoped-cleanup` | Clean retired Codex resources and stale Worktree Artifact connections. |
 
 All skills remain user-invocable and model-invocable.
 Invocation does not change the current session's role or dispatch authority.
@@ -173,6 +175,11 @@ Main resolves Delivery from its loaded role source directory.
 Main and Worker resolve Writing, Instruction Authoring, and Development from their own loaded role directories.
 Read each conditional skill only when its task scope matches and its complete content is not already loaded.
 Workgraph has no dependency on another plugin's skills or installation.
+Codex Main and Worker references conditionally load [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) before retiring its covered resources.
+The cleanup procedure and native attachment reference stay bundled rather than requiring a separate user-level skill.
+Cleanup compares individual session and worktree activity and preserves required changes through retained Git references.
+It separates physical retirement from Worktree Artifact removal and preserves active work and unique content outside Git.
+Claude hooks do not load this procedure, and invoking it in Claude does not authorize Codex cleanup.
 Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
 Manual Worker loading reads its active host reference unless the hook already supplied its complete content.
 The dispatch supplies any authorized subdelegation settings.
