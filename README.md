@@ -57,7 +57,6 @@ Separate metadata identifies complete content already loaded by the hook.
 These text fragments match native loading, but the host still delivers them through its hook message envelope.
 Agents need no additional file reads for the injected role and host guidance.
 For repository changes or delivery, Main reads the conditional [Delivery skill](skills/delivery/SKILL.md) before starting changes.
-Both roles read conditional Writing, Instruction Authoring, and Development skills when their task requires those procedures.
 Claude hook contexts stay within its 10,000-character inline limit, including tested path and line-ending variations.
 The hooks do not inject repository guidance or research documents.
 
@@ -150,9 +149,6 @@ Claude Code uses slash commands, while Codex uses dollar-prefixed skill names.
 | `/workgraph:main-agent-contract` | `$workgraph:main-agent-contract` | Load the main session's role. |
 | `/workgraph:subagent-context` | `$workgraph:subagent-context` | Load a dispatched agent's role. |
 | `/workgraph:delivery` | `$workgraph:delivery` | Load repository delivery procedures in Main. |
-| `/workgraph:writing` | `$workgraph:writing` | Load prose and Markdown guidance for drafting, editing, or review. |
-| `/workgraph:instruction-authoring` | `$workgraph:instruction-authoring` | Load guidance for skills, `AGENTS.md`, role instructions, and related references. |
-| `/workgraph:development` | `$workgraph:development` | Load code guidance and select the relevant language references. |
 | `/workgraph:workflow` | Unavailable | Request native Workflow in Claude Code. |
 
 All skills remain user-invocable and model-invocable.
@@ -161,7 +157,8 @@ The hooks operate without skill invocation.
 
 Automatic delivery includes each role's required environment reference.
 Hooks do not inject conditional task skills.
-Each role resolves its conditional skill links from the loaded role's source directory.
+Main resolves Delivery from its loaded role source directory.
+Workgraph has no dependency on another plugin's skills or installation.
 Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
 Manual Worker loading reads its active host reference unless the hook already supplied its complete content.
 The dispatch supplies any authorized subdelegation settings.
@@ -171,11 +168,9 @@ For authorized engineering delivery, it also reads its focused `references/deliv
 Read-only Workflow goals do not need that reference.
 The plugin includes no output assets or bundled helper scripts because its skills produce neither reusable files nor repeated script logic.
 
-Writing combines Stop Slop prose guidance with sentence-level Markdown formatting and table rules.
-Instruction Authoring governs audience, loading boundaries, conditional references, and validation for reusable instructions.
-Development contains shared code style and focused references for Java, Kotlin, TypeScript, JavaScript, Python, Go, Rust, and shell.
-Target repository rules and lint take precedence over Development's defaults.
-These skills apply to both Main and Worker without adding orchestration or model policy to Worker.
+Workgraph supplies coordination and delivery procedures.
+Prose, instruction authoring, and language policies are outside this plugin's consumer scope.
+Installing Workgraph does not install or require a separate policy plugin.
 
 ## Hook Errors
 

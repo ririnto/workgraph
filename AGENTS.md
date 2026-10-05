@@ -8,6 +8,7 @@ Complete authorized changes and relevant checks before returning a final result,
 
 Keep contributor conventions and validation commands here.
 Keep consumer behavior in `skills/`.
+Keep consumer links and required resources inside this plugin.
 Keep role procedures self-contained in each role's `SKILL.md`.
 Keep host-specific execution timing in each role's references, and inject only the selected host's reference.
 Keep orchestration and model guidance in Main Agent references.

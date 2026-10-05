@@ -26,9 +26,6 @@ Use repository-relative paths and portable examples in committed content.
 ### Communication
 
 Use English in agent messages and the user's requested language for user-facing content.
-For prose or Markdown work, read [Writing](../writing/SKILL.md) before drafting, editing, or reviewing text.
-For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) before creating, editing, or reviewing them.
-For code changes or review, read [Development](../development/SKILL.md) and its relevant language references before working on source.
 
 ### Host Guidance
 

@@ -57,7 +57,6 @@ Each hook delivers the selected role and its active host reference without model
 Worker references contain execution timing without Main orchestration or model policy.
 The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.
 Main loads the separate Delivery skill for repository changes or delivery, while hooks retain role and host guidance.
-Both roles load Writing, Instruction Authoring, and Development only for tasks within those skills' scopes.
 The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
@@ -188,7 +187,8 @@ Claude uses descriptions to select skills and supports user-only invocation thro
 The Agent Skills guidance recommends clear activation conditions, focused bodies, and conditional references.
 The specification recommends fewer than 500 lines per body and one level of references.
 Workgraph keeps role rules inline and injects each role's matching host reference during startup.
-Task skills remain conditional, with routes in each applicable role and focused language references under Development.
+Delivery remains conditional, with its route in Main.
+Consumer references remain inside their owning plugin so installation and activation do not depend on another plugin.
 The hook names loaded source paths so the model can locate references and recognize content already present.
 All skills remain user-invocable and model-invocable.
 Their bodies define role and scope boundaries independently of invocation metadata.

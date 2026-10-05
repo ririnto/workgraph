@@ -458,11 +458,7 @@ test("roles resolve conditional skills from relocated sources without injecting 
     ].map((match) => path.resolve(path.dirname(source), match.groups.file));
     assert.deepEqual(
       new Set(linked.map((file) => path.basename(path.dirname(file)))),
-      new Set(
-        event === "SessionStart"
-          ? ["delivery", "development", "instruction-authoring", "writing"]
-          : ["development", "instruction-authoring", "writing"]
-      )
+      new Set(event === "SessionStart" ? ["delivery"] : [])
     );
     for (const file of linked) {
       const [, metadata, body] = readFileSync(file, "utf-8").split(/^---$/mu);
