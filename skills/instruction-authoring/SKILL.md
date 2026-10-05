@@ -12,7 +12,8 @@ Read [Writing](../writing/SKILL.md) unless its complete content is already loade
 Identify the instruction's audience, loading point, required behavior, and acceptance evidence before editing.
 Use `AGENTS.md` for repository conventions and skills for task procedures.
 Keep host, model, and tool mechanics in their existing instruction sources.
-Remove rules that duplicate those sources or other loaded instructions.
+Remove rules that repeat instructions already present in the same loaded context.
+Allow necessary repetition when loading points are fully separate and each context must work independently.
 Preserve explicit user requirements and authority boundaries when simplifying text.
 Include only rules that change a relevant decision or action.
 Do not turn a task example or temporary environment detail into a general requirement.
@@ -24,6 +25,8 @@ When writing concise-output rules, constrain visible length without reducing req
 Keep each skill usable within its stated scope.
 Write a short activation description that distinguishes the skill from neighboring skills.
 Put shared procedure in the skill body and conditional detail in focused skills or references.
+Keep required supporting instructions in bundled skills or references.
+Use external instruction links as optional attribution, without requiring agents to retrieve them.
 Link each conditional file from its caller with a trigger and a resolvable path.
 Read each selected file before applying its rules.
 Identify sources already loaded completely so agents do not retrieve them again.
