@@ -125,7 +125,7 @@ for (const [event, name] of roles) {
     ).split(/^---$/mu);
     assert.equal(prefix, "");
     assert.match(frontmatter, new RegExp(`^name: ${name}$`, "mu"));
-    assert.match(frontmatter, /^user-invocable: true$/mu);
+    assert.doesNotMatch(frontmatter, /^user-invocable: false$/mu);
     assert.ok(body.trim());
     assert.equal(
       body.match(/^# (?<heading>.+)$/mu)?.groups?.heading,
@@ -458,7 +458,11 @@ test("roles resolve conditional skills from relocated sources without injecting 
     ].map((match) => path.resolve(path.dirname(source), match.groups.file));
     assert.deepEqual(
       new Set(linked.map((file) => path.basename(path.dirname(file)))),
-      new Set(event === "SessionStart" ? ["delivery"] : [])
+      new Set(
+        event === "SessionStart"
+          ? ["delivery", "writing", "instruction-authoring", "development"]
+          : ["writing", "instruction-authoring", "development"]
+      )
     );
     for (const file of linked) {
       const [, metadata, body] = readFileSync(file, "utf-8").split(/^---$/mu);
@@ -467,7 +471,7 @@ test("roles resolve conditional skills from relocated sources without injecting 
         new RegExp(`^name: ${path.basename(path.dirname(file))}$`, "mu")
       );
       assert.match(metadata, /^description: .+$/mu);
-      assert.match(metadata, /^user-invocable: true$/mu);
+      assert.doesNotMatch(metadata, /^user-invocable: false$/mu);
       assert.ok(body.trim());
       for (const host of hosts) {
         const result = runHook(

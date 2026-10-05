@@ -1,7 +1,6 @@
 ---
 name: subagent-context
 description: Use when executing a bounded task as a Workgraph dispatch node.
-user-invocable: true
 ---
 
 # Subagent Context
@@ -26,6 +25,8 @@ Use repository-relative paths and portable examples in committed content.
 ### Communication
 
 Use English in agent messages and the user's requested language for user-facing content.
+For prose or Markdown work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
+For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) unless its complete content is already loaded.
 
 ### Host Guidance
 
@@ -45,6 +46,10 @@ Revalidate source files, repository state, and check inputs before relying on re
 Check partial effects before retrying interrupted writes.
 Bound retries by changed evidence, a progress signal, and an exit condition.
 Remove only clean worktrees created for this change, within the cleanup grant.
+
+## Source Work
+
+Before source or maintained code work, read [Development](../development/SKILL.md) unless its complete content is already loaded.
 
 ## Delegation And Git
 

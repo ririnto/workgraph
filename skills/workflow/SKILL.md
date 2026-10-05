@@ -5,7 +5,6 @@ description: >-
   Use for an identified in-scope follow-up agent that may need an earlier result.
   Use host Agent for independent assessments that main combines.
 argument-hint: "[goal]"
-user-invocable: true
 ---
 
 # Workgraph Workflow

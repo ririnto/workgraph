@@ -66,6 +66,7 @@ We used [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) for 
 We read its complete skill and the `phrases.md`, `structures.md`, and `examples.md` references.
 The local skill identifies Hardik Pandya as its author and declares the MIT license.
 It informed direct verbs, specific subjects, and removal of filler.
+The bundled Writing skill adapts its prose guidance.
 The plugin does not redistribute the source skill or its reference files verbatim.
 
 ## Research And Official Documentation
@@ -87,3 +88,9 @@ Earlier design research included [Building effective agents](https://www.anthrop
 We also studied [context4ai/agent-graph](https://github.com/context4ai/agent-graph/blob/main/docs/en/graph-engineering.md) and [luxiaolei/graph-engineering](https://github.com/luxiaolei/graph-engineering).
 These sources informed discussion of context boundaries and graph execution.
 Workgraph does not bundle their code or adopt their runtime guarantees.
+
+## Communication Guidance
+
+The Writing skill also adapts communication guidance from [i-have-adhd](https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md) by Ayoub Ghriss.
+The source repository declares the MIT license and identifies 2026 copyright.
+This adaptation uses general communication guidance without redistributing the source skill verbatim.

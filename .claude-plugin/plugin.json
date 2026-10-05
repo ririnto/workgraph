@@ -3,7 +3,7 @@
   "author": {
     "name": "ririnto"
   },
-  "description": "Task coordination instructions for Claude Code, delivered through native session and subagent hooks.",
+  "description": "Engineering coordination, writing, and development skills for Claude Code and Codex.",
   "homepage": "https://github.com/ririnto/workgraph",
   "keywords": [
     "claude-code",
@@ -16,5 +16,5 @@
   "license": "MIT",
   "name": "workgraph",
   "repository": "https://github.com/ririnto/workgraph",
-  "version": "2026.10.05.01"
+  "version": "2026.10.05.02"
 }

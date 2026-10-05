@@ -1,6 +1,6 @@
 # Workgraph
 
-Workgraph supplies engineering coordination skills and hooks for Claude Code and Codex.
+Workgraph supplies engineering coordination, writing, and development skills with hooks for Claude Code and Codex.
 It delivers the selected agent role and host-specific orchestration and model guidance through native hooks.
 The runtime uses Node built-ins and needs no npm dependencies.
 Workgraph supplies instructions, not a scheduler or permission system.
@@ -150,6 +150,9 @@ Claude Code uses slash commands, while Codex uses dollar-prefixed skill names.
 | `/workgraph:subagent-context` | `$workgraph:subagent-context` | Load a dispatched agent's role. |
 | `/workgraph:delivery` | `$workgraph:delivery` | Load repository delivery procedures in Main. |
 | `/workgraph:workflow` | Unavailable | Request native Workflow in Claude Code. |
+| `/workgraph:writing` | `$workgraph:writing` | Load prose and Markdown guidance. |
+| `/workgraph:instruction-authoring` | `$workgraph:instruction-authoring` | Load reusable instruction design guidance. |
+| `/workgraph:development` | `$workgraph:development` | Load coding guidance and matching language references. |
 
 All skills remain user-invocable and model-invocable.
 Invocation does not change the current session's role or dispatch authority.
@@ -158,6 +161,8 @@ The hooks operate without skill invocation.
 Automatic delivery includes each role's required environment reference.
 Hooks do not inject conditional task skills.
 Main resolves Delivery from its loaded role source directory.
+Main and Worker resolve Writing, Instruction Authoring, and Development from their own loaded role directories.
+Read each conditional skill only when its task scope matches and its complete content is not already loaded.
 Workgraph has no dependency on another plugin's skills or installation.
 Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
 Manual Worker loading reads its active host reference unless the hook already supplied its complete content.
@@ -168,9 +173,10 @@ For authorized engineering delivery, it also reads its focused `references/deliv
 Read-only Workflow goals do not need that reference.
 The plugin includes no output assets or bundled helper scripts because its skills produce neither reusable files nor repeated script logic.
 
-Workgraph supplies coordination and delivery procedures.
-Prose, instruction authoring, and language policies are outside this plugin's consumer scope.
-Installing Workgraph does not install or require a separate policy plugin.
+Workgraph bundles coordination, delivery, writing, instruction authoring, and development guidance in one plugin.
+Writing owns prose and Markdown rules, while Instruction Authoring loads Writing before its design procedure.
+Development selects matching language references and excludes externally maintained files from its code-style defaults.
+Gradle and Maven wrappers are examples of that exception.
 
 ## Hook Errors
 
