@@ -153,7 +153,9 @@ The host may relay the user's `/workgraph:workflow` invocation to a dispatched a
 That relay carries no Workflow launch authority.
 The dispatched agent should complete the assigned task within its authority instead of launching another Workflow or returning it unworked.
 
-Main treats failed or missing agent results as incomplete and revalidates source state before accepting replayed evidence.
+Main treats failed or missing agent results as incomplete and validates relevant conditions before accepting replayed evidence.
+Evidence follows relevant behavior, inputs, configuration, and toolchain rather than file or branch hashes.
+Unrelated edits or changes to commit identity, parent, or branch name alone do not invalidate passing evidence.
 The native tool supplies Workflow syntax, resume behavior, notifications, and waiting.
 Workgraph does not repeat those mechanics in its skills.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.
