@@ -42,7 +42,11 @@ For granted subdelegation, use the dispatch's model, effort, resource ownership,
 
 Give each shared resource one writer.
 Without a native agent wait tool, end an idle turn when only completion notifications remain, without claiming completion.
-Revalidate source files, repository state, and check inputs before relying on replayed agent results.
+Validate replayed results against relevant behavior, inputs, configuration, and toolchain.
+Compare named references and task-relevant changes without pinning file or branch hashes.
+Reuse passing evidence while those conditions remain unchanged.
+Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
+Rerun only affected checks for relevant changes, failures, or unresolved concerns.
 Check partial effects before retrying interrupted writes.
 Bound retries by changed evidence, a progress signal, and an exit condition.
 

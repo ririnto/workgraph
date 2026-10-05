@@ -135,7 +135,9 @@ Workgraph ships no reusable Workflow scripts.
 The `/workgraph:workflow` skill selects Claude Code's native Workflow for explicit requests or suitable dependency graphs.
 Its description targets dependent stages and identified follow-up stages without imposing an itinerary.
 Workers complete relayed bounded assignments without starting another Workflow.
-Main revalidates source files and check inputs before relying on replayed results.
+Main validates relevant behavior, inputs, configuration, and toolchain before relying on replayed results.
+Main and Worker compare named references and task-relevant changes without pinning file or branch hashes.
+Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 
 ## Skill Invocation
 

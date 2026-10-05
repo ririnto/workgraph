@@ -88,6 +88,8 @@ Inspect tool results because an attempted invocation alone does not prove succes
 Review sentence completeness, line boundaries, and conditions.
 Report model adherence as unverified unless a behavioral evaluation supplies evidence.
 Reuse passing checks for unchanged inputs, configuration, and toolchain.
+Compare named references and task-relevant changes without pinning file or branch hashes.
+Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 Rerun or broaden checks only for changed inputs, failures, or unresolved concerns.
 Report exact commands, results, and unverified behavior.
 Run formatting fixes only within the authorized change.
