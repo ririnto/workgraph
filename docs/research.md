@@ -232,7 +232,7 @@ Luna's bundled prompt also restricts tests unless the user requests testing or v
 Sol and Astra instead direct appropriate checks.
 Workgraph does not reproduce those changing host rules.
 
-The skills retain role ownership, English handoffs, sentence-level Markdown rules, and host-specific model-family selection policy.
+The skills retain role ownership, English handoffs, and host-specific model-family selection policy.
 Runtime references use family names rather than pinned release identifiers.
 Research records retain the measured releases so benchmark results keep their original meaning.
 They retain dependency routing, one writer per resource, delegated Git grants, publication privacy, and the shared-history restriction.
