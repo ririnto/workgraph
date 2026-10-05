@@ -155,7 +155,7 @@ The dispatched agent should complete the assigned task within its authority inst
 
 Main treats failed or missing agent results as incomplete and validates relevant conditions before accepting replayed evidence.
 Evidence follows relevant behavior, inputs, configuration, and toolchain rather than file or branch hashes.
-Unrelated edits or changes to commit identity, parent, or branch name alone do not invalidate passing evidence.
+Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 The native tool supplies Workflow syntax, resume behavior, notifications, and waiting.
 Workgraph does not repeat those mechanics in its skills.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.

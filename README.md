@@ -137,7 +137,7 @@ Its description targets dependent stages and identified follow-up stages without
 Workers complete relayed bounded assignments without starting another Workflow.
 Main validates relevant behavior, inputs, configuration, and toolchain before relying on replayed results.
 Main and Worker compare named references and task-relevant changes without pinning file or branch hashes.
-Unrelated edits or changes to commit identity, parent, or branch name alone do not invalidate passing evidence.
+Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 
 ## Skill Invocation
 
