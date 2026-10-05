@@ -62,7 +62,8 @@ The events are `SessionStart` and `SubagentStart`, and the hosts are `claude` an
 It selects the corresponding role shown in the [README](../README.md#automatic-instructions).
 It validates the leading skill frontmatter block without interpreting YAML values.
 Delimiter lines follow Codex's trimmed-line comparison.
-Claude delivery excludes that frontmatter block and preserves the remaining text, including whitespace.
+Claude delivery excludes frontmatter and consumes leading body whitespace, matching native Skill loading.
+It preserves trailing whitespace and separators within the body.
 Its Skill fragment starts with the native base-directory line.
 Codex delivery uses the native `<skill>` wrapper with the qualified plugin name, actual path, and complete file.
 It accepts LF and CRLF line endings and preserves separators inside the body.

@@ -466,6 +466,8 @@ The [Codex skill parser](https://github.com/openai/codex/blob/main/codex-rs/skil
 Workgraph uses that boundary rule without interpreting or repairing YAML values.
 Inline dashes remain in frontmatter, while indented delimiter lines end it.
 Claude receives the remaining text, and Codex retains the complete original skill file.
+The inspected Claude Code 2.1.289 Skill loader consumes whitespace after the closing frontmatter delimiter.
+Workgraph removes that leading body whitespace while preserving trailing whitespace and Codex's raw skill file.
 
 The [Claude Code skills reference](https://code.claude.com/docs/en/skills) documents skill invocation controls and `${CLAUDE_PLUGIN_ROOT}` substitution in skill Markdown.
 We use the invocation controls for [manual invocation](design.md#support-manual-invocation), and the hook-delivered role bodies need no extra file reads for their contracts.

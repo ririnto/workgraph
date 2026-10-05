@@ -51,6 +51,7 @@ Each hook names the execution host so agents can distinguish it from the selecte
 Each role receives its selected host reference with its source path.
 Worker references contain execution timing without Main orchestration or model guidance.
 Claude Code receives the native Skill text with its base directory and frontmatter-stripped body, preserving trailing whitespace.
+Claude body delivery removes leading whitespace to match native Skill loading.
 Codex receives the native `<skill>` text with its qualified name, source path, and complete file, including YAML frontmatter.
 Claude references use native Read line numbering, while Codex references preserve raw file text.
 Separate metadata identifies complete content already loaded by the hook.
