@@ -10,9 +10,6 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | `README.md` | Plugin users | Users find installation instructions, hook behavior, manual invocation, and errors here. |
 | `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow role authority, planning, dispatch, reporting, and conditional skill routing. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and branch cleanup procedures. |
-| `skills/writing/SKILL.md` | Agents writing or reviewing prose | Agents follow prose, sentence-level Markdown, and table rules. |
-| `skills/instruction-authoring/SKILL.md` | Agents authoring reusable instructions | Agents define audience, load order, conditional references, and acceptance evidence. |
-| `skills/development/SKILL.md` | Agents changing or reviewing code | Agents load shared style and the relevant language references. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow the common rules and the assignment scope, permitted operations, and result delivery requirements in one self-contained body. |
 | Role host references | Main and Worker agents | Each selected reference supplies execution timing, while Main references also supply orchestration and model guidance. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds graph-specific procedures after Main and invokes native Workflow for explicit requests or graph-suitable work. |
@@ -25,11 +22,9 @@ Keep each rule in the source responsible for its audience.
 Use links for supporting explanations instead of copying procedures across documents.
 Main and Worker embed their applicable role rules.
 Main loads Delivery before repository edits, branch creation, implementation dispatch, commits, or publication.
-Main and Worker load Writing, Instruction Authoring, or Development when their assignment requires that task's guidance.
-Hooks do not inject conditional task skills.
-Writing owns prose and Markdown formatting so role bodies do not repeat those rules.
-Instruction Authoring owns instruction boundaries without repeating Writing's prose rules.
-Development keeps language rules in focused references and respects the target repository's rules and lint.
+Hooks do not inject Delivery.
+Consumer skills and their references stay inside this plugin.
+Coordination instructions do not route to prose or language policy plugins.
 Workflow adds its operation to the Main session without repeating those common rules.
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
@@ -168,8 +163,6 @@ Each role keeps its own procedures inline.
 Main reads Delivery when repository changes or delivery require its procedures.
 Inspection-only tasks do not require Delivery.
 Main resolves the linked file from its loaded skill directory, regardless of the working directory.
-Both roles resolve Writing, Instruction Authoring, and Development from the same role source directory.
-Development selects its language references from changed source or examples without loading other languages.
 Manual Main invocation reads the active host reference before dispatch unless its complete content is already loaded.
 The hook already supplies that reference during automatic Main delivery.
 Manual Worker invocation reads its active host reference unless its complete content is already loaded.
