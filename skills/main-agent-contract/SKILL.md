@@ -91,7 +91,8 @@ Keep valid results after requirement changes and continue unaffected tasks after
 
 Before source or maintained code work, read [Development](../development/SKILL.md) unless its complete content is already loaded.
 
-For repository changes or delivery, read [delivery](../delivery/SKILL.md) before edits, branch creation, implementation dispatch, commits, or publication.
+For repository changes or delivery, use [Delivery](../delivery/SKILL.md).
+Read it before edits, branch creation, implementation dispatch, commits, or publication unless its complete content is already loaded.
 For read-only, research-only, or review-only goals, omit implementation, new branch publication, new PR/MR creation, and integration.
 Review existing PRs/MRs without inferring publication authority from inspection requests.
 Report unsupported findings as unverified.
