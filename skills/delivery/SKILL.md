@@ -30,6 +30,15 @@ Treat this scan as exploration, without a code review.
 Require file locations and the type of exposure, or a clear no-findings result.
 Inspect flagged content and remove exposed details before pushing the branch.
 
+## Evidence Retention
+
+Record concise validation summaries in authorized PR/MR descriptions or comments.
+Include commands, outcomes, coverage, and material limitations without uploading raw logs by default.
+Create local evidence only when a current check, failure investigation, or recovery needs files.
+After all task delivery units merge, remove task-owned local evidence whose required results are recorded in PR/MR discussions.
+Retain evidence needed for unresolved failures, recovery, or explicit retention requirements, and report its owner and purpose.
+Coordinate cleanup ownership before deleting evidence shared with another Main session.
+
 ## Review And Publish
 
 Use project roles or the user's statement to determine whether the user maintains the project.
