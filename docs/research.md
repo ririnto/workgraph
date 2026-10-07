@@ -93,7 +93,7 @@ Its runtime delivers context through Claude Code hooks, and its instructions use
 
 ### Model Effort And Cost
 
-We reviewed seven exact models using official model, effort, pricing, host, and prompting documentation.
+We reviewed eight exact models using official model, effort, pricing, host, and prompting documentation.
 The table separates API defaults from documented host recommendations.
 The inspected Codex catalog defaults, recorded below, can differ from those recommendations.
 Prices are standard API dollars per million input, cached input, and output tokens.
@@ -105,16 +105,27 @@ They do not describe subscription usage limits, fast-mode prices, or paid tool c
 | [GPT-6.1 Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | The guide gives task-specific medium or xhigh starting points. | $2 / $0.10 / $10 |
 | [GPT-6 Astra](https://developers.openai.com/api/docs/models/gpt-6-astra.md) | `low`, `medium`, `high`, `xhigh`, `max` | The reviewed sources did not establish a default. | The Codex guide starts at `low`. | $10 / $1 / $50 |
 | [Claude Haiku 4.5](https://platform.claude.com/docs/en/models/haiku-4-5/overview.md), `claude-haiku-4-5-20251001`, October 15, 2025 | Effort is unsupported. | Not applicable | Leave effort unset. | $1 / $0.10 / $5 |
+| [Claude Haiku 5.5](https://platform.claude.com/docs/en/models/haiku-5-5/overview), `claude-haiku-5-5`, October 7, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | Claude Code defaults to `medium`. | $0.10 / $0.01 / $0.50 up to 100K input tokens, then $0.50 / $0.05 / $2.50 |
 | [Claude Sonnet 5.5](https://platform.claude.com/docs/en/models/sonnet-5-5/overview.md), `claude-sonnet-5-5`, September 28, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `medium`. | $2 / $0.20 / $10 |
 | [Claude Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview.md), `claude-opus-5-5`, September 22, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | Claude Code starts at `medium`. | $4 / $0.20 / $20 |
 | [Claude Fable 5.1](https://platform.claude.com/docs/en/models/fable-5-1/overview.md), `claude-fable-5-1`, September 1, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `high`. | $10 / $0.25 / $50 |
 
 The [Codex model guide](https://developers.openai.com/codex/models.md) supplies Astra and Luna starting settings.
-The [Claude Code model guide](https://code.claude.com/docs/en/model-config.md) supplies its host defaults.
+The [Claude Code model guide](https://code.claude.com/docs/en/model-config.md) supplies its host defaults, provider aliases, and minimum CLI version.
 Anthropic's [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort.md) supplies supported effort levels and API defaults.
 Fable 5.1 and Opus 5.5 keep adaptive thinking on.
 Sonnet 5.5 accepts `between_tools` at `high` or below to remove up-front thinking, but rejects it at `xhigh` and `max`.
 Haiku 4.5 defaults to thinking off and supports optional manual thinking budgets, not adaptive effort.
+Haiku 5.5 defaults to adaptive thinking and accepts `output_config.effort` on the API.
+Claude Code exposes the same five effort levels through its model and session controls.
+The API permits disabled thinking only through `high`, while Claude Code does not allow it for Haiku 5.5.
+Per-message effort changes are beta on the Claude API and Google Cloud for Haiku 5.5.
+Claude Code 2.1.293 and later supports Haiku 5.5, and the `haiku` alias selects it only on the Anthropic API.
+Claude Code subagent effort frontmatter overrides session effort unless `CLAUDE_CODE_EFFORT_LEVEL` is set, and subagents inherit session thinking configuration.
+The official Haiku 5.5 prompting guide warns that multi-turn `xhigh` responses may occasionally contain no visible text.
+Haiku 5.5 has a 1M token context window and 128K maximum output on the API.
+The model page lists availability on the Claude API, Bedrock, Google Cloud, Microsoft Foundry, and Claude Platform on AWS.
+Organization effort limits can cap the effective Claude Code level below the selected setting.
 These capabilities follow Anthropic's [thinking configuration table](https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting.md).
 
 Broad external benchmarks supply the primary effort comparisons.
@@ -128,6 +139,7 @@ Source verification does not establish model performance outside the published w
 | [GPT-6.1 Sol](https://artificialanalysis.ai/models/releases/gpt-6-1-sol) | High to max raises the rounded composite index from 50 to 52 and estimated task cost from $0.32 to $0.72. | Preserve task-based starting settings and evaluate required gains above high. |
 | [GPT-6 Astra](https://deepswe.datacurve.ai/artifacts/v1.1/leaderboard-live.json) | Across 452 attempts per effort, medium passes 72.79%, xhigh 74.12%, and max 73.23%. | Compare medium and xhigh for similar terminal work, with the prerelease alias and overlapping intervals stated. |
 | [Claude Haiku 4.5](https://artificialanalysis.ai/models/releases/claude-4-5-haiku) | The thinking score is measured, but the non-thinking score is estimated and the thinking budget is undisclosed. | Leave effort unset, and evaluate manual thinking budgets separately when the host supports them. |
+| [Claude Haiku 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) | No comparable public effort benchmark was reviewed. | Start at the documented `medium` default and evaluate the target workload before raising effort. |
 | [Claude Sonnet 5.5](https://artificialanalysis.ai/models/releases/claude-sonnet-5-5) | Medium to max raises the composite index from 41 to 56 and estimated task cost from $0.59 to $7.67. | Compare Opus medium or high before Sonnet xhigh or max, retaining workload-specific exceptions. |
 | [Claude Opus 5.5](https://artificialanalysis.ai/models/releases/claude-opus-5-5) | Xhigh and max tie at 59.60% terminal passes, while estimated task cost rises from $8.78 to $13.11. | Prefer medium or high, and avoid higher effort unless comparable-task gains justify its cost. |
 | [Claude Fable 5.1](https://artificialanalysis.ai/models/releases/claude-fable-5-1) | Terminal pass rate peaks at xhigh, while max adds about 0.15 composite points at about 28% more cost. | Compare high and xhigh for terminal tasks, and retain max for workloads with demonstrated gains. |
@@ -167,7 +179,12 @@ Local hook and Workflow checks test instruction delivery and tool execution, not
 
 Claude Code supports `fable`, `opus`, `sonnet`, and `haiku` aliases, as documented in its [model configuration](https://code.claude.com/docs/en/model-config.md).
 Provider routing, overrides, and allowlists can resolve an alias to another release.
-The current Anthropic model catalog identifies Haiku 4.5 as `claude-haiku-4-5-20251001`, with API alias `claude-haiku-4-5`.
+The exact Haiku 5.5 ID is `claude-haiku-5-5`, without a date suffix.
+Claude Code 2.1.293 and later supports Haiku 5.5, and its `haiku` alias selects Haiku 5.5 on the Anthropic API.
+Claude Code's `haiku` alias selects Haiku 4.5 on Claude Platform on AWS, Bedrock, Google Cloud, and Microsoft Foundry.
+Haiku 4.5's exact ID remains `claude-haiku-4-5-20251001`, with API alias `claude-haiku-4-5`.
+Claude Code does not accept `max` in persistent `effortLevel` or `modelSettings` values.
+Use `max` per session, through an effort frontmatter override, or through `CLAUDE_CODE_EFFORT_LEVEL`.
 Codex's Astra, Sol, and Luna display names do not establish support for bare aliases in dispatch tools.
 Use the host's supported exact IDs and preserve pinned versions.
 Record requested settings and report resolved settings only when the host supplies them, otherwise mark them unknown.

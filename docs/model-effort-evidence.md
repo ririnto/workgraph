@@ -188,6 +188,16 @@ The two variants do not establish a controlled quality gain from thinking.
 Haiku does not support the effort control used in the preceding tables.
 Its thinking budget is a separate control.
 
+## Claude Haiku 5.5
+
+Anthropic's [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort) lists `low`, `medium`, `high`, `xhigh`, and `max`, with `medium` as the API default.
+The guide specifies `output_config.effort` for API requests and says disabled thinking is valid only through `high`.
+Claude Code supports the same five levels at `medium` by default and does not allow thinking to be disabled for this model.
+Its [model configuration](https://code.claude.com/docs/en/model-config) requires Claude Code 2.1.293 or later and identifies the API model as `claude-haiku-5-5`.
+The model has a 1M token context window, up to 128K output tokens, and API availability on the listed Claude and cloud platforms.
+The [Haiku 5.5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) recommends evaluating effort on the target task and warns that multi-turn `xhigh` responses may occasionally have no visible text.
+No comparable within-model effort sweep was reviewed for Haiku 5.5, so its published defaults do not establish a workload-specific quality gain.
+
 ### Structured Output And Knowledge Retrieval
 
 [Career Ops' report](https://github.com/career-ops-hq/career-ops/blob/claude/keen-albattani-oehpz5/evals/results/README.md) describes structured-output experiments.
