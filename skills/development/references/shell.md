@@ -16,3 +16,5 @@ Use supported `--` terminators for path arguments that could start with `-`.
 Do not parse `ls` output.
 For repositories with shell assets, use their applicable `shfmt` and `shellcheck` checks.
 Report unavailable required checks instead of replacing them with weaker evidence.
+Document functions exposed by sourced scripts with declaration-level comment blocks describing their contracts.
+Treat callable sourced functions as public unless the script's API contract marks them internal.

@@ -7,6 +7,7 @@ description: Use when implementing, refactoring, debugging, or reviewing source 
 
 Apply the target repository's rules and lint configuration before these defaults.
 Read only matching language references unless their complete content is already loaded.
+For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
 
 | Language | Source | Reference |
 | --- | --- | --- |
@@ -23,12 +24,54 @@ Read only matching language references unless their complete content is already 
 
 Exclude externally maintained files and configurations from these code-style defaults.
 Examples include Gradle's `gradlew` and `gradlew.bat`, and Maven's `mvnw` and `mvnw.cmd`.
+For external contributions, restrict style cleanup to lines already included in the user's contribution diff.
 Preserve the project's declared runtime, toolchain, public contracts, and required failure behavior.
-Prefer immutable values when mutation is not part of the contract.
-Inline single-use values when clarity, evaluation order, cost, type resolution, and captured snapshots stay unchanged.
-Keep function bodies free of blank lines and explanatory inline comments.
-Keep blank lines between functions and tests.
-Document public contracts at their declarations, using the language's documentation syntax.
+Avoid unnecessary helpers, abstractions, and custom configuration layers.
+Use official SDK or framework properties directly when they satisfy the required behavior.
+Prefer immutable bindings and minimize mutable state.
+Inline single-use local values only when readability, evaluation order, side effects, lifetime, exceptions, and lazy execution stay unchanged.
+Also preserve cost, inferred types, overload selection, and captured snapshots.
+
+## Spacing
+
+Remove blank lines inside functions, except where lint requires them or line breaks carry meaning, including string literals.
+Keep exactly one blank line between functions and between sibling test or lifecycle-hook blocks.
+Apply that separation inside test callbacks, including `beforeTest`, `afterTest`, `beforeEach`, `afterEach`, and `it` blocks.
+The sibling-block separation takes precedence over removing blank lines inside functions.
+Do not insert blank lines between object-literal methods or function-valued properties.
+This object-literal rule takes precedence over separation between functions.
+Preserve required formatter output and meaningful line breaks when these spacing defaults conflict.
+
+## Documentation And Comments
+
+Document effective public, protected, and exported declarations using the language's declaration documentation syntax.
+Check implicit visibility, enclosing scopes, re-exports, and default exports when identifying these declarations.
 Use multiline declaration documentation where that syntax supports it.
-Minimize mid-function exits without deeper nesting or changes to validation, cleanup, or return behavior.
-Use existing formatters, checkers, and test frameworks without introducing replacement tooling for these defaults.
+Documentation for other declarations is optional unless tooling or a safety contract requires it.
+Use no explanatory inline comments.
+Preserve required semantic comments, including build directives, licenses, suppressions, and safety invariants.
+For necessary catch or ignore explanations, use the existing logger's safe debug or trace level when appropriate.
+Keep log arguments free of side effects.
+Do not add filler logs, expose sensitive values, or change exception propagation, recovery, or control flow.
+
+## Dependency Versions
+
+When selecting dependency versions, prefer officially supported LTS releases, or stable releases when no LTS line exists.
+Verify current support status and compatibility with the project's runtime, toolchain, and dependent APIs.
+Do not add commit-hash or image-digest pinning as part of version selection.
+Preserve existing integrity checks, including lockfile integrity fields and signature or checksum verification.
+
+## Automation
+
+Use the project's existing formatters, checkers, and test frameworks for ordinary development changes.
+When lint automation is authorized, prefer built-in rules and supported configuration before custom rules.
+Use the Kotlin and Node.js tooling guidance in the matching language references.
+For other languages, use their existing standard tools.
+Verify tool-version support and edge cases before adding a custom rule.
+Make rules AST-aware and preserve literals, comments, and automatic semicolon insertion where applicable.
+Provide positive and negative fixtures covering intended matches and cases that must remain unchanged.
+Offer automatic fixes only when evaluation, side effects, and program behavior remain unchanged.
+Verify formatter idempotence and convergence between rule fixes and formatting.
+If a rule cannot detect violations safely, do not add it.
+If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
+Adding instructions alone does not authorize lint implementations or changes across consumer repositories.

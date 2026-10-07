@@ -14,7 +14,7 @@ Use `any`, `slices`, and `maps` only when the declared Go version supports them.
 Use `strings.Builder` for repeated concatenation in loops.
 Pre-size maps and slices when required hot-path performance justifies it.
 Sort map keys when iteration order is observable.
-Start exported declaration comments with the identifier's name.
+Use Go documentation comments for exported declarations, starting with the identifier's name.
 State each package's responsibility in its package comment.
 Use table-driven subtests for pure logic when they fit the behavior under test.
 Use `t.Parallel()` for independent cases whose setup and shared resources permit it.

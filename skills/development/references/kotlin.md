@@ -12,7 +12,8 @@ Name lambda parameters for their roles, using `_` only for unused parameters.
 ## Expressions And Control Flow
 
 Use expression bodies when return types, `Unit` behavior, nullability, and API semantics stay unchanged.
-Prefer callable references when types, overload selection, receiver binding, and evaluation stay unchanged.
+Use callable or property references for simple delegation or access lambdas when types, overload selection, and receivers stay unchanged.
+Preserve receiver evaluation timing, captures, nullability, and required lambda adaptation.
 Split pure independent predicates into chained `filter` or nullable `takeIf` calls when behavior stays unchanged.
 Preserve condition order, smart casts, nullability, effects, exceptions, allocations, and required performance.
 Keep negative or mixed-polarity predicates together when splitting would change their logic.
@@ -44,3 +45,16 @@ Keep `java.nio.file.Path` as the path type and prefer supported `kotlin.io.path`
 Use the imported `div` operator for child paths when it preserves `resolve` semantics.
 Preserve results, exceptions, filtering callbacks, options, and resource handling when replacing Java file operations.
 Keep Java methods when no Kotlin equivalent satisfies the contract.
+
+## Kotest Specs
+
+Move reusable immutable declarations and functions from Spec superclass-constructor lambdas into a companion object when sharing preserves behavior.
+Keep per-test state local and preserve initialization order, parallel isolation, and captured values.
+A `val` binding alone does not make its referenced object immutable or safe to share.
+Expose injected dependencies through explicit parameters or appropriate extension functions.
+Keep stateful rule instances scoped to their required lifecycle instead of sharing them unconditionally.
+
+## Automation
+
+For authorized Kotlin lint automation, use ktlint and its custom-rule API when built-in rules cannot express a safe requirement.
+Verify compatibility with the project's ktlint version before implementing custom rules or fixes.
