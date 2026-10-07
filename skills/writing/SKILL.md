@@ -33,13 +33,26 @@ Preserve technical meaning, authority boundaries, required syntax, and exact quo
 ## Markdown Sentences
 
 Write complete sentences in prose and list items.
-Put each complete sentence on its own source line.
-Use a period to end a sentence before starting the next source line.
-Do not join separate sentences with semicolons, commas, dashes, or substituted punctuation.
+Put each sentence on its own source line.
+End each sentence before starting the next source line.
+Do not force separate sentences together with semicolons or other punctuation.
 Do not replace sentence boundaries to fit several instructions onto one line.
 Do not reflow prose to a fixed column width.
 Preserve headings, code, metadata, links, and exact quotations in their required syntax.
 Use lists for parallel, sequential, or comparative items, without nesting unless the hierarchy is necessary.
+
+## Human-Facing Documents
+
+For human-facing documents, lead with the action or outcome and use clear headings, compact lists, and short paragraphs.
+Follow the action-first, scannable presentation represented by [structured readability guidance](https://github.com/ayghri/i-have-adhd).
+The required presentation rules are stated here, so agents do not need to retrieve the linked page.
+Check the rendered document for readability after editing it.
+
+## Agent-Facing Documents
+
+Agent-facing documents and prompts are exempt from the human-facing presentation rules and rendered-readability check above.
+They still use one sentence per source line and do not join separate sentences with semicolons.
+Use LaTeX or Mermaid when notation or a diagram makes the instructions clearer.
 
 ## Tables
 

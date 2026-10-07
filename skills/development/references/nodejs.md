@@ -4,12 +4,15 @@
 
 Remove unnecessary terminal `return undefined` statements when fallthrough preserves the return contract.
 Keep required early exits and inferred or declared return types.
-Invert conditions around `return`, `continue`, or `break` only when the result is simpler and preserves control flow.
+Prefer condition inversion to reduce `return`, `continue`, or `break` statements when equivalent behavior stays intact without deeper nesting.
+Preserve required exits, labels, `finally` behavior, loop effects, and async contracts.
 Prefer appropriate `await` and error handling over using `void` solely to discard a call's return value.
 Preserve callback contracts, async signatures, execution order, and intentional background work.
 For intentional background work, preserve its existing error-handling policy without forcing callers to wait.
 
 ## Automation
 
-For authorized Node.js lint automation, prefer Ultracite's supported Oxlint and Oxfmt rules and configuration.
-Check the installed versions' capabilities before adding custom rules or assuming a formatter can enforce a requirement.
+For authorized Node.js lint automation, prefer supported built-in Oxlint rules and Oxfmt formatting through Ultracite when the project uses it.
+Keep a functioning direct Oxlint and Oxfmt stack when changing only the wrapper name would add no capability.
+Check installed versions before adding custom rules or assuming a formatter can enforce a requirement.
+Do not add dependencies with known vulnerabilities.
