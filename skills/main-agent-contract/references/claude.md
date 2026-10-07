@@ -21,7 +21,7 @@ Use Agent for bounded outcomes only when it can safely meet the task contract.
 Use `haiku` for simple exploration and extraction, and `sonnet` for routine development and analysis.
 Use `opus` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `fable` only at the user's explicit request.
-On the Anthropic API, `haiku` resolves to Haiku 5.5.
+In Claude Code, the `haiku` alias resolves to Haiku 5.5 when Claude Code uses the Anthropic API.
 Claude Code resolves that alias to Haiku 4.5 on Claude Platform on AWS, Bedrock, Google Cloud, and Microsoft Foundry.
 Use a provider-supported exact model ID when a specific Haiku release is required.
 
