@@ -7,10 +7,12 @@ Preserve evaluation order and exception timing when selecting generators or eage
 Use f-strings for interpolation and `pathlib.Path` for filesystem paths.
 Use standard parsers for structured data instead of string matching.
 Handle specific exception types at the smallest scope that can recover.
-Catch `Exception` only at documented boundaries and surface each caught failure.
+Catch `Exception` only at documented boundaries, preserving intentional recovery and required failure reporting.
 Keep public-function type hints without forcing full annotations on private glue code.
 Use `match` for dispatch on one value when the declared Python version supports it.
 Use Python suite syntax and convert deep recursion to iteration when depth scales with input.
-Write module, class, and public-function docstrings as multiline prose, including one-sentence docstrings.
+Write public module, class, and function docstrings as multiline prose, including one-sentence docstrings.
+Check implicit public names and declared exports such as `__all__`.
+Describe public attributes and constants in their owning module or class docstring when direct docstrings are unavailable.
 Put opening and closing triple quotes on separate lines.
 Describe contracts and semantic constraints without repeating type hints.

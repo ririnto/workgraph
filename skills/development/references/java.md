@@ -1,6 +1,6 @@
 # Java
 
-Use Javadoc for public declarations, including constructors and fields.
+Use Javadoc for effective public and protected declarations, including constructors, fields, and implicitly public interface members.
 State contracts and constraints without restating names or signatures.
 Use braces for control-flow blocks, including one-line branches.
 Use imports instead of fully qualified names in executable code, without wildcard imports.

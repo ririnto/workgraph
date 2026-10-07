@@ -1,6 +1,7 @@
 # TypeScript
 
-Document exported declarations, types, re-exports, and default exports with multiline TSDoc.
+Document exported declarations, types, re-exports, default exports, and effective public or protected class members with multiline TSDoc.
+Include constructors and implicitly public members, accounting for enclosing visibility.
 State the public contract instead of restating the declaration's name.
 Put `/**` and `*/` on separate lines, with meaningful sentences on `*` lines.
 Use `@param` and `@returns` only when they clarify meaning beyond identifiers and types.

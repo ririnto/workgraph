@@ -15,7 +15,8 @@ Model distinct domain states with data-carrying enums and exhaustive matches.
 Avoid wildcard match arms when exhaustiveness checks can protect the contract.
 Use `impl Trait` for internal APIs when it expresses the needed contract.
 Use generic trait bounds where public surfaces or implementation requirements need them.
-Document public items with `///` prose, including errors and panics where applicable.
+Document effective public items and re-exports with `///` prose, including errors and panics where applicable.
+Account for enclosing module visibility when identifying public items.
 Use doc examples for non-trivial APIs and verify them with the existing Rust test setup.
 Document the safety invariant of each `unsafe` block after checking for a safe alternative.
 Bound recursion on untrusted input or use iteration with an explicit stack.
