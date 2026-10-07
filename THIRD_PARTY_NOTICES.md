@@ -72,6 +72,8 @@ The plugin does not redistribute the source skill or its reference files verbati
 ## Research And Official Documentation
 
 The [research notes](docs/research.md) cite the papers and official documentation used for context, graph, and verification decisions.
+We consulted the official [golangci-lint documentation](https://golangci-lint.run/docs/) for Go linting and custom-linter guidance.
+The guidance uses its documented recommendations without redistributing golangci-lint code or claiming compatibility for a specific project.
 We read the full [Agent Skills combined source](https://agentskills.io/llms-full.txt), including its specification and skill creation guidance.
 Its guidance informed the conditional reference boundary without supplying plugin code or bundled assets.
 We consulted Anthropic's official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) for host behavior.
