@@ -179,15 +179,6 @@ This small application sample needs repetition before selecting low for another 
 For DeepSWE-style terminal repairs, compare medium and xhigh against the same local acceptance tests.
 The reported max setting increases time and cost without improving its mean pass rate over high.
 
-## Claude Haiku 4.5
-
-[Artificial Analysis's release comparison](https://artificialanalysis.ai/models/releases/claude-4-5-haiku) reports reasoning at index 17 and $0.28 per task.
-That run produced 78M output tokens, with no published thinking budget.
-The non-reasoning variant has an estimated index of 15.411 and no cost result.
-The two variants do not establish a controlled quality gain from thinking.
-Haiku does not support the effort control used in the preceding tables.
-Its thinking budget is a separate control.
-
 ## Claude Haiku 5.5
 
 Anthropic's [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort) lists `low`, `medium`, `high`, `xhigh`, and `max`, with `medium` as the API default.
@@ -196,36 +187,25 @@ Claude Code supports the same five levels at `medium` by default and does not al
 Its [model configuration](https://code.claude.com/docs/en/model-config) requires Claude Code 2.1.293 or later and identifies the API model as `claude-haiku-5-5`.
 The model has a 1M token context window, up to 128K output tokens, and API availability on the listed Claude and cloud platforms.
 The [Haiku 5.5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) recommends evaluating effort on the target task and warns that multi-turn `xhigh` responses may occasionally have no visible text.
-No comparable within-model effort sweep was reviewed for Haiku 5.5, so its published defaults do not establish a workload-specific quality gain.
 
-### Structured Output And Knowledge Retrieval
+### Published Effort Curves And Verification Limits
 
-[Career Ops' report](https://github.com/career-ops-hq/career-ops/blob/claude/keen-albattani-oehpz5/evals/results/README.md) describes structured-output experiments.
-The author supplies [call records](https://github.com/career-ops-hq/career-ops/blob/claude/keen-albattani-oehpz5/evals/results/claude-runs.jsonl).
-The study records 108 calls, including 45 exact Haiku calls with null effort metadata.
-The synthetic workload uses 15 posts, one profile, and an Opus 5 reference rather than human ground truth.
-Schema success is 0/30 for baseline and 6/15 for inline instructions, with repeat drift of 0.38.
-The reported Haiku totals are 0.76M processed tokens and 12K output tokens.
-The median CLI duration is 2.6 minutes, with an estimated cost of $0.25.
-The study changes instruction structure without controlling a thinking-budget sweep.
+Anthropic's [October 7 announcement](https://www.anthropic.com/claude-haiku-5-5) publishes cost-versus-score curves across the five effort settings.
+They cover OSWorld 2.1's offline subset, GDPval-AA v2.1, Humanity's Last Exam without tools, and Terminal-Bench 4.0.
+The retrieved page exposes chart titles and model legends, but no point-level scores, costs, or effort labels.
+Its linked [system card](https://www.anthropic.com/claude-haiku-5-5-system-card) could not be retrieved during this review.
+The numerical sweeps and their evaluation conditions therefore remain unverified.
 
-[Strauss Agent Tools' analysis](https://github.com/saasontools/strauss-agent-tools/blob/assafkamil/saa-597-research-control-arm-benchmark-for-standing-fields-does/packages/strauss-kb/bench/results/full-claude-x3-2026-09-05-analysis.md) compares knowledge-retrieval configurations.
-The study covers 744 calls: 31 questions, four arms, two models, and three repeats.
-The authors disable thinking and verify zero thinking tokens.
-Haiku's 26 core questions score 98.7%, 94.9%, 87.2%, and 100% across information structures.
-The study supplies no thinking-enabled sweep.
+The announcement's summary table reports 39.2% on Terminal-Bench 4.0 and 46.4% on FrontierCode 1.1 Main.
+The retrieved text does not identify Haiku's effort for either score.
+Do not assign those scores to medium, xhigh, or max without the underlying evaluation details.
+The announcement recommends Sonnet or Opus for complex agentic coding and Haiku for narrower subagent tasks.
+This routing evidence does not determine Haiku's best coding effort.
 
-[Caty's benchmark](https://github.com/caty-ai/caty-agent-harness/blob/main/docs/benchmark.md) compares bare and harness runs of headless `claude-haiku-4-5`.
-The authors supply aggregate results in `docs/benchmark/ev006-aggregate.json` and identify the model in issue 100.
-They cover three genres, three sizes, and five instances per combination.
-On medium and large cases, bare runs pass 4/30 and harness runs pass 13/30.
-On small cases, bare runs pass 10/15 and harness runs pass 9/15.
-Both configurations pass 0/10 medium and large CSV cases.
-The authors change the turn caps from 10 to 16 or 24 and omit the thinking budget.
-Raw transcripts remain offline, and the comparison isolates neither effort nor thinking budget.
-
-For structured output and retrieval, measure instruction structure before assigning extra thinking budget.
-Record the budget and observed thinking tokens because an effort label cannot describe Haiku's configuration.
+The inspected [Artificial Analysis leaderboard](https://artificialanalysis.ai/leaderboards/models), [AI Coding Daily effort comparison](https://aicodingdaily.com/compare/effort-levels), and [DeepSWE artifact](https://deepswe.datacurve.ai/artifacts/v1.1/leaderboard-live.json) contained no Haiku 5.5 effort sweep.
+That inspection does not establish that no other public sweep exists.
+Keep medium identified as the documented default until the numerical curves support a workload-specific recommendation.
+Do not transfer Luna's coding effort recommendation to Haiku from their effort names or unmatched headline scores.
 
 ## Claude Sonnet 5.5
 

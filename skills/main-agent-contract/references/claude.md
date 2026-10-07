@@ -21,13 +21,10 @@ Use Agent for bounded outcomes only when it can safely meet the task contract.
 Use `haiku` for simple exploration and extraction, and `sonnet` for routine development and analysis.
 Use `opus` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `fable` only at the user's explicit request.
-In Claude Code, the `haiku` alias resolves to Haiku 5.5 when Claude Code uses the Anthropic API.
-Claude Code resolves that alias to Haiku 4.5 on Claude Platform on AWS, Bedrock, Google Cloud, and Microsoft Foundry.
-Use a provider-supported exact model ID when a specific Haiku release is required.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `haiku` | Bounded extraction and quick sweeps | Use `medium` for Haiku 5.5, and leave effort unset for Haiku 4.5. |
+| `haiku` | Bounded extraction and quick sweeps | Use `medium`. |
 | `sonnet` | Routine coding and bounded agentic work | Use `medium`. |
 | | Harder coding or reasoning | Use `high`. |
 | `opus` | Complex coding and reasoning | Use `medium`, or `high` for harder tasks. |
@@ -35,14 +32,15 @@ Use a provider-supported exact model ID when a specific Haiku release is require
 | | Difficult terminal work | Use `xhigh`. |
 | | The hardest reasoning | Use `max`. |
 
-Haiku 5.5 supports `low`, `medium`, `high`, `xhigh`, and `max` effort, with `medium` as the API and Claude Code default.
-Use `high` for longer tasks or strict instruction following, and reserve `xhigh` or `max` for workloads where evaluation shows a quality gain.
-Haiku 5.5 uses adaptive thinking by default and does not accept a manual thinking budget.
-Claude Code does not allow thinking to be disabled for Haiku 5.5.
+Haiku supports `low`, `medium`, `high`, `xhigh`, and `max` effort.
+Its API and Claude Code default is `medium`.
+Reserve Haiku `xhigh` and `max` for workloads where evaluation shows a quality gain.
+Haiku uses adaptive thinking by default.
+Claude Code does not allow thinking to be disabled for Haiku.
 The API accepts disabled thinking only with `low`, `medium`, or `high` effort.
-Watch for empty visible responses in Haiku 5.5 multi-turn sessions at `xhigh`.
+Watch for empty visible responses in Haiku multi-turn sessions at `xhigh`.
 Claude Code subagent `effort` frontmatter overrides session effort unless `CLAUDE_CODE_EFFORT_LEVEL` is set.
 Subagents inherit the session thinking configuration and do not have a separate thinking toggle.
 Claude Code does not accept `max` in persistent `effortLevel` or `modelSettings` values.
 Use `max` only for a session, an effort frontmatter override, or the documented environment variable.
-Leave Haiku 4.5's manual thinking budget and Sonnet or Opus `xhigh` and `max` to explicit or configured choices.
+Leave Sonnet or Opus `xhigh` and `max` to explicit or configured choices.

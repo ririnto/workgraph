@@ -45,7 +45,7 @@ We fetched relevant sections of the official [Claude Opus 5.5](https://platform.
 We used their scope, completion, and effort sections to guide task boundaries and workload-specific evaluation.
 We reviewed Anthropic's [model catalog](https://platform.claude.com/docs/en/about-claude/models/overview.md), [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort.md), [pricing](https://platform.claude.com/docs/en/about-claude/pricing.md), and [Claude Code model configuration](https://code.claude.com/docs/en/model-config.md).
 We reviewed the [Haiku 5.5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) and [Claude Code subagent documentation](https://code.claude.com/docs/en/sub-agents) for model and delegation behavior.
-We reviewed the [Fable 5.1](https://www.anthropic.com/claude-fable-and-mythos-5-1), [Opus 5.5](https://www.anthropic.com/claude-opus-5-5), [Sonnet 5.5](https://www.anthropic.com/claude-sonnet-5-5), and [Haiku 4.5](https://www.anthropic.com/news/claude-haiku-4-5) announcements for published performance and cost comparisons.
+We reviewed the [Fable 5.1](https://www.anthropic.com/claude-fable-and-mythos-5-1), [Opus 5.5](https://www.anthropic.com/claude-opus-5-5), [Sonnet 5.5](https://www.anthropic.com/claude-sonnet-5-5), and [Haiku 5.5](https://www.anthropic.com/claude-haiku-5-5) announcements for published performance and cost comparisons.
 Their benchmark results retain the task, harness, effort, and pricing limits described in the research notes.
 
 ## Model Benchmarks And Workload Reports
@@ -58,7 +58,7 @@ The [model evidence record](docs/model-effort-evidence.md) links their methods a
 We consulted original reports from [Joonlab](https://github.com/joonlab/gpt-6.1-sol-benchmark), [Dyad](https://github.com/dyad-sh/dyad), and [GitDiagram](https://github.com/ahmedkhaleel2004/gitdiagram).
 We also consulted [ElectricityBench](https://electricitybench.com/about/), [FaultMaven](https://github.com/FaultMaven/faultmaven/issues/1800), and [Claude Subagent Router](https://github.com/stas4000/claude-subagent-router).
 [Simon Willison](https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/) supplies public generation logs, and [CodeRabbit](https://www.coderabbit.ai/blog/opus-5-5-model-review) supplies product review results.
-[Kernelbench](https://github.com/Infatoshi/kernelbench.com), [Career Ops](https://github.com/career-ops-hq/career-ops/pull/4561), [Strauss Agent Tools](https://github.com/saasontools/strauss-agent-tools/pull/46), and [Caty](https://github.com/caty-ai/caty-agent-harness) supply supporting workload studies.
+[Kernelbench](https://github.com/Infatoshi/kernelbench.com) supplies supporting workload studies.
 These reports inform workload limits and do not supply bundled source code.
 
 ## Stop Slop
