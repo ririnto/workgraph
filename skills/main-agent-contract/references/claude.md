@@ -18,13 +18,16 @@ Use Agent for bounded outcomes only when it can safely meet the task contract.
 
 ## Model Selection
 
-Use `haiku` for simple exploration and extraction, and `sonnet` for routine development and analysis.
+Use `haiku` for clear, bounded tasks, including coding, review, exploration, and extraction.
+Use `sonnet` for broader development and analysis, or when Haiku misses acceptance criteria.
 Use `opus` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `fable` only at the user's explicit request.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `haiku` | Bounded extraction and quick sweeps | Use `medium`. |
+| `haiku` | Simple exploration and extraction | Use `low`. |
+| | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
+| | Other bounded analysis and agentic work | Use `medium`, or `high` for harder tasks. |
 | `sonnet` | Routine coding and bounded agentic work | Use `medium`. |
 | | Harder coding or reasoning | Use `high`. |
 | `opus` | Complex coding and reasoning | Use `medium`, or `high` for harder tasks. |
@@ -32,12 +35,9 @@ Call `fable` only at the user's explicit request.
 | | Difficult terminal work | Use `xhigh`. |
 | | The hardest reasoning | Use `max`. |
 
-Haiku supports `low`, `medium`, `high`, `xhigh`, and `max` effort.
-Its API and Claude Code default is `medium`.
-Reserve Haiku `xhigh` and `max` for workloads where evaluation shows a quality gain.
-Haiku uses adaptive thinking by default.
+Use Haiku `medium` for small code changes.
+Haiku defaults to `medium` with adaptive thinking.
 Claude Code does not allow thinking to be disabled for Haiku.
-The API accepts disabled thinking only with `low`, `medium`, or `high` effort.
 Watch for empty visible responses in Haiku multi-turn sessions at `xhigh`.
 Claude Code subagent `effort` frontmatter overrides session effort unless `CLAUDE_CODE_EFFORT_LEVEL` is set.
 Subagents inherit the session thinking configuration and do not have a separate thinking toggle.

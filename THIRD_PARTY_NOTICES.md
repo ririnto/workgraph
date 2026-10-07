@@ -47,6 +47,8 @@ We reviewed Anthropic's [model catalog](https://platform.claude.com/docs/en/abou
 We reviewed the [Haiku 5.5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) and [Claude Code subagent documentation](https://code.claude.com/docs/en/sub-agents) for model and delegation behavior.
 We reviewed the [Fable 5.1](https://www.anthropic.com/claude-fable-and-mythos-5-1), [Opus 5.5](https://www.anthropic.com/claude-opus-5-5), [Sonnet 5.5](https://www.anthropic.com/claude-sonnet-5-5), and [Haiku 5.5](https://www.anthropic.com/claude-haiku-5-5) announcements for published performance and cost comparisons.
 Their benchmark results retain the task, harness, effort, and pricing limits described in the research notes.
+We read the supplied [Haiku 5.5 system card](https://www.anthropic.com/document/claude-haiku-5-5-system-card), including its capability methods and effort curves.
+Its reported FrontierCode comparisons inform Haiku's coding effort choices, with graph estimates distinguished from labeled figures.
 
 ## Model Benchmarks And Workload Reports
 
