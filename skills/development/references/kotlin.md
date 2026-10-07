@@ -7,6 +7,12 @@ Account for enclosing `internal` and `private` scopes when determining visibilit
 Put `/**` and `*/` on separate lines, with meaningful sentences on `*` lines.
 Give class, object, companion object, and private top-level properties explicit types.
 Use `val` for bindings that do not require reassignment.
+When a generic-producing call initializes a variable, prefer putting the explicit type on the variable declaration so the initializer can infer it.
+For example, write `val savedCallbackHistory: CapturingSlot<Iterable<FileCallbackHistoryEntity>> = slot()` rather than `val savedCallbackHistory = slot<Iterable<FileCallbackHistoryEntity>>()`.
+Preserve the exact type, nullability, variance, overload selection, and inference.
+Keep generic arguments when reified or uninferable parameters require them.
+Do not add casts as inference workarounds.
+When safe single-use inlining removes the variable, do not introduce one solely to relocate type arguments.
 Name lambda parameters for their roles, using `_` only for unused parameters.
 
 ## Expressions And Control Flow
