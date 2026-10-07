@@ -44,8 +44,7 @@ Use lists for parallel, sequential, or comparative items, without nesting unless
 ## Human-Facing Documents
 
 For human-facing documents, lead with the action or outcome and use clear headings, compact lists, and short paragraphs.
-Follow the action-first, scannable presentation represented by [structured readability guidance](https://github.com/ayghri/i-have-adhd).
-The required presentation rules are stated here, so agents do not need to retrieve the linked page.
+Use the action-first, scannable presentation rules in this section.
 Check the rendered document for readability after editing it.
 
 ## Agent-Facing Documents
