@@ -73,7 +73,8 @@ Use only assertions documented as compatible with the project's Kotest version.
 Unsupported Kotest assertions and third-party assertions can fail immediately and prevent later checks from running.
 Keep mock verification outside a soft group unless a compatible wrapper preserves its intended behavior.
 Preserve receiver binding in nested groups and qualify a receiver only when needed to avoid shadowing.
-Keep coroutine work inside the group and await structured child work that should contribute to its aggregate.
+Keep assertions that depend on coroutine work inside the group after that work completes.
+Await structured child work in the surrounding coroutine scope.
 Verify assertion-context propagation for the project's Kotest version when assertions cross coroutine dispatchers or context boundaries.
 Inline a single-use test value only when construction timing, side effects, readability, resource lifetime, and fixture isolation remain unchanged.
 Inline a service used only as the `assertSoftly` subject when its construction or expression can move safely.
