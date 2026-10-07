@@ -31,6 +31,7 @@ Use official SDK or framework properties directly when they satisfy the required
 Prefer immutable bindings and minimize mutable state.
 Inline single-use local values only when readability, evaluation order, side effects, lifetime, exceptions, and lazy execution stay unchanged.
 Also preserve cost, inferred types, overload selection, and captured snapshots.
+Prefer condition inversion to reduce mid-function `return`, `continue`, or `break` statements when equivalent behavior stays intact without deeper nesting.
 
 ## Spacing
 
@@ -47,6 +48,8 @@ Preserve required formatter output and meaningful line breaks when these spacing
 Document effective public, protected, and exported declarations using the language's declaration documentation syntax.
 Check implicit visibility, enclosing scopes, re-exports, and default exports when identifying these declarations.
 Use multiline declaration documentation where that syntax supports it.
+Format documentation comments and docstrings as multiline, even for one sentence, wherever language syntax supports them.
+Preserve their text, indentation, declaration attachment, and language-native semantics when formatting or moving them.
 Documentation for other declarations is optional unless tooling or a safety contract requires it.
 Use no explanatory inline comments.
 Preserve required semantic comments, including build directives, licenses, suppressions, and safety invariants.
@@ -74,4 +77,5 @@ Offer automatic fixes only when evaluation, side effects, and program behavior r
 Verify formatter idempotence and convergence between rule fixes and formatting.
 If a rule cannot detect violations safely, do not add it.
 If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
+Do not promise automatic fixes that replace `void` with `await`, restructure control flow, or hoist state across lifecycle boundaries.
 Adding instructions alone does not authorize lint implementations or changes across consumer repositories.

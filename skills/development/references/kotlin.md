@@ -18,8 +18,9 @@ Split pure independent predicates into chained `filter` or nullable `takeIf` cal
 Preserve condition order, smart casts, nullability, effects, exceptions, allocations, and required performance.
 Keep negative or mixed-polarity predicates together when splitting would change their logic.
 Use sequences only when lazy evaluation matches the contract.
-Use `?.let` with a named non-null parameter for optional nullable work.
-Use the captured parameter instead of rereading a nullable property.
+Use `?.let` or an equivalent safe call for null-present work when behavior stays unchanged.
+Preserve stable-value semantics, getter evaluation count, smart casts, nullable-result and Elvis behavior, captures, and non-local returns.
+Use the captured non-null value instead of rereading a nullable property when access timing and getter evaluation stay equivalent.
 Keep required validation and failure behavior explicit.
 Use subject-based `when` for complete comparisons of one stable subject when semantics match.
 Use braces for every `if` and `else` branch.
@@ -51,10 +52,11 @@ Keep Java methods when no Kotlin equivalent satisfies the contract.
 Move reusable immutable declarations and functions from Spec superclass-constructor lambdas into a companion object when sharing preserves behavior.
 Keep per-test state local and preserve initialization order, parallel isolation, and captured values.
 A `val` binding alone does not make its referenced object immutable or safe to share.
+Treat `RuleProvider` factories as potentially eager, and do not hoist them based only on syntax.
 Expose injected dependencies through explicit parameters or appropriate extension functions.
 Keep stateful rule instances scoped to their required lifecycle instead of sharing them unconditionally.
 
 ## Automation
 
-For authorized Kotlin lint automation, use ktlint and its custom-rule API when built-in rules cannot express a safe requirement.
+For authorized Kotlin lint automation, prefer ktlint built-in rules and use its supported custom-rule API when built-ins cannot express a safe requirement.
 Verify compatibility with the project's ktlint version before implementing custom rules or fixes.
