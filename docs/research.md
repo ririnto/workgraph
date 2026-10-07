@@ -438,6 +438,15 @@ Without a native agent wait tool, agents end an idle turn until a completion not
 This idle-turn rule also applies to background Bash.
 The papers provide coordination context but do not prove this prompt resolves the observed behavior.
 
+## Go Linting
+
+The official [Go Plugin System documentation](https://golangci-lint.run/docs/plugins/go-plugins/) recommends the Module Plugin System for custom linters.
+The official [Module Plugin System documentation](https://golangci-lint.run/docs/plugins/module-plugins/) describes its setup.
+The Go Plugin System documentation describes Go plugin build and dependency constraints.
+The official [FAQ](https://golangci-lint.run/docs/welcome/faq/) describes supported Go versions and compatibility with the Go version used to build golangci-lint.
+These sources support guidance to prefer built-in linters, check toolchain compatibility, and use the recommended plugin mechanism.
+They do not establish compatibility for a particular repository or replace independent security and semantic checks.
+
 ## Writing And Host Contracts
 
 ### Claude Code Workflow And Subagent Contracts
