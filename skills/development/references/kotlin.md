@@ -8,7 +8,7 @@ Put `/**` and `*/` on separate lines, with meaningful sentences on `*` lines.
 Give class, object, companion object, and private top-level properties explicit types.
 Use `val` for bindings that do not require reassignment.
 When a generic-producing call initializes a variable, prefer putting the explicit type on the variable declaration so the initializer can infer it.
-For example, write `val savedCallbackHistory: CapturingSlot<Iterable<FileCallbackHistoryEntity>> = slot()` rather than `val savedCallbackHistory = slot<Iterable<FileCallbackHistoryEntity>>()`.
+For example, prefer `val captured: CapturingSlot<String> = slot()` to `val captured = slot<String>()`.
 Preserve the exact type, nullability, variance, overload selection, and inference.
 Keep generic arguments when reified or uninferable parameters require them.
 Do not add casts as inference workarounds.
