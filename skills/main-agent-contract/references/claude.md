@@ -18,13 +18,16 @@ Use Agent for bounded outcomes only when it can safely meet the task contract.
 
 ## Model Selection
 
-Use `haiku` for simple exploration and extraction, and `sonnet` for routine development and analysis.
+Use `haiku` for clear, bounded tasks, including coding, review, exploration, and extraction.
+Use `sonnet` for broader development and analysis, or when Haiku misses acceptance criteria.
 Use `opus` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `fable` only at the user's explicit request.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `haiku` | Bounded extraction and quick sweeps | Leave effort unset when the model has no effort control. |
+| `haiku` | Simple exploration and extraction | Use `low`. |
+| | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
+| | Other bounded analysis and agentic work | Use `medium`, or `high` for harder tasks. |
 | `sonnet` | Routine coding and bounded agentic work | Use `medium`. |
 | | Harder coding or reasoning | Use `high`. |
 | `opus` | Complex coding and reasoning | Use `medium`, or `high` for harder tasks. |
@@ -32,4 +35,12 @@ Call `fable` only at the user's explicit request.
 | | Difficult terminal work | Use `xhigh`. |
 | | The hardest reasoning | Use `max`. |
 
-Leave Haiku's manual thinking budget and Sonnet or Opus `xhigh` and `max` to explicit or configured choices.
+Use Haiku `medium` for small code changes.
+Haiku defaults to `medium` with adaptive thinking.
+Claude Code does not allow thinking to be disabled for Haiku.
+Watch for empty visible responses in Haiku multi-turn sessions at `xhigh`.
+Claude Code subagent `effort` frontmatter overrides session effort unless `CLAUDE_CODE_EFFORT_LEVEL` is set.
+Subagents inherit the session thinking configuration and do not have a separate thinking toggle.
+Claude Code does not accept `max` in persistent `effortLevel` or `modelSettings` values.
+Use `max` only for a session, an effort frontmatter override, or the documented environment variable.
+Leave Sonnet or Opus `xhigh` and `max` to explicit or configured choices.

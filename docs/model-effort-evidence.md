@@ -3,14 +3,14 @@
 ## Scope
 
 This record compares public evidence for seven exact models.
-No local Workgraph test establishes model quality.
+No local test establishes model quality.
 The multi-task effort comparisons supply the main evidence.
 The smaller workload studies supply supporting evidence and limits.
 These results describe the authors' tasks, harnesses, and settings.
 Use their methods and limits when choosing comparable local experiments.
 Read [the research notes](research.md#model-effort-and-cost) for supported controls, official defaults, host settings, and pricing.
 The selection implications below are workload-specific judgments.
-Workgraph behavior checks do not establish universal model-effort rankings.
+Local behavior checks do not establish universal model-effort rankings.
 
 ### Shared Measurement Limits
 
@@ -110,7 +110,7 @@ The [real-world suite](https://electricitybench.com/suites/real-world@v3/) uses 
 It supplies no controlled high, xhigh, or max comparison.
 
 For bounded diagram generation, evaluate the complete deployment configuration with fresh fixtures and recovery costs.
-Use the composite curve to budget Luna escalation, then test the target task's required quality.
+Use Luna xhigh for coding and max for harder coding tasks.
 
 ## GPT-6.1 Sol
 
@@ -143,8 +143,7 @@ The author marks all attempts correct.
 High's medians were 516 reasoning tokens and 26.837 seconds, compared with max at 1,399 tokens and 53.478 seconds.
 One prompt cannot establish performance on harder reasoning tasks.
 
-For small Python tasks like the ceiling sample, test lower effort before paying for extra reasoning.
-Use harder acceptance cases before deciding whether Sol xhigh or max improves required outcomes.
+Use Sol medium for ordinary development and high for complex debugging, algorithms, and architecture.
 
 ## GPT-6 Astra
 
@@ -176,46 +175,146 @@ The composite weights user journeys at 60%, security at 25%, and one Sol judge a
 The authors estimate token costs and keep the generated outputs private.
 This small application sample needs repetition before selecting low for another workload.
 
-For DeepSWE-style terminal repairs, compare medium and xhigh against the same local acceptance tests.
+Use Astra medium for difficult terminal repairs and xhigh for harder tasks.
 The reported max setting increases time and cost without improving its mean pass rate over high.
 
-## Claude Haiku 4.5
+## Claude Haiku 5.5
 
-[Artificial Analysis's release comparison](https://artificialanalysis.ai/models/releases/claude-4-5-haiku) reports reasoning at index 17 and $0.28 per task.
-That run produced 78M output tokens, with no published thinking budget.
-The non-reasoning variant has an estimated index of 15.411 and no cost result.
-The two variants do not establish a controlled quality gain from thinking.
-Haiku does not support the effort control used in the preceding tables.
-Its thinking budget is a separate control.
+Anthropic's [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort) lists `low`, `medium`, `high`, `xhigh`, and `max`, with `medium` as the API default.
+The guide specifies `output_config.effort` for API requests and says disabled thinking is valid only through `high`.
+Claude Code supports the same five levels at `medium` by default and does not allow thinking to be disabled for this model.
+Its [model configuration](https://code.claude.com/docs/en/model-config) requires Claude Code 2.1.293 or later and identifies the API model as `claude-haiku-5-5`.
+The model has a 1M token context window, up to 128K output tokens, and API availability on the listed Claude and cloud platforms.
+The [Haiku 5.5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) recommends evaluating effort on the target task and warns that multi-turn `xhigh` responses may occasionally have no visible text.
 
-### Structured Output And Knowledge Retrieval
+### Coding Effort Comparisons
 
-[Career Ops' report](https://github.com/career-ops-hq/career-ops/blob/claude/keen-albattani-oehpz5/evals/results/README.md) describes structured-output experiments.
-The author supplies [call records](https://github.com/career-ops-hq/career-ops/blob/claude/keen-albattani-oehpz5/evals/results/claude-runs.jsonl).
-The study records 108 calls, including 45 exact Haiku calls with null effort metadata.
-The synthetic workload uses 15 posts, one profile, and an Opus 5 reference rather than human ground truth.
-Schema success is 0/30 for baseline and 6/15 for inline instructions, with repeat drift of 0.38.
-The reported Haiku totals are 0.76M processed tokens and 12K output tokens.
-The median CLI duration is 2.6 minutes, with an estimated cost of $0.25.
-The study changes instruction structure without controlling a thinking-budget sweep.
+We read the supplied [October 7 system card](https://www.anthropic.com/document/claude-haiku-5-5-system-card), including every capability effort curve in Section 8.
+Pages 112–114 report Cognition's FrontierCode comparison in Claude Code.
+Main contains 100 harder tasks, while Extended contains all 150 tasks.
+Each result averages five runs per task and combines functional blockers with code-quality rubric criteria.
+The grading penalizes changes outside the task's scope.
 
-[Strauss Agent Tools' analysis](https://github.com/saasontools/strauss-agent-tools/blob/assafkamil/saa-597-research-control-arm-benchmark-for-standing-fields-does/packages/strauss-kb/bench/results/full-claude-x3-2026-09-05-analysis.md) compares knowledge-retrieval configurations.
-The study covers 744 calls: 31 questions, four arms, two models, and three repeats.
-The authors disable thinking and verify zero thinking tokens.
-Haiku's 26 core questions score 98.7%, 94.9%, 87.2%, and 100% across information structures.
-The study supplies no thinking-enabled sweep.
+The figures label effort levels but omit most exact scores and all Haiku dollar costs.
+Values marked `~` below are rounded visual estimates, rather than recovered raw measurements.
+Main's xhigh and max scores, and Extended's max score, are explicitly reported in the text or summary table.
 
-[Caty's benchmark](https://github.com/caty-ai/caty-agent-harness/blob/main/docs/benchmark.md) compares bare and harness runs of headless `claude-haiku-4-5`.
-The authors supply aggregate results in `docs/benchmark/ev006-aggregate.json` and identify the model in issue 100.
-They cover three genres, three sizes, and five instances per combination.
-On medium and large cases, bare runs pass 4/30 and harness runs pass 13/30.
-On small cases, bare runs pass 10/15 and harness runs pass 9/15.
-Both configurations pass 0/10 medium and large CSV cases.
-The authors change the turn caps from 10 to 16 or 24 and omit the thinking budget.
-Raw transcripts remain offline, and the comparison isolates neither effort nor thinking budget.
+| Effort | FrontierCode Main | FrontierCode Extended | Estimated output tokens per task |
+| --- | ---: | ---: | ---: |
+| low | ~35% | ~48% | ~24K |
+| medium | ~42% | ~55% | ~36K |
+| high | ~42% | ~56% | ~55K |
+| xhigh | 45.8% | ~58% | ~100K |
+| max | 46.4% | 58.4% | ~180K |
 
-For structured output and retrieval, measure instruction structure before assigning extra thinking budget.
-Record the budget and observed thinking tokens because an effort label cannot describe Haiku's configuration.
+Medium and high have similar Main scores, while xhigh supplies the larger next gain.
+Max adds 0.6 percentage points over xhigh on Main with about 80% more output tokens, estimated from the plot.
+The result files supply no uncertainty intervals, so that difference does not establish statistical significance.
+Output counts do not establish complete request cost, especially across Haiku's prompt-length pricing boundary.
+These coding tasks do not separately measure debugging, refactoring, or code review.
+
+Use Haiku xhigh for coding, max for harder tasks, and medium for small code changes.
+The debugging, refactoring, and review recommendations extend the coding comparison as workload judgments.
+Complex or broad coding can still require Sonnet or Opus.
+
+### Research And Computer-Use Effort Sweeps
+
+Pages 118–123 report the following labeled Haiku scores across all five effort levels.
+HLE reports accuracy, DRACO reports normalized rubric scores, and WANDR reports soft F1.
+These metrics describe different tasks and cannot be averaged into one effort ranking.
+
+| Evaluation | low | medium | high | xhigh | max |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| HLE with tools | 38.6% | 45.0% | 50.1% | 54.8% | 57.4% |
+| HLE without tools | 30.9% | 35.5% | 39.7% | 44.1% | 45.9% |
+| DRACO | 64.3% | 72.4% | 77.8% | 80.5% | 81.5% |
+| WANDR | 3.5% | 12.9% | 37.3% | 45.9% | 49.9% |
+
+HLE uses 2,500 questions, a 980K task-token budget, and no context compaction.
+Its tool variant includes search, fetch, code execution, and contamination screening.
+DRACO uses 100 tasks and five grading runs per response with an Opus judge instead of the paper's original judge.
+WANDR uses 500 tasks, a frozen search index, modified prompts, and a different judge from Perplexity's setup.
+The modified research harnesses prevent direct comparison with the original benchmark headlines.
+Their Haiku costs use recorded token usage and omit web-search fees.
+Their Sonnet and Opus costs assume perfect cache hits, which limits cross-model cost comparisons.
+
+Pages 127–130 cover OSWorld's 82 offline tasks, with five attempts per task and a 500-action limit.
+Its partial score measures checkpoint credit, while strict pass requires every checkpoint.
+The caption orders effort points from low to max, but the graphs omit exact point labels.
+The table retains rounded visual estimates and the explicitly reported max endpoints.
+
+| Effort | Partial score | Strict pass rate | Estimated dollars per task |
+| --- | ---: | ---: | ---: |
+| low | ~42% | ~13% | ~0.07 |
+| medium | ~53% | ~21% | ~0.13 |
+| high | ~61% | ~27% | ~0.18 |
+| xhigh | ~68% | ~31% | ~0.28 |
+| max | 72.4% | 37.1% | ~0.61 |
+
+The offline setup and two distinct success metrics limit transfer to other computer-use tasks.
+Higher effort improves these reported means without establishing gains for simple extraction or every agentic task.
+
+### Visual And Professional Work
+
+We inspected Chartography's tool and no-tool curves on pages 124–125 and BenchCAD's curves on pages 126–127.
+The plots show individual points without effort labels or exact lower-effort values.
+We retain their observed trends and reported endpoints instead of inventing precise per-effort measurements.
+Chartography's no-tool curve is not monotonic at its lowest-cost points.
+Its max scores are 46.4% without tools and 86.2% with tools.
+BenchCAD's Vision2Code curves improve with additional compute, reaching 0.670 voxel IoU without tools and 0.870 with tools at max.
+Chartography uses 100 tasks, while BenchCAD uses a random 1,000-file subset.
+Both average five runs and show 95% confidence intervals.
+Their costs include actual cache reads and writes, per-request Haiku prompt-length pricing, and updated Sonnet cache prices.
+
+Page 131 reports two effort settings for Artificial Analysis's independent professional-work evaluations.
+It does not supply a complete numerical five-level sweep.
+
+| Evaluation | medium Elo | max Elo | Output-token comparison |
+| --- | ---: | ---: | --- |
+| GDPval-AA v2.1 | 1277 | 1620 | Medium uses about one tenth of max's output tokens. |
+| AA-Briefcase v1.1 | 1372 | 1578 | Medium uses less than one quarter of max's output tokens. |
+
+GDPval-AA covers 220 tasks across 44 occupations and uses blind pairwise judging.
+AA-Briefcase covers linked project tasks and combines rubric and pairwise grading.
+The higher professional-work scores at max come with substantially more output tokens.
+The launch-only GDPval and Terminal-Bench graph points remain unextracted and do not determine the coding recommendation.
+
+### Healthcare Effort And Latency
+
+Pages 132–134 report these five-level results.
+HealthBench scores below are length-adjusted, while PhysicianBench reports attempt pass rates.
+These measurements describe benchmark behavior and do not recommend medical decisions or model deployment.
+
+| Evaluation | low | medium | high | xhigh | max |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| HealthBench | 59.9% | 60.2% | 60.3% | 61.1% | 61.6% |
+| HealthBench Professional | 57.9% | 59.9% | 61.3% | 61.0% | 64.8% |
+| PhysicianBench | 17.8% | 25.2% | 31.6% | 35.8% | 43.0% |
+
+HealthBench uses one run below max and five at max, with runs on different days.
+HealthBench Professional uses five runs per level and reports high and xhigh as indistinguishable.
+Its max response time is about 110 seconds, compared with 8–21 seconds below max.
+PhysicianBench uses 100 tasks and five attempts per task at each level.
+Its high-to-xhigh confidence interval reaches zero, while its xhigh-to-max comparison uses runs three days apart.
+Its median model time rises from 48 seconds at low to about 11 minutes at max, excluding tools and judging.
+These results show workload-dependent plateaus and time costs, rather than a universal high-effort advantage.
+
+### Single-Setting Coding Results And Scope
+
+Pages 111–117 also report coding evaluations that lack a lower-effort control.
+Terminal-Bench 4.0 scores 39.2% at max in Claude Code's bare mode, with 66 tasks and ten trials per task.
+Its standard error is 1.9 percentage points, treating trials as independent.
+Haiku ran without internet egress or a fallback model, and safeguard interventions failed 1.8% of trials.
+Terminal-Bench-Science scores 20.6% at max under the same host and network restrictions.
+FrontierSWE scores 43.8% at max across 34 tasks with five trials and a 20-hour task budget in Proximal's harness.
+ProgramBench reports 82.0% hidden-test passes on 166 filtered tasks in mini-swe-agent without its upstream six-hour limit.
+The summary's standard Haiku configuration is adaptive thinking at max unless a section states another setting.
+None of these single-setting results proves that lower effort would fail.
+
+The inspected [Artificial Analysis leaderboard](https://artificialanalysis.ai/leaderboards/models), [AI Coding Daily effort comparison](https://aicodingdaily.com/compare/effort-levels), and [DeepSWE artifact](https://deepswe.datacurve.ai/artifacts/v1.1/leaderboard-live.json) contained no additional Haiku 5.5 effort sweep.
+That inspection does not establish that no other public sweep exists.
+The supplied model overview confirms defaults and limits, while the supplied app system prompt describes product behavior rather than benchmark performance.
+Both remain reference material rather than consumer instructions.
 
 ## Claude Sonnet 5.5
 
@@ -247,10 +346,10 @@ Opus high exceeds Sonnet xhigh's composite score at about 34% lower estimated co
 Their terminal pass rates differ by 0.51 percentage points, without a paired significance result.
 Opus medium costs about half as much as Sonnet xhigh, with lower composite and terminal scores.
 Sonnet max exceeds every reviewed Opus setting on terminal pass rate, although its estimated terminal cost is higher.
-These comparisons support testing an Opus delegate before Sonnet's highest efforts when model substitution is allowed.
+Use Sonnet medium for routine coding and high for harder coding or reasoning.
 They do not support prohibiting Sonnet xhigh or max across workloads.
 Leave Astra and Fable outside automatic promotion because their use requires an explicit user request.
-Luna's measured gains through max keep that setting valid when its required quality and cost fit the task.
+Use Luna max for harder coding tasks.
 
 The [September 28 release article](https://artificialanalysis.ai/articles/claude-sonnet-5-5) reports about 0.1% fallback, mainly on Terminal-Bench.
 Those fallback calls went to Sonnet 5.
@@ -272,7 +371,6 @@ The author reports 358 minutes, 1,174,141 output tokens, 389 turns, and $56.48 e
 The resulting isolated megakernel passes correctness checks and runs 32.13 times faster than PyTorch.
 GPU contention, out-of-memory events, 52 operator skills, and the absence of a lower-effort control limit the comparison.
 
-For the practitioner's small coding sample, test high against medium before increasing output expenditure.
 The kernel run establishes one completed long task at max, without evidence that lower effort would fail.
 
 ## Claude Opus 5.5
@@ -309,7 +407,7 @@ On 80 open-source cases, Standard versus Max recall is 51/80 versus 50/80, with 
 On 13 hard Signal cases, actionable findings are 8/13 versus 10/13, with precision of 66.7% versus 52%.
 The authors omit total cost and time.
 
-Prefer medium or high for Opus, and discourage xhigh or max without comparable-task evidence of required gains.
+Use Opus medium for complex coding and reasoning, or high for harder tasks.
 This default does not establish that higher effort cannot improve reasoning or other workloads.
 For SVG generation, check output-budget failures when evaluating max.
 Choose review pipeline modes against the desired precision and recall, with API effort recorded apart from those modes.
@@ -344,5 +442,6 @@ Low produced 4,124 output tokens, including 893 thinking tokens, in 52 seconds.
 The author supplies neither quality grading nor cost for these calls.
 Low therefore still permits thinking on this request.
 
-For terminal work, measure whether xhigh's score gain justifies its cost over high.
+Use Fable high for long work and xhigh for difficult terminal tasks.
+Use max for the hardest reasoning.
 The captured request supports a latency experiment, but it supplies no acceptance evidence for lowering effort.
