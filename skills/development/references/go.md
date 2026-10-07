@@ -21,7 +21,7 @@ Use `t.Parallel()` for independent cases whose setup and shared resources permit
 
 ## Linting
 
-Use golangci-lint for Go linting.
+When the repository already uses golangci-lint or the user authorizes adopting it, use golangci-lint for Go linting.
 Prefer built-in linters before custom extensions.
 Use its module plugin system for custom linters because golangci-lint recommends it over Go plugins.
 Check whether golangci-lint's build Go version supports the project's Go version.
