@@ -36,7 +36,8 @@ Read the active host reference before execution unless its complete content is a
 ### Further Delegation
 
 Complete the assignment without subdelegation unless the dispatch grants it.
-For granted subdelegation, use the dispatch's model, effort, resource ownership, and acceptance requirements.
+Preserve inherited constraints, model, effort, resource ownership, and acceptance requirements through every authorized delegation and follow-up.
+Require authorized descendants to preserve them recursively.
 
 ### Assignment And Evidence
 

@@ -135,6 +135,45 @@ for (const [event, name] of roles) {
   });
 }
 
+test("role contexts preserve constraints through recursive delegation and follow-ups", () => {
+  const development = readFileSync(
+    path.join(skills, "development", "SKILL.md"),
+    "utf-8"
+  );
+  assert.match(development, /Do not add commit-hash or image-digest pinning/u);
+  assert.match(
+    development,
+    /Preserve existing integrity checks, including lockfile integrity fields and signature or checksum verification/u
+  );
+  for (const [event] of roles) {
+    for (const host of hosts) {
+      const result = runHook([event, host]);
+      assert.equal(result.status, 0, result.stderr);
+      const context = JSON.parse(result.stdout).hookSpecificOutput
+        .additionalContext;
+      if (event === "SessionStart") {
+        assert.match(
+          context,
+          /passing user constraints recursively through assignments and follow-ups/u
+        );
+      } else {
+        assert.match(
+          context,
+          /Preserve inherited constraints, model, effort, resource ownership, and acceptance requirements through every authorized delegation and follow-up/u
+        );
+        assert.match(
+          context,
+          /Require authorized descendants to preserve them recursively/u
+        );
+        assert.match(
+          context,
+          /Complete the assignment without subdelegation unless the dispatch grants it/u
+        );
+      }
+    }
+  }
+});
+
 test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
   const root = path.join(copyPlugin(t), "a".repeat(100), "b".repeat(100));
   mkdirSync(path.join(root, "hooks"), { recursive: true });
