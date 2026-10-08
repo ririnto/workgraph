@@ -45,7 +45,7 @@ Mark unreported settings as unknown.
 
 ### Assignment And Evidence
 
-Specify assignment inputs, owned resources, authority, outputs, acceptance evidence, and cleanup requirements.
+Specify inputs, ownership, authority, outputs, acceptance evidence, and cleanup, passing user constraints recursively through assignments and follow-ups.
 Before delegating Git writes, specify permitted operations, refs, ownership limits, and pre-action checks.
 Give each shared resource one writer.
 Ask an exploration agent to identify the source of unexpected changes.
