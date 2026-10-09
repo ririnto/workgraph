@@ -75,7 +75,8 @@ The plugin does not redistribute the source skill or its reference files verbati
 ## Sinon Language Tooling
 
 We reviewed [ririnto/sinon](https://github.com/ririnto/sinon) on its named `main` branch.
-Its MIT license credits ririnto, copyright 2026.
+The repository's root MIT license credits ririnto, copyright 2026.
+The reviewed Harness component declares [Apache-2.0](https://github.com/ririnto/sinon/blob/main/plugins/harness/LICENSE).
 The Harness Java parity mapping, Kotlin rules, and Gradle compatibility guidance informed the Development references.
 Workgraph adapts their decision boundaries without bundling Sinon tooling or requiring its installation.
 

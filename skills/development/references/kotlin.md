@@ -20,6 +20,7 @@ Avoid leading underscores in declaration names while preserving `override`, `ope
 
 Prefer imports over fully qualified type names when name resolution remains unchanged.
 Preserve wildcard imports and meaningful aliases that resolve name collisions.
+For new ktlint configurations applying these defaults, set `ktlint_standard_no-wildcard-imports = disabled` in `.editorconfig`.
 Keep qualified names when declarations, imports, aliases, same-package symbols, or existing unqualified uses make resolution uncertain.
 Restrict syntax-only import rules to type references and leave expression receiver chains unchanged.
 Verify resolution beyond the current file before accepting import fixes from rules without compiler symbol information.
