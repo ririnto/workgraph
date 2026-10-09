@@ -14,6 +14,7 @@ Keep coupled work together when splitting prevents independent verification or m
 Avoid tiny phases and stacked PRs that require repeated rebases.
 Publish, review, and integrate each ready unit within granted authority.
 Proceed with publication and integration already authorized by the goal without requesting renewed approval.
+
 Use the user's specified base branch, otherwise retain the recorded base or use the current branch.
 Without a base, confirm the active development branch.
 Record working and authorized base branches before branch creation, commits, or publication.
@@ -24,6 +25,7 @@ Use named branch references and current PR changes, not fixed commit hashes.
 ## Check Before Publication
 
 Inspect changed files and required evidence before publishing to the authorized base.
+
 Before each branch push, delegate a brief diff scan for exposed user environment details to an exploration agent.
 Reuse a scan only while its diff remains unchanged.
 Treat this scan as exploration, without a code review.
@@ -54,6 +56,7 @@ flowchart TD
 Reuse an existing PR/MR for the unit.
 Follow the consumer repository's review method.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.
+
 Fix blockers before integration when they violate acceptance, required behavior, correctness, safety, or required checks.
 Only confirmed blockers require code changes before integration.
 Keep blocker fixes on the same working branch and update its existing PR/MR, if any.
@@ -69,6 +72,7 @@ Without authorized, available tracker access, do not integrate with untracked de
 Implement deferred follow-ups only after updating the base branch.
 Repeat base syncs or rebases only for conflicts or invalidated evidence.
 Set a finite fix/re-review limit and stop sooner without progress or when a concrete blocker prevents work.
+
 Integrate after required checks pass, confirmed blockers are resolved, and deferred follow-ups are recorded.
 Finish delivery by verifying the authorized base branch update.
 Delete feature branches except the base, only within granted cleanup after base integration and ancestry proof.

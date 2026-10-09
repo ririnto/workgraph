@@ -2,6 +2,7 @@
 
 Workgraph supplies engineering coordination, writing, and development skills with hooks for Claude Code and Codex.
 It delivers the selected agent role and host-specific orchestration and model guidance through native hooks.
+
 The runtime uses Node built-ins and needs no npm dependencies.
 Workgraph supplies instructions, not a scheduler or permission system.
 The host controls task execution, model settings, and completion notifications.
@@ -33,6 +34,7 @@ Codex selects `.codex-plugin/plugin.json`, which declares `hooks/codex-hooks.jso
 The Codex handlers use `PLUGIN_ROOT` and disable context spill with `additionalContextLimit: 0`.
 Use the host's normal plugin activation and trust controls.
 The inspected Codex source supports this configuration, while activation in the installed desktop host remains unverified.
+
 Both host descriptors declare the same release version.
 Each host reads its own descriptor, so neither version declaration replaces the other.
 Follow [Version Updates](#version-updates) when publishing changes.
@@ -50,13 +52,16 @@ Each output identifies the selected skill source and states which complete conte
 Each hook names the execution host so agents can distinguish it from the selected model family.
 Each role receives its selected host reference with its source path.
 Worker references contain execution timing without Main orchestration or model guidance.
+
 Claude Code receives the native Skill text with its base directory and frontmatter-stripped body, preserving trailing whitespace.
 Claude body delivery removes leading whitespace to match native Skill loading.
 Codex receives the native `<skill>` text with its qualified name, source path, and complete file, including YAML frontmatter.
 Claude references use native Read line numbering, while Codex references preserve raw file text.
+
 Separate metadata identifies complete content already loaded by the hook.
 These text fragments match native loading, but the host still delivers them through its hook message envelope.
 Agents need no additional file reads for the injected role and host guidance.
+
 For repository changes or delivery, Main reads the conditional [Delivery skill](skills/delivery/SKILL.md) before starting changes.
 Claude hook contexts stay within its 10,000-character inline limit, including tested path and line-ending variations.
 The hooks do not inject repository guidance or research documents.
@@ -68,11 +73,13 @@ Edges represent result dependencies or conditions, not chronology.
 The main agent starts ready independent work in parallel when writes do not conflict and serializes conflicting writes.
 Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
 Workers complete bounded assignments within their authority.
+
 For maintainers, Main requests independent review after PR/MR creation.
 For other contributors, Main requests that review before PR/MR creation.
 Main integrates after required checks pass and confirmed blockers are resolved.
 The instructions also cover evidence freshness, bounded feedback, English handoffs, and ownership-safe cleanup.
 The host supplies tool usage, model controls, and background execution mechanics.
+
 In Claude Code, the main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
 One stage qualifies when its result may trigger an identified in-scope follow-up agent.
 Claude Main uses host Agent for independent assessments that it combines in its own final report.
@@ -82,21 +89,25 @@ Main does not add display-only phases to justify implicit Workflow selection.
 If explicitly selected Workflow is unavailable, Main reports the failure without silently substituting Agent.
 For an implicit Workflow selection, Main reports unavailability and uses Agent only when it can safely deliver bounded outcomes.
 These Workflow selection rules apply to Claude Code.
+
 Codex uses its available native delegation tools for independent and dependent assignments.
 Codex Main coordinates dependencies and passes verified predecessor results to successors.
 Codex does not provide Claude Code's native Workflow tool.
 For an explicit Workflow request in Codex, Main reports that it did not run and preserves the requested tool choice.
+
 Direct main work covers planning, design, publication, integration, final reporting, trivial outcomes without an explicit delegation-tool choice, explicit no-delegation requests, or unavailable delegation tools.
 Resolve conflicting explicit execution-tool requests before dispatch.
 
 Each role file in the table carries the common rules and that role's procedures in one self-contained body.
 These instructions guide agents but do not guarantee model adherence.
+
 Main's [Codex reference](skills/main-agent-contract/references/codex.md) covers Luna, Sol, and Astra.
 Codex assigns clear tasks to Luna, including multistep work, with Sol for stronger judgment.
 Luna uses xhigh for coding, max for harder coding tasks, and low for simple exploration or extraction.
 Its [Claude Code reference](skills/main-agent-contract/references/claude.md) covers Haiku, Sonnet, Opus, and Fable.
 Both references order families from routine work to more complex work and assign effort by model and workload.
 Astra and Fable require the user's explicit request.
+
 Assignments record requested settings and report resolved settings only when the host supplies them.
 Each Main hook loads only its host's execution, orchestration, and model guidance.
 Worker hooks load their own execution references without Main orchestration or model policy.
@@ -124,10 +135,12 @@ The [Delivery skill](skills/delivery/SKILL.md) defines branch selection, publica
 Main uses the user's specified base branch, otherwise retains the recorded base or uses the current branch.
 Without a base, Main confirms the active development branch before starting changes.
 Main records the base before creating a working branch and retains it through delivery.
+
 Before each branch push, an exploration agent scans the diff for exposed user environment details.
 Main resolves any exposure before pushing.
 Main requests one full independent review after PR/MR creation for maintainers, and before creation for other contributors.
 Main fixes confirmed blockers and records permitted deferrals before integrating into the authorized base.
+
 Selecting a base branch does not grant publication, integration, or cleanup authority.
 Read-only goals retain their inspection scope.
 
@@ -143,6 +156,7 @@ Workgraph ships no reusable Workflow scripts.
 The `/workgraph:workflow` skill selects Claude Code's native Workflow for explicit requests or suitable dependency graphs.
 Its description targets dependent stages and identified follow-up stages without imposing an itinerary.
 Workers complete relayed bounded assignments without starting another Workflow.
+
 Main validates relevant behavior, inputs, configuration, and toolchain before relying on replayed results.
 Main and Worker compare named references and task-relevant changes without pinning file or branch hashes.
 Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
@@ -175,14 +189,17 @@ Main resolves Delivery from its loaded role source directory.
 Main and Worker resolve Writing, Instruction Authoring, and Development from their own loaded role directories.
 Read each conditional skill only when its task scope matches and its complete content is not already loaded.
 Workgraph has no dependency on another plugin's skills or installation.
+
 Codex Main and Worker references conditionally load [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) before retiring its covered resources.
 The cleanup procedure and native attachment reference stay bundled rather than requiring a separate user-level skill.
 Cleanup compares individual session and worktree activity and preserves required changes through retained Git references.
 It separates physical retirement from Worktree Artifact removal and preserves active work and unique content outside Git.
 Claude hooks do not load this procedure, and invoking it in Claude does not authorize Codex cleanup.
+
 Manual Main loading reads the active host's reference before dispatch unless the hook already supplied its complete content.
 Manual Worker loading reads its active host reference unless the hook already supplied its complete content.
 The dispatch supplies any authorized subdelegation settings.
+
 The Workflow skill reports unavailability and stops when invoked in Codex.
 The Workflow skill keeps its core rules inline.
 For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.
@@ -207,8 +224,10 @@ Inspect the hook error notice if instructions fail to load.
 Use npm and the Node version range in `package.json` for development.
 The development tools require Node.js 24.15 or later within major version 24.
 This development requirement is separate from the Node.js 18 minimum for hook execution.
+
 Plugin evaluation relocates `HOME` into its sandbox.
 If a Node version-manager shim fails there, prepend the installed Node binary's directory to the evaluator's `PATH`.
+
 Install the pinned development tools.
 
 ```sh
