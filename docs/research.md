@@ -458,6 +458,38 @@ Without a native agent wait tool, agents end an idle turn until a completion not
 This idle-turn rule also applies to background Bash.
 The papers provide coordination context but do not prove this prompt resolves the observed behavior.
 
+## Language Tooling And Rule Mappings
+
+Preserve a project's working lint and formatter choices before applying defaults to an unconfigured project.
+The Development skill selects Ruff, Ultracite with Oxlint and Oxfmt, ktlint, and golangci-lint for authorized setup.
+Java retains its selected native tools, including Spotless with Palantir Java Format and Checkstyle.
+
+We reviewed Sinon's integrated [Kotlin guidance](https://github.com/ririnto/sinon/blob/main/plugins/harness/docs/languages/kotlin.md) and [Java parity mapping](https://github.com/ririnto/sinon/blob/main/plugins/harness/docs/languages/java.md).
+We compared their documented coverage with the named `main` implementations and compatibility limits.
+Upstream verification reports 221 Kotlin tests and Java formatter, checker, wildcard-import, and final-newline fixtures.
+These are upstream results, not Workgraph consumer tests or evidence of model adherence.
+
+| Rule area | Applicable guidance |
+| --- | --- |
+| Imports | Preserve wildcard imports and qualified names when name resolution is uncertain. |
+| Kotlin import conversion | Restrict syntax-only rules to type references and verify resolution beyond their single-file checks. |
+| Declaration names | Preserve Kotlin override, open, abstract, and interface contracts and Java's overridden names and supported unnamed bindings. |
+| Java documentation and spacing | Review multiline Javadoc, documentation quality, and method-body spacing beyond the selected tools' coverage. |
+| Logging | Avoid false-positive lexical checks against text blocks or shadowed names. |
+| Control flow | Preserve semantic edge cases instead of promising syntax-only automatic fixes. |
+
+The Kotlin import rule skips conflicting declarations, imports, aliases, wildcard imports, same-package references, and existing unqualified uses.
+It lacks compiler symbol resolution and leaves expression chains unchanged to preserve receiver interpretation.
+The Java profile has no equivalent import transformation that proves collision safety.
+Its lexical logging pattern can match shadowed `System` names or text-block content.
+Workgraph retains these coverage limits when recommending safe automation.
+
+The [Gradle reference](https://github.com/ririnto/sinon/blob/main/plugins/harness/docs/tools/gradle.md) distinguishes Kotlin compatibility, Java compilation, and lint-runtime requirements.
+Its newer stable Gradle example falls outside the selected Kotlin compiler's fully supported range.
+Verify the target's supported combination instead of copying profile versions or assuming the newest stable tool is compatible.
+Register custom rulesets with the consumer's ktlint runtime and prove native lint discovers them.
+Workgraph bundles guidance only and does not install Sinon tooling, consumer rules, plugins, or hooks.
+
 ## Go Linting
 
 The official [Go Plugin System documentation](https://golangci-lint.run/docs/plugins/go-plugins/) recommends the Module Plugin System for custom linters.
