@@ -4,6 +4,7 @@ Borrow values when functions need access without ownership transfer.
 Return owned values from constructors and parsers, and retain ownership where the contract requires it.
 Replace avoidable clones with borrows without changing lifetimes or required ownership.
 Use `Cow` only when a measured need justifies it.
+
 Use `Result` for recoverable failures and `Option` for absent values.
 Reserve panics, `unwrap`, and `expect` for justified initialization or invariant failures.
 Propagate recoverable errors with `?` and preserve typed errors at module boundaries.

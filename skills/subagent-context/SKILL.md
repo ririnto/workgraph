@@ -43,11 +43,13 @@ Require authorized descendants to preserve them recursively.
 
 Give each shared resource one writer.
 Without a native agent wait tool, end an idle turn when only completion notifications remain, without claiming completion.
+
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain.
 Compare named references and task-relevant changes without pinning file or branch hashes.
 Reuse passing evidence while those conditions remain unchanged.
 Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 Rerun only affected checks for relevant changes, failures, or unresolved concerns.
+
 Check partial effects before retrying interrupted writes.
 Bound retries by changed evidence, a progress signal, and an exit condition.
 
@@ -58,10 +60,12 @@ Keep local evidence temporary, excluding dependency trees, build caches, and red
 Delete task-owned evidence after recording required results when no active check, failure investigation, recovery, or retention requirement needs it.
 Confirm cleanup ownership before deleting shared evidence.
 Return concise check results to Main instead of creating a persistent evidence archive.
+
 Before handback, inspect running background processes and descendants against the recorded assignment resources.
 Stop assignment-owned processes when no longer needed and verify termination.
 Before handback, remove unneeded Docker containers and disposable caches created for the assignment.
 Before handback, remove clean assignment-created worktrees within granted cleanup when no longer needed.
+
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
 Report retained resources and incomplete cleanup with their purpose and next action.
 
@@ -74,6 +78,7 @@ Before source or maintained code work, read [Development](../development/SKILL.m
 Leave main-session orchestration to Main.
 Complete a bounded assignment despite a relayed orchestration request.
 Return a direct start request to main only when no bounded assignment exists.
+
 Perform Git writes only when the dispatch names the operations, refs, owned resources, and required checks.
 Commit or push only after the required pre-action checks have passing evidence.
 Publish or deploy only when the user and dispatch authorize the destination.
