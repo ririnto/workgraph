@@ -71,6 +71,16 @@ Preserve existing integrity checks, including lockfile integrity fields and sign
 ## Automation
 
 Use the project's existing formatters, checkers, and test frameworks for ordinary development changes.
+Preserve existing lint and formatter choices when adding guidance or filling configuration gaps.
+
+For authorized lint setup in projects without an existing lint configuration, use these defaults.
+
+| Language | Default |
+| --- | --- |
+| Python | Ruff |
+| JavaScript and TypeScript | Ultracite, invoking Oxlint and Oxfmt through Ultracite |
+| Kotlin | ktlint |
+| Go | golangci-lint |
 
 When lint automation is authorized, prefer built-in rules and supported configuration before custom rules.
 Use the Kotlin and Node.js tooling guidance in the matching language references.

@@ -14,6 +14,15 @@ Keep generic arguments when reified or uninferable parameters require them.
 Do not add casts as inference workarounds.
 When safe single-use inlining removes the variable, do not introduce one solely to relocate type arguments.
 Name lambda parameters for their roles, using `_` only for unused parameters.
+Avoid leading underscores in declaration names while preserving `override`, `open`, `abstract`, and interface contracts.
+
+## Imports
+
+Prefer imports over fully qualified type names when name resolution remains unchanged.
+Preserve wildcard imports and meaningful aliases that resolve name collisions.
+Keep qualified names when declarations, imports, aliases, same-package symbols, or existing unqualified uses make resolution uncertain.
+Restrict syntax-only import rules to type references and leave expression receiver chains unchanged.
+Verify resolution beyond the current file before accepting import fixes from rules without compiler symbol information.
 
 ## Expressions And Control Flow
 
@@ -90,3 +99,7 @@ Preserve setup timing, evaluation order, resource lifetime, mock verification or
 
 For authorized Kotlin lint automation, prefer ktlint built-in rules and use its supported custom-rule API when built-ins cannot express a safe requirement.
 Verify compatibility with the project's ktlint version before implementing custom rules or fixes.
+Check Kotlin, Gradle, JVM, ktlint engine, and plugin compatibility together before selecting versions.
+Stay within Kotlin's officially supported Gradle range even when a newer stable Gradle release exists.
+Attach custom rulesets to the consumer's actual ktlint runtime instead of relying on `buildSrc` visibility.
+Verify native consumer lint reports a disposable violation before accepting a ruleset integration.

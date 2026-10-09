@@ -72,6 +72,13 @@ It informed direct verbs, specific subjects, and removal of filler.
 The bundled Writing skill adapts its prose guidance.
 The plugin does not redistribute the source skill or its reference files verbatim.
 
+## Sinon Language Tooling
+
+We reviewed [ririnto/sinon](https://github.com/ririnto/sinon) on its named `main` branch.
+Its MIT license credits ririnto, copyright 2026.
+The Harness Java parity mapping, Kotlin rules, and Gradle compatibility guidance informed the Development references.
+Workgraph adapts their decision boundaries without bundling Sinon tooling or requiring its installation.
+
 ## Research And Official Documentation
 
 The [research notes](docs/research.md) cite the papers and official documentation used for context, graph, and verification decisions.
