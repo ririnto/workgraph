@@ -193,6 +193,8 @@ Workgraph has no dependency on another plugin's skills or installation.
 Codex Main and Worker references conditionally load [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) before retiring its covered resources.
 The cleanup procedure and native attachment reference stay bundled rather than requiring a separate user-level skill.
 Cleanup compares individual session and worktree activity and preserves required changes through retained Git references.
+Its [app-server reference](skills/codex-scoped-cleanup/references/app-server.md) covers native inventory, writer ownership, lifecycle effects, and exact readback.
+Permanent deletion requires explicit human authority for the affected scope and preserves tool-specific action-time confirmation.
 It separates physical retirement from Worktree Artifact removal and preserves active work and unique content outside Git.
 Claude hooks do not load this procedure, and invoking it in Claude does not authorize Codex cleanup.
 
