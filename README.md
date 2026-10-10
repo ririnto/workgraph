@@ -74,45 +74,20 @@ The main agent starts ready independent work in parallel when writes do not conf
 Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
 Workers complete bounded assignments within their authority.
 
-For maintainers, Main requests independent review after PR/MR creation.
-For other contributors, Main requests that review before PR/MR creation.
-Main integrates after required checks pass and confirmed blockers are resolved.
-The instructions also cover evidence freshness, bounded feedback, English handoffs, and ownership-safe cleanup.
-The host supplies tool usage, model controls, and background execution mechanics.
+The [Main contract](skills/main-agent-contract/SKILL.md) owns orchestration, authority, request-origin communication, and evidence freshness.
+The [Worker contract](skills/subagent-context/SKILL.md) owns bounded assignments and handbacks.
+Both keep their role procedures self-contained, and these instructions do not guarantee model adherence.
 
-In Claude Code, the main agent selects native Workflow when a delegated agent depends on another agent's result or outcome.
-One stage qualifies when its result may trigger an identified in-scope follow-up agent.
-Claude Main uses host Agent for independent assessments that it combines in its own final report.
-A possible future task alone does not qualify.
-An explicit Workflow request selects native Workflow even for one stage because user instructions override these routing defaults.
-Main does not add display-only phases to justify implicit Workflow selection.
-If explicitly selected Workflow is unavailable, Main reports the failure without silently substituting Agent.
-For an implicit Workflow selection, Main reports unavailability and uses Agent only when it can safely deliver bounded outcomes.
-These Workflow selection rules apply to Claude Code.
+Claude Code uses native Workflow for dependent stages and explicit Workflow requests.
+Its [Main host reference](skills/main-agent-contract/references/claude.md#orchestration) owns selection and fallback rules.
+The [Workflow skill](skills/workflow/SKILL.md) owns graph preparation, execution, and result verification.
+Codex uses native delegation under its [Main host reference](skills/main-agent-contract/references/codex.md), without native Claude Code Workflow.
 
-Codex uses its available native delegation tools for independent and dependent assignments.
-Codex Main coordinates dependencies and passes verified predecessor results to successors.
-Codex does not provide Claude Code's native Workflow tool.
-For an explicit Workflow request in Codex, Main reports that it did not run and preserves the requested tool choice.
-
-Direct main work covers planning, design, publication, integration, final reporting, trivial outcomes without an explicit delegation-tool choice, explicit no-delegation requests, or unavailable delegation tools.
-Resolve conflicting explicit execution-tool requests before dispatch.
-
-Each role file in the table carries the common rules and that role's procedures in one self-contained body.
-These instructions guide agents but do not guarantee model adherence.
-
-Main's [Codex reference](skills/main-agent-contract/references/codex.md) covers Luna, Sol, and Astra.
-Codex assigns clear tasks to Luna, including multistep work, with Sol for stronger judgment.
-Luna uses xhigh for coding, max for harder coding tasks, and low for simple exploration or extraction.
-Its [Claude Code reference](skills/main-agent-contract/references/claude.md) covers Haiku, Sonnet, Opus, and Fable.
-Both references order families from routine work to more complex work and assign effort by model and workload.
-Astra and Fable require the user's explicit request.
-
-Assignments record requested settings and report resolved settings only when the host supplies them.
+The active Main host reference supplies defaults for each model or effort setting unspecified by the user or configuration.
+Assignments distinguish requested settings from host-reported resolved settings.
 Each Main hook loads only its host's execution, orchestration, and model guidance.
 Worker hooks load their own execution references without Main orchestration or model policy.
 Forked workers can inherit Main's host guidance through parent history.
-The references supply task defaults and escalation conditions without requiring session-level model comparisons or benchmark evaluations.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](docs/research.md#model-effort-and-cost).
 
 ## Goal-Driven Work
@@ -131,35 +106,15 @@ Build dependencies from actual results or conditions, not progress-phase labels.
 Pass predecessor results to successors, run ready independent outcomes in parallel, and serialize conflicting writes.
 Keep planning, design decisions, publication, and integration in Main.
 
-The [Delivery skill](skills/delivery/SKILL.md) defines branch selection, publication, review, deferral, integration, and branch cleanup.
-Main uses the user's specified base branch, otherwise retains the recorded base or uses the current branch.
-Without a base, Main confirms the active development branch before starting changes.
-Main records the base before creating a working branch and retains it through delivery.
-
-Before each branch push, an exploration agent scans the diff for exposed user environment details.
-Main resolves any exposure before pushing.
-Main requests one full independent review after PR/MR creation for maintainers, and before creation for other contributors.
-Main fixes confirmed blockers and records permitted deferrals before integrating into the authorized base.
-
+Follow [Delivery](skills/delivery/SKILL.md) for branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
 Selecting a base branch does not grant publication, integration, or cleanup authority.
 Read-only goals retain their inspection scope.
-
-Main records concise validation summaries in authorized PR/MR descriptions or comments.
-Local evidence stays temporary and excludes dependency trees, build caches, and redundant logs.
-Main and Worker delete task-owned evidence after recording required results when no active work or retention requirement needs it.
-They retain evidence needed for active checks, unresolved failures, recovery, or explicit retention requirements.
-They confirm cleanup ownership before deleting shared evidence.
-Before handback, both roles inspect owned background processes and descendants, stop unused processes, and verify termination.
+Each [role contract](#automatic-instructions) governs evidence retention, replay validation, and owned resource cleanup.
 
 The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.
-The `/workgraph:workflow` skill selects Claude Code's native Workflow for explicit requests or suitable dependency graphs.
-Its description targets dependent stages and identified follow-up stages without imposing an itinerary.
+Read [Workflow](skills/workflow/SKILL.md) for graph procedures and explicit-tool handling.
 Workers complete relayed bounded assignments without starting another Workflow.
-
-Main validates relevant behavior, inputs, configuration, and toolchain before relying on replayed results.
-Main and Worker compare named references and task-relevant changes without pinning file or branch hashes.
-Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 
 ## Skill Invocation
 

@@ -143,22 +143,11 @@ Main can run $i$ and $t$ in parallel when their writes do not conflict.
 Main starts $v$ after accepting both results and starts $p$ after passing checks and the environment-detail scan.
 This example does not require the same nodes for other goals.
 
-The [README](../README.md#goal-driven-work) documents Workflow selection, script discovery, and the branch, publication, review, and deferral procedures for plugin users.
-The [Delivery skill](../skills/delivery/SKILL.md) contains the operational delivery procedures for both hosts.
-Main selects the user's specified base branch, otherwise retains the recorded base or selects the current branch.
-Without a base, Main confirms the active development branch.
-Main records both branches before branch creation and keeps the base for publication, integration, and cleanup.
-
-Before each branch push, Main delegates a brief environment-detail scan of the diff to an exploration agent.
-Main uses the scan's findings before pushing.
-Main requests independent review after PR/MR creation for maintainers, and before creation for other contributors.
-
-Delivery keeps durable validation summaries in authorized PR/MR descriptions or comments.
-Main and Worker treat local evidence as temporary and exclude dependency trees, build caches, and redundant logs.
-Each role deletes task-owned evidence after recording required results when no active work or retention requirement needs it.
-Each role retains evidence needed for active checks, unresolved failures, recovery, or explicit retention requirements.
-Each role confirms ownership before deleting shared evidence.
-Each role inspects its background processes and descendants before handback, stops unused processes, and verifies termination.
+The [README](../README.md#goal-driven-work) introduces goal-driven work for plugin users.
+The [Delivery skill](../skills/delivery/SKILL.md) owns branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
+[Main](../skills/main-agent-contract/SKILL.md) owns orchestration and evidence acceptance, while [Worker](../skills/subagent-context/SKILL.md) owns bounded assignment handbacks.
+Each role carries its applicable requirements for retaining evidence, verifying cleanup ownership, and terminating owned processes.
+Links keep those procedures in their operational sources rather than duplicating them in design notes.
 
 The graph below shows conditional loading and review timing for authorized repository delivery.
 Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.
@@ -188,16 +177,14 @@ The host may relay the user's `/workgraph:workflow` invocation to a dispatched a
 That relay carries no Workflow launch authority.
 The dispatched agent should complete the assigned task within its authority instead of launching another Workflow or returning it unworked.
 
-Main treats failed or missing agent results as incomplete and validates relevant conditions before accepting replayed evidence.
-Evidence follows relevant behavior, inputs, configuration, and toolchain rather than file or branch hashes.
-Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
+Each role owns evidence freshness and replay validation within its scope.
 The native tool supplies Workflow syntax, resume behavior, notifications, and waiting.
 Workgraph does not repeat those mechanics in its skills.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.
 
 Codex uses available native delegation tools for independent and dependent assignments.
 Its Main session coordinates dependencies without Claude Code's native Workflow tool.
-Keep tool routing in each host reference and task-graph ownership in the common Main contract.
+Each host reference owns tool routing, while the common Main contract owns task graphs.
 
 ## Support Manual Invocation
 
