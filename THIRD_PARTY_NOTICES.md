@@ -99,6 +99,8 @@ Workgraph adapts their decision boundaries without bundling Sinon tooling or req
 The [research notes](docs/research.md) cite the papers and official documentation used for context, graph, and verification decisions.
 We consulted the official [golangci-lint documentation](https://golangci-lint.run/docs/) for Go linting and custom-linter guidance.
 The guidance uses its documented recommendations without redistributing golangci-lint code or claiming compatibility for a specific project.
+We consulted the Go project's [Go 1.23 release notes](https://go.dev/doc/go1.23) and [`maps.Values`](https://pkg.go.dev/maps#Values) and [`slices.Values`](https://pkg.go.dev/slices#Values) documentation.
+Those official sources informed version-aware Go iteration guidance and supplied no redistributed code.
 We read the full [Agent Skills combined source](https://agentskills.io/llms-full.txt), including its specification and skill creation guidance.
 Its guidance informed the conditional reference boundary without supplying plugin code or bundled assets.
 We consulted Anthropic's official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) for host behavior.

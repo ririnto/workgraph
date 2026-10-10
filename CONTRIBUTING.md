@@ -11,23 +11,19 @@ Keep conditions and exceptions with their actions.
 Preserve technical meaning, permissions, code, metadata, exact quotations, licenses, and required table syntax.
 Exclude generated and vendored material from mechanical prose edits.
 
-Use `.yaml` for YAML files when their consumer supports it.
-Retain a required `.yml` name and record the consumer's requirement before changing extensions.
+Use `.yaml` for maintained YAML files unless their consumer requires another exact filename.
 Check references and the consuming tool when renaming a file.
-The existing Dependabot configuration and evaluation cases use `.yaml` and require no rename.
 
 ## Issues
 
-Use the [bug report](.github/ISSUE_TEMPLATE/bug_report.md) for reproducible defects.
-Use the [improvement request](.github/ISSUE_TEMPLATE/improvement.md) for documentation changes, new requirements, and follow-up work.
+Use the [bug report form](.github/ISSUE_TEMPLATE/bug_report.yaml) for reproducible defects.
+Use the [improvement request form](.github/ISSUE_TEMPLATE/improvement.yaml) for documentation changes, new requirements, and follow-up work.
 Complete the template sections when creating issues through an API or CLI.
 Link related work and describe the evidence, scope, acceptance criteria, owner, and next action.
 Keep credentials and private environment details out of reports and attachments.
 
-These templates use GitHub's supported Markdown format.
-[GitHub's template documentation](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/about-issue-and-pull-request-templates) requires `.yml` for issue forms.
-It also specifies `config.yml` for optional chooser configuration.
-This repository needs neither file because its Markdown templates provide the required sections without chooser overrides.
+These templates use GitHub's [issue form schema](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema).
+The repository checks their YAML and the textarea fields used by these forms.
 
 ## Commits
 

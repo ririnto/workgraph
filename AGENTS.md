@@ -70,7 +70,7 @@ Use `const` for bindings that do not change.
 Keep explanations in declaration comments rather than comments inside function bodies.
 Leave no blank lines inside function bodies.
 Use no trailing commas in TypeScript.
-Use `.yaml` for maintained YAML files unless the consumer requires another extension.
+Use `.yaml` for maintained YAML files unless the consumer requires another exact filename.
 Use block sequences except for an explicit empty sequence.
 
 ## Validation
@@ -79,9 +79,10 @@ Select the narrowest applicable read-only gate.
 
 - Use `npm run check:markdownlint-cli2` for prose-only changes.
 - Use `npm run check:hooks` for changes confined to hook execution.
+- Use `npm run check:issue-forms` for issue form YAML changes.
 - Use `npm run check:plugin-version` for host manifest version checks.
-- Use `npm run check:validation-tests` for document and version gate tests.
-- Use `npm run check` for mixed changes or repository-wide validation of Markdown, Ultracite, hooks, and document/version gates.
+- Use `npm run check:validation-tests` for issue form and release version gate tests.
+- Use `npm run check` for mixed changes or repository-wide validation of Markdown, Ultracite, hooks, and issue form/version gates.
 
 After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
 For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.
