@@ -19,8 +19,8 @@
     "markdownlint-rule-relative-links": "^5.1.2",
     "npm-run-all2": "^9.0.3",
     "oxfmt": "^0.71.0",
-    "oxlint": "^1.86.0",
-    "ultracite": "^7.12.2"
+    "oxlint": "^1.87.0",
+    "ultracite": "^7.12.4"
   },
   "engines": {
     "node": ">=24.15.0 <25"
