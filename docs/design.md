@@ -96,6 +96,9 @@ The hook cannot change those roles or fabricate native tool calls.
 
 Claude Code spills fields over 10,000 characters to files without requesting a read.
 Keep each Claude context within that limit so the host delivers its complete instructions inline.
+Reserve headroom for paragraph spacing and later instruction changes without shortening required native wrappers or omitting selected files.
+Measure complete contexts with long source paths and CRLF before accepting injected prose changes.
+Path length affects every repeated source path, so an ordinary-path measurement alone does not establish inline delivery.
 
 The script reads every selected instruction file before producing stdout.
 On a file or frontmatter error, it identifies the failing file without emitting partial instructions.
