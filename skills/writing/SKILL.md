@@ -11,7 +11,8 @@ Lead with the answer, completed result, or next useful action.
 Put commands, paths, and code beside the action they support.
 Number steps when readers must perform actions in a required order.
 
-For active work, report current state and remaining work when they affect a decision, action, or wait.
+For direct human work, report state and remaining work when they affect a decision, action, or wait.
+For agent-origin messages, follow the active role's communication policy.
 Explain errors by naming the cause and the next useful fix.
 Offer a duration only when it helps the reader decide and known assumptions support it.
 

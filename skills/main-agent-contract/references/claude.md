@@ -3,16 +3,16 @@
 ## Orchestration
 
 Prefer `timeout: 240000` for foreground Bash commands.
-Set background command timeouts from the required execution duration.
-Consider available `Monitor` for command output or external events that require action.
+Set background timeouts from required execution duration.
+Consider available `Monitor` for actionable command output or external events.
 For requested fixed loops, prefer `/loop 4m` unless another interval is needed.
 For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when the task permits.
 Use native Workflow when an in-scope follow-up agent needs another agent's result.
 Use host Agent for independent work Main combines.
-Orchestration requests do not establish result dependencies.
-A speculative future task is not a follow-up agent.
-Treat `/workgraph:workflow` and other explicit Workflow requests as user choices, even for one stage.
-Do not add display-only phases to justify implicit Workflow selection.
+Orchestration requests establish no result dependencies.
+Speculative future tasks are not follow-up agents.
+Honor explicit Workflow requests, including `/workgraph:workflow`, even for one stage.
+Do not add display-only phases for implicit Workflow selection.
 If implicit Workflow is unavailable, report it and use Agent only for safely achievable bounded outcomes.
 
 ## Model Selection

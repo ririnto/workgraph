@@ -29,8 +29,8 @@ Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 
 ## Writing
 
-Write maintained instructions, documentation, and messages to other agents in concise English.
-Use the user's requested language for user-facing explanations.
+Write maintained instructions and documentation in concise English.
+Follow the active role's request-origin communication policy for conversations and handbacks.
 
 In all Markdown documents, use complete sentences in prose and list items, with one sentence per source line.
 Keep conditions and exceptions with their actions.
