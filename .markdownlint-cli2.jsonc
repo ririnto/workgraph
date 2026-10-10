@@ -23,10 +23,8 @@
   },
   "customRules": [
     "./rules/no-box-drawing.ts",
-    "./rules/issue-template-front-matter.mjs",
     "markdownlint-rule-relative-links"
   ],
-  "frontMatter": "^---[ \\t]*\\r?\\n[\\s\\S]*?\\r?\\n---[ \\t]*(?:\\r?\\n|$)",
   "gitignore": ".gitignore",
-  "globs": ["**/*.md", ".github/ISSUE_TEMPLATE/*.md"]
+  "globs": ["**/*.md"]
 }

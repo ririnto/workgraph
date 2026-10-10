@@ -8,6 +8,7 @@ description: Use when implementing, refactoring, debugging, or reviewing source 
 Apply the target repository's rules and lint configuration before these defaults.
 Read only matching language references unless their complete content is already loaded.
 For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
+Use `.yaml` for YAML files unless the consuming platform requires another exact filename.
 
 | Language | Source | Reference |
 | --- | --- | --- |

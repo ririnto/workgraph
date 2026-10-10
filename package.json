@@ -5,6 +5,7 @@
   "scripts": {
     "check": "run-p check:*",
     "check:hooks": "node --test hooks/inject-context.test.mjs",
+    "check:issue-forms": "node scripts/check-issue-forms.mjs",
     "check:markdownlint-cli2": "markdownlint-cli2",
     "check:plugin-version": "node scripts/check-plugin-version.mjs",
     "check:validation-tests": "node --test scripts/validation.test.mjs",

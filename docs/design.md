@@ -221,10 +221,12 @@ Plugin validation checks configuration rather than model behavior.
 Use the validation commands and prose review requirements in [AGENTS.md](../AGENTS.md#validation).
 
 The Markdown gate checks relative file links and heading fragments with a maintained markdownlint rule.
-It explicitly includes `.github/ISSUE_TEMPLATE/*.md` and validates nonempty string `name` and `about` frontmatter fields.
-The template rule uses markdownlint-cli2's public YAML parser instead of another parser dependency.
+The issue-form gate parses `.github/ISSUE_TEMPLATE/*.yaml` with markdownlint-cli2's public YAML parser.
+It validates nonempty top-level `name` and `description` strings, a nonempty body, and required textarea fields.
+It also checks unique chooser names, field IDs, and labels, plus GitHub's field ID character rules.
+Local validation covers this repository's form subset and does not establish GitHub's live chooser recognition.
 The version gate resolves both manifests from its module location and checks format, calendar dates, sequence, and parity.
-Validation tests exercise valid and invalid metadata, file links, and release versions.
+Validation tests exercise valid and invalid forms, YAML scalar semantics, file links, and release versions.
 
 CI runs full development checks on Linux with the package's Node engine range.
 Separate macOS and Node.js 18 jobs run dependency-free hook tests without installing development tools.

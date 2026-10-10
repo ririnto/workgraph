@@ -70,6 +70,11 @@ For multiple items under one label, leave later first cells blank and prefix des
 Use that continuation form only when the items need separate rows.
 Preserve valid Markdown row syntax instead of breaking a cell across source lines.
 
+## YAML Scalars
+
+Use `|-` or `>-` for multiline YAML strings to omit the final line feed.
+Preserve literal or folded semantics and validate parsed values, including template strings.
+
 ## Final Pass
 
 Read the changed prose for filler, repeated rules, sentence boundaries, and detached conditions.
