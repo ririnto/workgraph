@@ -516,6 +516,8 @@ The [Local delete implementation](https://github.com/openai/codex/blob/main/code
 Its multi-thread loop can leave partial file deletion before state rows are removed.
 The [Thread manager](https://github.com/openai/codex/blob/main/codex-rs/core/src/thread_manager.rs) guards live internal workers.
 Preparation can shut down earlier ordinary runtimes before a later descendant rejects removal.
+The [Local archive implementation](https://github.com/openai/codex/blob/main/codex-rs/thread-store/src/local/archive_thread.rs) can log descendant failures after root archival succeeds.
+Workgraph therefore requires complete affected-set readback even after a successful archive response.
 
 The [attachment processor](https://github.com/openai/codex/blob/main/codex-rs/app-server/src/request_processors/thread_attachments.rs) provides paginated owner lookup.
 The [app-server reference](https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md) separates connection removal from referenced-resource deletion.

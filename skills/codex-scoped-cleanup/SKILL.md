@@ -35,7 +35,9 @@ Remove redundant recovery copies without creating another complete backup.
 
 Evaluate each session or worktree independently.
 The parent project's recent activity does not prove that a particular worktree remains in use.
-Use three days of inactivity for requested session cleanup unless the user supplies another window.
+Use three days of inactivity to discover session candidates only when the request relies on inactivity and supplies no window.
+Retire verified completed, unnecessary resources within explicit authority without adding an age delay after completed handback.
+Do not treat recent timestamps alone as proof that a resource remains needed or is eligible for retirement.
 Include session events, compressed rollouts, running descendants, and exact worktree consumers when checking activity.
 Exclude the current session and running work.
 Read the latest request and result before treating an idle session as completed.

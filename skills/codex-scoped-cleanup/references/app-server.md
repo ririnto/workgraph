@@ -11,6 +11,9 @@ Check method registration, parameters, backend support, and effects before mutat
 Schema presence establishes request shape, not preservation, ownership, or deletion effects.
 Reference source from another version does not establish the installed server's exact behavior.
 Preserve resources when the installed effects cannot be verified.
+Discover each object namespace separately because the inspected daemon exposes `project/delete` but no Session namespace.
+Its schema exposes no general writer-release method.
+Do not apply Thread cleanup authority or effects to Project deletion without its own verified contract and explicit authority.
 
 Prefer a supported control proxy when the owning daemon exposes one.
 In the inspected implementation, `codex app-server proxy` forwards raw bytes to the running daemon's control socket.
@@ -52,6 +55,7 @@ Its persisted graph can omit ephemeral children or failed spawn-edge writes.
 Resolve live-child ownership separately because parent removal can also discover in-memory descendants.
 
 Use metadata reads and supported paginated turn and item history to establish completion and continuation requirements.
+An empty turns array in a summary or metadata response does not prove an empty or completed history.
 An idle, unloaded, archived, or old Thread can still contain unfinished work.
 Inventory affected spawned descendants before archive or delete because parent operations can affect their subtree.
 Verify whether the installed descendant listing includes threads without their own user messages.
@@ -102,7 +106,11 @@ Do not assume an error or absent notification means nothing changed.
 Do not replay confirmed successful operations.
 Retry only remaining authorized work after changed evidence, with a bounded exit condition.
 
-For archive, confirm selected identities leave the active inventory and appear in the archived inventory.
+For archive, confirm every affected identity leaves the active inventory and appears in the archived inventory.
+Paginate fresh affected-set listings completely and compare them with the preserved preflight identities.
+The inspected archive implementation can log descendant failures after root success.
+A root-only acknowledgement does not establish subtree completion.
+Reconcile missing descendant outcomes even when the RPC returns success.
 Use `thread/unarchive` only for authorized recovery supported by the installed backend.
 For delete, check exact metadata reads and fresh active and archived inventories for every affected identity.
 Distinguish a verified not-found response from transport, permission, or database failure.
