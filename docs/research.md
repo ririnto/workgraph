@@ -490,6 +490,41 @@ Verify the target's supported combination instead of copying profile versions or
 Register custom rulesets with the consumer's ktlint runtime and prove native lint discovers them.
 Workgraph bundles guidance only and does not install Sinon tooling, consumer rules, plugins, or hooks.
 
+## Codex Native Cleanup
+
+We inspected Local CLI 0.161.0, managed daemon 0.162.1, and the official Codex checkout's named `main` branch.
+The installed versions differ, so we generated experimental schemas from both executables and used the daemon schema for protocol checks.
+The [official app-server guide](https://learn.chatgpt.com/docs/app-server) supplies initialization and version-matched schema guidance.
+The [CLI](https://github.com/openai/codex/blob/main/codex-rs/cli/src/main.rs) selects the control socket for its proxy.
+The [proxy](https://github.com/openai/codex/blob/main/codex-rs/stdio-to-uds/src/lib.rs) forwards bytes without translating protocol framing.
+The [control transport](https://github.com/openai/codex/blob/main/codex-rs/app-server-transport/src/transport/unix_socket.rs) upgrades connections to WebSocket.
+
+Non-mutating daemon checks verified initialization, two active-list pages, two archived-list pages, loaded inventory, attachment listing, and owner lookup.
+We used an installed maintained WebSocket client and an absent synthetic attachment identity for the owner lookup.
+An earlier raw newline-delimited proxy probe timed out because it did not perform the required transport handshake.
+Both clients closed after their checks, and no archive, delete, or attachment mutation ran.
+These bounded reads verify protocol access rather than exhaustive target inventory or cleanup effects.
+
+The [Thread processor](https://github.com/openai/codex/blob/main/codex-rs/app-server/src/request_processors/thread_processor.rs) defines inventory defaults and archive preparation.
+Its relation query removes default source and provider filters only when those fields are omitted.
+The [state query](https://github.com/openai/codex/blob/main/codex-rs/state/src/runtime/threads.rs) includes persisted descendants without user messages.
+Its global listing can omit those rows, so global discovery is not complete owner or descendant coverage.
+The [agent control](https://github.com/openai/codex/blob/main/codex-rs/core/src/agent/control.rs) can omit ephemeral children or failed spawn-edge persistence.
+The Thread manager combines persisted and live descendants, which prevents treating persisted relation pages as universal subtree proof.
+The [delete processor](https://github.com/openai/codex/blob/main/codex-rs/app-server/src/request_processors/thread_delete.rs) prepares the spawn subtree before persistent deletion.
+The [Local delete implementation](https://github.com/openai/codex/blob/main/codex-rs/thread-store/src/local/delete_thread.rs) checks external references and removes persisted data.
+Its multi-thread loop can leave partial file deletion before state rows are removed.
+The [Thread manager](https://github.com/openai/codex/blob/main/codex-rs/core/src/thread_manager.rs) guards live internal workers.
+Preparation can shut down earlier ordinary runtimes before a later descendant rejects removal.
+
+The [attachment processor](https://github.com/openai/codex/blob/main/codex-rs/app-server/src/request_processors/thread_attachments.rs) provides paginated owner lookup.
+The [app-server reference](https://github.com/openai/codex/blob/main/codex-rs/app-server/README.md) separates connection removal from referenced-resource deletion.
+Workgraph uses these sources to require descendant protection, writer checks, exact readback, and partial-effect reconciliation.
+The app's native worktree tool contracts separately describe snapshot preservation and detached restore behavior.
+Conversation archive is not physical worktree archival.
+Reference-source effects do not establish installed-version parity, actual deletion results, Cloud filesystem cleanup, or model adherence.
+The cleanup skill requires installed-effect verification before mutation and never requires production deletion for validation.
+
 ## Go Linting
 
 The official [Go Plugin System documentation](https://golangci-lint.run/docs/plugins/go-plugins/) recommends the Module Plugin System for custom linters.

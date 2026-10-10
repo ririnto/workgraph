@@ -1,11 +1,24 @@
 ---
 name: codex-scoped-cleanup
-description: Use in Codex when retiring sessions, worktrees, recovery copies, caches, or stale Worktree Artifact connections.
+description: Use in Codex when archiving or deleting native threads, or retiring worktrees, recovery copies, caches, and stale connections.
 ---
 
 # Codex Scoped Cleanup
 
 Apply this procedure only in Codex and within the current cleanup authority.
+
+## Authority And Native Lifecycle
+
+Record the selected resources, their owners, permitted operations, preservation requirements, and protected resources before cleanup.
+Treat archive authority, permanent-delete authority, attachment retirement, and physical removal as separate scopes.
+Require explicit human authority for permanent deletion of the exact affected scope.
+Preserve any action-time confirmation required by the selected tool, even when broader cleanup is already authorized.
+Do not infer Project, Session, or Chat deletion support from a Thread method.
+
+Before native inventory or lifecycle changes, read [App-Server Lifecycle](references/app-server.md) unless already loaded completely.
+Use supported lifecycle methods rather than editing authoritative SQLite, rollout files, or raw host state.
+Do not restart shared daemons or terminate unrelated workers to evade ownership guards.
+Keep temporary private identities, paths, payloads, and protocol logs out of published instructions and shared reports.
 
 ## Git Preservation
 
@@ -25,6 +38,10 @@ The parent project's recent activity does not prove that a particular worktree r
 Use three days of inactivity for requested session cleanup unless the user supplies another window.
 Include session events, compressed rollouts, running descendants, and exact worktree consumers when checking activity.
 Exclude the current session and running work.
+Read the latest request and result before treating an idle session as completed.
+Preserve unfinished, blocked, recurring, and explicitly retained work, including its continuation and recovery assets.
+Inspect affected descendants and every resource owner before changing a parent container.
+Stop when scope, descendant coverage, ownership, or preservation remains uncertain.
 Completed, unused Git-backed worktrees and recovery copies need no additional age delay.
 Preserve primary, shared, and pinned checkouts during generic task cleanup.
 
@@ -54,8 +71,11 @@ Do not use the owning Thread's activity as a substitute for worktree-specific ev
 
 ## Acceptance
 
+Read back native lifecycle state separately from attachment state and filesystem state.
 Verify removed connections through a fresh native listing and confirm protected connections remain.
 Check that selected paths and temporary quarantine directories are absent after physical cleanup.
 Remove temporary schemas, payload copies, scripts, logs, and task-owned server processes after verification.
 Report attachment counts separately from physical disk-space changes.
 Use measured volume availability rather than summing directory allocation as reclaimed space.
+Report source checks, read-only protocol checks, actual mutations, and model adherence as distinct evidence.
+Do not require production deletion to validate cleanup instructions.

@@ -15,7 +15,7 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | `skills/writing/SKILL.md` | Agents doing prose or Markdown work | Agents follow concise prose, sentence boundaries, and table rules. |
 | `skills/instruction-authoring/SKILL.md` | Agents designing reusable instructions | Agents follow instruction boundaries, conditional loading, and source validation. |
 | `skills/development/SKILL.md` | Agents doing source or maintained code work | Agents load shared code defaults and only matching language references. |
-| `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify scoped activity, retained Git content, and native Worktree Artifact removal. |
+| `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify native lifecycle authority, scoped activity, retained content, and Worktree Artifact removal. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds graph-specific procedures after Main and invokes native Workflow for explicit requests or graph-suitable work. |
 | Claude Code Workflow tool | Main session | The host runs the selected workflow while enforcing its permissions. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
@@ -41,7 +41,7 @@ Worker model selection stays in the dispatch, without a model-policy reference.
 Each role has separate host references because Main and Worker load at different execution stages.
 
 Both Codex role references link the conditional Codex Scoped Cleanup skill for resource retirement.
-Its native attachment procedure loads only when Worktree Artifact connections require changes.
+Its app-server procedure loads before native inventory or lifecycle changes, and attachment details load when Worktree Artifact connections require changes.
 Claude references contain no cleanup-skill routing, and neither hook injects the conditional cleanup procedure.
 The bundled skill replaces the standalone user-level copy without repeating the common role cleanup contract.
 

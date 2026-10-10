@@ -37,6 +37,15 @@ We used their prompting and effort sections to confirm supported settings and ev
 These references do not replace local model policy or configure the host.
 We reviewed the [Astra](https://developers.openai.com/api/docs/models/gpt-6-astra.md) and [Luna](https://developers.openai.com/api/docs/models/gpt-6-luna.md) model pages, [model selection](https://developers.openai.com/api/docs/guides/model-selection.md), [reasoning](https://developers.openai.com/api/docs/guides/reasoning.md), [deployment checklist](https://developers.openai.com/api/docs/guides/deployment-checklist.md), and [Codex models](https://developers.openai.com/codex/models.md) for effort, pricing, and host starting settings.
 
+## Codex App-Server
+
+We inspected [openai/codex](https://github.com/openai/codex) on its named `main` branch and its installed app-server schemas.
+The repository declares the Apache License 2.0.
+Its lifecycle, inventory, owner guards, attachment APIs, and control transport informed the Codex Scoped Cleanup procedure.
+We also consulted the [official app-server guide](https://learn.chatgpt.com/docs/app-server) for protocol initialization and schema generation.
+Workgraph distributes its own instructions without bundling Codex source or a cleanup client.
+The [research notes](docs/research.md#codex-native-cleanup) distinguish reference-source effects from installed protocol and destructive-operation evidence.
+
 ## Anthropic Guidance
 
 We reviewed the supplied copy of [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5).
