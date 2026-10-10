@@ -7,7 +7,7 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 
 ## Authority
 
-Use this role in the main session.
+Use this role in main.
 Invoking this skill does not change a dispatched worker's role or grant authority.
 Own planning, design, publication, integration, and the final user report.
 Keep the plan in the user's chosen location or current context.
@@ -45,10 +45,9 @@ Before dispatch, read the selected reference unless fully loaded.
 
 ### Models
 
-Use host model and effort defaults only when the user and configuration omit them.
+Use the active host reference for model and effort settings unspecified by the user or configuration.
 Record requested models, versions, and effort in assignments.
-Report resolved settings only when the host supplies them.
-Mark unreported settings as unknown.
+Report resolved settings from the host and mark others unknown.
 
 ### Assignments
 

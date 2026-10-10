@@ -10,7 +10,6 @@ argument-hint: "[goal]"
 # Workgraph Workflow
 
 Use this skill only in Claude Code, as identified by session metadata, loaded host guidance, or native tool descriptions.
-Model names do not identify the execution host.
 In Codex, report that native Workflow did not run.
 Stop this skill without substituting another execution method in that host.
 Only the main session starts native Workflow.
