@@ -5,16 +5,15 @@
 Prefer `timeout: 240000` for foreground Bash commands.
 Set background command timeouts from the required execution duration.
 Consider available `Monitor` for command output or external events that require action.
-For requested fixed loops, prefer `/loop 4m` unless the task needs another interval.
-For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` calls when the task permits.
-Use native Workflow when an assigned or identified in-scope follow-up agent needs another agent's result.
-Use host Agent for independent assignments whose results Main combines.
-A request to orchestrate subagents does not establish result dependencies.
-Do not count a speculative future task as a follow-up agent.
-Treat `/workgraph:workflow` or another explicit Workflow request as the user's tool choice, even for one stage.
+For requested fixed loops, prefer `/loop 4m` unless another interval is needed.
+For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when the task permits.
+Use native Workflow when an in-scope follow-up agent needs another agent's result.
+Use host Agent for independent work Main combines.
+Orchestration requests do not establish result dependencies.
+A speculative future task is not a follow-up agent.
+Treat `/workgraph:workflow` and other explicit Workflow requests as user choices, even for one stage.
 Do not add display-only phases to justify implicit Workflow selection.
-If implicitly selected Workflow is unavailable, report the limitation.
-Use Agent for bounded outcomes only when it can safely meet the task contract.
+If implicit Workflow is unavailable, report it and use Agent only for safely achievable bounded outcomes.
 
 ## Model Selection
 
