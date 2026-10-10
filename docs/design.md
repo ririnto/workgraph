@@ -33,6 +33,13 @@ Consumer skills and their references stay inside this plugin.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating those common rules.
 
+Main and Worker classify communication by the initiating sender rather than a relayed message envelope.
+Agent assignments remain agent-originated when they relay a human request.
+Their messages use English and omit routine narration while preserving required human input, actionable blockers, and mandatory host messages.
+Direct human conversations use the requested language.
+Recursive dispatches carry request origin and communication mode alongside inherited constraints.
+Writing defers to the active role's policy and limits routine state-report guidance to direct human conversations.
+
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
 Main orchestration and model policy use separate Codex and Claude Code references.

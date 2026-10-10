@@ -24,7 +24,14 @@ Use repository-relative paths and portable examples in committed content.
 
 ### Communication
 
-Use English in agent messages and the user's requested language for user-facing content.
+Use English without routine narration in agent-to-agent messages, including assignments, follow-ups, handoffs, results, and blockers.
+Use the user's requested language in direct human conversations.
+
+Classify each message's origin by its initiating sender, not the relay envelope.
+Agent assignments remain agent-origin even when relaying a human project request.
+Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
+
+Preserve required human input, report actionable blockers, and send mandatory host messages.
 For prose or Markdown work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
 For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) unless its complete content is already loaded.
 
