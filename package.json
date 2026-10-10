@@ -6,6 +6,8 @@
     "check": "run-p check:*",
     "check:hooks": "node --test hooks/inject-context.test.mjs",
     "check:markdownlint-cli2": "markdownlint-cli2",
+    "check:plugin-version": "node scripts/check-plugin-version.mjs",
+    "check:validation-tests": "node --test scripts/validation.test.mjs",
     "check:ultracite": "ultracite check",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
@@ -14,6 +16,7 @@
   "devDependencies": {
     "markdownlint": "^0.41.1",
     "markdownlint-cli2": "^0.23.3",
+    "markdownlint-rule-relative-links": "^5.1.2",
     "npm-run-all2": "^9.0.3",
     "oxfmt": "^0.71.0",
     "oxlint": "^1.86.0",

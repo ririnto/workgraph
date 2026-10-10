@@ -1,5 +1,14 @@
 version: 2
 updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - actions/checkout
+          - actions/setup-node
   - package-ecosystem: npm
     directory: "/"
     schedule:
@@ -14,6 +23,7 @@ updates:
         patterns:
           - markdownlint
           - markdownlint-cli2
+          - markdownlint-rule-relative-links
     ignore:
       # 0.x minor updates need a reviewed manifest and lockfile change, so
       # Dependabot stays inside the chosen 0.x minor and proposes patches only.

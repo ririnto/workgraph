@@ -79,7 +79,9 @@ Select the narrowest applicable read-only gate.
 
 - Use `npm run check:markdownlint-cli2` for prose-only changes.
 - Use `npm run check:hooks` for changes confined to hook execution.
-- Use `npm run check` for mixed changes or repository-wide validation of Markdown, ultracite, and Node hook tests.
+- Use `npm run check:plugin-version` for host manifest version checks.
+- Use `npm run check:validation-tests` for document and version gate tests.
+- Use `npm run check` for mixed changes or repository-wide validation of Markdown, Ultracite, hooks, and document/version gates.
 
 After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
 For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.

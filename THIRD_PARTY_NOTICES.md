@@ -5,6 +5,11 @@ It does not redistribute their source files verbatim.
 The [research notes](docs/research.md) record source evidence, reviewed sections, and limits.
 This document records attribution and prior sources.
 
+## Markdown Link Validation
+
+Workgraph uses [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) under the MIT license.
+The package credits Théo LUDWIG as its author and copyright holder.
+
 ## Superpowers
 
 We studied [obra/superpowers](https://github.com/obra/superpowers) on its `main` branch.

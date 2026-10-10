@@ -233,6 +233,18 @@ They establish the source and delivery contract without exercising Claude Code's
 Plugin validation checks configuration rather than model behavior.
 Use the validation commands and prose review requirements in [AGENTS.md](../AGENTS.md#validation).
 
+The Markdown gate checks relative file links and heading fragments with a maintained markdownlint rule.
+It explicitly includes `.github/ISSUE_TEMPLATE/*.md` and validates nonempty string `name` and `about` frontmatter fields.
+The template rule uses markdownlint-cli2's public YAML parser instead of another parser dependency.
+The version gate resolves both manifests from its module location and checks format, calendar dates, sequence, and parity.
+Validation tests exercise valid and invalid metadata, file links, and release versions.
+
+CI runs full development checks on Linux with the package's Node engine range.
+Separate macOS and Node.js 18 jobs run dependency-free hook tests without installing development tools.
+Those jobs verify runtime compatibility rather than support for the development dependencies on Node.js 18.
+Pull requests and main updates trigger the workflow without path filters, and its token receives read-only contents permission.
+Dependabot checks npm dependencies and GitHub Actions weekly.
+
 Behavioral evaluation requires a host run with the changed plugin loaded.
 Relevant cases include an idle background command, a completion callback, and an English handoff during a non-English user conversation.
 Record which model, host, and loaded plugin produced the result.

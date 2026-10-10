@@ -238,6 +238,9 @@ npm ci
 
 Follow [AGENTS.md](AGENTS.md) for contributor conventions and validation commands.
 It identifies the checks for prose, hook execution, and plugin configuration changes.
+The Markdown gate checks relative links and required issue-template metadata, including templates inside `.github`.
+The aggregate gate also validates matching release versions and runs positive and negative validation tests.
+CI runs the aggregate gate on Linux and dependency-free hook tests on macOS and Node.js 18.
 Read [the design](docs/design.md) for delivery mechanics, instruction ownership, and test coverage.
 Read [the research notes](docs/research.md) for source evidence and its limits.
 [Third-party notices](THIRD_PARTY_NOTICES.md) record attribution.
