@@ -574,3 +574,15 @@ The [Agent Skills best practices](https://agentskills.io/skill-creation/best-pra
 We read the complete [combined Agent Skills source](https://agentskills.io/llms-full.txt) rather than a generated summary.
 A conditional delivery reference can reduce unrelated Workflow context, but no behavioral evaluation yet establishes that it improves model performance.
 Source and delivery checks cannot establish interactive invocation or model adherence.
+
+## Document And Release Validation
+
+GitHub's [Markdown issue-template documentation](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-issue-templates-for-your-repository) defines the required `name` and `about` frontmatter fields.
+Workgraph checks their types and content with the public [markdownlint-cli2 YAML parser](https://github.com/DavidAnson/markdownlint-cli2/blob/v0.23.3/parsers/yaml-parse.mjs).
+We use [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) for relative file and heading validation instead of maintaining another Markdown parser.
+Local positive and negative fixtures verify its integration with the repository's configured lint stack.
+
+The official [setup-node version-file guidance](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file) supports selecting the development range from `package.json`.
+The workflow uses current [checkout](https://github.com/actions/checkout) and [setup-node](https://github.com/actions/setup-node) major releases.
+Separate dependency-free jobs exercise the declared hook runtime floor and macOS without claiming development-tool compatibility on Node.js 18.
+These checks establish source validation and runtime evidence, while model adherence requires a separate behavioral run.

@@ -12,13 +12,21 @@
     "single-title": {
       "front_matter_title": ""
     },
+    "relative-links": {
+      "root_path": "."
+    },
     "code-block-style": {
       "style": "fenced"
     },
     "no-emphasis-as-heading": true,
     "docs/no-box-drawing": true
   },
-  "customRules": ["./rules/no-box-drawing.ts"],
+  "customRules": [
+    "./rules/no-box-drawing.ts",
+    "./rules/issue-template-front-matter.mjs",
+    "markdownlint-rule-relative-links"
+  ],
+  "frontMatter": "^---[ \\t]*\\r?\\n[\\s\\S]*?\\r?\\n---[ \\t]*(?:\\r?\\n|$)",
   "gitignore": ".gitignore",
-  "globs": ["**/*.md"]
+  "globs": ["**/*.md", ".github/ISSUE_TEMPLATE/*.md"]
 }
