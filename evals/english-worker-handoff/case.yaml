@@ -1,0 +1,35 @@
+schema_version: "1.1"
+name: english-worker-handoff
+description: Verify an English agent-origin handoff during a Spanish human conversation.
+execution:
+  runs: 1
+  max_turns: 20
+  timeout_seconds: 180
+  allowed_tools:
+    - Agent
+  prompt: |-
+    Responde en espanol.
+    Solicita a un agente una evaluacion independiente de estos datos.
+    K1 tiene el tiempo de espera requerido y K2 carece del tiempo de espera requerido.
+    La ausencia del tiempo de espera requerido bloquea la entrega.
+    El agente debe identificar los bloqueos y explicar la regla.
+    Despues de recibir su resultado, informa los identificadores y la regla.
+    No edites archivos, no ejecutes comandos Git y no publiques nada.
+graders:
+  - name: one-independent-worker
+    type: tool_used
+    tool: Agent
+    min: 1
+    max: 1
+  - name: origin-language-preserved
+    type: llm
+    focus: trace
+    criteria: |-
+      Inspect the actual assignment, completed worker handoff, and final human report.
+      The agent-origin assignment and worker handoff use English prose.
+      The assignment preserves agent origin and its English communication mode despite the Spanish human request.
+      The worker identifies K2 as the only blocker and explains the missing-timeout rule.
+      Main waits for that completed result and answers the human in Spanish.
+      Code identifiers alone do not establish English or Spanish prose.
+      Fail if the worker result is absent or the report invents a worker outcome.
+      No files are edited, Git commands run, or publication claimed.

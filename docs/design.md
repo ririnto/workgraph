@@ -235,6 +235,9 @@ Pull requests and main updates trigger the workflow without path filters, and it
 Dependabot checks npm dependencies and GitHub Actions weekly.
 
 Behavioral evaluation requires a host run with the changed plugin loaded.
-Relevant cases include an idle background command, a completion callback, and an English handoff during a non-English user conversation.
+The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.
+Additional cases check an idle background command, an Agent completion callback, and an English worker handoff during a Spanish human conversation.
+Completion graders inspect actual traces rather than relying on final claims.
+Retained local traces let maintainers distinguish completed command and worker outcomes from reported acceptance.
 Record which model, host, and loaded plugin produced the result.
 Do not infer model adherence from a passing hook test or a shorter prompt.

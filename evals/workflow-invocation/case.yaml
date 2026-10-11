@@ -21,6 +21,7 @@ graders:
     min: 1
   - name: workflow-completed
     type: llm
+    focus: trace
     criteria: |-
       The session receives a completed native Workflow result with worker outcomes.
       One worker computes the sum and a dependent worker checks it.
