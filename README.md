@@ -191,6 +191,11 @@ Install the pinned development tools.
 npm ci
 ```
 
+The development manifest overrides markdownlint-cli2's pinned smol-toml with a patched release in the same major version.
+Remove that scoped override when markdownlint-cli2 supports the patched parser directly.
+The remaining braces and KaTeX advisories await supported upstream fixes in [Issue #78](https://github.com/ririnto/workgraph/issues/78) and [Issue #79](https://github.com/ririnto/workgraph/issues/79).
+These development dependencies are not required by the hook runtime.
+
 Follow [AGENTS.md](AGENTS.md) for contributor conventions and validation commands.
 It identifies the checks for prose, hook execution, and plugin configuration changes.
 The Markdown gate checks relative links.
