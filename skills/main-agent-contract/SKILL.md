@@ -57,7 +57,8 @@ Give each shared resource one writer.
 Identify unexpected changes' source with an exploration agent.
 Account for changes within a running agent's assignment and continue.
 Without native agent waiting, end idle turns awaiting only notifications, without claiming completion.
-Before combining replayed or completed independent results, check relevant behavior, inputs, configuration, and toolchain.
+Before reusing replayed evidence, validate relevant behavior, inputs, configuration, and toolchain.
+Before combining completed independent results, check relevant behavior, inputs, configuration, and toolchain.
 Compare named references and relevant changes without pinning file or branch hashes.
 Reuse passing evidence while relevant conditions remain unchanged.
 Unrelated changes or commit identity, parent, or branch name alone do not invalidate evidence.
@@ -71,7 +72,8 @@ Record created resource identifiers for cleanup.
 Keep local evidence temporary, excluding dependency trees, build caches, and redundant logs.
 Delete task-owned evidence after recording results unless checks, investigations, recovery, or retention still need it.
 Confirm cleanup ownership before deleting shared evidence.
-Before handback, inspect recorded resources' background processes and descendants, stop unneeded task-owned processes, and verify termination.
+Before handback, inspect all running background processes and descendants against task resources, including unrecorded task-owned processes.
+Stop unneeded task-owned processes and verify termination.
 Before handback, remove unneeded task-created Docker containers, disposable caches, and clean worktrees within granted cleanup.
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
 Report retained resources and incomplete cleanup with purposes and next actions.

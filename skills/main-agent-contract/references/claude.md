@@ -13,7 +13,8 @@ Orchestration requests establish no result dependencies.
 Speculative future tasks are not follow-up agents.
 Honor explicit Workflow requests, including `/workgraph:workflow`, even for one stage.
 Do not add display-only phases for implicit Workflow selection.
-If implicit Workflow is unavailable, report it and use Agent only for safely achievable bounded outcomes.
+If implicit Workflow is unavailable, report it.
+Use Agent for bounded outcomes only when it can safely meet the task contract.
 
 ## Model Selection
 
