@@ -16,6 +16,7 @@ Check references and the consuming tool when renaming a file.
 
 ## Issues
 
+Follow [the security policy](SECURITY.md) when reporting suspected vulnerabilities.
 Use the [bug report form](.github/ISSUE_TEMPLATE/bug_report.yaml) for reproducible defects.
 Use the [improvement request form](.github/ISSUE_TEMPLATE/improvement.yaml) for documentation changes, new requirements, and follow-up work.
 Complete the template sections when creating issues through an API or CLI.
