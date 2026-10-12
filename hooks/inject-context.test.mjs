@@ -41,6 +41,15 @@ const copyPlugin = (t) => {
   t.after(() => rmSync(root, { force: true, recursive: true }));
   mkdirSync(path.join(root, "hooks"));
   copyFileSync(script, path.join(root, "hooks", "inject-context.mjs"));
+  copyFileSync(
+    new URL("codex-hooks.json", import.meta.url),
+    path.join(root, "hooks", "codex-hooks.json")
+  );
+  cpSync(
+    new URL("../.codex-plugin/", import.meta.url),
+    path.join(root, ".codex-plugin"),
+    { recursive: true }
+  );
   cpSync(skills, path.join(root, "skills"), { recursive: true });
   return root;
 };
@@ -354,9 +363,20 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
 
 test("configured Codex hooks load complete relocated skill files without a context limit", (t) => {
   const root = copyPlugin(t);
-  const config = JSON.parse(
-    readFileSync(new URL("codex-hooks.json", import.meta.url), "utf-8")
+  const descriptor = JSON.parse(
+    readFileSync(path.join(root, ".codex-plugin", "plugin.json"), "utf-8")
   );
+  const selectedSkills = path.resolve(root, descriptor.skills);
+  const selectedHooks = path.resolve(root, descriptor.hooks);
+  assert.equal(
+    realpathSync(selectedSkills),
+    realpathSync(path.join(root, "skills"))
+  );
+  assert.equal(
+    realpathSync(selectedHooks),
+    realpathSync(path.join(root, "hooks", "codex-hooks.json"))
+  );
+  const config = JSON.parse(readFileSync(selectedHooks, "utf-8"));
   assert.deepEqual(
     new Set(Object.keys(config.hooks)),
     new Set(["SessionStart", "SubagentStart"])
@@ -382,7 +402,7 @@ test("configured Codex hooks load complete relocated skill files without a conte
     assert.equal(result.stderr, "");
     assert.deepEqual(
       JSON.parse(result.stdout),
-      expectedOutput(event, "codex", path.join(root, "skills"))
+      expectedOutput(event, "codex", selectedSkills)
     );
   }
 });
