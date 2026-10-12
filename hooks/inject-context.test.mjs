@@ -23,6 +23,7 @@ const roles = [
   ["SubagentStart", "subagent-context"]
 ];
 const hosts = ["claude", "codex"];
+const hookTimeoutMilliseconds = 5000;
 
 /**
  * Run the hook with the current Node and capture its result.
@@ -30,7 +31,22 @@ const hosts = ["claude", "codex"];
 const runHook = (args, scriptPath = script, cwd = tmpdir()) =>
   spawnSync(process.execPath, [scriptPath, ...args], {
     cwd,
-    encoding: "utf-8"
+    encoding: "utf-8",
+    killSignal: "SIGKILL",
+    timeout: hookTimeoutMilliseconds
+  });
+
+/**
+ * Replace the test shell so timeout termination reaches the hook process.
+ */
+const runConfiguredHook = (command, env) =>
+  spawnSync(`exec ${command}`, {
+    cwd: tmpdir(),
+    encoding: "utf-8",
+    env: { ...process.env, ...env },
+    killSignal: "SIGKILL",
+    shell: true,
+    timeout: hookTimeoutMilliseconds
   });
 
 /**
@@ -271,11 +287,8 @@ test("configured Claude hooks load relocated skills and references with LF or CR
           )
         );
       }
-      const result = spawnSync(hook.command, {
-        cwd: tmpdir(),
-        encoding: "utf-8",
-        env: { ...process.env, CLAUDE_PLUGIN_ROOT: root },
-        shell: true
+      const result = runConfiguredHook(hook.command, {
+        CLAUDE_PLUGIN_ROOT: root
       });
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
@@ -392,11 +405,8 @@ test("configured Codex hooks load complete relocated skill files without a conte
     assert.equal(hook.timeout, 5);
     assert.equal(hook.additionalContextLimit, 0);
     assert.ok(hook.command.endsWith(`${event} codex`));
-    const result = spawnSync(hook.command, {
-      cwd: tmpdir(),
-      encoding: "utf-8",
-      env: { ...process.env, PLUGIN_ROOT: root },
-      shell: true
+    const result = runConfiguredHook(hook.command, {
+      PLUGIN_ROOT: root
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stderr, "");
@@ -404,6 +414,31 @@ test("configured Codex hooks load complete relocated skill files without a conte
       JSON.parse(result.stdout),
       expectedOutput(event, "codex", selectedSkills)
     );
+  }
+});
+
+test("hook test runners terminate children that keep active handles", (t) => {
+  const root = copyPlugin(t);
+  const scriptPath = path.join(root, "hooks", "inject-context.mjs");
+  writeFileSync(
+    scriptPath,
+    'process.stdout.write("active handle started\\n");\nsetInterval(() => {}, 1000);\n'
+  );
+  const config = JSON.parse(
+    readFileSync(path.join(root, "hooks", "codex-hooks.json"), "utf-8")
+  );
+  const [entry] = config.hooks.SessionStart;
+  const [hook] = entry.hooks;
+  const { command } = hook;
+  for (const result of [
+    runHook(["SessionStart", "codex"], scriptPath),
+    runConfiguredHook(command, { PLUGIN_ROOT: root })
+  ]) {
+    assert.equal(result.error?.code, "ETIMEDOUT");
+    assert.equal(result.status, null);
+    assert.equal(result.signal, "SIGKILL");
+    assert.match(result.stdout, /active handle started/u);
+    assert.throws(() => process.kill(result.pid, 0), { code: "ESRCH" });
   }
 });
 
