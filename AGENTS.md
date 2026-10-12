@@ -75,6 +75,7 @@ Use block sequences except for an explicit empty sequence.
 
 ## Validation
 
+Keep development validation gates in `test/validation/` and their Node tests in `test/`.
 Select the narrowest applicable read-only gate.
 
 - Use `npm run check:markdownlint-cli2` for prose-only changes.

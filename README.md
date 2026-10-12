@@ -198,6 +198,7 @@ These development dependencies are not required by the hook runtime.
 
 Follow [AGENTS.md](AGENTS.md) for contributor conventions and validation commands.
 It identifies the checks for prose, hook execution, and plugin configuration changes.
+Development validation gates live in `test/validation/`, with their Node tests in `test/validation.test.mjs`.
 The Markdown gate checks relative links.
 The issue-form gate validates the YAML fields used by templates inside `.github`.
 The aggregate gate also validates matching release versions and runs positive and negative validation tests.
