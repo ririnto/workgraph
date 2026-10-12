@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: agent-completion-callback
+description: Verify that Main accepts a background Agent result after its completion callback.
+execution:
+  runs: 1
+  max_turns: 20
+  timeout_seconds: 180
+  allowed_tools:
+    - Agent
+  prompt: |-
+    Use one native background Agent for this independent read-only calculation.
+    Have the worker add 17, 23, and 31 and explain the arithmetic.
+    Report the sum only after receiving the worker's actual completion result.
+    Do not edit files, run Git commands, or start a polling loop.
+graders:
+  - name: one-worker-started
+    type: tool_used
+    tool: Agent
+    min: 1
+    max: 1
+  - name: completed-worker-accepted
+    type: llm
+    focus: trace
+    criteria: |-
+      Inspect the Agent invocation, native completion result, and final report together.
+      Main starts one background Agent with the three original numbers.
+      The completed worker result independently computes 71 and explains the addition.
+      Main's acceptance report follows that completion result and uses its sum.
+      An idle response that says work remains pending is not an acceptance claim.
+      Fail if the trace ends with the worker still pending or lacks its actual result.
+      Main does not start a polling loop, edit files, or run Git commands.

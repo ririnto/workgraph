@@ -202,6 +202,16 @@ The Markdown gate checks relative links.
 The issue-form gate validates the YAML fields used by templates inside `.github`.
 The aggregate gate also validates matching release versions and runs positive and negative validation tests.
 CI runs the aggregate gate on Linux and dependency-free hook tests on macOS and Node.js 18.
+The native behavioral suite requires Claude Code with Agent, Workflow, and Bash available.
+Run it from a trusted checkout and retain local traces until their actual completion results have been inspected.
+Put the resolved Node binary directory on `PATH` so each isolated run can execute Node without a home-dependent version-manager shim.
+
+```sh
+PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --runs 1 --ablation none --allow-tools Agent Workflow Bash --keep-temp --no-publish --output-dir ../workgraph-eval-results
+```
+
+Remove task-owned reports and retained evaluation sandboxes after recording the results when they are no longer needed.
+These runs establish bounded host and model behavior rather than universal model adherence.
 Read [the design](docs/design.md) for delivery mechanics, instruction ownership, and test coverage.
 Read [the research notes](docs/research.md) for source evidence and its limits.
 [Third-party notices](THIRD_PARTY_NOTICES.md) record attribution.
