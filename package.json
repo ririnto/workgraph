@@ -5,10 +5,10 @@
   "scripts": {
     "check": "run-p check:*",
     "check:hooks": "node --test hooks/inject-context.test.mjs",
-    "check:issue-forms": "node scripts/check-issue-forms.mjs",
+    "check:issue-forms": "node test/validation/issue-forms.mjs",
     "check:markdownlint-cli2": "markdownlint-cli2",
-    "check:plugin-version": "node scripts/check-plugin-version.mjs",
-    "check:validation-tests": "node --test scripts/validation.test.mjs",
+    "check:plugin-version": "node test/validation/plugin-version.mjs",
+    "check:validation-tests": "node --test test/validation.test.mjs",
     "check:ultracite": "ultracite check",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",

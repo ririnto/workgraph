@@ -1,6 +1,6 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 import yamlParser from "markdownlint-cli2/parsers/yaml";
 
@@ -148,7 +148,7 @@ export const validateIssueForms = (forms) => {
 };
 
 const run = () => {
-  const root = fileURLToPath(new URL("../", import.meta.url));
+  const root = fileURLToPath(new URL("../../", import.meta.url));
   const directory = path.join(root, ".github/ISSUE_TEMPLATE");
   const files = readdirSync(directory, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".yaml"))
@@ -174,7 +174,8 @@ const run = () => {
 
 if (
   process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
+  existsSync(process.argv[1]) &&
+  realpathSync(import.meta.filename) === realpathSync(process.argv[1])
 ) {
   run();
 }

@@ -1,6 +1,6 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 
 const versionPattern =
   /^(?<year>\d{4})\.(?<month>\d{2})\.(?<day>\d{2})\.(?<sequence>\d{2})$/u;
@@ -49,7 +49,7 @@ export const validatePluginVersions = (claudeVersion, codexVersion) => {
 };
 
 const run = () => {
-  const root = fileURLToPath(new URL("../", import.meta.url));
+  const root = fileURLToPath(new URL("../../", import.meta.url));
   const claude = JSON.parse(
     readFileSync(path.join(root, ".claude-plugin/plugin.json"), "utf-8")
   );
@@ -64,7 +64,8 @@ const run = () => {
 
 if (
   process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
+  existsSync(process.argv[1]) &&
+  realpathSync(import.meta.filename) === realpathSync(process.argv[1])
 ) {
   try {
     run();

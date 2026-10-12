@@ -1,14 +1,17 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdtempSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync
 } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 
 import yamlParser from "markdownlint-cli2/parsers/yaml";
 import relativeLinksRule, {
@@ -19,8 +22,8 @@ import { lint } from "markdownlint/promise";
 import {
   validateIssueFormContent,
   validateIssueForms
-} from "./check-issue-forms.mjs";
-import { validatePluginVersions } from "./check-plugin-version.mjs";
+} from "./validation/issue-forms.mjs";
+import { validatePluginVersions } from "./validation/plugin-version.mjs";
 
 const repositoryRoot = new URL("../", import.meta.url);
 const validIssueForm = `name: Bug report
@@ -289,4 +292,33 @@ test("plugin version validation rejects invalid format, date, sequence, and pari
     () => validatePluginVersions("2026.10.10.01", "2026.10.10.02"),
     /must match/u
   );
+});
+
+test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {
+  const root = mkdtempSync(path.join(tmpdir(), "workgraph-entrypoints-"));
+  t.after(() => rmSync(root, { force: true, recursive: true }));
+  for (const [filename, output] of [
+    ["issue-forms.mjs", "Validated 2 GitHub issue forms.\n"],
+    [
+      "plugin-version.mjs",
+      "Host plugin versions match the yyyy.mm.dd.seq format.\n"
+    ]
+  ]) {
+    const source = fileURLToPath(
+      new URL(`validation/${filename}`, import.meta.url)
+    );
+    const alias = path.join(root, filename);
+    symlinkSync(source, alias, "file");
+    for (const entrypoint of [source, alias]) {
+      const result = spawnSync(process.execPath, [entrypoint], {
+        cwd: root,
+        encoding: "utf-8",
+        killSignal: "SIGKILL",
+        timeout: 5000
+      });
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(result.stderr, "");
+      assert.equal(result.stdout, output);
+    }
+  }
 });
