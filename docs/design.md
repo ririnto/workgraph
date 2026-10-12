@@ -63,7 +63,7 @@ The [host comparison](research.md#host-instruction-comparison) records the revie
 
 ## Deliver Context
 
-Claude Code selects `hooks/hooks.json` through its plugin descriptor and locates the injector through `CLAUDE_PLUGIN_ROOT`.
+Claude Code loads `hooks/hooks.json` from the default plugin location and locates the injector through `CLAUDE_PLUGIN_ROOT`.
 Codex selects `hooks/codex-hooks.json` through `.codex-plugin/plugin.json` and uses `PLUGIN_ROOT`.
 Codex commands set `additionalContextLimit: 0` to keep complete context inline rather than spilling it to a recovery file.
 Both hosts run the same Node injector with an explicit host argument.
@@ -212,6 +212,7 @@ Keep one injector and one configuration per host, without runtime host detection
 It checks exact role content, loaded source paths, host reference selection, and exclusion of unrelated files.
 It covers invalid arguments, role and reference file errors, invalid frontmatter, and empty selected content.
 It executes the registered shell commands from a path with spaces and an unrelated working directory.
+The Codex command test selects its hook configuration and skills directory through the relocated host descriptor.
 It checks Claude's inline limit with complete instructions, long plugin paths, and LF or CRLF line endings.
 Each test removes its disposable plugin copies.
 
