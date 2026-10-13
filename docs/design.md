@@ -178,8 +178,9 @@ That relay carries no Workflow launch authority.
 The dispatched agent should complete the assigned task within its authority instead of launching another Workflow or returning it unworked.
 
 Each role owns evidence freshness and replay validation within its scope.
-The native tool supplies Workflow syntax, resume behavior, notifications, and waiting.
-Workgraph does not repeat those mechanics in its skills.
+The native tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
+The bundled Workflow authoring reference adds graph mapping, result acceptance, early-stop detection, and cache-preserving recovery.
+Role contracts link that procedure without duplicating its script mechanics.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.
 
 Codex uses available native delegation tools for independent and dependent assignments.

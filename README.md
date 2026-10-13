@@ -27,7 +27,7 @@ claude --plugin-dir ./
 
 Use `/hooks` to confirm that the SessionStart and SubagentStart handlers are active.
 An installed marketplace copy and a development checkout can contain different versions.
-Check the loaded plugin before evaluating changed instructions.
+Check the loaded plugin version and actual source paths before evaluating changed instructions.
 
 For Codex, install or enable the repository through a host that supports native plugin lifecycle hooks.
 Codex selects `.codex-plugin/plugin.json`, which declares `hooks/codex-hooks.json` and the shared skills directory.
@@ -84,7 +84,7 @@ The [Workflow skill](skills/workflow/SKILL.md) owns graph preparation, execution
 Codex uses native delegation under its [Main host reference](skills/main-agent-contract/references/codex.md), without native Claude Code Workflow.
 
 The active Main host reference supplies defaults for each model or effort setting unspecified by the user or configuration.
-Assignments distinguish requested settings from host-reported resolved settings.
+Main applies its [model and effort policy](skills/main-agent-contract/SKILL.md#models) to authorized delegations, including native Workflow calls.
 Each Main hook loads only its host's execution, orchestration, and model guidance.
 Worker hooks load their own execution references without Main orchestration or model policy.
 Forked workers can inherit Main's host guidance through parent history.
@@ -105,6 +105,10 @@ In Claude Code, request a goal through the Workflow entry point without prescrib
 Build dependencies from actual results or conditions, not progress-phase labels.
 Pass predecessor results to successors, run ready independent outcomes in parallel, and serialize conflicting writes.
 Keep planning, design decisions, publication, and integration in Main.
+Native Workflow runs a JavaScript script, not Main's abstract graph.
+Use the native `script` input first, then its returned `scriptPath` for an authorized continuation.
+Pass structured `args` and `resumeFromRunId` only as the current tool supports them.
+Read [Workflow script authoring](skills/workflow/references/authoring.md) before authoring or resuming a script.
 
 Follow [Delivery](skills/delivery/SKILL.md) for branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
 Selecting a base branch does not grant publication, integration, or cleanup authority.
@@ -255,7 +259,9 @@ For an installed Claude marketplace copy, update the plugin after publication.
 claude plugin update workgraph@workgraph
 ```
 
-Run `/reload-plugins` or start a new session to load the downloaded version.
+Run `/reload-plugins` to make downloaded files available to new plugin loads, or start a new session.
+Reloading does not prove that previously injected instructions were replaced in the current context.
+Use a fresh session and confirm its plugin version and source paths when evaluating changed instructions.
 Local development directories load current files on reload or session startup without requiring a version change.
 See the [Claude loading reference](https://code.claude.com/docs/en/plugins/loading#versions-and-updates) for cache and update behavior.
 For Codex, use the host's plugin update controls and start a new session after updating.

@@ -45,25 +45,26 @@ Before dispatch, read the selected reference unless fully loaded.
 
 ### Models
 
-Use the active host reference for model and effort settings unspecified by the user or configuration.
-Record requested models, versions, and effort in assignments.
-Report resolved settings from the host and mark others unknown.
+Honor each user or configuration setting, and choose remaining defaults from the active host reference.
+Set model and effort for generic agents without pinned settings.
+If the selected agent definition pins either, pass neither option.
+Record requested settings and report resolved values only when the host exposes them.
 
 ### Assignments
 
 Specify inputs, ownership, authority, outputs, acceptance evidence, and cleanup, passing user constraints recursively through assignments and follow-ups.
 Before delegating Git writes, specify operations, refs, ownership limits, and pre-action checks.
 Give each shared resource one writer.
+Give each outcome one owner and execution path.
 Identify unexpected changes' source with an exploration agent.
 Account for changes within a running agent's assignment and continue.
 Without native agent waiting, end idle turns awaiting only notifications, without claiming completion.
-Before reusing replayed evidence, validate relevant behavior, inputs, configuration, and toolchain.
-Before combining completed independent results, check relevant behavior, inputs, configuration, and toolchain.
+Before reusing or combining evidence, validate relevant behavior, inputs, configuration, and toolchain.
 Compare named references and relevant changes without pinning file or branch hashes.
 Reuse passing evidence while relevant conditions remain unchanged.
 Unrelated changes or commit identity, parent, or branch name alone do not invalidate evidence.
 Rerun affected checks only after relevant changes, failures, or unresolved concerns.
-Check partial effects before retrying interrupted writes.
+Check attempt status and partial effects before Main retries, reassigns, or stops.
 Bound retries by changed evidence, progress signals, and an exit condition.
 
 ### Cleanup
@@ -84,6 +85,7 @@ Use a task graph when dependencies make coordination useful.
 Record each bounded node's operation, prerequisites, inputs, outputs, owner, authority, and completion evidence in the plan.
 Connect nodes only when a result or condition gates a successor.
 Send successors required conclusions and completion evidence.
+Treat null, missing, or unsupported evidence as incomplete rather than successful.
 Join branches only when successors need their results.
 Keep valid results after requirement changes and continue unaffected tasks after failures.
 Use Mermaid or LaTeX when it clarifies dependencies or readiness.

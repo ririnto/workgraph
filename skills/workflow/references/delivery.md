@@ -1,15 +1,31 @@
 # Authorized Engineering Delivery Nodes
 
-Use each row only when the goal's scope and authority include that operation.
+Use only nodes allowed by the goal's scope and authority.
 
-| Node | Required inputs | Result |
-| --- | --- | --- |
-| Implementation | Bounded scope, owned files, agreed behavior | Changes and implementation evidence |
-| Verification | Changed behavior, relevant existing checks | Check commands, observed results, and evidence limits |
-| Environment scan | Current diff and changed files | File locations and exposure types, or no findings |
-| Publication in Main | Accepted changes, required checks, environment scan result, working branch, base branch | Published branch and PR/MR |
-| Independent review | Maintainer PR/MR or contributor working-branch changes, acceptance criteria | Findings with source evidence |
-| Blocker fix | Confirmed finding, affected files, same branch, PR/MR if one exists | Fix and verification evidence |
-| Scoped review | Earlier finding, affected changes, same branch, PR/MR if one exists | Reassessment with source evidence |
-| Deferral registration | Accepted nonblocking finding, authorized tracker | Follow-up record |
-| Integration in Main | Passing checks, resolved blockers, registered follow-ups | Base branch update and verification |
+| Node | Owner and authority | Required inputs | Result and completion evidence |
+| --- | --- | --- | --- |
+| Implementation | Main or one named Worker writes only assigned files within granted authority. | Bounded scope, accepted behavior, prerequisite results, and owned paths. | Changes, relevant checks, and material limitations. |
+| Verification | Main or one named Worker runs authorized read-only checks. | Changed behavior, expected results, and applicable existing checks. | Exact commands, outcomes, coverage, and evidence limits. |
+| Environment scan | Main assigns one read-only Explorer to inspect the current diff. | Current changed files and publication destination. | File locations and exposure types, or a clear no-findings result. |
+| Publication in Main | Main publishes only to the user-authorized destination. | Accepted changes, required checks, environment scan, working branch, and base branch. | Published branch and PR/MR URL. |
+| Independent review | A separate reviewer inspects the maintainer's PR/MR or contributor's complete branch. | Current changes, acceptance criteria, and required checks. | Findings with source evidence, or a clear no-findings result. |
+| Blocker fix | The same branch owner changes only confirmed affected scope. | Confirmed blocker, affected files, and existing PR/MR when available. | Fix with relevant verification evidence. |
+| Scoped review | The earlier reviewer reassesses affected changes. | Prior finding, updated files, and current PR/MR when available. | Reassessment with source evidence. |
+| Deferral registration | Main uses the authorized long-term tracker. | Accepted nonblocking finding and verified tracker access. | Follow-up record with evidence, scope, acceptance, owner, and next action. |
+| Integration in Main | Main integrates only after all required gates pass. | Passing checks, resolved blockers, registered deferrals, and authorized base branch. | Base branch update and post-integration verification. |
+
+## Readiness And Transitions
+
+Before starting a node, confirm its accepted inputs, owner, authority, tools, paths, and branch.
+Confirm that required predecessor nodes ended and no conflicting writer owns the same resource.
+Connect nodes only when a predecessor result or condition gates its successor.
+Start ready independent nodes in parallel and serialize conflicting writes.
+Join branches only when a later node requires their combined results.
+
+Main owns node status and decides whether to retry, reassign, or stop after a failure.
+Before retrying, confirm the previous attempt ended and inspect partial effects.
+Retry only after a changed input, new evidence, or a recovery action justifies another attempt.
+Stop when the finite retry bound or exit condition is reached.
+
+Integrate after required checks pass, confirmed blockers are resolved, and accepted deferrals are registered.
+Verify the authorized base branch update before reporting completion.

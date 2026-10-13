@@ -18,6 +18,7 @@ Select each model family's supported ID from the active host's catalog.
 Use `luna` for clear tasks, including development, review, document analysis, and multistep agentic work.
 Use `sol` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `astra` only at the user's explicit request.
+Follow [Main's model policy](../SKILL.md#models) when assigning settings.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
