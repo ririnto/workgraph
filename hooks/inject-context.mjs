@@ -65,12 +65,12 @@ const skill = readInstruction(`${role}/SKILL.md`, true);
 const reference = readInstruction(`${role}/references/${host}.md`, false);
 const skillContext =
   host === "claude"
-    ? `Workgraph instructions loaded from ${skill.source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body.trimStart()}`
+    ? `Workgraph source paths are relative to the skill base directory below.\nWorkgraph instructions loaded from ${path.basename(skill.source)}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body.trimStart()}`
     : `Workgraph instructions loaded from ${skill.source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${role}</name>\n<path>${skill.source}</path>\n${skill.content}\n</skill>`;
 process.stdout.write(
   `${JSON.stringify({
     hookSpecificOutput: {
-      additionalContext: `${skillContext}\n\nWorkgraph ${host} guidance loaded from ${reference.source}.\nThe complete reference content is already loaded below.\n\n${
+      additionalContext: `${skillContext}\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(skill.source), reference.source) : reference.source}.\nThe complete reference content is already loaded below.\n\n${
         host === "claude"
           ? reference.content
               .replace(/^\uFEFF/u, "")
