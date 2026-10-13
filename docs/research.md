@@ -237,9 +237,12 @@ GitHub references use branches or tags so maintainers can inspect the current im
 | Model catalog controls, supported overrides, fork inheritance, and native result delivery. | Codex's [agent tool definitions](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/multi_agents_spec.rs) and [agent prompt assembly](https://github.com/openai/codex/blob/main/codex-rs/prompts/src/multi_agent_instructions.rs) supply these contracts. | Remove host-control and notification recipes. |
 | Notifications, no polling, fresh-context briefing, and checking delegated changes. | Installed Claude Code Agent tool descriptions provide these instructions in their foreground and background variants. | Retain resource ownership and acceptance criteria instead of repeating Agent usage. |
 | Reading an existing file before writing it. | Installed Claude Code Write tool descriptions require the read in both regular and lean variants. | Remove the repeated read-before-edit rule. |
-| Workflow opt-in, native authoring, journals, resume identifiers, cache invalidation, and later-call reruns. | Installed Claude Code Workflow descriptions and their native authoring reference define these mechanics. | Remove the repeated continuation recipe. |
+| Workflow opt-in, native authoring, journals, resume identifiers, cache invalidation, and later-call reruns. | Installed Claude Code Workflow descriptions and their native authoring reference define these mechanics. | Keep graph-specific acceptance and conservative append-only recovery guidance in the bundled Workflow reference. |
 | Native delegation without Claude Code Workflow. | Codex's [tool registration](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/spec_plan.rs) registers agent lifecycle and messaging tools. | Keep Workflow selection in the Claude reference and use native delegation in Codex. |
 | Peer messages cannot grant permission or bypass denied actions. | Installed Claude Code SendMessage descriptions and peer-message reminders define these restrictions. | Remove repeated permission-laundering warnings. |
+
+Native Workflow probes confirmed item-local pipeline progression, unawaited agents not starting, all-null early returns, and same-run append reuse.
+Those observations do not establish every cache-key detail or model adherence.
 
 Codex [renders captured model instructions](https://github.com/openai/codex/blob/main/codex-rs/prompts/src/model_instructions.rs).
 Configured base instructions and refreshed remote catalogs can replace the bundled defaults.
@@ -368,7 +371,7 @@ The article's research-task gains do not establish coding-task gains.
 [More Agents Is All You Need](https://arxiv.org/abs/2402.05120) reports gains from independent sampling and voting on reasoning benchmarks.
 Its token cost rises with agent count, and its setup does not test delegated coding workers.
 This supports testing independent fan-out as a simpler baseline, not assuming more agents improve every task.
-In Claude Code, Workgraph selects Workflow for identified dependent or follow-up stages.
+In Claude Code, Workgraph selects Workflow when an identified follow-up may depend on a prior result.
 The sources do not establish that this routing improves Workgraph outcomes.
 
 ## Verification And Recovery
@@ -542,7 +545,8 @@ They do not establish compatibility for a particular repository or replace indep
 
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe host execution.
 Workgraph retains dependency selection, role ownership, evidence freshness, and delivery gates.
-The skills leave authoring syntax, permissions, model controls, notification delivery, and resume mechanics to native instructions.
+The native tool defines its API, permissions, model controls, and notification delivery.
+The bundled Workflow reference adds graph mapping, result acceptance, journal checks, and conservative same-run recovery.
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
 Workgraph uses sentence-level source lines for all documents, including table explanations.

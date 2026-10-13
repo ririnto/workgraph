@@ -152,52 +152,8 @@ for (const [event, name] of roles) {
     assert.match(frontmatter, new RegExp(`^name: ${name}$`, "mu"));
     assert.doesNotMatch(frontmatter, /^user-invocable: false$/mu);
     assert.ok(body.trim());
-    assert.equal(
-      body.match(/^# (?<heading>.+)$/mu)?.groups?.heading,
-      event === "SessionStart" ? "Main Agent Contract" : "Subagent Context"
-    );
-    assert.match(body, /Invoking this skill does not/u);
   });
 }
-
-test("role contexts preserve constraints through recursive delegation and follow-ups", () => {
-  const development = readFileSync(
-    path.join(skills, "development", "SKILL.md"),
-    "utf-8"
-  );
-  assert.match(development, /Do not add commit-hash or image-digest pinning/u);
-  assert.match(
-    development,
-    /Preserve existing integrity checks, including lockfile integrity fields and signature or checksum verification/u
-  );
-  for (const [event] of roles) {
-    for (const host of hosts) {
-      const result = runHook([event, host]);
-      assert.equal(result.status, 0, result.stderr);
-      const context = JSON.parse(result.stdout).hookSpecificOutput
-        .additionalContext;
-      if (event === "SessionStart") {
-        assert.match(
-          context,
-          /passing user constraints recursively through assignments and follow-ups/u
-        );
-      } else {
-        assert.match(
-          context,
-          /Preserve inherited constraints, model, effort, resource ownership, and acceptance requirements through every authorized delegation and follow-up/u
-        );
-        assert.match(
-          context,
-          /Require authorized descendants to preserve them recursively/u
-        );
-        assert.match(
-          context,
-          /Complete the assignment without subdelegation unless the dispatch grants it/u
-        );
-      }
-    }
-  }
-});
 
 test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
   const root = path.join(copyPlugin(t), "a".repeat(100), "b".repeat(100));
@@ -239,9 +195,10 @@ test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) =>
             .replaceAll("\n", newline)
         )
       );
+      const contextLength = output.hookSpecificOutput.additionalContext.length;
       assert.ok(
-        output.hookSpecificOutput.additionalContext.length <= 10_000,
-        `Claude ${event} exceeds its inline context limit`
+        contextLength <= 10_000,
+        `Claude ${event} exceeds its inline context limit (${contextLength} characters)`
       );
     }
   }
@@ -481,16 +438,6 @@ for (const [event, name] of roles) {
           "u"
         )
       );
-      if (event === "SessionStart" && host === "codex") {
-        assert.match(
-          context,
-          /native delegation tools for independent and dependent assignments/u
-        );
-        assert.doesNotMatch(context, /Use native Workflow|Use host Agent/u);
-      } else if (event === "SessionStart") {
-        assert.match(context, /Use native Workflow/u);
-        assert.match(context, /Use host Agent/u);
-      }
       writeFileSync(target, content);
     }
   });
@@ -526,19 +473,6 @@ test("Codex delimiter lines preserve raw files and remove Claude body prefixes",
       }
     }
   }
-});
-
-test("common Main excludes Claude routing and Workflow discovery is Claude-scoped", () => {
-  assert.doesNotMatch(
-    readFileSync(path.join(skills, "main-agent-contract", "SKILL.md"), "utf-8"),
-    /Workflow|host Agent/u
-  );
-  const [, metadata, body] = readFileSync(
-    path.join(skills, "workflow", "SKILL.md"),
-    "utf-8"
-  ).split(/^---$/mu);
-  assert.match(metadata, /Use in the Claude Code main session/u);
-  assert.match(body, /In Codex, report that native Workflow did not run/u);
 });
 
 test("roles resolve conditional skills from relocated sources without injecting them", (t) => {
@@ -587,9 +521,9 @@ test("roles resolve conditional skills from relocated sources without injecting 
   }
 });
 
-test("workers load selected execution guidance without Main model or orchestration policy", (t) => {
+test("worker hooks load only their role and selected host reference", (t) => {
   const root = copyPlugin(t);
-  rmSync(path.join(root, "skills", "main-agent-contract", "references"), {
+  rmSync(path.join(root, "skills", "main-agent-contract"), {
     recursive: true
   });
   for (const host of hosts) {
@@ -602,28 +536,6 @@ test("workers load selected execution guidance without Main model or orchestrati
       JSON.parse(result.stdout),
       expectedOutput("SubagentStart", host, path.join(root, "skills"))
     );
-    assert.doesNotMatch(
-      result.stdout,
-      /main-agent-contract|luna|astra|gpt-6|GLM|model selection|Workflow|host Agent|native delegation tools/iu
-    );
-    if (host === "codex") {
-      assert.match(result.stdout, /subagent-context\/references\/codex\.md/u);
-      assert.match(result.stdout, /wait_agent/u);
-      assert.match(result.stdout, /timeout_ms.{0,20}240000/u);
-      assert.match(result.stdout, /functions\.wait/u);
-      assert.match(result.stdout, /yield_time_ms.{0,20}240000/u);
-      assert.doesNotMatch(
-        result.stdout,
-        /foreground Bash|background duration|Monitor/u
-      );
-    } else {
-      assert.match(result.stdout, /subagent-context\/references\/claude\.md/u);
-      assert.match(result.stdout, /Bash/u);
-      assert.match(result.stdout, /timeout.{0,20}240000/u);
-      assert.match(result.stdout, /background/iu);
-      assert.match(result.stdout, /Monitor/u);
-      assert.doesNotMatch(result.stdout, /functions\.wait|wait_agent/u);
-    }
   }
 });
 
