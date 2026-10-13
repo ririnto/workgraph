@@ -142,11 +142,13 @@ E = \lbrace (i,v), (t,v), (v,p)\rbrace.
 $$
 
 Main can run $i$ and $t$ in parallel when their writes do not conflict.
-Main starts $v$ after accepting both results and starts $p$ after passing checks and the environment-detail scan.
+Main starts $v$ after accepting both results and starts $p$ after passing checks and the environment-detail and secret scan.
 This example does not require the same nodes for other goals.
 
 The [README](../README.md#goal-driven-work) introduces goal-driven work for plugin users.
-The [Delivery skill](../skills/delivery/SKILL.md) owns branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
+The delivery skill owns branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
+Exposure scans cover user environment details and secrets only.
+Commit author and committer names and email addresses are contributor information, excluded from exposure findings, rewrites, and publication blocks.
 [Main](../skills/main-agent-contract/SKILL.md) owns orchestration and evidence acceptance, while [Worker](../skills/subagent-context/SKILL.md) owns bounded assignment handbacks.
 Each role carries its applicable requirements for retaining evidence, verifying cleanup ownership, and terminating owned processes.
 Links keep those procedures in their operational sources rather than duplicating them in design notes.
@@ -161,7 +163,7 @@ flowchart TD
     T -->|Yes| D[Read Delivery skill]
     D --> B[Record base and working branches]
     B --> C[Prepare changes and required evidence]
-    C --> E[Exploration agent scans diff for environment details]
+    C --> E[Exploration agent scans diff for environment details and secrets only]
     E --> F[Resolve exposures and push working branch]
     F --> M{Project maintainer?}
     M -->|Yes| P[Create PR or MR]

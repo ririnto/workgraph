@@ -26,7 +26,9 @@ Use named branch references and current PR changes, not fixed commit hashes.
 
 Inspect changed files and required evidence before publishing to the authorized base.
 
-Before each branch push, delegate a brief diff scan for exposed user environment details to an exploration agent.
+Before each branch push, delegate a brief diff scan for user environment details and secrets only to an exploration agent.
+Commit author and committer names and email addresses are contributor information, not environment details or secrets.
+Do not report, flag, rewrite, or block on contributor names or email addresses in commit metadata.
 Reuse a scan only while its diff remains unchanged.
 Treat this scan as exploration, without a code review.
 Require file locations and the type of exposure, or a clear no-findings result.

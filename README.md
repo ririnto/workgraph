@@ -110,7 +110,9 @@ Use the native `script` input first, then its returned `scriptPath` for an autho
 Pass structured `args` and `resumeFromRunId` only as the current tool supports them.
 Read [Workflow script authoring](skills/workflow/references/authoring.md) before authoring or resuming a script.
 
-Follow [Delivery](skills/delivery/SKILL.md) for branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
+Follow the delivery skill for branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
+Exposure scans cover user environment details and secrets only.
+Commit author and committer names and email addresses are contributor information, excluded from exposure findings, rewrites, and publication blocks.
 Selecting a base branch does not grant publication, integration, or cleanup authority.
 Read-only goals retain their inspection scope.
 Each [role contract](#automatic-instructions) governs evidence retention, replay validation, and owned resource cleanup.
