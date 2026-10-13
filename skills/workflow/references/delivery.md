@@ -6,7 +6,7 @@ Use only nodes allowed by the goal's scope and authority.
 | --- | --- | --- | --- |
 | Implementation | Main or one named Worker writes only assigned files within granted authority. | Bounded scope, accepted behavior, prerequisite results, and owned paths. | Changes, relevant checks, and material limitations. |
 | Verification | Main or one named Worker runs authorized read-only checks. | Changed behavior, expected results, and applicable existing checks. | Exact commands, outcomes, coverage, and evidence limits. |
-| Environment scan | Main assigns one read-only Explorer to inspect the current diff. | Current changed files and publication destination. | File locations and exposure types, or a clear no-findings result. |
+| Environment scan | Main assigns one read-only Explorer to scan only user environment details and secrets in the current diff. | Provide the current diff and publication destination, excluding commit author and committer names and email addresses. | Report exposure locations and types or no findings without reporting, flagging, rewriting, or blocking on excluded contributor information. |
 | Publication in Main | Main publishes only to the user-authorized destination. | Accepted changes, required checks, environment scan, working branch, and base branch. | Published branch and PR/MR URL. |
 | Independent review | A separate reviewer inspects the maintainer's PR/MR or contributor's complete branch. | Current changes, acceptance criteria, and required checks. | Findings with source evidence, or a clear no-findings result. |
 | Blocker fix | The same branch owner changes only confirmed affected scope. | Confirmed blocker, affected files, and existing PR/MR when available. | Fix with relevant verification evidence. |
