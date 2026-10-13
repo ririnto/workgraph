@@ -182,7 +182,7 @@ const verification = await agent(
     phase: 'Verify',
     schema: VERIFY,
     model: 'haiku',
-    effort: 'low'
+    effort: 'medium'
   }
 )
 if (verification === null || verification.accepted !== true) {

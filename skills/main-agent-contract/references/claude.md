@@ -15,7 +15,8 @@ Honor explicit Workflow requests, including `/workgraph:workflow`, even for one 
 Do not add display-only phases for implicit Workflow selection.
 If implicit Workflow is unavailable, report it.
 Use Agent for independent bounded outcomes only when it can safely meet the task contract.
-Rely on host notifications for tracked results; do not poll only to await them.
+Rely on host notifications for tracked results.
+Do not poll only to await them.
 
 ## Model Selection
 
