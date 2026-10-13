@@ -125,15 +125,15 @@ Do not claim a specific option invalidates cache unless the current host contrac
 
 ## Anti-Patterns
 
-- Calling an agent or pipeline without awaiting its result.
-- Treating `null`, an empty failed pipeline, or failure diagnostics as successful empty findings.
-- Assuming `phase()` or `meta.phases` enforces execution order.
-- Returning successfully before required verification or synthesis runs.
-- Starting the same outcome through both Agent and Workflow.
-- Trusting a schema without checking the returned fields and evidence.
-- Reordering, rewording, or re-parameterizing earlier calls during a cache-preserving extension.
-- Inserting new agent calls before a cached prefix or resuming without the original `runId`.
-- Attempting to resume a Workflow from another session.
+- Do not call an agent or pipeline without awaiting its result.
+- Do not treat `null`, an empty failed pipeline, or failure diagnostics as successful empty findings.
+- Do not assume `phase()` or `meta.phases` enforces execution order.
+- Do not return successfully before required verification or synthesis runs.
+- Do not start the same outcome through both Agent and Workflow.
+- Do not trust a schema without checking the returned fields and evidence.
+- Do not reorder, reword, or re-parameterize earlier calls during a cache-preserving extension.
+- Do not insert new agent calls before a cached prefix or resume without the original `runId`.
+- Do not resume a Workflow from another session.
 
 ## Append-Only Example
 

@@ -19,6 +19,9 @@ Do not poll only to await them.
 
 ## Model Selection
 
+Use `haiku` for clear, bounded tasks.
+Escalate to `sonnet` for broader work or when Haiku misses criteria.
+Use `opus` only for conflicting evidence, difficult tradeoffs, or acceptance failures.
 Call `fable` only at the user's explicit request.
 Follow [Main's model policy](../SKILL.md#models) when assigning settings.
 
