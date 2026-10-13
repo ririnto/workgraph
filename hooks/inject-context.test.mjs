@@ -521,9 +521,9 @@ test("roles resolve conditional skills from relocated sources without injecting 
   }
 });
 
-test("workers load selected execution guidance without Main model or orchestration policy", (t) => {
+test("worker hooks load only their role and selected host reference", (t) => {
   const root = copyPlugin(t);
-  rmSync(path.join(root, "skills", "main-agent-contract", "references"), {
+  rmSync(path.join(root, "skills", "main-agent-contract"), {
     recursive: true
   });
   for (const host of hosts) {

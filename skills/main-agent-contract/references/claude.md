@@ -7,14 +7,13 @@ Set background timeouts from required execution duration.
 Consider available `Monitor` for actionable command output or external events.
 For requested fixed loops, prefer `/loop 4m` unless another interval is needed.
 For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when the task permits.
-Use native Workflow when a dependent stage needs an accepted earlier result.
+Use native Workflow when a follow-up may consume an accepted earlier result, including when that result decides whether the follow-up runs.
 Use host Agent for independent work Main combines.
 An orchestration request alone establishes no result dependency.
 Speculative future tasks are not follow-up agents.
 Honor explicit Workflow requests, including `/workgraph:workflow`, even for one stage.
 Do not add display-only phases for implicit Workflow selection.
-If implicit Workflow is unavailable, report it.
-Use Agent for independent bounded outcomes only when it can safely meet the task contract.
+If implicit Workflow is unavailable, use Agent only when it can safely meet the task contract, and report the limitation.
 Rely on host notifications for tracked results.
 Do not poll only to await them.
 

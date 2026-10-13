@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use in the Claude Code main session when the user explicitly requests native Workflow or a dependent stage must consume an accepted earlier result.
+  Use in the Claude Code main session when the user explicitly requests native Workflow or a follow-up may depend on an accepted earlier result.
 argument-hint: "[goal]"
 ---
 

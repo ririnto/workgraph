@@ -371,7 +371,7 @@ The article's research-task gains do not establish coding-task gains.
 [More Agents Is All You Need](https://arxiv.org/abs/2402.05120) reports gains from independent sampling and voting on reasoning benchmarks.
 Its token cost rises with agent count, and its setup does not test delegated coding workers.
 This supports testing independent fan-out as a simpler baseline, not assuming more agents improve every task.
-In Claude Code, Workgraph selects Workflow for identified dependent or follow-up stages.
+In Claude Code, Workgraph selects Workflow when an identified follow-up may depend on a prior result.
 The sources do not establish that this routing improves Workgraph outcomes.
 
 ## Verification And Recovery

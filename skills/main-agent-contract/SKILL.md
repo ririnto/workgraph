@@ -45,9 +45,10 @@ Before dispatch, read the selected reference unless fully loaded.
 
 ### Models
 
-Honor each user or configuration setting, and choose remaining defaults from the active host reference.
-Set model and effort for generic agents without pinned settings.
-If the selected agent definition pins either, pass neither option.
+Honor each user or configuration setting, and choose unspecified defaults from the active host reference.
+Set model and effort for generic agents.
+Omit only settings pinned by the selected agent definition, and pass each unpinned setting when the host supports it.
+Report incompatible settings instead of silently dropping them.
 Record requested settings and report resolved values only when the host exposes them.
 
 ### Assignments

@@ -7,12 +7,11 @@ This reference adds Workgraph's graph mapping, result acceptance, and recovery r
 
 ## Map The Main Graph
 
-Main owns graph design, scope, readiness, node authority, dependencies, and acceptance criteria.
-Encode only accepted graph dependencies in Workflow script control flow.
-Give each node explicit inputs, outputs, owner, authority, readiness, and completion evidence.
-Pass each dependent call the accepted predecessor result it needs.
+Use Main's accepted node contracts and dependencies as script inputs.
+Encode accepted dependencies in Workflow control flow, not progress labels.
+Pass each agent its accepted inputs, bounded task, authority, and output evidence contract.
+Pass each dependent call only the predecessor results it needs.
 Do not assume local variables, progress labels, phases, or agent context transfer between calls.
-Give each outcome one execution path instead of duplicating it through Agent and Workflow.
 
 Use `pipeline()` by default when each item's later work depends only on that item's earlier result.
 Pipeline stages receive the previous result, original item, and item index.
@@ -20,9 +19,6 @@ An awaited pipeline runs item chains independently and returns their results tog
 Use `parallel()` only when downstream work needs the complete result set.
 A barrier is justified for cross-item deduplication, comparison, or a decision based on all results.
 Do not use a barrier merely to transform results between item-local stages.
-Serialize conflicting writes and start work only when its inputs and authority are ready.
-Main owns node status and checks partial effects before deciding to retry, reassign, or stop.
-Bound retries by changed evidence, progress, and a clear exit condition.
 
 ## Author The Script
 
@@ -42,8 +38,8 @@ Do not use TypeScript annotations or syntax.
 Await each required `agent()`, `pipeline()`, `parallel()`, and nested `workflow()` call.
 A schema requests structured output, but the script must validate required fields and acceptance criteria.
 Follow [Main's model policy](../../main-agent-contract/SKILL.md#models) when choosing agent settings.
-Workflow inherits session settings when options are omitted, so Main must pass `opts.model` and `opts.effort` for unpinned `agent()` calls.
-For a pinning `agentType`, Main passes neither option.
+Workflow inherits session settings when options are omitted, so pass supported `opts.model` and `opts.effort` values for unpinned `agent()` settings.
+Omit only settings pinned by the selected `agentType`.
 Check native descriptions before using optional settings or a custom agent type.
 
 `phase(title)` and agent options such as `label` and `phase` group progress for display.
@@ -84,12 +80,19 @@ Return success only when every required phase has validated completion evidence.
 Compare the returned phase evidence with `meta.phases` before returning success.
 
 ```js
-const requiredTitles = meta.phases.map(item => item.title)
+const requiredTitles = new Set(meta.phases.map(item => item.title))
 const completedTitles = phaseEvidence
   .filter(item => item.status === 'completed')
   .map(item => item.title)
+const completedTitleSet = new Set(completedTitles)
 
-if (JSON.stringify(completedTitles) !== JSON.stringify(requiredTitles)) {
+if (
+  requiredTitles.size !== meta.phases.length ||
+  phaseEvidence.length !== requiredTitles.size ||
+  completedTitles.length !== requiredTitles.size ||
+  completedTitleSet.size !== requiredTitles.size ||
+  [...requiredTitles].some(title => !completedTitleSet.has(title))
+) {
   throw new Error('Required phase evidence is incomplete')
 }
 ```

@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: workflow-follow-up
-description: Verify implicit Workflow selection when an identified conditional follow-up agent may not run.
+description: Verify implicit Workflow selection when an earlier result may gate a follow-up that does not run.
 execution:
   runs: 1
   max_turns: 20
