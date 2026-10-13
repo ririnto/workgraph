@@ -8,7 +8,7 @@ Consider available `Monitor` for actionable command output or external events.
 For requested fixed loops, prefer `/loop 4m` unless another interval is needed.
 For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when the task permits.
 Use native Workflow when a follow-up may consume an accepted earlier result, including when that result decides whether the follow-up runs.
-Before authoring or resuming native Workflow, read [Workflow](../../workflow/SKILL.md) unless its complete content is already loaded.
+Before authoring or resuming native Workflow, read the workflow skill unless its complete content is already loaded.
 Use host Agent for independent work Main combines.
 An orchestration request alone establishes no result dependency.
 Speculative future tasks are not follow-up agents.

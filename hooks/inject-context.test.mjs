@@ -583,17 +583,20 @@ test("only relocated Claude Main routes to the bundled Workflow procedure withou
       );
       const routes = [
         ...readFileSync(source, "utf-8").matchAll(
-          /\]\((?<file>[^)]+\/workflow\/SKILL\.md)\)/gu
+          /^(?<instruction>.*\b(?<name>[a-z-]+) skill\b.*)$/gimu
         )
-      ].map((match) => path.resolve(path.dirname(source), match.groups.file));
+      ];
       assert.deepEqual(
-        routes,
-        event === "SessionStart" && host === "claude"
-          ? [path.join(root, "skills", "workflow", "SKILL.md")]
-          : []
+        routes.map((match) => match.groups.name.toLowerCase()),
+        event === "SessionStart" && host === "claude" ? ["workflow"] : []
       );
-      for (const route of routes) {
+      for (const routeMatch of routes) {
+        assert.match(routeMatch.groups.instruction, /^Before\b/iu);
+        assert.match(routeMatch.groups.instruction, /\bunless\b.+\bloaded\b/iu);
+        const skillName = routeMatch.groups.name.toLowerCase();
+        const route = path.join(root, "skills", skillName, "SKILL.md");
         const workflow = readFileSync(route, "utf-8");
+        assert.match(workflow, new RegExp(`^name: ${skillName}$`, "mu"));
         const references = [
           ...workflow.matchAll(/`(?<file>references\/[^`]+\.md)`/gu)
         ].map((match) => path.resolve(path.dirname(route), match.groups.file));
@@ -612,6 +615,7 @@ test("only relocated Claude Main routes to the bundled Workflow procedure withou
         assert.equal(result.status, 0, result.stderr);
         const context = JSON.parse(result.stdout).hookSpecificOutput
           .additionalContext;
+        assert.ok(context.includes(routeMatch.groups.instruction));
         assert.ok(!context.includes(workflow));
         for (const reference of references) {
           assert.ok(!context.includes(readFileSync(reference, "utf-8")));
