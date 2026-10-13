@@ -90,6 +90,8 @@ Claude references follow native full-file Read normalization and line numbering,
 Codex references preserve raw file text, as ordinary file-read stdout does.
 
 Separate metadata identifies the complete loaded content and its actual path.
+Claude source labels resolve from the canonical skill base directory to avoid repeating long installation paths.
+Codex source labels retain absolute paths.
 For each role, it also loads the matching host reference and identifies that source path.
 Worker references contain execution timing without Main orchestration or model guidance.
 This guarantee covers new hook output, not context inherited from a parent session.
@@ -179,8 +181,9 @@ The dispatched agent should complete the assigned task within its authority inst
 
 Each role owns evidence freshness and replay validation within its scope.
 The native tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
-The bundled Workflow authoring reference adds graph mapping, result acceptance, early-stop detection, and cache-preserving recovery.
-Role contracts link that procedure without duplicating its script mechanics.
+Claude Main's host reference conditionally loads the bundled Workflow skill before authoring or resuming explicit or implicit runs.
+The skill requires its authoring reference for graph mapping, result acceptance, early-stop detection, and cache-preserving recovery.
+Worker and Codex contexts do not load this procedure.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.
 
 Codex uses available native delegation tools for independent and dependent assignments.

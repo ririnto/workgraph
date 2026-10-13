@@ -80,14 +80,14 @@ const expectedOutput = (event, host, rootSkills = skills, body = "") => {
   const content = readFileSync(source, "utf-8");
   const context =
     host === "claude"
-      ? `Workgraph instructions loaded from ${source}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${(body || content.slice(content.indexOf("\n---\n") + 5)).trimStart()}`
+      ? `Workgraph source paths are relative to the skill base directory below.\nWorkgraph instructions loaded from ${path.basename(source)}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${(body || content.slice(content.indexOf("\n---\n") + 5)).trimStart()}`
       : `Workgraph instructions loaded from ${source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`;
   const reference = realpathSync(
     path.join(rootSkills, name, "references", `${host}.md`)
   );
   return {
     hookSpecificOutput: {
-      additionalContext: `${context}\n\nWorkgraph ${host} guidance loaded from ${reference}.\nThe complete reference content is already loaded below.\n\n${
+      additionalContext: `${context}\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(source), reference) : reference}.\nThe complete reference content is already loaded below.\n\n${
         host === "claude"
           ? readFileSync(reference, "utf-8")
               .replace(/^\uFEFF/u, "")
@@ -156,8 +156,15 @@ for (const [event, name] of roles) {
 }
 
 test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
-  const root = path.join(copyPlugin(t), "a".repeat(100), "b".repeat(100));
+  const parent = realpathSync(copyPlugin(t));
+  const rootLength = Math.max(311, parent.length + 202);
+  const root = path.join(
+    parent,
+    "a".repeat(100),
+    "b".repeat(rootLength - parent.length - 102)
+  );
   mkdirSync(path.join(root, "hooks"), { recursive: true });
+  assert.equal(realpathSync(root).length, rootLength);
   copyFileSync(script, path.join(root, "hooks", "inject-context.mjs"));
   cpSync(skills, path.join(root, "skills"), { recursive: true });
   for (const newline of ["\n", "\r\n"]) {
@@ -196,9 +203,12 @@ test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) =>
         )
       );
       const contextLength = output.hookSpecificOutput.additionalContext.length;
+      t.diagnostic(
+        `${event} ${newline === "\n" ? "LF" : "CRLF"}: ${contextLength} characters at canonical root length ${rootLength}`
+      );
       assert.ok(
-        contextLength <= 10_000,
-        `Claude ${event} exceeds its inline context limit (${contextLength} characters)`
+        contextLength <= 9750,
+        `Claude ${event} lacks inline context headroom (${contextLength} characters)`
       );
     }
   }
@@ -289,10 +299,13 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
         host === "claude"
           ? `Base directory for this skill: ${path.dirname(source)}\n\n${body}`
           : `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${raw}\n</skill>`;
-      const reference = `\n\nWorkgraph ${host} guidance loaded from ${realpathSync(path.join(root, "skills", name, "references", `${host}.md`))}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`;
+      const referenceSource = realpathSync(
+        path.join(root, "skills", name, "references", `${host}.md`)
+      );
+      const reference = `\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(source), referenceSource) : referenceSource}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`;
       assert.deepEqual(JSON.parse(result.stdout), {
         hookSpecificOutput: {
-          additionalContext: `Workgraph instructions loaded from ${source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded below, without YAML frontmatter." : "The complete skill file is already loaded below, including YAML frontmatter."}\n\n${fragment}${reference}`,
+          additionalContext: `${host === "claude" ? "Workgraph source paths are relative to the skill base directory below.\n" : ""}Workgraph instructions loaded from ${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded below, without YAML frontmatter." : "The complete skill file is already loaded below, including YAML frontmatter."}\n\n${fragment}${reference}`,
           hookEventName: event
         }
       });
@@ -311,7 +324,10 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
     "subagent-context/references/claude.md"
   ]) {
     const target = path.join(root, "skills", file);
-    const source = `${target}.source`;
+    const source = file.includes("/references/")
+      ? path.join(root, "host sources", `${file}.source`)
+      : `${target}.source`;
+    mkdirSync(path.dirname(source), { recursive: true });
     copyFileSync(target, source);
     rmSync(target);
     symlinkSync(source, target);
@@ -327,6 +343,39 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
         JSON.parse(result.stdout),
         expectedOutput(event, host, path.join(root, "skills"))
       );
+      if (host === "claude") {
+        const context = JSON.parse(result.stdout).hookSpecificOutput
+          .additionalContext;
+        const base = context.match(
+          /^Base directory for this skill: (?<directory>.+)$/mu
+        ).groups.directory;
+        const loaded = [
+          ...context.matchAll(/^Workgraph .* loaded from (?<source>.+)\.$/gmu)
+        ].map((match) => path.resolve(base, match.groups.source));
+        assert.deepEqual(loaded, [
+          realpathSync(
+            path.join(
+              root,
+              "skills",
+              event === "SessionStart"
+                ? "main-agent-contract"
+                : "subagent-context",
+              "SKILL.md"
+            )
+          ),
+          realpathSync(
+            path.join(
+              root,
+              "skills",
+              event === "SessionStart"
+                ? "main-agent-contract"
+                : "subagent-context",
+              "references",
+              "claude.md"
+            )
+          )
+        ]);
+      }
     }
   }
 });
@@ -515,6 +564,67 @@ test("roles resolve conditional skills from relocated sources without injecting 
         assert.deepEqual(
           JSON.parse(result.stdout),
           expectedOutput(event, host, path.join(root, "skills"))
+        );
+      }
+    }
+  }
+});
+
+test("only relocated Claude Main routes to the bundled Workflow procedure without injecting it", (t) => {
+  const root = copyPlugin(t);
+  for (const [event, name] of roles) {
+    for (const host of hosts) {
+      const source = path.join(
+        root,
+        "skills",
+        name,
+        "references",
+        `${host}.md`
+      );
+      const routes = [
+        ...readFileSync(source, "utf-8").matchAll(
+          /^(?<instruction>.*\b(?<name>[a-z-]+) skill\b.*)$/gimu
+        )
+      ];
+      assert.deepEqual(
+        routes.map((match) => match.groups.name.toLowerCase()),
+        event === "SessionStart" && host === "claude" ? ["workflow"] : []
+      );
+      for (const routeMatch of routes) {
+        assert.match(routeMatch.groups.instruction, /^Before\b/iu);
+        assert.match(routeMatch.groups.instruction, /\bunless\b.+\bloaded\b/iu);
+        const skillName = routeMatch.groups.name.toLowerCase();
+        const route = path.join(root, "skills", skillName, "SKILL.md");
+        const workflow = readFileSync(route, "utf-8");
+        assert.match(workflow, new RegExp(`^name: ${skillName}$`, "mu"));
+        const references = [
+          ...workflow.matchAll(/`(?<file>references\/[^`]+\.md)`/gu)
+        ].map((match) => path.resolve(path.dirname(route), match.groups.file));
+        assert.ok(
+          references.includes(
+            path.join(root, "skills", "workflow", "references", "authoring.md")
+          )
+        );
+        for (const reference of references) {
+          assert.ok(readFileSync(reference, "utf-8").trim());
+        }
+        const result = runHook(
+          [event, host],
+          path.join(root, "hooks", "inject-context.mjs")
+        );
+        assert.equal(result.status, 0, result.stderr);
+        const context = JSON.parse(result.stdout).hookSpecificOutput
+          .additionalContext;
+        assert.ok(context.includes(routeMatch.groups.instruction));
+        assert.ok(!context.includes(workflow));
+        for (const reference of references) {
+          assert.ok(!context.includes(readFileSync(reference, "utf-8")));
+        }
+        rmSync(path.dirname(route), { recursive: true });
+        assert.equal(
+          runHook([event, host], path.join(root, "hooks", "inject-context.mjs"))
+            .status,
+          0
         );
       }
     }
