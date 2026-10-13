@@ -26,6 +26,14 @@ We studied [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail)
 The project uses the MIT license and credits Dietrich Gebert, copyright 2026.
 It informed reuse of existing tools, limited abstractions, and the smallest sufficient implementation.
 
+## Lauren Tan
+
+Lauren Tan, known as [@poteto](https://x.com/poteto), published a [recorded presentation](https://x.com/poteto/status/2102050467505430555) on September 21, 2026 UTC.
+We reviewed its automatic English captions and presentation screens.
+Her CLI and feature-map examples, correction priorities, and Dune ownership boundaries informed Verification and Development guidance.
+Workgraph adapts those ideas without redistributing her video, slides, transcript, pstack, or Dune implementation.
+The [research notes](docs/research.md#lauren-tan-on-verification-and-agent-environments) distinguish practitioner examples from Workgraph evidence.
+
 ## Giver Architecture
 
 We studied [sng2c/giver-architecture](https://github.com/sng2c/giver-architecture) at version `v0.1.1`.

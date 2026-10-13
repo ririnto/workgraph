@@ -138,6 +138,7 @@ Claude Code uses slash commands, while Codex uses dollar-prefixed skill names.
 | `/workgraph:writing` | `$workgraph:writing` | Load prose and Markdown guidance. |
 | `/workgraph:instruction-authoring` | `$workgraph:instruction-authoring` | Load reusable instruction design guidance. |
 | `/workgraph:development` | `$workgraph:development` | Load coding guidance and matching language references. |
+| `/workgraph:verification` | `$workgraph:verification` | Reproduce behavior and collect evidence with the project's existing tools. |
 | Not applicable | `$workgraph:codex-scoped-cleanup` | Clean retired Codex resources and stale Worktree Artifact connections. |
 
 All skills remain user-invocable and model-invocable.
@@ -168,6 +169,26 @@ The Workflow skill keeps its core rules inline.
 For authorized engineering delivery, it also reads its focused `references/delivery.md` before building the delivery graph.
 Read-only Workflow goals do not need that reference.
 The plugin includes no output assets or bundled helper scripts because its skills produce neither reusable files nor repeated script logic.
+
+### Application Verification
+
+[Verification](skills/verification/SKILL.md) connects application behavior to reproducible commands and observable results.
+Development loads it for behavior changes, performance work, or report reproduction.
+Instruction Authoring loads it when instructions change behavior.
+It stays conditional and outside hook context.
+
+Reuse the project's existing CLI, tests, and diagnostics before adding verification helpers.
+Use a focused feature map when repeated reports need product context beyond those tools.
+Keep feature access paths, expected outcomes, owners, and checks beside the project's verification instructions.
+Update affected entries when their behavior changes.
+
+Development prioritizes correcting architecture and data structures, then automated checks, then rules and skills, and finally human-only guidance.
+Keep legal execution boundaries and shared-state ownership explicit.
+These procedures do not ban semantic comments or replace existing declaration documentation.
+External alerts and reports remain inputs to the authorized task graph, using the host's existing execution tools.
+
+The maintainer [verification map](docs/verification-map.md) links Workgraph behavior to existing commands and evidence limits.
+Passing source or hook checks does not establish installed host activation or model adherence.
 
 Workgraph bundles coordination, delivery, writing, instruction authoring, and development guidance in one plugin.
 Writing owns prose and Markdown rules, while Instruction Authoring loads Writing before its design procedure.

@@ -376,6 +376,30 @@ The sources do not establish that this routing improves Workgraph outcomes.
 
 ## Verification And Recovery
 
+### Lauren Tan On Verification And Agent Environments
+
+We reviewed Lauren Tan's [recorded presentation](https://x.com/poteto/status/2102050467505430555), published on September 21, 2026 UTC.
+The approximately 38-minute recording and its automatic English captions describe practitioner experience at Cursor and Grok Bot.
+The post names 2,500 production PRs, while the opening slide and captions name 2,000.
+We retain that discrepancy without treating either count as measured Workgraph evidence.
+
+At 09:15–12:34, Tan combines a reproducible CLI with a feature map describing behavior and access paths.
+At 14:56–18:57, she prioritizes code structure, static analysis, rules and Bugbot, skills, then human-applied style guidance.
+At 26:43–30:38, Dune slides show execution boundaries, state ownership, discovered feature files, and checks before review.
+At 32:35–35:16, external reports and alerts trigger work using existing bot and cloud-agent tooling.
+
+These examples motivate [Verification](../skills/verification/SKILL.md) and Development's correction procedure.
+Workgraph reuses existing commands and adds a focused [maintainer verification map](verification-map.md).
+Consumer feature maps remain optional, local to the relevant project, and updated with affected behavior.
+Main already owns ready-node execution, bounded assignments, and shared-resource writers.
+The host already owns connectors, event delivery, and task execution.
+We retain those boundaries instead of adding a scheduler or copying Dune's framework.
+
+Tan describes banning comments in Dune after agents used them to justify workarounds.
+Workgraph instead preserves required semantic comments and declaration documentation while removing in-scope bad exemplars.
+Her talk supplies no controlled Workgraph evaluation, proof of universal comment harm, or automatic-merge acceptance policy.
+Runtime observation does not establish formal correctness, and hook delivery does not establish model adherence.
+
 [Why Do Multi-Agent LLM Systems Fail?](https://arxiv.org/abs/2503.13657) introduces the MAST failure taxonomy.
 Its abstract groups failures into system design, inter-agent misalignment, and task verification.
 Workgraph addresses these categories through clear assignments, English handoffs, completion evidence, and bounded feedback loops.
