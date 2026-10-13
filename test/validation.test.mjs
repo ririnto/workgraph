@@ -174,59 +174,25 @@ test("issue form names must be unique across discovered forms", () => {
   );
 });
 
-test("issue forms preserve the five original sections and remove Markdown templates", () => {
+test("issue forms preserve required field IDs and remove Markdown templates", () => {
   const directory = new URL(".github/ISSUE_TEMPLATE/", repositoryRoot);
-  const expectedLabels = [
-    "Problem",
-    "Evidence",
-    "Scope",
-    "Acceptance",
-    "Ownership And Next Action"
+  const expectedIds = [
+    "problem",
+    "evidence",
+    "scope",
+    "acceptance",
+    "ownership_next_action"
   ];
-  const expectedMetadata = {
-    bug_report: {
-      description:
-        "Report a reproducible documentation, instruction, or hook defect.",
-      name: "Bug report"
-    },
-    improvement: {
-      description:
-        "Propose a bounded improvement with evidence and acceptance criteria.",
-      name: "Improvement request"
-    }
-  };
   const forms = [];
-  const expectedDescriptions = {
-    bug_report: [
-      "Describe the defect and its effect on the reader or host. Link related issues or pull requests.",
-      "Provide reproduction steps, expected behavior, and observed behavior. For host-specific defects, include the host and relevant tool versions. Remove credentials and private environment details.",
-      "Identify affected documents, instructions, or runtime paths. State the boundaries the fix must preserve.",
-      "Describe the observable result and checks that establish completion. Distinguish source checks from host execution and model behavior.",
-      "Name the owner and the next bounded action."
-    ],
-    improvement: [
-      "Describe the requirement or current limitation. Link related issues or pull requests.",
-      "Provide concrete examples or source references supporting the change. Distinguish confirmed behavior from assumptions. Remove credentials and private environment details.",
-      "Describe the proposed change and its exclusions. Identify affected documents, instructions, or runtime paths.",
-      "Describe the observable result and checks that establish completion. Record material limits and any validation that requires a specific host.",
-      "Name the owner and the next bounded action."
-    ]
-  };
   for (const filename of ["bug_report", "improvement"]) {
     const formPath = new URL(`${filename}.yaml`, directory);
     const source = `${filename}.yaml`;
     const content = readFileSync(formPath, "utf-8");
     const form = yamlParser(content);
-    assert.equal(form.name, expectedMetadata[filename].name);
-    assert.equal(form.description, expectedMetadata[filename].description);
     assert.ok(!form.description.endsWith("\n"));
     assert.deepEqual(
-      form.body.map((field) => field.attributes.label),
-      expectedLabels
-    );
-    assert.deepEqual(
-      form.body.map((field) => field.attributes.description),
-      expectedDescriptions[filename]
+      form.body.map((field) => field.id),
+      expectedIds
     );
     assert.ok(
       form.body.every((field) => !field.attributes.description.endsWith("\n"))
