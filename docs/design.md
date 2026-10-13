@@ -15,6 +15,7 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | `skills/writing/SKILL.md` | Agents doing prose or Markdown work | Agents follow concise prose, sentence boundaries, and table rules. |
 | `skills/instruction-authoring/SKILL.md` | Agents designing reusable instructions | Agents follow instruction boundaries, conditional loading, and source validation. |
 | `skills/development/SKILL.md` | Agents doing source or maintained code work | Agents load shared code defaults and only matching language references. |
+| `skills/verification/SKILL.md` | Agents reproducing behavior or assessing runtime outcomes | Agents reuse execution tools and connect feature context to observable evidence. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify native lifecycle authority, scoped activity, retained content, and Worktree Artifact removal. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds graph-specific procedures after Main and invokes native Workflow for explicit requests or graph-suitable work. |
 | Claude Code Workflow tool | Main session | The host runs the selected workflow while enforcing its permissions. |
@@ -28,6 +29,7 @@ Main and Worker embed their applicable role rules.
 
 Main loads Delivery before repository edits, branch creation, implementation dispatch, commits, or publication.
 Main and Worker conditionally load Writing, Instruction Authoring, and Development for tasks within those skills' scopes.
+Development and Instruction Authoring route behavioral work to the conditional Verification skill.
 Hooks inject only the selected role and host reference, leaving task skills and language references conditional.
 Consumer skills and their references stay inside this plugin.
 Skip retrieving conditional files whose complete content is already loaded.
@@ -213,6 +215,16 @@ Automatic hooks read the selected role and its host reference without invoking s
 Keep one injector and one configuration per host, without runtime host detection or fallback implementations.
 
 ## Verify Delivery And Behavior
+
+The [verification map](verification-map.md) connects maintained Workgraph behavior to its current commands and evidence boundaries.
+Use existing npm gates instead of adding a second verification CLI.
+Keep source delivery, installed host activation, and model adherence as separate claims.
+
+The conditional Verification skill adds product-specific reproduction and runtime evidence selection.
+Consumer feature maps belong beside that project's verification instructions and contain only useful behavior entries.
+Development owns correction priorities and architecture boundaries, while Main and Delivery retain acceptance, review, and publication authority.
+Existing host tools handle event-triggered work within the authorized graph.
+This change adds no scheduler, telemetry service, or runtime dependency.
 
 `hooks/inject-context.test.mjs` uses Node's test runner and child processes to check the real command.
 It checks exact role content, loaded source paths, host reference selection, and exclusion of unrelated files.

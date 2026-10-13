@@ -56,6 +56,7 @@ Format documentation comments and docstrings as multiline, even for one sentence
 Preserve their text, indentation, declaration attachment, and language-native semantics when formatting or moving them.
 Documentation for other declarations is optional unless tooling or a safety contract requires it.
 
+Remove obsolete workaround comments when changing affected code.
 Use no explanatory inline comments.
 Preserve required semantic comments, including build directives, licenses, suppressions, and safety invariants.
 For necessary catch or ignore explanations, use the existing logger's safe debug or trace level when appropriate.
@@ -97,3 +98,11 @@ If a rule cannot detect violations safely, do not add it.
 If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
 Do not promise automatic fixes that replace `void` with `await`, restructure control flow, or hoist state across lifecycle boundaries.
 Adding instructions alone does not authorize lint implementations or changes across consumer repositories.
+
+## Verification Routing
+
+For behavioral changes, performance claims, or report reproduction, read [Verification](../verification/SKILL.md) unless its complete content is already loaded.
+When correcting a defect, fix its cause in code or data architecture first.
+Next, use existing static checks or add meaningful regression checks.
+Update rules or skills only when they prevent recurrence.
+Change human-only guides last.

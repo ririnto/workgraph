@@ -42,6 +42,10 @@ Remove replaced paths and update their consumers in the same change.
 
 ## Validate The Result
 
+For changed instruction behavior, read [Verification](../verification/SKILL.md) unless its complete content is already loaded.
+Enforce structural requirements through existing validators when they can check the contract safely.
+Keep semantic judgment separate from lexical assertions about instruction wording.
+
 Confirm frontmatter and invocation fields against the target host's supported skill format.
 Keep model invocation enabled unless the user requires another policy.
 Check links from installed or relocated source directories, rather than assuming the repository working directory.
