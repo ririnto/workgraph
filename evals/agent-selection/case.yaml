@@ -8,9 +8,11 @@ execution:
   allowed_tools:
     - Agent
     - Workflow
+    - Skill(workgraph:main-agent-contract)
     - Skill(workgraph:workflow)
     - Skill(workflow-authoring)
   prompt: |-
+    Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
     Delegate one bounded read-only assessment to a worker.
     Give that worker both batches and report its result in Main.
     A finding blocks release if its required timeout is absent.
@@ -33,6 +35,7 @@ graders:
     type: llm
     focus: trace
     criteria: |-
+      Require Main's contract and selected Claude reference to be loaded before delegation.
       Require one completed Agent assessment that receives both batches and applies the timeout rule.
       Main must use that worker's actual result to identify the blockers.
       An irrelevant Agent call, missing worker result, or report before completion fails this check.

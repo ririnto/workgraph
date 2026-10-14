@@ -8,9 +8,11 @@ execution:
   allowed_tools:
     - Agent
     - Workflow
+    - Skill(workgraph:main-agent-contract)
     - Skill(workgraph:workflow)
     - Skill(workflow-authoring)
   prompt: |-
+    Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
     Please orchestrate a read-only assessment with subagents.
     Give one worker batch A and another worker batch B, and combine their independent results in Main.
     No worker needs another worker's result.
@@ -29,6 +31,7 @@ graders:
     type: llm
     focus: trace
     criteria: |-
+      Require Main's contract and selected Claude reference to be loaded before orchestration.
       Require completed native Workflow results from both independent workers before the final report.
       The workers assess separate batches without consuming each other's results.
       Main combines their actual results and reports A1 and B2 as the only blockers.
