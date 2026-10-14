@@ -1,5 +1,10 @@
 import type { MicromarkToken, Rule, RuleParams } from "markdownlint";
 
+/**
+ * Workgraph adapts the Sinon Harness control flow while preserving its diagnostic contract.
+ * The upstream Apache-2.0 license is retained in LICENSES/sinon-harness.txt.
+ */
+
 const terminatorPattern = /[.!?]/gu;
 const whitespacePattern = /\s/u;
 const semicolonPattern = /[;；;]/gu;
@@ -67,23 +72,24 @@ interface Finding {
  */
 const proseBlocks = (tokens: readonly MicromarkToken[]): MicromarkToken[] => {
   const blocks: MicromarkToken[] = [];
-  const visit = (token: MicromarkToken) => {
+  const iterators = [tokens[Symbol.iterator]()];
+  const visit = (token: MicromarkToken): void => {
     if (token.type === "paragraph") {
       blocks.push(token);
-      return;
-    }
-    if (
-      skippedContainerTypes.has(token.type) ||
-      (token.type === "blockQuote" && !alertPattern.test(token.text))
+    } else if (
+      !skippedContainerTypes.has(token.type) &&
+      (token.type !== "blockQuote" || alertPattern.test(token.text))
     ) {
-      return;
-    }
-    for (const child of token.children) {
-      visit(child);
+      iterators.push(token.children[Symbol.iterator]());
     }
   };
-  for (const token of tokens) {
-    visit(token);
+  for (let iterator = iterators.at(-1); iterator; iterator = iterators.at(-1)) {
+    const step = iterator.next();
+    if (step.done) {
+      iterators.pop();
+    } else {
+      visit(step.value);
+    }
   }
   return blocks;
 };
@@ -197,8 +203,11 @@ const nameInitial = (before: string, remainder: string): boolean =>
  * Finds a terminator that ends one independent sentence and starts another.
  */
 const joinedSentence = (line: string): Finding | undefined => {
-  for (const match of line.matchAll(terminatorPattern)) {
-    const index = match.index ?? 0;
+  const matches = line.matchAll(terminatorPattern);
+  let match = matches.next();
+  let finding: Finding | undefined;
+  while (!match.done && finding === undefined) {
+    const index = match.value.index ?? 0;
     const after = line.slice(index + 1).replace(closingQuotePattern, "");
     const [next] = after;
     const before = line.slice(0, index);
@@ -211,17 +220,24 @@ const joinedSentence = (line: string): Finding | undefined => {
       remainder !== "" &&
       sentenceStartPattern.test(remainder)
     ) {
-      return { column: index + 1, length: 1 };
+      finding = { column: index + 1, length: 1 };
+    }
+    if (finding === undefined) {
+      match = matches.next();
     }
   }
+  return finding;
 };
 
 /**
  * Finds a semicolon used to join independent prose on one line.
  */
 const joinedSemicolon = (line: string): Finding | undefined => {
-  for (const match of line.matchAll(semicolonPattern)) {
-    const index = match.index ?? 0;
+  const matches = line.matchAll(semicolonPattern);
+  let match = matches.next();
+  let finding: Finding | undefined;
+  while (!match.done && finding === undefined) {
+    const index = match.value.index ?? 0;
     const before = line.slice(0, index);
     const tail = line.slice(index + 1).trimStart();
     const previous = before.trimEnd().at(-1);
@@ -239,7 +255,62 @@ const joinedSemicolon = (line: string): Finding | undefined => {
         conjunctiveAdverbPattern.test(tail) ||
         lowercaseClauseStartPattern.test(tail);
       if (independent) {
-        return { column: index + 1, length: [...match[0]].length };
+        finding = { column: index + 1, length: [...match.value[0]].length };
+      }
+    }
+    if (finding === undefined) {
+      match = matches.next();
+    }
+  }
+  return finding;
+};
+
+/**
+ * Inspect unprotected prose without changing diagnostic order or source coordinates.
+ */
+const inspectProse: Rule["function"] = (params, onError) => {
+  const tokens = params.parsers.micromark?.tokens ?? [];
+  const reported = new Set<string>();
+  for (const paragraph of proseBlocks(tokens)) {
+    const sourceLines = [...segmentsByLine(paragraph)];
+    const protectedLines = protectText(
+      sourceLines.map(([, segments]) => rebuildLine(segments)).join("\n")
+    ).split("\n");
+    for (const [index, [lineNumber]] of sourceLines.entries()) {
+      const line = protectedLines[index] ?? "";
+      const continuationFinding =
+        sourceLines[index - 1]?.[0] === lineNumber - 1
+          ? continuation(protectedLines[index - 1], line)
+          : undefined;
+      if (continuationFinding) {
+        onError({
+          context: (params.lines[lineNumber - 1] ?? "").trim(),
+          detail: /^[a-z]/u.test(line.trimStart())
+            ? "Sentence continues from the previous source line; keep the sentence on one line."
+            : "End the previous instruction with a sentence terminator before this continuation.",
+          lineNumber,
+          range: [continuationFinding.column, continuationFinding.length]
+        });
+      }
+      for (const [kind, finding] of [
+        ["sentences", joinedSentence(line)],
+        ["semicolon", joinedSemicolon(line)]
+      ] as const) {
+        if (finding) {
+          const key = `${lineNumber}:${kind}`;
+          if (!reported.has(key)) {
+            reported.add(key);
+            onError({
+              context: (params.lines[lineNumber - 1] ?? "").trim(),
+              detail:
+                kind === "sentences"
+                  ? "Multiple sentences on one line; put each sentence on its own line."
+                  : "Semicolon-joined sentences on one line; put each sentence on its own line.",
+              lineNumber,
+              range: [finding.column, finding.length]
+            });
+          }
+        }
       }
     }
   }
@@ -251,53 +322,8 @@ const joinedSemicolon = (line: string): Finding | undefined => {
 const rule: Rule = {
   description: "Prose sentences must be separated by physical source lines",
   function: (params, onError) => {
-    if (protectedDocument(params)) {
-      return;
-    }
-    const tokens = params.parsers.micromark?.tokens ?? [];
-    const reported = new Set<string>();
-    for (const paragraph of proseBlocks(tokens)) {
-      const sourceLines = [...segmentsByLine(paragraph)];
-      const protectedLines = protectText(
-        sourceLines.map(([, segments]) => rebuildLine(segments)).join("\n")
-      ).split("\n");
-      for (const [index, [lineNumber]] of sourceLines.entries()) {
-        const line = protectedLines[index] ?? "";
-        const continuationFinding =
-          sourceLines[index - 1]?.[0] === lineNumber - 1
-            ? continuation(protectedLines[index - 1], line)
-            : undefined;
-        if (continuationFinding) {
-          onError({
-            context: (params.lines[lineNumber - 1] ?? "").trim(),
-            detail: /^[a-z]/u.test(line.trimStart())
-              ? "Sentence continues from the previous source line; keep the sentence on one line."
-              : "End the previous instruction with a sentence terminator before this continuation.",
-            lineNumber,
-            range: [continuationFinding.column, continuationFinding.length]
-          });
-        }
-        for (const [kind, finding] of [
-          ["sentences", joinedSentence(line)],
-          ["semicolon", joinedSemicolon(line)]
-        ] as const) {
-          if (finding) {
-            const key = `${lineNumber}:${kind}`;
-            if (!reported.has(key)) {
-              reported.add(key);
-              onError({
-                context: (params.lines[lineNumber - 1] ?? "").trim(),
-                detail:
-                  kind === "sentences"
-                    ? "Multiple sentences on one line; put each sentence on its own line."
-                    : "Semicolon-joined sentences on one line; put each sentence on its own line.",
-                lineNumber,
-                range: [finding.column, finding.length]
-              });
-            }
-          }
-        }
-      }
+    if (!protectedDocument(params)) {
+      inspectProse(params, onError);
     }
   },
   names: ["docs/sentence-per-line"],

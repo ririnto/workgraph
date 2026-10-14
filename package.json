@@ -8,6 +8,7 @@
     "check:issue-forms": "node test/validation/issue-forms.mjs",
     "check:markdownlint-cli2": "markdownlint-cli2",
     "check:plugin-version": "node test/validation/plugin-version.mjs",
+    "check:tooling-tests": "node --test test/tooling.test.mjs",
     "check:ultracite": "ultracite check",
     "check:validation-tests": "node --test test/validation.test.mjs",
     "fix": "run-p fix:*",
