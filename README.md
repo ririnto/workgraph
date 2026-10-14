@@ -183,6 +183,7 @@ Keep feature access paths, expected outcomes, owners, and checks beside the proj
 Update affected entries when their behavior changes.
 
 Development prioritizes correcting architecture and data structures, then automated checks, then rules and skills, and finally human-only guidance.
+Its [development lifecycle](skills/development/SKILL.md#development-lifecycle) distinguishes features, bug fixes, refactoring, and performance work.
 Keep legal execution boundaries and shared-state ownership explicit.
 These procedures do not ban semantic comments or replace existing declaration documentation.
 External alerts and reports remain inputs to the authorized task graph, using the host's existing execution tools.
@@ -205,20 +206,26 @@ Inspect the hook error notice if instructions fail to load.
 
 ## Development
 
-Use npm and the Node version range in `package.json` for development.
+Use pnpm and the Node version range in `package.json` for development.
 The development tools require Node.js 24.15 or later within major version 24.
 This development requirement is separate from the Node.js 18 minimum for hook execution.
 
 Plugin evaluation relocates `HOME` into its sandbox.
 If a Node version-manager shim fails there, prepend the installed Node binary's directory to the evaluator's `PATH`.
 
-Install the pinned development tools.
+Install the pnpm version declared by `packageManager` before installing the pinned development tools.
 
 ```sh
-npm ci
+pnpm install --frozen-lockfile
 ```
 
-The development manifest overrides markdownlint-cli2's pinned smol-toml with a patched release in the same major version.
+Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
+The real pre-commit and pre-push hooks run `pnpm run pre-commit` and `pnpm run pre-push`.
+Each script runs the complete existing check gate and blocks the Git operation on failure.
+Ultracite owns source lint and formatting, including the adopted Sinon source-style plugins.
+Markdownlint also checks sentence boundaries and table separators using the adopted Harness rules.
+
+The pnpm workspace overrides markdownlint-cli2's pinned smol-toml with a patched release in the same major version.
 Remove that scoped override when markdownlint-cli2 supports the patched parser directly.
 The remaining braces and KaTeX advisories await supported upstream fixes in [Issue #78](https://github.com/ririnto/workgraph/issues/78) and [Issue #79](https://github.com/ririnto/workgraph/issues/79).
 These development dependencies are not required by the hook runtime.

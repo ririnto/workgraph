@@ -30,6 +30,8 @@ Main and Worker embed their applicable role rules.
 Main loads Delivery before repository edits, branch creation, implementation dispatch, commits, or publication.
 Main and Worker conditionally load Writing, Instruction Authoring, and Development for tasks within those skills' scopes.
 Development and Instruction Authoring route behavioral work to the conditional Verification skill.
+Development selects acceptance, reproduction, equivalence, or measurement evidence according to the requested change.
+Its lifecycle procedure guides the user's session and leaves shared contributor enforcement to project automation and the Sinon Harness.
 Hooks inject only the selected role and host reference, leaving task skills and language references conditional.
 Consumer skills and their references stay inside this plugin.
 Skip retrieving conditional files whose complete content is already loaded.
@@ -217,7 +219,7 @@ Keep one injector and one configuration per host, without runtime host detection
 ## Verify Delivery And Behavior
 
 The [verification map](verification-map.md) connects maintained Workgraph behavior to its current commands and evidence boundaries.
-Use existing npm gates instead of adding a second verification CLI.
+Use existing pnpm gates instead of adding a second verification CLI.
 Keep source delivery, installed host activation, and model adherence as separate claims.
 
 The conditional Verification skill adds product-specific reproduction and runtime evidence selection.

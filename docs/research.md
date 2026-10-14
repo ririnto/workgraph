@@ -622,3 +622,41 @@ The official [setup-node version-file guidance](https://github.com/actions/setup
 The workflow uses current [checkout](https://github.com/actions/checkout) and [setup-node](https://github.com/actions/setup-node) major releases.
 Separate dependency-free jobs exercise the declared hook runtime floor and macOS without claiming development-tool compatibility on Node.js 18.
 These checks establish source validation and runtime evidence, while model adherence requires a separate behavioral run.
+
+## Pstack Development Lifecycle
+
+We studied the original [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) on its named `main` branch.
+The reviewed plugin declares version `0.15.24` and an MIT license attributed to Lauren Tan.
+We read its feature, bug-fix, refactoring, performance, and shipping playbooks, TDD skill, and verification principles.
+We also read its build and verification guides and confirmed the official bug-fix source.
+
+The [feature playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/feature.md) defines design and acceptance before implementation.
+The [bug-fix playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/bug-fix.md) requires matching-surface reproduction and evidence for the causal mechanism.
+Its [TDD skill](https://github.com/cursor/plugins/blob/main/pstack/skills/tdd/SKILL.md) uses failing-first regression checks when practical.
+The [refactoring playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/refactoring.md) captures behavior before structural changes and proves equivalence afterward.
+The [performance playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/perf-issue.md) requires baseline traces and comparable measurements.
+The [verification principle](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-prove-it-works/SKILL.md) checks the actual artifact rather than a proxy.
+The [shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/shipping.md) rechecks whether verdicts describe the current candidate.
+
+Workgraph adapts these decisions into its conditional [Development skill](../skills/development/SKILL.md#development-lifecycle).
+Existing Main, Delivery, and Verification contracts retain orchestration, publication authority, evidence freshness, and cleanup.
+We do not import Cursor-specific tools, model choices, mandatory stack operations, force pushes, or reordered shared history.
+Consumer lifecycle guidance runs in the user's session.
+Shared contributor rules require project automation and belong in the Sinon Harness when that baseline applies.
+Source and hook checks establish bundled instruction delivery, not universal model adherence.
+
+## pnpm And Git Hook Tooling
+
+We reviewed the read-only [Sinon pnpm profile](https://github.com/ririnto/sinon/tree/main/plugins/harness/tooling/pnpm).
+The root retains its compatible lint versions, common check and fix surface, Markdown settings, and Ultracite owner.
+It adopts the applicable source-style plugins and Markdown sentence and table-separator rules from that profile.
+The copied rules retain their upstream license and run through the repository's existing lint owners.
+Dependency versions move into the pnpm catalog, retaining the patched smol-toml override and existing lockfile resolutions.
+The selected [pnpm release](https://pnpm.io/installation) supports Node.js 24, which remains an official [LTS line](https://nodejs.org/en/about/previous-releases).
+The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.0.0) reads the manifest pin and installs the selected runtime.
+
+We checked Husky `9.1.7` in the npm registry and reviewed its official [setup](https://typicode.github.io/husky/get-started.html) and [hook documentation](https://typicode.github.io/husky/how-to.html).
+It requires Node.js 18 or later and supplies the Git dispatchers through the standard `prepare` lifecycle.
+Workgraph's two hooks call the corresponding pnpm scripts and retain the complete existing check gate.
+Actual commit and push operations in disposable repositories verify execution and intentional failure propagation.
+These local Git checks do not establish native plugin activation or provider behavior.

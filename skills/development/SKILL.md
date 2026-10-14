@@ -10,6 +10,43 @@ Read only matching language references unless their complete content is already 
 For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
 Use `.yaml` for YAML files unless the consuming platform requires another exact filename.
 
+## Development Lifecycle
+
+Choose the lifecycle from the requested outcome before editing.
+Record the behavior contract, affected consumers, exclusions, and observable acceptance evidence.
+Inspect the affected implementation and stop discovery once evidence supports the smallest safe change.
+
+For features, define the expected user behavior and preserved contracts before selecting the implementation.
+Name the data model or state transitions when they remove invalid states or repeated branching.
+Use existing tools and dependencies before introducing new infrastructure.
+
+For bugs, reproduce the trigger on the matching execution surface before fixing it.
+Use observations to eliminate competing causes and confirm the surviving mechanism.
+When a cheap local regression path exists, make it fail for the intended reason before changing production code.
+Otherwise, use the closest executable reproduction and record its limits.
+Rerun the original trigger after the fix and check affected consumers.
+
+For refactoring, capture the current behavior before moving structure.
+Use characterization, recorded output, or an equivalence check that exercises the real contract.
+Keep that evidence passing through each bounded change.
+Migrate all affected callers and remove superseded interfaces together.
+Treat discovered features or bugs as separate scoped outcomes.
+
+For performance work, record a baseline trace and measurement conditions before proposing an optimization.
+Change one supported hypothesis at a time and compare the same workload under comparable conditions.
+Check results and errors alongside timings.
+Keep measured improvements and remove changes whose evidence refutes their premise.
+
+Verify each coherent unit before building dependent work on it.
+Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
+Use [Verification](../verification/SKILL.md) for matching-surface evidence and its limits.
+Main and [Delivery](../delivery/SKILL.md) retain review, integration, and cleanup authority.
+
+These procedures guide the user's agent session.
+Shared contributor requirements need project automation rather than reliance on injected instructions.
+Use the project's adopted tooling baseline, with Sinon Harness owning its shared lint rules when applicable.
+Do not change that tooling source or consumer projects without authorization.
+
 | Language | Source | Reference |
 | --- | --- | --- |
 | Java | `.java` | [Java](references/java.md) |

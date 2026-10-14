@@ -5,6 +5,8 @@
       "style": "fenced"
     },
     "docs/no-box-drawing": true,
+    "docs/sentence-per-line": true,
+    "docs/table-separators": true,
     "line-length": false,
     "no-duplicate-heading": {
       "siblings_only": true
@@ -26,6 +28,8 @@
   },
   "customRules": [
     "./rules/no-box-drawing.ts",
+    "./rules/sentence-per-line.ts",
+    "./rules/table-separators.ts",
     "markdownlint-rule-relative-links"
   ],
   "gitignore": ".gitignore",
