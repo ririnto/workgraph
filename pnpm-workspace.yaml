@@ -11,3 +11,4 @@ catalog:
 
 overrides:
   markdownlint-cli2>smol-toml: ^1.9.1
+  micromark-extension-math>katex: ^0.19.0

@@ -222,12 +222,15 @@ pnpm install --frozen-lockfile
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
 The real pre-commit and pre-push hooks run `pnpm run pre-commit` and `pnpm run pre-push`.
 Each script runs the complete existing check gate and blocks the Git operation on failure.
+The aggregate gate requires `pnpm audit --prod` to pass.
 Ultracite owns source lint and formatting, including the adopted Sinon source-style plugins.
 Markdownlint also checks sentence boundaries and table separators using the adopted Harness rules.
 
 The pnpm workspace overrides markdownlint-cli2's pinned smol-toml with a patched release in the same major version.
 Remove that scoped override when markdownlint-cli2 supports the patched parser directly.
-The remaining braces and KaTeX advisories await supported upstream fixes in [Issue #78](https://github.com/ririnto/workgraph/issues/78) and [Issue #79](https://github.com/ririnto/workgraph/issues/79).
+The workspace also scopes patched KaTeX to micromark-extension-math, whose declared range still permits only the affected series.
+Remove that override when the parent supports a patched release directly, tracked in [Issue #79](https://github.com/ririnto/workgraph/issues/79).
+The unpatched braces advisory remains in development dependencies, tracked in [Issue #78](https://github.com/ririnto/workgraph/issues/78).
 These development dependencies are not required by the hook runtime.
 
 Follow [AGENTS.md](AGENTS.md) for contributor conventions and validation commands.
