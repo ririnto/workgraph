@@ -54,7 +54,8 @@ Record requested settings and report resolved values only when the host exposes 
 ### Assignments
 
 Specify inputs, ownership, authority, outputs, acceptance evidence, and cleanup, passing user constraints recursively through assignments and follow-ups.
-Before delegating Git writes, specify operations, refs, ownership limits, and pre-action checks.
+Before delegating Git writes, specify allowed commands, refs, ownership limits, and pre-action checks in the prompt.
+For Git-writing fan-out, forbid destructive commands and require fast-forward-only syncs and skip-with-reason results when blocked.
 Give each shared resource one writer.
 Give each outcome one owner and execution path.
 Identify unexpected changes' source with an exploration agent.

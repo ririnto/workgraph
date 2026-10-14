@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: agent-selection
-description: Verify that Main uses Agent for independent single-stage work instead of Workflow.
+description: Verify that Main uses Agent for one bounded assessment.
 execution:
   runs: 1
   max_turns: 20
@@ -8,12 +8,13 @@ execution:
   allowed_tools:
     - Agent
     - Workflow
+    - Skill(workgraph:main-agent-contract)
     - Skill(workgraph:workflow)
     - Skill(workflow-authoring)
   prompt: |-
-    Please orchestrate a read-only assessment with subagents.
-    Give one worker batch A and another worker batch B, and combine their independent results in Main.
-    No worker needs another worker's result.
+    Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
+    Delegate one bounded read-only assessment to a worker.
+    Give that worker both batches and report its result in Main.
     A finding blocks release if its required timeout is absent.
     Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
     Batch B has B1 with a timeout, B2 without a timeout, and B3 with a timeout.
@@ -23,7 +24,8 @@ graders:
   - name: agents-invoked
     type: tool_used
     tool: Agent
-    min: 2
+    min: 1
+    max: 1
   - name: workflow-not-invoked
     type: tool_used
     tool: Workflow
@@ -31,7 +33,12 @@ graders:
     max: 0
   - name: blockers-reported
     type: llm
+    focus: trace
     criteria: |-
+      Require Main's contract and selected Claude reference to be loaded before delegation.
+      Require one completed Agent assessment that receives both batches and applies the timeout rule.
+      Main must use that worker's actual result to identify the blockers.
+      An irrelevant Agent call, missing worker result, or report before completion fails this check.
       The final report identifies A1 and B2 as the only blockers.
       It applies the missing required timeout rule to both independent batches.
       It does not claim files were edited or a release was published.

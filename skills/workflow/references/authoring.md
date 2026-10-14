@@ -37,9 +37,6 @@ Do not use TypeScript annotations or syntax.
 `agent(prompt, options)` returns a promise and may return `null` after a skip or terminal API failure.
 Await each required `agent()`, `pipeline()`, `parallel()`, and nested `workflow()` call.
 A schema requests structured output, but the script must validate required fields and acceptance criteria.
-Follow [Main's model policy](../../main-agent-contract/SKILL.md#models) when choosing agent settings.
-Workflow inherits session settings when options are omitted, so pass supported `opts.model` and `opts.effort` values for unpinned `agent()` settings.
-Omit only settings pinned by the selected `agentType`.
 Check native descriptions before using optional settings or a custom agent type.
 
 `phase(title)` and agent options such as `label` and `phase` group progress for display.
@@ -47,9 +44,8 @@ They do not create dependency edges or guarantee that work ran.
 Set `opts.phase` explicitly inside concurrent stages to avoid global phase races.
 `meta.phases` describes progress and does not schedule or enforce phases.
 
-Follow the active session's Workflow size and concurrency guidance.
-Treat a planning guideline as guidance, not a runtime cap, unless the host says otherwise.
-The native probes did not establish a universal concurrency limit.
+Choose another permitted family or limit fan-out items when a caller enforces a per-family concurrency cap.
+Workflow fan-out does not enforce that caller's family cap.
 
 Without a token target, `budget.total` is `null` and `budget.remaining()` is `Infinity`.
 Serialization may display that `Infinity` as `null`, which does not mean zero.
@@ -77,17 +73,18 @@ When an empty input is valid, run the later phase and record why it had no items
 Record explicit phase outcomes such as `completed`, `skipped`, or `failed` with a reason.
 A skipped required phase must fail the final acceptance check.
 Return success only when every required phase has validated completion evidence.
-Compare the returned phase evidence with `meta.phases` before returning success.
+Validate returned outcomes against a script-local list matching the declared phases before returning success.
 
 ```js
-const requiredTitles = new Set(meta.phases.map(item => item.title))
+const declaredTitles = ['Count', 'Verify']
+const requiredTitles = new Set(declaredTitles)
 const completedTitles = phaseEvidence
   .filter(item => item.status === 'completed')
   .map(item => item.title)
 const completedTitleSet = new Set(completedTitles)
 
 if (
-  requiredTitles.size !== meta.phases.length ||
+  requiredTitles.size !== declaredTitles.length ||
   phaseEvidence.length !== requiredTitles.size ||
   completedTitles.length !== requiredTitles.size ||
   completedTitleSet.size !== requiredTitles.size ||
@@ -108,20 +105,10 @@ A completion notification or successful top-level return alone proves neither ex
 
 Resume only in the same session, using the original `runId` and returned `scriptPath`.
 Inspect the journal and relevant transcripts before explaining unexpected results or deciding what to rerun.
-Stop an active prior run with the host's stop control before editing or resuming it.
-Verify that the prior run has ended before continuing.
-Completed runs are already stopped.
 
 Edit the stored script and pass `scriptPath` with `resumeFromRunId` to continue the same run.
 Preserve accepted evidence only while behavior, inputs, configuration, and toolchain remain relevant.
 A cache hit avoids repeated work but does not prove acceptance.
-
-Keep earlier agent prompts, options, schemas, and call order unchanged as a conservative cache-preserving recipe.
-Append new calls and phases after the unchanged prefix.
-Pass new information through appended prompts or arguments used only by new calls.
-If an earlier call consumes changed arguments, treat its prompt and later cache as changed.
-The host describes reuse of the longest unchanged agent-call prefix, but not every cache-key detail.
-Do not claim a specific option invalidates cache unless the current host contract documents it.
 
 ## Anti-Patterns
 
@@ -131,8 +118,6 @@ Do not claim a specific option invalidates cache unless the current host contrac
 - Do not return successfully before required verification or synthesis runs.
 - Do not start the same outcome through both Agent and Workflow.
 - Do not trust a schema without checking the returned fields and evidence.
-- Do not reorder, reword, or re-parameterize earlier calls during a cache-preserving extension.
-- Do not insert new agent calls before a cached prefix or resume without the original `runId`.
 - Do not resume a Workflow from another session.
 
 ## Append-Only Example
@@ -195,8 +180,9 @@ const phaseEvidence = [
   { title: 'Count', status: 'completed' },
   { title: 'Verify', status: 'completed' }
 ]
+const declaredTitles = ['Count', 'Verify']
 if (JSON.stringify(phaseEvidence.map(item => item.title)) !==
-    JSON.stringify(meta.phases.map(item => item.title))) {
+    JSON.stringify(declaredTitles)) {
   throw new Error('Required phase evidence is incomplete')
 }
 return { complete: true, phaseEvidence, prior, verification }
