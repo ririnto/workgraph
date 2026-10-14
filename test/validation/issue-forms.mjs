@@ -66,18 +66,22 @@ const validateAttributes = (attributes, fieldName, labels, report) => {
   }
 };
 
+const validateMappedTextarea = (field, fieldName, ids, labels, report) => {
+  const { attributes, id, type, validations } = field;
+  if (type !== "textarea") {
+    report(`${fieldName} must use the textarea type.`);
+  }
+  validateFieldId(id, fieldName, ids, report);
+  validateAttributes(attributes, fieldName, labels, report);
+  if (!isMapping(validations) || validations.required !== true) {
+    report(`${fieldName} must require a response.`);
+  }
+};
+
 const validateTextarea = (field, index, ids, labels, report) => {
   const fieldName = `body[${index + 1}]`;
   if (isMapping(field)) {
-    const { attributes, id, type, validations } = field;
-    if (type !== "textarea") {
-      report(`${fieldName} must use the textarea type.`);
-    }
-    validateFieldId(id, fieldName, ids, report);
-    validateAttributes(attributes, fieldName, labels, report);
-    if (!isMapping(validations) || validations.required !== true) {
-      report(`${fieldName} must require a response.`);
-    }
+    validateMappedTextarea(field, fieldName, ids, labels, report);
   } else {
     report(`${fieldName} must be a mapping.`);
   }
@@ -97,6 +101,12 @@ const validateBody = (body, report) => {
   }
 };
 
+const validateMappedForm = (form, report) => {
+  const { body } = form;
+  validateTopLevel(form, report);
+  validateBody(body, report);
+};
+
 /**
  * Validate the issue-form fields Workgraph uses.
  * @param {unknown} form Parsed YAML value.
@@ -107,9 +117,7 @@ export const validateIssueForm = (form, source = "<form>") => {
   const errors = [];
   const report = (message) => errors.push(`${source}: ${message}`);
   if (isMapping(form)) {
-    const { body } = form;
-    validateTopLevel(form, report);
-    validateBody(body, report);
+    validateMappedForm(form, report);
   } else {
     report("issue form must be a YAML mapping.");
   }
