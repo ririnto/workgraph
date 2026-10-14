@@ -32,6 +32,6 @@
     "./rules/table-separators.ts",
     "markdownlint-rule-relative-links"
   ],
-  "gitignore": ".gitignore",
+  "gitignore": true,
   "globs": ["**/*.md"]
 }

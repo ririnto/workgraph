@@ -12,6 +12,11 @@ import type {
 } from "@oxc-project/types";
 
 /**
+ * Workgraph adapts the Sinon Harness control flow while preserving its diagnostic contract.
+ * The upstream Apache-2.0 license is retained in LICENSES/sinon-harness.txt.
+ */
+
+/**
  * Oxlint comment token shape used by sourceCode comment lookup.
  */
 interface Comment {
@@ -45,29 +50,28 @@ interface RuleContext {
  * @returns The printable name, or undefined when the node carries none.
  */
 const nameOf = (value: unknown): string | undefined => {
-  if (typeof value !== "object" || value === null) {
-    return undefined;
-  }
-  if ("name" in value && typeof value.name === "string") {
-    return value.name;
-  }
-  if (
-    "value" in value &&
-    (typeof value.value === "string" ||
-      typeof value.value === "number" ||
-      typeof value.value === "boolean" ||
-      typeof value.value === "bigint")
+  const node = typeof value === "object" && value !== null ? value : undefined;
+  let name: string | undefined;
+  if (node && "name" in node && typeof node.name === "string") {
+    ({ name } = node);
+  } else if (
+    node &&
+    "value" in node &&
+    (typeof node.value === "string" ||
+      typeof node.value === "number" ||
+      typeof node.value === "boolean" ||
+      typeof node.value === "bigint")
   ) {
-    return String(value.value);
+    name = String(node.value);
+  } else if (node && "left" in node && "right" in node) {
+    const left = nameOf(node.left);
+    const right = nameOf(node.right);
+    name =
+      left !== undefined && right !== undefined
+        ? `${left}.${right}`
+        : undefined;
   }
-  if ("left" in value && "right" in value) {
-    const left = nameOf(value.left);
-    const right = nameOf(value.right);
-    return left !== undefined && right !== undefined
-      ? `${left}.${right}`
-      : undefined;
-  }
-  return undefined;
+  return name;
 };
 
 /**
@@ -211,16 +215,12 @@ const exportTsdocRule = {
       }
     };
     /**
-     * Validate an exposed class's public members once, regardless of export count.
+     * Report documentation diagnostics for an exposed class's public members.
      *
      * @param node Exposed class declaration node to validate.
      * @returns Nothing.
      */
-    const validateClassMembers = (node: Class): void => {
-      if (checkedClasses.has(node)) {
-        return;
-      }
-      checkedClasses.add(node);
+    const reportClassMembers = (node: Class): void => {
       for (const element of node.body.body) {
         if (isPublicClassElement(element)) {
           report(
@@ -232,6 +232,18 @@ const exportTsdocRule = {
       }
     };
     /**
+     * Validate an exposed class once without reading already checked members.
+     *
+     * @param node Exposed class declaration node to validate.
+     * @returns Nothing.
+     */
+    const validateClassMembers = (node: Class): void => {
+      if (!checkedClasses.has(node)) {
+        checkedClasses.add(node);
+        reportClassMembers(node);
+      }
+    };
+    /**
      * Validate TSDoc on a supported exported declaration node.
      *
      * @param node Exported declaration node from an export wrapper.
@@ -240,14 +252,11 @@ const exportTsdocRule = {
     const validateExportedDeclaration = (
       node: Node | null | undefined
     ): void => {
-      if (!node) {
-        return;
-      }
-      const kind = declarationKinds[node.type];
-      if (isClassDeclaration(node)) {
+      const kind = node ? declarationKinds[node.type] : undefined;
+      if (node && isClassDeclaration(node)) {
         report(node, "class", nodeName(node));
         validateClassMembers(node);
-      } else if (kind !== undefined) {
+      } else if (node && kind !== undefined) {
         report(
           node,
           kind,
@@ -287,47 +296,44 @@ const exportTsdocRule = {
         }
       }
     };
-    if (
-      !/\.(?:[cm]?ts|tsx)$/u.test(
-        context.filename ?? context.getFilename?.() ?? ""
-      )
-    ) {
-      return {};
-    }
-    return {
-      ExportAllDeclaration(node: ExportAllDeclaration) {
-        report(node, "re-export", exportStatementName(node));
-      },
-      ExportDefaultDeclaration(node: ExportDefaultDeclaration) {
-        if (node.declaration.type in declarationKinds) {
-          validateExportedDeclaration(node.declaration);
-        } else {
-          report(node, "default export", "default");
-          if (node.declaration.type === "Identifier") {
-            validateLocalClass(node, node.declaration.name);
-          }
-        }
-      },
-      ExportNamedDeclaration(node: ExportNamedDeclaration) {
-        if (node.declaration) {
-          validateExportedDeclaration(node.declaration);
-        } else if (node.source || node.specifiers.length > 0) {
-          report(
-            node,
-            node.source ? "re-export" : "export list",
-            exportStatementName(node)
-          );
-          if (!node.source) {
-            for (const specifier of node.specifiers) {
-              validateLocalClass(node, nameOf(specifier.local));
+    return /\.(?:[cm]?ts|tsx)$/u.test(
+      context.filename ?? context.getFilename?.() ?? ""
+    )
+      ? {
+          ExportAllDeclaration(node: ExportAllDeclaration) {
+            report(node, "re-export", exportStatementName(node));
+          },
+          ExportDefaultDeclaration(node: ExportDefaultDeclaration) {
+            if (node.declaration.type in declarationKinds) {
+              validateExportedDeclaration(node.declaration);
+            } else {
+              report(node, "default export", "default");
+              if (node.declaration.type === "Identifier") {
+                validateLocalClass(node, node.declaration.name);
+              }
             }
+          },
+          ExportNamedDeclaration(node: ExportNamedDeclaration) {
+            if (node.declaration) {
+              validateExportedDeclaration(node.declaration);
+            } else if (node.source || node.specifiers.length > 0) {
+              report(
+                node,
+                node.source ? "re-export" : "export list",
+                exportStatementName(node)
+              );
+              if (!node.source) {
+                for (const specifier of node.specifiers) {
+                  validateLocalClass(node, nameOf(specifier.local));
+                }
+              }
+            }
+          },
+          TSExportAssignment(node: TSExportAssignment) {
+            report(node, "export assignment", "=");
           }
         }
-      },
-      TSExportAssignment(node: TSExportAssignment) {
-        report(node, "export assignment", "=");
-      }
-    };
+      : {};
   },
   meta: {
     docs: {

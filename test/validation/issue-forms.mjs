@@ -54,17 +54,7 @@ const validateFieldLabel = (label, fieldName, labels, report) => {
   }
 };
 
-const validateTextarea = (field, index, ids, labels, report) => {
-  const fieldName = `body[${index + 1}]`;
-  if (!isMapping(field)) {
-    report(`${fieldName} must be a mapping.`);
-    return;
-  }
-  const { attributes, id, type, validations } = field;
-  if (type !== "textarea") {
-    report(`${fieldName} must use the textarea type.`);
-  }
-  validateFieldId(id, fieldName, ids, report);
+const validateAttributes = (attributes, fieldName, labels, report) => {
   if (isMapping(attributes)) {
     const { description, label } = attributes;
     validateFieldLabel(label, fieldName, labels, report);
@@ -74,8 +64,36 @@ const validateTextarea = (field, index, ids, labels, report) => {
   } else {
     report(`${fieldName} must have an attributes mapping.`);
   }
-  if (!isMapping(validations) || validations.required !== true) {
-    report(`${fieldName} must require a response.`);
+};
+
+const validateTextarea = (field, index, ids, labels, report) => {
+  const fieldName = `body[${index + 1}]`;
+  if (isMapping(field)) {
+    const { attributes, id, type, validations } = field;
+    if (type !== "textarea") {
+      report(`${fieldName} must use the textarea type.`);
+    }
+    validateFieldId(id, fieldName, ids, report);
+    validateAttributes(attributes, fieldName, labels, report);
+    if (!isMapping(validations) || validations.required !== true) {
+      report(`${fieldName} must require a response.`);
+    }
+  } else {
+    report(`${fieldName} must be a mapping.`);
+  }
+};
+
+const validateTextareas = (body, report) => {
+  const ids = new Set();
+  const labels = new Set();
+  for (const [index, field] of body.entries()) {
+    validateTextarea(field, index, ids, labels, report);
+  }
+};
+
+const validateBody = (body, report) => {
+  if (Array.isArray(body) && body.length > 0) {
+    validateTextareas(body, report);
   }
 };
 
@@ -88,18 +106,12 @@ const validateTextarea = (field, index, ids, labels, report) => {
 export const validateIssueForm = (form, source = "<form>") => {
   const errors = [];
   const report = (message) => errors.push(`${source}: ${message}`);
-  if (!isMapping(form)) {
-    return [`${source}: issue form must be a YAML mapping.`];
-  }
-  const { body } = form;
-  validateTopLevel(form, report);
-  if (!Array.isArray(body) || body.length === 0) {
-    return errors;
-  }
-  const ids = new Set();
-  const labels = new Set();
-  for (const [index, field] of body.entries()) {
-    validateTextarea(field, index, ids, labels, report);
+  if (isMapping(form)) {
+    const { body } = form;
+    validateTopLevel(form, report);
+    validateBody(body, report);
+  } else {
+    report("issue form must be a YAML mapping.");
   }
   return errors;
 };

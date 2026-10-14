@@ -15,6 +15,7 @@ Run a focused command when only one listed area changes.
 | Markdown references resolve to files and headings. | `README.md`, `skills/`, and `docs/`. | `pnpm run check:markdownlint-cli2` and `pnpm run check:validation-tests` | The Markdown gate checks repository links, while validation tests cover existing file and heading links and reject missing files. |
 | Issue templates follow Workgraph's supported schema. | `.github/ISSUE_TEMPLATE/*.yaml` and `test/validation/issue-forms.mjs`. | `pnpm run check:issue-forms` | `pnpm run check:validation-tests` covers required fields, unique names, field IDs, and invalid forms. |
 | Host plugin versions use matching calendar-date releases. | `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, and `test/validation/plugin-version.mjs`. | `pnpm run check:plugin-version` | `pnpm run check:validation-tests` covers date format, valid dates, nonzero sequence, and parity. |
+| Adopted lint rules preserve protected prose, first matches, class reuse, and filename selection. | `rules/sentence-per-line.ts`, `plugins/tsdoc-plugin.ts`, and `test/tooling.test.mjs`. | `pnpm run check:tooling-tests` | Tests check Markdownlint parser diagnostics and TSDoc visitor effects, including lazy reads. |
 
 These checks exercise repository source and registered commands, not native host activation.
 Installed-host activation, interactive invocation menus, and model adherence require direct host-session evidence.
