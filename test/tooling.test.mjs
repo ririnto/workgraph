@@ -51,6 +51,46 @@ test("sentence searches retain the first matching column and preserve protected 
   );
 });
 
+test("sentence token traversal preserves leaf diagnostics through deep containers", () => {
+  let params;
+  lint({
+    config: { default: false, "docs/sentence-per-line": true },
+    customRules: [
+      {
+        ...sentencePerLine,
+        function: (input) => {
+          params = input;
+        }
+      }
+    ],
+    strings: { "input.md": "- First sentence. Second sentence.\n" }
+  });
+  const [container] = params.parsers.micromark.tokens;
+  const paragraph = container.children
+    .flatMap(({ children }) => children)
+    .find(({ type }) => type === "paragraph");
+  assert.ok(paragraph);
+  let nested = paragraph;
+  for (let depth = 0; depth < 10_000; depth += 1) {
+    nested = { ...container, children: [nested] };
+  }
+  const expected = [];
+  sentencePerLine.function(params, (diagnostic) => expected.push(diagnostic));
+  assert.equal(expected.length, 1);
+  const actual = [];
+  sentencePerLine.function(
+    {
+      ...params,
+      parsers: {
+        ...params.parsers,
+        micromark: { ...params.parsers.micromark, tokens: [nested] }
+      }
+    },
+    (diagnostic) => actual.push(diagnostic)
+  );
+  assert.deepEqual(actual, expected);
+});
+
 test("TSDoc class reuse preserves diagnostic order and reads members only once", () => {
   const reports = [];
   let memberReads = 0;

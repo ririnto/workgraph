@@ -72,24 +72,25 @@ interface Finding {
  */
 const proseBlocks = (tokens: readonly MicromarkToken[]): MicromarkToken[] => {
   const blocks: MicromarkToken[] = [];
-  const walk = {
-    children(children: readonly MicromarkToken[]): void {
-      for (const child of children) {
-        walk.token(child);
-      }
-    },
-    token(token: MicromarkToken): void {
-      if (token.type === "paragraph") {
-        blocks.push(token);
-      } else if (
-        !skippedContainerTypes.has(token.type) &&
-        (token.type !== "blockQuote" || alertPattern.test(token.text))
-      ) {
-        walk.children(token.children);
-      }
+  const iterators = [tokens[Symbol.iterator]()];
+  const visit = (token: MicromarkToken): void => {
+    if (token.type === "paragraph") {
+      blocks.push(token);
+    } else if (
+      !skippedContainerTypes.has(token.type) &&
+      (token.type !== "blockQuote" || alertPattern.test(token.text))
+    ) {
+      iterators.push(token.children[Symbol.iterator]());
     }
   };
-  walk.children(tokens);
+  for (let iterator = iterators.at(-1); iterator; iterator = iterators.at(-1)) {
+    const step = iterator.next();
+    if (step.done) {
+      iterators.pop();
+    } else {
+      visit(step.value);
+    }
+  }
   return blocks;
 };
 
