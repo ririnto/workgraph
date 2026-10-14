@@ -1,7 +1,7 @@
 # Third-Party Notices
 
 Workgraph contains instructions informed by the projects and documents listed here.
-It does not redistribute their source files verbatim.
+Bundled third-party tooling retains the attribution and license identified below.
 The [research notes](docs/research.md) record source evidence, reviewed sections, and limits.
 This document records attribution and prior sources.
 
@@ -33,6 +33,11 @@ We reviewed its automatic English captions and presentation screens.
 Her CLI and feature-map examples, correction priorities, and Dune ownership boundaries informed Verification and Development guidance.
 Workgraph adapts those ideas without redistributing her video, slides, transcript, pstack, or Dune implementation.
 The [research notes](docs/research.md#lauren-tan-on-verification-and-agent-environments) distinguish practitioner examples from Workgraph evidence.
+
+We also studied the original [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) on its `main` branch.
+Its MIT license credits Lauren Tan, copyright 2026.
+Its feature, bug-fix, refactoring, performance, TDD, verification, and shipping procedures informed Development's lifecycle decisions.
+Workgraph adapts those decisions without bundling pstack source or importing Cursor tools, models, or stack operations.
 
 ## Giver Architecture
 
@@ -100,7 +105,10 @@ We reviewed [ririnto/sinon](https://github.com/ririnto/sinon) on its named `main
 The repository's root MIT license credits ririnto, copyright 2026.
 The reviewed Harness component declares [Apache-2.0](https://github.com/ririnto/sinon/blob/main/plugins/harness/LICENSE).
 The Harness Java parity mapping, Kotlin rules, and Gradle compatibility guidance informed the Development references.
-Workgraph adapts their decision boundaries without bundling Sinon tooling or requiring its installation.
+Workgraph adapts their decision boundaries without requiring a Sinon installation.
+Its development tooling copies the Harness source-style plugins and Markdown sentence and table-separator rules.
+These files retain the Harness [Apache-2.0 license](LICENSES/sinon-harness.txt), with attribution to ririnto.
+The repository owns the copied configuration and checks without modifying the upstream Harness.
 
 ## Research And Official Documentation
 

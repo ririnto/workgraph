@@ -26,4 +26,7 @@ const rule: Rule = {
   tags: ["docs", "unicode"]
 };
 
+/**
+ * Provide the Markdown box drawing diagnostic.
+ */
 export default rule;

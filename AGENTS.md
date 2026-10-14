@@ -61,9 +61,9 @@ Emit context only after all required files load and contain text.
 Keep host permissions and task execution in the host.
 
 Update consumers when replacing paths or interfaces, and remove the replaced implementation in the same change.
-Use Node and npm for development.
+Use Node and pnpm for development.
 Follow the Node engine range in `package.json`.
-Keep the dependency pins in `package-lock.json` consistent with the manifest.
+Keep dependency versions in the `pnpm-workspace.yaml` catalog and resolutions in `pnpm-lock.yaml` consistent with the manifest.
 
 Match the existing lint configuration.
 Use `const` for bindings that do not change.
@@ -78,12 +78,12 @@ Use block sequences except for an explicit empty sequence.
 Keep development validation gates in `test/validation/` and their Node tests in `test/`.
 Select the narrowest applicable read-only gate.
 
-- Use `npm run check:markdownlint-cli2` for prose-only changes.
-- Use `npm run check:hooks` for changes confined to hook execution.
-- Use `npm run check:issue-forms` for issue form YAML changes.
-- Use `npm run check:plugin-version` for host manifest version checks.
-- Use `npm run check:validation-tests` for issue form and release version gate tests.
-- Use `npm run check` for mixed changes or repository-wide validation of Markdown, Ultracite, hooks, and issue form/version gates.
+- Use `pnpm run check:markdownlint-cli2` for prose-only changes.
+- Use `pnpm run check:hooks` for changes confined to hook execution.
+- Use `pnpm run check:issue-forms` for issue form YAML changes.
+- Use `pnpm run check:plugin-version` for host manifest version checks.
+- Use `pnpm run check:validation-tests` for issue form and release version gate tests.
+- Use `pnpm run check` for mixed changes or repository-wide validation of Markdown, Ultracite, hooks, and issue form/version gates.
 
 After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
 For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.

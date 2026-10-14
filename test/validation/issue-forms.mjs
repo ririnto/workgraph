@@ -81,6 +81,9 @@ const validateTextarea = (field, index, ids, labels, report) => {
 
 /**
  * Validate the issue-form fields Workgraph uses.
+ * @param {unknown} form Parsed YAML value.
+ * @param {string} source Diagnostic source label.
+ * @returns {string[]} Schema diagnostics.
  */
 export const validateIssueForm = (form, source = "<form>") => {
   const errors = [];
@@ -120,12 +123,17 @@ const parseIssueFormContent = (content, source) => {
 
 /**
  * Parse and validate one issue form with markdownlint-cli2's YAML parser.
+ * @param {string} content YAML source text.
+ * @param {string} source Diagnostic source label.
+ * @returns {string[]} Parse and schema diagnostics.
  */
 export const validateIssueFormContent = (content, source = "<form>") =>
   parseIssueFormContent(content, source).errors;
 
 /**
  * Validate issue forms together, including unique chooser names.
+ * @param {{content: string, source: string}[]} forms Labeled YAML sources.
+ * @returns {string[]} Parse, schema, and duplicate-name diagnostics.
  */
 export const validateIssueForms = (forms) => {
   const parsedForms = forms.map(({ content, source }) =>

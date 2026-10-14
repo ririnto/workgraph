@@ -15,12 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: pnpm/setup@v3.0.0
         with:
-          node-version-file: package.json
-          cache: npm
-      - run: npm ci
-      - run: npm run check
+          runtime: node@24
+          install: false
+          cache: true
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run check
   macos:
     name: macOS hooks
     runs-on: macos-latest
@@ -29,7 +30,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: package.json
-      - run: npm run check:hooks
+      - run: node --test hooks/inject-context.test.mjs
   node18:
     name: Node.js 18 hooks
     runs-on: ubuntu-latest
@@ -38,4 +39,4 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 18
-      - run: npm run check:hooks
+      - run: node --test hooks/inject-context.test.mjs

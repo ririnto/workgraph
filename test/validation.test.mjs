@@ -68,6 +68,9 @@ body:
 
 /**
  * Lint one source file with only relative-link validation enabled.
+ * @param {string} filename Source path used for link resolution.
+ * @param {string} content Markdown source text.
+ * @returns {Promise<object[]>} Relative-link diagnostics.
  */
 const lintRelativeLinks = async (filename, content) => {
   const result = await lint({

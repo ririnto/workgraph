@@ -27,6 +27,10 @@ const hookTimeoutMilliseconds = 5000;
 
 /**
  * Run the hook with the current Node and capture its result.
+ * @param {string[]} args Hook event and host arguments.
+ * @param {string} scriptPath Injector path.
+ * @param {string} cwd Child working directory.
+ * @returns {object} Captured process output and exit status.
  */
 const runHook = (args, scriptPath = script, cwd = tmpdir()) =>
   spawnSync(process.execPath, [scriptPath, ...args], {
@@ -38,6 +42,9 @@ const runHook = (args, scriptPath = script, cwd = tmpdir()) =>
 
 /**
  * Replace the test shell so timeout termination reaches the hook process.
+ * @param {string} command Configured shell command.
+ * @param {object} env Child environment overrides.
+ * @returns {object} Captured process output and exit status.
  */
 const runConfiguredHook = (command, env) =>
   spawnSync(`exec ${command}`, {
@@ -51,6 +58,8 @@ const runConfiguredHook = (command, env) =>
 
 /**
  * Copy the plugin into a disposable directory owned by the test.
+ * @param {import("node:test").TestContext} t Test cleanup owner.
+ * @returns {string} Disposable plugin root.
  */
 const copyPlugin = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph skills "));
@@ -72,6 +81,11 @@ const copyPlugin = (t) => {
 
 /**
  * Assert the complete output, including exact source paths and loaded text.
+ * @param {string} event Hook event.
+ * @param {string} host Selected execution host.
+ * @param {string} rootSkills Skill directory.
+ * @param {string} body Optional replacement skill body.
+ * @returns {object} Expected hook envelope.
  */
 const expectedOutput = (event, host, rootSkills = skills, body = "") => {
   const name =
@@ -105,6 +119,8 @@ const expectedOutput = (event, host, rootSkills = skills, body = "") => {
 
 /**
  * Assert that a required file failure emits no partial context.
+ * @param {object} result Captured hook process result.
+ * @param {string} file Required file named in the error.
  */
 const assertFileFailure = (result, file) => {
   assert.equal(result.status, 1, result.stderr);

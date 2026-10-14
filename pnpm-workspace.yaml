@@ -1,0 +1,13 @@
+catalog:
+  "@oxc-project/types": ^0.153.0
+  husky: ^9.1.7
+  markdownlint: ^0.41.1
+  markdownlint-cli2: ^0.23.3
+  markdownlint-rule-relative-links: ^5.1.2
+  npm-run-all2: ^9.0.3
+  oxfmt: ^0.71.0
+  oxlint: ^1.87.0
+  ultracite: ^7.12.4
+
+overrides:
+  markdownlint-cli2>smol-toml: ^1.9.1
