@@ -7,6 +7,8 @@ const versionPattern =
 
 /**
  * Validate matching host plugin versions in yyyy.mm.dd.seq format.
+ * @param {string} claudeVersion Claude manifest version.
+ * @param {string} codexVersion Codex manifest version.
  */
 export const validatePluginVersions = (claudeVersion, codexVersion) => {
   for (const [host, version] of [

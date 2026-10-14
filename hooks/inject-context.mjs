@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url";
 
 /**
  * Report hook errors without emitting partial context.
+ * @param {string} message Failure description.
+ * @param {number} code Process exit status.
  */
 const fail = (message, code) => {
   console.error(`inject-context: ${message}`);
@@ -14,6 +16,9 @@ const fail = (message, code) => {
 /**
  * Resolve and load required text before emitting any context.
  * Match trimmed delimiter lines and preserve the remaining text.
+ * @param {string} file Skill-relative instruction path.
+ * @param {boolean} stripFrontmatter Whether to remove skill metadata.
+ * @returns {{body: string, content: string, source: string}} Loaded instruction text and canonical path.
  */
 const readInstruction = (file, stripFrontmatter) => {
   try {
