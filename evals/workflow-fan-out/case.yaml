@@ -1,0 +1,37 @@
+schema_version: "1.1"
+name: workflow-fan-out
+description: Verify that Main selects Workflow for independent fan-out without dependent stages.
+execution:
+  runs: 1
+  max_turns: 20
+  timeout_seconds: 360
+  allowed_tools:
+    - Agent
+    - Workflow
+    - Skill(workgraph:workflow)
+    - Skill(workflow-authoring)
+  prompt: |-
+    Please orchestrate a read-only assessment with subagents.
+    Give one worker batch A and another worker batch B, and combine their independent results in Main.
+    No worker needs another worker's result.
+    A finding blocks release if its required timeout is absent.
+    Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
+    Batch B has B1 with a timeout, B2 without a timeout, and B3 with a timeout.
+    Report only after both workers finish.
+    Report the blocker IDs and explain the rule.
+    Do not edit files, run Git commands, or publish anything.
+graders:
+  - name: workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+  - name: fan-out-completed
+    type: llm
+    focus: trace
+    criteria: |-
+      Require completed native Workflow results from both independent workers before the final report.
+      The workers assess separate batches without consuming each other's results.
+      Main combines their actual results and reports A1 and B2 as the only blockers.
+      It applies the missing required timeout rule and claims no edits or publication.
+      A proposed run, missing worker result, permission denial, or report before completion fails this check.
+      Judge observed tool results and evidence rather than fixed wording.

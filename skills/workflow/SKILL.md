@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use in the Claude Code main session when the user explicitly requests native Workflow or a follow-up may depend on an accepted earlier result.
+  Use in Claude Code main sessions for fan-out, dependent stages, or verification that benefits from orchestration.
 argument-hint: "[goal]"
 ---
 
@@ -31,9 +31,11 @@ Use its returned `scriptPath` and same-session `resumeFromRunId` for an authoriz
 Pass structured JSON through `args` when the script needs runtime inputs.
 Await every required agent, pipeline, parallel, or nested Workflow promise before returning.
 
+Keep a valid Workflow running because cancellation loses in-progress agent results.
+Stop only broken or unauthorized runs.
+Wait for completion before changing its script, then append later phases or accept a full rerun.
+
 If the native Workflow tool is unavailable, report that it did not run.
-For an explicit Workflow request, do not silently substitute Agent or direct execution when Workflow is unavailable.
-For an implicit selection, continue with Agent only when it can safely deliver bounded outcomes, and report the Workflow limitation.
 
 ## Verify Results
 
