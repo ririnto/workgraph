@@ -73,17 +73,18 @@ When an empty input is valid, run the later phase and record why it had no items
 Record explicit phase outcomes such as `completed`, `skipped`, or `failed` with a reason.
 A skipped required phase must fail the final acceptance check.
 Return success only when every required phase has validated completion evidence.
-Compare the returned phase evidence with `meta.phases` before returning success.
+Validate returned outcomes against a script-local list matching the declared phases before returning success.
 
 ```js
-const requiredTitles = new Set(meta.phases.map(item => item.title))
+const declaredTitles = ['Count', 'Verify']
+const requiredTitles = new Set(declaredTitles)
 const completedTitles = phaseEvidence
   .filter(item => item.status === 'completed')
   .map(item => item.title)
 const completedTitleSet = new Set(completedTitles)
 
 if (
-  requiredTitles.size !== meta.phases.length ||
+  requiredTitles.size !== declaredTitles.length ||
   phaseEvidence.length !== requiredTitles.size ||
   completedTitles.length !== requiredTitles.size ||
   completedTitleSet.size !== requiredTitles.size ||
@@ -179,8 +180,9 @@ const phaseEvidence = [
   { title: 'Count', status: 'completed' },
   { title: 'Verify', status: 'completed' }
 ]
+const declaredTitles = ['Count', 'Verify']
 if (JSON.stringify(phaseEvidence.map(item => item.title)) !==
-    JSON.stringify(meta.phases.map(item => item.title))) {
+    JSON.stringify(declaredTitles)) {
   throw new Error('Required phase evidence is incomplete')
 }
 return { complete: true, phaseEvidence, prior, verification }

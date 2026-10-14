@@ -35,3 +35,8 @@ graders:
       It applies the missing required timeout rule and claims no edits or publication.
       A proposed run, missing worker result, permission denial, or report before completion fails this check.
       Judge observed tool results and evidence rather than fixed wording.
+  - name: standalone-agent-not-invoked
+    type: tool_used
+    tool: Agent
+    min: 0
+    max: 0

@@ -31,7 +31,11 @@ graders:
     max: 0
   - name: blockers-reported
     type: llm
+    focus: trace
     criteria: |-
+      Require one completed Agent assessment that receives both batches and applies the timeout rule.
+      Main must use that worker's actual result to identify the blockers.
+      An irrelevant Agent call, missing worker result, or report before completion fails this check.
       The final report identifies A1 and B2 as the only blockers.
       It applies the missing required timeout rule to both independent batches.
       It does not claim files were edited or a release was published.
