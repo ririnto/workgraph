@@ -212,6 +212,11 @@ The real pre-commit and pre-push hooks run `pnpm run pre-commit` and `pnpm run p
 Each script runs the complete existing check gate and blocks the Git operation on failure.
 The aggregate gate requires `pnpm audit --prod` to pass.
 Ultracite owns source lint and formatting, including the adopted Sinon source-style plugins.
+The root configs use the official Ultracite 8 presets and preserve their ignore patterns.
+Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
+The local style and TSDoc plugins retain mandatory function-body spacing, declaration-comment, and exported TypeScript documentation checks.
+These additions follow the [Sinon tooling examples](https://github.com/ririnto/sinon/tree/main/plugins/harness/tooling/pnpm).
+JavaScript parameter and return annotations and type imports follow the official preset defaults.
 Markdownlint also checks sentence boundaries and table separators using the adopted Harness rules.
 
 The pnpm workspace overrides markdownlint-cli2's pinned smol-toml with a patched release in the same major version.
