@@ -58,6 +58,7 @@ Before delegating Git writes, specify allowed commands, refs, ownership limits, 
 For Git-writing fan-out, forbid destructive commands and require fast-forward-only syncs and skip-with-reason results when blocked.
 Give each shared resource one writer.
 Give each outcome one owner and execution path.
+Raise concurrency only after verification of the delegated outcome demonstrates that its results can be trusted.
 Identify unexpected changes' source with an exploration agent.
 Account for changes within a running agent's assignment and continue.
 Without native agent waiting, end idle turns awaiting only notifications, without claiming completion.

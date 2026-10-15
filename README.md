@@ -172,22 +172,9 @@ The plugin includes no output assets or bundled helper scripts because its skill
 
 ### Application Verification
 
-Verification connects application behavior to reproducible commands and observable results.
-Development loads it for behavior changes, performance work, or report reproduction.
-Instruction Authoring loads it when instructions change behavior.
-It stays conditional and outside hook context.
-
-Reuse the project's existing CLI, tests, and diagnostics before adding verification helpers.
-Use a focused feature map when repeated reports need product context beyond those tools.
-Keep feature access paths, expected outcomes, owners, and checks beside the project's verification instructions.
-Update affected entries when their behavior changes.
-
-Development prioritizes correcting architecture and data structures, then automated checks, then rules and skills, and finally human-only guidance.
-Its Development lifecycle distinguishes features, bug fixes, refactoring, and performance work.
-Keep legal execution boundaries and shared-state ownership explicit.
-Development keeps the user's engineering preferences self-contained, including comment documentation, async calls, early exits, dependency style, and LTS selection.
-Its side-effect boundaries record why risky items remain policy text without new lint rules, autofixes, or runtime changes.
-External alerts and reports remain inputs to the authorized task graph, using the host's existing execution tools.
+Read Verification for behavior changes, performance claims, or report reproduction, and Development for lifecycle selection, correction order, user preferences, and side-effect boundaries.
+Instruction Authoring routes instruction behavior changes to Verification.
+These skills stay conditional and outside hook context.
 
 The maintainer [verification map](docs/verification-map.md) links Workgraph behavior to existing commands and evidence limits.
 Passing source or hook checks does not establish installed host activation or model adherence.

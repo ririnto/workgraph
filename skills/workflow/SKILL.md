@@ -15,6 +15,8 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 
 ## Prepare The Run
 
+Use native Workflow for independent fan-out or dependent verification, including follow-ups that consume an accepted result or run only when that result permits them.
+Use a single host Agent for one bounded task, exclude speculative future tasks and display-only phases, and report unavailable implicit Workflow before using Agent only when it safely meets the task contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 Encode its actual dependencies in script control flow, not in progress labels.
 Pass each required predecessor result to the dependent call.

@@ -29,7 +29,6 @@ Rerun the original trigger after the fix and check affected consumers.
 For refactoring, capture the current behavior before moving structure.
 Use characterization, recorded output, or an equivalence check that exercises the real contract.
 Keep that evidence passing through each bounded change.
-Migrate all affected callers and remove superseded interfaces together.
 Treat discovered features or bugs as separate scoped outcomes.
 
 For performance work, record a baseline trace and measurement conditions before proposing an optimization.
@@ -66,6 +65,8 @@ For external contributions, restrict style cleanup to lines already included in 
 
 Preserve the project's declared runtime, toolchain, public contracts, and required failure behavior.
 Avoid unnecessary helpers, abstractions, and custom configuration layers.
+Replace superseded implementations and their consumers together, removing obsolete paths in the same change.
+Agents copy nearby code as precedent, so avoid copying neighboring workarounds and fix recurring causes in code or data architecture first.
 Use official SDK or framework properties directly when they satisfy the required behavior.
 Prefer immutable bindings and minimize mutable state.
 
@@ -117,6 +118,7 @@ Record the affected item and reason in the task report.
 | Early-exit inversion | Rewriting branches can change evaluation order, cleanup, cost, or admission and security checks. |
 | Dependency style and LTS selection | Manifest restructuring or upgrades can change resolution, runtime requirements, and supported APIs. |
 | Rule rollout | New diagnostics and fixes can misclassify source or change behavior before target-specific validation. |
+| Structured validation identifiers | Replacing exported string diagnostics or bare errors changes observable validator contracts, so keep migration as policy until those consumers can be migrated safely. |
 
 ## Dependency Versions
 
@@ -163,6 +165,7 @@ Adding instructions alone does not authorize lint implementations or changes acr
 
 For behavioral changes, performance claims, or report reproduction, read Verification unless its complete content is already loaded.
 When correcting a defect, fix its cause in code or data architecture first.
+When needed, a narrow guard may stop new instances of a known bad pattern before separate cleanup of existing debt.
 Next, use existing static checks or add meaningful regression checks.
-Update rules or skills only when they prevent recurrence.
+Update rules or skills only when they prevent recurrence, pairing prevention with removal of existing offending patterns where feasible.
 Change human-only guides last.

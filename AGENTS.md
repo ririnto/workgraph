@@ -20,7 +20,6 @@ Match native loading by excluding YAML for Claude and retaining the complete ski
 Load every selected file before emitting context, without requiring model retrieval during hook startup.
 Keep all skills model-invocable and user-invocable.
 Keep Workflow focused on its lower-level operation without repeating the Main contract.
-Remove replaced paths and aliases without compatibility layers.
 
 Use `README.md` for installation and runtime behavior.
 Read `docs/design.md` when changing instruction boundaries or hook delivery.
@@ -60,7 +59,6 @@ Keep hook commands portable through the selected host's plugin-root variable.
 Emit context only after all required files load and contain text.
 Keep host permissions and task execution in the host.
 
-Update consumers when replacing paths or interfaces, and remove the replaced implementation in the same change.
 Use Node and pnpm for development.
 Follow the Node engine range in `package.json`.
 Keep dependency versions in the `pnpm-workspace.yaml` catalog and resolutions in `pnpm-lock.yaml` consistent with the manifest.
