@@ -1,10 +1,90 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { test } from "node:test";
 
 import { lint } from "markdownlint/sync";
 
 import tsdoc from "../plugins/tsdoc-plugin.ts";
 import sentencePerLine from "../rules/sentence-per-line.ts";
+
+test("Ultracite preserves mandatory rules, ignores, and formatter convergence", async () => {
+  const root = path.resolve(import.meta.dirname, "..");
+  const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tooling-"));
+  try {
+    await Promise.all(
+      ["package.json", "oxlint.config.ts", "oxfmt.config.ts", "plugins"].map(
+        (entry) =>
+          cp(path.join(root, entry), path.join(directory, entry), {
+            recursive: true
+          })
+      )
+    );
+    await symlink(
+      path.join(root, "node_modules"),
+      path.join(directory, "node_modules")
+    );
+    await mkdir(path.join(directory, "dist"));
+    await writeFile(
+      path.join(directory, "dist/ignored.ts"),
+      "not valid TypeScript {"
+    );
+    const markdown = "# Unformatted\n\n|A|B|\n|-|-|\n|1|2|\n";
+    await writeFile(path.join(directory, "ignored.md"), markdown);
+    await writeFile(
+      path.join(directory, "sample.ts"),
+      "export const sample = () => {\n// explain\n\nreturn 1;\n};\n"
+    );
+    const command = path.join(root, "node_modules/ultracite/dist/index.js");
+    const invalid = spawnSync(
+      process.execPath,
+      [command, "check", "--format", "json"],
+      {
+        cwd: directory,
+        encoding: "utf-8",
+        timeout: 30_000
+      }
+    );
+    assert.ifError(invalid.error);
+    assert.equal(invalid.status, 1, invalid.stderr);
+    const start = invalid.stdout.search(/\{\s*"diagnostics"\s*:/u);
+    assert.notEqual(start, -1, invalid.stdout);
+    const { diagnostics } = JSON.parse(
+      invalid.stdout.slice(start, invalid.stdout.lastIndexOf("}") + 1)
+    );
+    assert.deepEqual(diagnostics.map(({ code }) => code).toSorted(), [
+      "eslint(arrow-body-style)",
+      "style(no-blank-lines-in-functions)",
+      "style(no-inline-comments-in-functions)",
+      "tsdoc(require-export-tsdoc)"
+    ]);
+    const valid =
+      "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true\n};\n";
+    await writeFile(path.join(directory, "sample.ts"), valid);
+    for (const action of ["fix", "fix", "check"]) {
+      const result = spawnSync(process.execPath, [command, action], {
+        cwd: directory,
+        encoding: "utf-8",
+        timeout: 30_000
+      });
+      assert.ifError(result.error);
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.equal(
+        readFileSync(path.join(directory, "sample.ts"), "utf-8"),
+        valid
+      );
+      assert.equal(
+        readFileSync(path.join(directory, "ignored.md"), "utf-8"),
+        markdown
+      );
+    }
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
 
 /**
  * Capture sentence diagnostics through Markdownlint's real parser.

@@ -2,8 +2,7 @@ import { defineConfig } from "oxfmt";
 import ultracite from "ultracite/oxfmt";
 
 /**
- * Extends the shared ultracite Oxfmt configuration with Markdown exclusion
- * and a trailing-comma ban.
+ * Preserve Ultracite ignores, Markdown exclusion, and the trailing-comma ban.
  */
 export default defineConfig({
   ...ultracite,
