@@ -79,7 +79,7 @@ The Worker contract owns bounded assignments and handbacks.
 Both keep their role procedures self-contained, and these instructions do not guarantee model adherence.
 
 Claude Code uses native Workflow when a follow-up may depend on an accepted earlier result, including conditional follow-ups, or when explicitly requested.
-Its [Main host reference](skills/main-agent-contract/references/claude.md#orchestration) owns selection and fallback rules.
+Its [Main host reference](skills/main-agent-contract/references/claude.md#orchestration) routes to Workflow for selection and fallback rules.
 The Workflow skill owns graph preparation, execution, and result verification.
 Codex uses native delegation under its [Main host reference](skills/main-agent-contract/references/codex.md), without native Claude Code Workflow.
 
