@@ -31,7 +31,7 @@ Main loads Delivery before repository edits, branch creation, implementation dis
 Main and Worker conditionally load Writing, Instruction Authoring, and Development for tasks within those skills' scopes.
 Development and Instruction Authoring route behavioral work to the conditional Verification skill.
 Development selects acceptance, reproduction, equivalence, or measurement evidence according to the requested change.
-Its lifecycle procedure guides the user's session and leaves shared contributor enforcement to project automation and the Sinon Harness.
+Its lifecycle procedure and bundled engineering preferences guide the user's session independently of other plugins.
 Hooks inject only the selected role and host reference, leaving task skills and language references conditional.
 Consumer skills and their references stay inside this plugin.
 Skip retrieving conditional files whose complete content is already loaded.
@@ -153,9 +153,9 @@ The [README](../README.md#goal-driven-work) introduces goal-driven work for plug
 The delivery skill owns branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
 Exposure scans cover user environment details and secrets only.
 Commit author and committer names and email addresses are contributor information, excluded from exposure findings, rewrites, and publication blocks.
-[Main](../skills/main-agent-contract/SKILL.md) owns orchestration and evidence acceptance, while [Worker](../skills/subagent-context/SKILL.md) owns bounded assignment handbacks.
+Main Agent Contract owns orchestration and evidence acceptance, while Subagent Context owns bounded assignment handbacks.
 Each role carries its applicable requirements for retaining evidence, verifying cleanup ownership, and terminating owned processes.
-Links keep those procedures in their operational sources rather than duplicating them in design notes.
+Skill names identify the operational sources without duplicating their procedures in design notes.
 
 The graph below shows conditional loading and review timing for authorized repository delivery.
 Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.

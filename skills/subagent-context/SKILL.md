@@ -32,8 +32,8 @@ Agent assignments remain agent-origin even when relaying a human project request
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
 Preserve required human input, report actionable blockers, and send mandatory host messages.
-For prose or Markdown work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
-For instruction files, read [Instruction Authoring](../instruction-authoring/SKILL.md) unless its complete content is already loaded.
+For prose or Markdown work, read Writing unless its complete content is already loaded.
+For instruction files, read Instruction Authoring unless its complete content is already loaded.
 
 ### Host Guidance
 
@@ -78,7 +78,7 @@ Report retained resources and incomplete cleanup with their purpose and next act
 
 ## Source Work
 
-Before source or maintained code work, read [Development](../development/SKILL.md) unless its complete content is already loaded.
+Before source or maintained code work, read Development unless its complete content is already loaded.
 
 ## Delegation And Git
 

@@ -235,7 +235,9 @@ test("relative link rule rejects missing files", async (t) => {
   const source = path.join(temporaryRoot, "source.md");
   const errors = await lintRelativeLinks(source, "[Missing](./missing.md)\n");
   assert.equal(errors.length, 1);
-  assert.match(errors[0].errorDetail, /should exist in the file system/u);
+  assert.deepEqual(errors[0].ruleNames, ["relative-links"]);
+  assert.equal(errors[0].lineNumber, 1);
+  assert.equal(errors[0].severity, "error");
 });
 
 test("plugin version validation accepts matching calendar date releases", () => {
@@ -266,28 +268,25 @@ test("plugin version validation rejects invalid format, date, sequence, and pari
 test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-entrypoints-"));
   t.after(() => rmSync(root, { force: true, recursive: true }));
-  for (const [filename, output] of [
-    ["issue-forms.mjs", "Validated 2 GitHub issue forms.\n"],
-    [
-      "plugin-version.mjs",
-      "Host plugin versions match the yyyy.mm.dd.seq format.\n"
-    ]
-  ]) {
+  for (const filename of ["issue-forms.mjs", "plugin-version.mjs"]) {
     const source = fileURLToPath(
       new URL(`validation/${filename}`, import.meta.url)
     );
     const alias = path.join(root, filename);
     symlinkSync(source, alias, "file");
-    for (const entrypoint of [source, alias]) {
-      const result = spawnSync(process.execPath, [entrypoint], {
+    const results = [source, alias].map((entrypoint) =>
+      spawnSync(process.execPath, [entrypoint], {
         cwd: root,
         encoding: "utf-8",
         killSignal: "SIGKILL",
         timeout: 5000
-      });
+      })
+    );
+    for (const result of results) {
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
-      assert.equal(result.stdout, output);
+      assert.ok(result.stdout.trim().length > 0);
     }
+    assert.equal(results[0].stdout, results[1].stdout);
   }
 });

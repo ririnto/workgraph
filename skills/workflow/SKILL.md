@@ -15,6 +15,8 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 
 ## Prepare The Run
 
+Use native Workflow for independent fan-out or dependent verification, including follow-ups that consume an accepted result or run only when that result permits them.
+Use a single host Agent for one bounded task, exclude speculative future tasks and display-only phases, and report unavailable implicit Workflow before using Agent only when it safely meets the task contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 Encode its actual dependencies in script control flow, not in progress labels.
 Pass each required predecessor result to the dependent call.
@@ -22,7 +24,7 @@ Use one execution path per outcome instead of duplicating work in host Agent and
 For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
-Follow [Main's model policy](../main-agent-contract/SKILL.md#models) for agent settings.
+Follow the Main Agent Contract's model policy for agent settings.
 
 ## Run Workflow
 

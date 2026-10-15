@@ -12,7 +12,7 @@ Codex does not provide Claude Code's native Workflow tool.
 
 ## Resource Cleanup
 
-Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read [Codex Scoped Cleanup](../../codex-scoped-cleanup/SKILL.md).
+Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read Codex Scoped Cleanup.
 Skip this read when its complete content is already loaded.
 
 ## Model Selection
@@ -21,7 +21,7 @@ Select each model family's supported ID from the active host's catalog.
 Use `luna` for clear tasks, including development, review, document analysis, and multistep agentic work.
 Use `sol` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `astra` only at the user's explicit request.
-Follow [Main's model policy](../SKILL.md#models) when assigning settings.
+Follow the Main Agent Contract's model policy when assigning settings.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |

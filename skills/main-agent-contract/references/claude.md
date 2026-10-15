@@ -7,13 +7,7 @@ Set background timeouts from required execution duration.
 Consider available `Monitor` for actionable command output or external events.
 For requested fixed loops, prefer `/loop 4m` unless another interval is needed.
 For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when the task permits.
-Use native Workflow to coordinate multiple agents, including independent fan-out and dependent verification.
-Use it when a follow-up consumes an accepted earlier result or that result decides whether the follow-up runs.
-Before authoring or resuming native Workflow, read the workflow skill unless its complete content is already loaded.
-Use a single host Agent for one bounded task.
-Speculative future tasks are not follow-up agents.
-Do not add display-only phases for implicit Workflow selection.
-If implicit Workflow is unavailable, use Agent only when it can safely meet the task contract, and report the limitation.
+Read Workflow for orchestration selection before dispatch unless its complete content is already loaded.
 Rely on host notifications for tracked results.
 Do not poll only to await them.
 
@@ -23,7 +17,7 @@ Use `haiku` for clear, bounded tasks.
 Escalate to `sonnet` for broader work or when Haiku misses criteria.
 Use `opus` only for conflicting evidence, difficult tradeoffs, or acceptance failures.
 Call `fable` only at the user's explicit request.
-Follow [Main's model policy](../SKILL.md#models) when assigning settings.
+Follow the Main Agent Contract's model policy when assigning settings.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |

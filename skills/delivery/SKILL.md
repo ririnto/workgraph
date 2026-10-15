@@ -44,7 +44,7 @@ Create local evidence only when a current check, failure investigation, or recov
 
 Use project roles or the user's statement to determine whether the user maintains the project.
 Run one full independent review per delivery unit.
-Follow [Main's model policy](../main-agent-contract/SKILL.md#models) when assigning review or scan agents.
+Follow the Main Agent Contract's model policy when assigning review or scan agents.
 Select the review order from the user's project role.
 
 ```mermaid
@@ -74,7 +74,7 @@ Reuse or update an existing tracker item when possible.
 Without authorized, available tracker access, do not integrate with untracked deferrals.
 Implement deferred follow-ups only after updating the base branch.
 Repeat base syncs or rebases only for conflicts or invalidated evidence.
-Set a finite fix/re-review limit and stop sooner without progress or when a concrete blocker prevents work.
+Follow Main Agent Contract for retry bounds and progress requirements.
 
 Integrate after required checks pass, confirmed blockers are resolved, and deferred follow-ups are recorded.
 Finish delivery by verifying the authorized base branch update.

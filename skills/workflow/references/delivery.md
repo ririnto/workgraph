@@ -23,9 +23,4 @@ Start ready independent nodes in parallel and serialize conflicting writes.
 Join branches only when a later node requires their combined results.
 
 Main owns node status and decides whether to retry, reassign, or stop after a failure.
-Before retrying, confirm the previous attempt ended and inspect partial effects.
-Retry only after a changed input, new evidence, or a recovery action justifies another attempt.
-Stop when the finite retry bound or exit condition is reached.
-
-Integrate after required checks pass, confirmed blockers are resolved, and accepted deferrals are registered.
-Verify the authorized base branch update before reporting completion.
+Follow Main Agent Contract for retry bounds and attempt handling, and Delivery for integration gates and base readback.
