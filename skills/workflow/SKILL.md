@@ -22,7 +22,7 @@ Use one execution path per outcome instead of duplicating work in host Agent and
 For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
-Follow [Main's model policy](../main-agent-contract/SKILL.md#models) for agent settings.
+Follow the Main Agent Contract's model policy for agent settings.
 
 ## Run Workflow
 

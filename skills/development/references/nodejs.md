@@ -7,12 +7,13 @@ Keep required early exits and inferred or declared return types.
 Preserve required exits, labels, `finally` behavior, loop effects, and async contracts.
 
 Prefer appropriate `await` and error handling over using `void` solely to discard a call's return value.
+This is guidance only, not a lint requirement or automatic rewrite.
 Preserve callback contracts, async signatures, execution order, and intentional background work.
 For intentional background work, preserve its existing error-handling policy without forcing callers to wait.
 
 ## Automation
 
 For authorized Node.js lint automation, prefer supported built-in Oxlint rules and Oxfmt formatting through Ultracite when the project uses it.
-Keep a functioning direct Oxlint and Oxfmt stack when changing only the wrapper name would add no capability.
+Ultracite is the only caller of Oxlint and Oxfmt.
 Check installed versions before adding custom rules or assuming a formatter can enforce a requirement.
 Do not add dependencies with known vulnerabilities.

@@ -388,7 +388,7 @@ At 14:56–18:57, she prioritizes code structure, static analysis, rules and Bug
 At 26:43–30:38, Dune slides show execution boundaries, state ownership, discovered feature files, and checks before review.
 At 32:35–35:16, external reports and alerts trigger work using existing bot and cloud-agent tooling.
 
-These examples motivate [Verification](../skills/verification/SKILL.md) and Development's correction procedure.
+These examples motivate Verification and Development's correction procedure.
 Workgraph reuses existing commands and adds a focused [maintainer verification map](verification-map.md).
 Consumer feature maps remain optional, local to the relevant project, and updated with affected behavior.
 Main already owns ready-node execution, bounded assignments, and shared-resource writers.
@@ -396,7 +396,8 @@ The host already owns connectors, event delivery, and task execution.
 We retain those boundaries instead of adding a scheduler or copying Dune's framework.
 
 Tan describes banning comments in Dune after agents used them to justify workarounds.
-Workgraph instead preserves required semantic comments and declaration documentation while removing in-scope bad exemplars.
+The user's comment preference permits declaration documentation and preserves required directives, licenses, existing suppressions, and documented safety invariants.
+Workgraph records risky transformations as policy text without adding explanatory logging or automatic rewrites.
 Her talk supplies no controlled Workgraph evaluation, proof of universal comment harm, or automatic-merge acceptance policy.
 Runtime observation does not establish formal correctness, and hook delivery does not establish model adherence.
 
@@ -638,11 +639,11 @@ The [performance playbook](https://github.com/cursor/plugins/blob/main/pstack/sk
 The [verification principle](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-prove-it-works/SKILL.md) checks the actual artifact rather than a proxy.
 The [shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/shipping.md) rechecks whether verdicts describe the current candidate.
 
-Workgraph adapts these decisions into its conditional [Development skill](../skills/development/SKILL.md#development-lifecycle).
+Workgraph adapts these decisions into its conditional Development skill.
 Existing Main, Delivery, and Verification contracts retain orchestration, publication authority, evidence freshness, and cleanup.
 We do not import Cursor-specific tools, model choices, mandatory stack operations, force pushes, or reordered shared history.
 Consumer lifecycle guidance runs in the user's session.
-Shared contributor rules require project automation and belong in the Sinon Harness when that baseline applies.
+Workgraph keeps the user's engineering preferences self-contained and remains independent of the Sinon Harness.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.
 
 ## pnpm And Git Hook Tooling

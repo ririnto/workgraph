@@ -39,13 +39,13 @@ Keep measured improvements and remove changes whose evidence refutes their premi
 
 Verify each coherent unit before building dependent work on it.
 Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
-Use [Verification](../verification/SKILL.md) for matching-surface evidence and its limits.
-Main and [Delivery](../delivery/SKILL.md) retain review, integration, and cleanup authority.
+Main and Delivery retain review, integration, and cleanup authority.
 
 These procedures guide the user's agent session.
-Shared contributor requirements need project automation rather than reliance on injected instructions.
-Use the project's adopted tooling baseline, with Sinon Harness owning its shared lint rules when applicable.
-Do not change that tooling source or consumer projects without authorization.
+Workgraph carries the user's engineering preferences independently of other plugins.
+Keep those preferences self-contained here and in the matching bundled language references.
+Apply the target project's rules and existing tools without requiring a Harness installation.
+Guidance alone does not authorize tooling changes or changes across consumer projects.
 
 | Language | Source | Reference |
 | --- | --- | --- |
@@ -73,6 +73,10 @@ Inline single-use local values only when readability, evaluation order, side eff
 Also preserve cost, inferred types, overload selection, and captured snapshots.
 
 Prefer condition inversion to reduce mid-function `return`, `continue`, or `break` statements when equivalent behavior stays intact without deeper nesting.
+Treat this preference as guidance only, without a lint rule or autofix.
+Lint rules and formatter output take precedence.
+Preserve evaluation order, side effects, cost, cancellation, cleanup, and security or admission conditions.
+Keep natural final returns and required failure propagation.
 
 ## Spacing
 
@@ -94,16 +98,32 @@ Preserve their text, indentation, declaration attachment, and language-native se
 Documentation for other declarations is optional unless tooling or a safety contract requires it.
 
 Remove obsolete workaround comments when changing affected code.
-Use no explanatory inline comments.
-Preserve required semantic comments, including build directives, licenses, suppressions, and safety invariants.
-For necessary catch or ignore explanations, use the existing logger's safe debug or trace level when appropriate.
-Keep log arguments free of side effects.
-Do not add filler logs, expose sensitive values, or change exception propagation, recovery, or control flow.
+General comments are banned.
+Use declaration documentation comments when an explanation is needed, rather than general comments.
+Preserve required directives, licenses, existing suppressions, and safety invariants expressed as documentation.
+Do not add runtime logging calls to preserve an explanation.
+
+## Side-Effect Boundaries
+
+Keep risky preferences as policy text only.
+Do not add a lint rule, autofix, or behavior change for an item with side-effect risk.
+Record the affected item and reason in the task report.
+
+| Item | Reason to keep it as policy text |
+| --- | --- |
+| Comment removal or relocation | Removing directives or changing documentation attachment can alter tooling, public contracts, or safety information. |
+| Explanatory logging | Added runtime calls change effects, cost, and possible information exposure. |
+| Await instead of void | Awaiting can change scheduling, callback contracts, rejection handling, and cancellation. |
+| Early-exit inversion | Rewriting branches can change evaluation order, cleanup, cost, or admission and security checks. |
+| Dependency style and LTS selection | Manifest restructuring or upgrades can change resolution, runtime requirements, and supported APIs. |
+| Rule rollout | New diagnostics and fixes can misclassify source or change behavior before target-specific validation. |
 
 ## Dependency Versions
 
 When selecting dependency versions, prefer officially supported LTS releases, or stable releases when no LTS line exists.
 Verify current support status and compatibility with the project's runtime, toolchain, and dependent APIs.
+Use existing native dependency catalogs and lockfiles, preserving compatible managed versions.
+Avoid unrelated upgrades.
 Do not add commit-hash or image-digest pinning as part of version selection.
 Preserve existing integrity checks, including lockfile integrity fields and signature or checksum verification.
 
@@ -130,6 +150,9 @@ Make rules AST-aware and preserve literals, comments, and automatic semicolon in
 Provide positive and negative fixtures covering intended matches and cases that must remain unchanged.
 Offer automatic fixes only when evaluation, side effects, and program behavior remain unchanged.
 Verify formatter idempotence and convergence between rule fixes and formatting.
+Stage separately authorized rules on representative source before enabling them across the project.
+Start with read-only checks and review their reports before any safe-fix rollout.
+Do not add suppressions, disable rules, or weaken checks to make a rollout pass.
 
 If a rule cannot detect violations safely, do not add it.
 If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
@@ -138,7 +161,7 @@ Adding instructions alone does not authorize lint implementations or changes acr
 
 ## Verification Routing
 
-For behavioral changes, performance claims, or report reproduction, read [Verification](../verification/SKILL.md) unless its complete content is already loaded.
+For behavioral changes, performance claims, or report reproduction, read Verification unless its complete content is already loaded.
 When correcting a defect, fix its cause in code or data architecture first.
 Next, use existing static checks or add meaningful regression checks.
 Update rules or skills only when they prevent recurrence.

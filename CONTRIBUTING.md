@@ -49,4 +49,4 @@ Use the [pull request template](.github/pull_request_template.md), including whe
 Explain the problem, resulting changes, verification, and remaining limitations.
 Link the issue and use a closing reference only when the change satisfies its acceptance criteria.
 Keep new requirements in separate linked issues.
-Follow the [Delivery skill](skills/delivery/SKILL.md) for publication, independent review, integration, and cleanup.
+Follow the Delivery skill for publication, independent review, integration, and cleanup.

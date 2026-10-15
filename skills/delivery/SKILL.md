@@ -44,7 +44,7 @@ Create local evidence only when a current check, failure investigation, or recov
 
 Use project roles or the user's statement to determine whether the user maintains the project.
 Run one full independent review per delivery unit.
-Follow [Main's model policy](../main-agent-contract/SKILL.md#models) when assigning review or scan agents.
+Follow the Main Agent Contract's model policy when assigning review or scan agents.
 Select the review order from the user's project role.
 
 ```mermaid

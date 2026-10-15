@@ -62,7 +62,7 @@ Separate metadata identifies complete content already loaded by the hook.
 These text fragments match native loading, but the host still delivers them through its hook message envelope.
 Agents need no additional file reads for the injected role and host guidance.
 
-For repository changes or delivery, Main reads the conditional [Delivery skill](skills/delivery/SKILL.md) before starting changes.
+For repository changes or delivery, Main reads the conditional Delivery skill before starting changes.
 Claude hook contexts stay within its 10,000-character inline limit, including tested path and line-ending variations.
 The hooks do not inject repository guidance or research documents.
 
@@ -74,17 +74,17 @@ The main agent starts ready independent work in parallel when writes do not conf
 Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
 Workers complete bounded assignments within their authority.
 
-The [Main contract](skills/main-agent-contract/SKILL.md) owns orchestration, authority, request-origin communication, and evidence freshness.
-The [Worker contract](skills/subagent-context/SKILL.md) owns bounded assignments and handbacks.
+The Main contract owns orchestration, authority, request-origin communication, and evidence freshness.
+The Worker contract owns bounded assignments and handbacks.
 Both keep their role procedures self-contained, and these instructions do not guarantee model adherence.
 
 Claude Code uses native Workflow when a follow-up may depend on an accepted earlier result, including conditional follow-ups, or when explicitly requested.
 Its [Main host reference](skills/main-agent-contract/references/claude.md#orchestration) owns selection and fallback rules.
-The [Workflow skill](skills/workflow/SKILL.md) owns graph preparation, execution, and result verification.
+The Workflow skill owns graph preparation, execution, and result verification.
 Codex uses native delegation under its [Main host reference](skills/main-agent-contract/references/codex.md), without native Claude Code Workflow.
 
 The active Main host reference supplies defaults for each model or effort setting unspecified by the user or configuration.
-Main applies its [model and effort policy](skills/main-agent-contract/SKILL.md#models) to authorized delegations, including native Workflow calls.
+Main applies the Main Agent Contract's model and effort policy to authorized delegations, including native Workflow calls.
 Each Main hook loads only its host's execution, orchestration, and model guidance.
 Worker hooks load their own execution references without Main orchestration or model policy.
 Forked workers can inherit Main's host guidance through parent history.
@@ -119,7 +119,7 @@ Each [role contract](#automatic-instructions) governs evidence retention, replay
 
 The [host Workflow documentation](https://code.claude.com/docs/en/workflows) defines availability, permissions, script discovery, and continuation.
 Workgraph ships no reusable Workflow scripts.
-Read [Workflow](skills/workflow/SKILL.md) for graph procedures and explicit-tool handling.
+Read Workflow for graph procedures and explicit-tool handling.
 Workers complete relayed bounded assignments without starting another Workflow.
 
 ## Skill Invocation
@@ -147,12 +147,12 @@ The hooks operate without skill invocation.
 
 Automatic delivery includes each role's required environment reference.
 Hooks do not inject conditional task skills.
-Main resolves Delivery from its loaded role source directory.
-Main and Worker resolve Writing, Instruction Authoring, and Development from their own loaded role directories.
+Main selects Delivery by skill name.
+Main and Worker select Writing, Instruction Authoring, and Development by skill name.
 Read each conditional skill only when its task scope matches and its complete content is not already loaded.
 Workgraph has no dependency on another plugin's skills or installation.
 
-Codex Main and Worker references conditionally load [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) before retiring its covered resources.
+Codex Main and Worker references conditionally load Codex Scoped Cleanup before retiring its covered resources.
 The cleanup procedure and native attachment reference stay bundled rather than requiring a separate user-level skill.
 Cleanup compares individual session and worktree activity and preserves required changes through retained Git references.
 Its [app-server reference](skills/codex-scoped-cleanup/references/app-server.md) covers native inventory, writer ownership, lifecycle effects, and exact readback.
@@ -172,7 +172,7 @@ The plugin includes no output assets or bundled helper scripts because its skill
 
 ### Application Verification
 
-[Verification](skills/verification/SKILL.md) connects application behavior to reproducible commands and observable results.
+Verification connects application behavior to reproducible commands and observable results.
 Development loads it for behavior changes, performance work, or report reproduction.
 Instruction Authoring loads it when instructions change behavior.
 It stays conditional and outside hook context.
@@ -183,9 +183,10 @@ Keep feature access paths, expected outcomes, owners, and checks beside the proj
 Update affected entries when their behavior changes.
 
 Development prioritizes correcting architecture and data structures, then automated checks, then rules and skills, and finally human-only guidance.
-Its [development lifecycle](skills/development/SKILL.md#development-lifecycle) distinguishes features, bug fixes, refactoring, and performance work.
+Its Development lifecycle distinguishes features, bug fixes, refactoring, and performance work.
 Keep legal execution boundaries and shared-state ownership explicit.
-These procedures do not ban semantic comments or replace existing declaration documentation.
+Development keeps the user's engineering preferences self-contained, including comment documentation, async calls, early exits, dependency style, and LTS selection.
+Its side-effect boundaries record why risky items remain policy text without new lint rules, autofixes, or runtime changes.
 External alerts and reports remain inputs to the authorized task graph, using the host's existing execution tools.
 
 The maintainer [verification map](docs/verification-map.md) links Workgraph behavior to existing commands and evidence limits.

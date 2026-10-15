@@ -5,7 +5,7 @@ description: Use when creating, editing, or reviewing SKILL.md, AGENTS.md, role 
 
 # Instruction Authoring
 
-Read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
+Read Writing unless its complete content is already loaded.
 
 ## Define The Boundary
 
@@ -31,7 +31,8 @@ Put shared procedure in the skill body and conditional detail in focused skills 
 
 Keep required supporting instructions in bundled skills or references.
 Use external instruction links as optional attribution, without requiring agents to retrieve them.
-Link each conditional file from its caller with a trigger and a resolvable path.
+Refer to conditional skills by their plain skill names and state when they apply.
+Link supporting reference files from their callers with triggers and resolvable bundled paths.
 Read each selected file before applying its rules.
 Identify sources already loaded completely so agents do not retrieve them again.
 
@@ -42,7 +43,7 @@ Remove replaced paths and update their consumers in the same change.
 
 ## Validate The Result
 
-For changed instruction behavior, read [Verification](../verification/SKILL.md) unless its complete content is already loaded.
+For changed instruction behavior, read Verification unless its complete content is already loaded.
 Enforce structural requirements through existing validators when they can check the contract safely.
 Keep semantic judgment separate from lexical assertions about instruction wording.
 

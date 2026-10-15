@@ -6,6 +6,7 @@ import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  readdirSync,
   realpathSync,
   rmSync,
   symlinkSync,
@@ -540,109 +541,74 @@ test("Codex delimiter lines preserve raw files and remove Claude body prefixes",
   }
 });
 
-test("roles resolve conditional skills from relocated sources without injecting them", (t) => {
+test("bundled skills retain invocation metadata and supporting reference files", (t) => {
   const root = copyPlugin(t);
-  for (const [event, name] of roles) {
-    const source = path.join(root, "skills", name, "SKILL.md");
-    const linked = [
-      ...readFileSync(source, "utf-8").matchAll(
-        /\]\((?<file>\.\.\/[^)]+\/SKILL\.md)\)/gu
-      )
-    ].map((match) => path.resolve(path.dirname(source), match.groups.file));
-    assert.deepEqual(
-      new Set(linked.map((file) => path.basename(path.dirname(file)))),
-      new Set(
-        event === "SessionStart"
-          ? ["delivery", "writing", "instruction-authoring", "development"]
-          : ["writing", "instruction-authoring", "development"]
-      )
+  for (const name of readdirSync(path.join(root, "skills"))) {
+    const directory = path.join(root, "skills", name);
+    const [prefix, metadata, body] = readFileSync(
+      path.join(directory, "SKILL.md"),
+      "utf-8"
+    ).split(/^---$/mu);
+    assert.equal(prefix, "");
+    assert.match(metadata, new RegExp(`^name: ${name}$`, "mu"));
+    assert.match(metadata, /^description: \S+/mu);
+    assert.doesNotMatch(
+      metadata,
+      /^(?:user-invocable: false|disable-model-invocation: true)$/mu
     );
-    for (const file of linked) {
-      const [, metadata, body] = readFileSync(file, "utf-8").split(/^---$/mu);
-      assert.match(
-        metadata,
-        new RegExp(`^name: ${path.basename(path.dirname(file))}$`, "mu")
-      );
-      assert.match(metadata, /^description: .+$/mu);
-      assert.doesNotMatch(metadata, /^user-invocable: false$/mu);
-      assert.ok(body.trim());
-      for (const host of hosts) {
-        const result = runHook(
-          [event, host],
-          path.join(root, "hooks", "inject-context.mjs")
-        );
-        assert.equal(result.status, 0, result.stderr);
-        assert.ok(
-          !JSON.parse(
-            result.stdout
-          ).hookSpecificOutput.additionalContext.includes(body)
-        );
-        assert.deepEqual(
-          JSON.parse(result.stdout),
-          expectedOutput(event, host, path.join(root, "skills"))
-        );
-      }
+    assert.ok(body.trim());
+    for (const match of body.matchAll(
+      /(?:\]\(|`)(?<file>references\/[^)`#\s]+\.md)/gu
+    )) {
+      const reference = realpathSync(path.join(directory, match.groups.file));
+      assert.ok(reference.startsWith(`${realpathSync(directory)}${path.sep}`));
+      assert.ok(readFileSync(reference, "utf-8").trim());
     }
   }
 });
 
-test("only relocated Claude Main routes to the bundled Workflow procedure without injecting it", (t) => {
+test("conditional skill bodies stay outside automatic delivery and are not startup dependencies", (t) => {
   const root = copyPlugin(t);
-  for (const [event, name] of roles) {
+  const roleNames = new Set(roles.map(([, name]) => name));
+  const conditional = readdirSync(path.join(root, "skills"))
+    .filter((name) => !roleNames.has(name))
+    .map((name) => path.join(root, "skills", name));
+  const bodies = conditional.map((directory) =>
+    readFileSync(path.join(directory, "SKILL.md"), "utf-8")
+      .split(/^---$/mu)[2]
+      .trim()
+  );
+  for (const [event] of roles) {
     for (const host of hosts) {
-      const source = path.join(
-        root,
-        "skills",
-        name,
-        "references",
-        `${host}.md`
+      const result = runHook(
+        [event, host],
+        path.join(root, "hooks", "inject-context.mjs")
       );
-      const routes = [
-        ...readFileSync(source, "utf-8").matchAll(
-          /^(?<instruction>.*\b(?<name>[a-z-]+) skill\b.*)$/gimu
-        )
-      ];
+      assert.equal(result.status, 0, result.stderr);
+      const output = JSON.parse(result.stdout);
       assert.deepEqual(
-        routes.map((match) => match.groups.name.toLowerCase()),
-        event === "SessionStart" && host === "claude" ? ["workflow"] : []
+        output,
+        expectedOutput(event, host, path.join(root, "skills"))
       );
-      for (const routeMatch of routes) {
-        assert.match(routeMatch.groups.instruction, /^Before\b/iu);
-        assert.match(routeMatch.groups.instruction, /\bunless\b.+\bloaded\b/iu);
-        const skillName = routeMatch.groups.name.toLowerCase();
-        const route = path.join(root, "skills", skillName, "SKILL.md");
-        const workflow = readFileSync(route, "utf-8");
-        assert.match(workflow, new RegExp(`^name: ${skillName}$`, "mu"));
-        const references = [
-          ...workflow.matchAll(/`(?<file>references\/[^`]+\.md)`/gu)
-        ].map((match) => path.resolve(path.dirname(route), match.groups.file));
-        assert.ok(
-          references.includes(
-            path.join(root, "skills", "workflow", "references", "authoring.md")
-          )
-        );
-        for (const reference of references) {
-          assert.ok(readFileSync(reference, "utf-8").trim());
-        }
-        const result = runHook(
-          [event, host],
-          path.join(root, "hooks", "inject-context.mjs")
-        );
-        assert.equal(result.status, 0, result.stderr);
-        const context = JSON.parse(result.stdout).hookSpecificOutput
-          .additionalContext;
-        assert.ok(context.includes(routeMatch.groups.instruction));
-        assert.ok(!context.includes(workflow));
-        for (const reference of references) {
-          assert.ok(!context.includes(readFileSync(reference, "utf-8")));
-        }
-        rmSync(path.dirname(route), { recursive: true });
-        assert.equal(
-          runHook([event, host], path.join(root, "hooks", "inject-context.mjs"))
-            .status,
-          0
-        );
+      for (const body of bodies) {
+        assert.ok(!output.hookSpecificOutput.additionalContext.includes(body));
       }
+    }
+  }
+  for (const directory of conditional) {
+    rmSync(directory, { recursive: true });
+  }
+  for (const [event] of roles) {
+    for (const host of hosts) {
+      const result = runHook(
+        [event, host],
+        path.join(root, "hooks", "inject-context.mjs")
+      );
+      assert.equal(result.status, 0, result.stderr);
+      assert.deepEqual(
+        JSON.parse(result.stdout),
+        expectedOutput(event, host, path.join(root, "skills"))
+      );
     }
   }
 });

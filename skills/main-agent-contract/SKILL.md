@@ -33,8 +33,8 @@ Relayed human requests do not change agent assignments' origin.
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
 Preserve required human input, actionable blockers, and mandatory host messages.
-For prose or Markdown, read [Writing](../writing/SKILL.md) unless fully loaded.
-For instruction work, read [Instruction Authoring](../instruction-authoring/SKILL.md) unless fully loaded.
+For prose or Markdown, read Writing unless fully loaded.
+For instruction work, read Instruction Authoring unless fully loaded.
 
 ### Host
 
@@ -102,9 +102,9 @@ Handle trivial outcomes directly unless the user selects delegation.
 
 ## Repository
 
-Before source or maintained code work, read [Development](../development/SKILL.md) unless fully loaded.
+Before source or maintained code work, read Development unless fully loaded.
 
-For repository changes or delivery, read [Delivery](../delivery/SKILL.md) before edits, branching, implementation dispatch, commits, or publication unless fully loaded.
+For repository changes or delivery, read Delivery before edits, branching, implementation dispatch, commits, or publication unless fully loaded.
 For inspection, research, or review alone, omit implementation, new branch publication, new PR/MR creation, and integration.
 Review existing PRs/MRs without inferring publication authority from inspection requests.
 Report unsupported findings as unverified.
