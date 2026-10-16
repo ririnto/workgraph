@@ -29,20 +29,15 @@ These recommendations guide instruction design without changing model or API con
 
 The fetched [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) lists `low`, `medium`, `high`, `xhigh`, and `max` effort settings, with `medium` as the default.
 It does not support `none` or `minimal` effort.
-Delegate clear tasks to Luna and use Sol when stronger judgment is required.
-We confirm supported settings from the model page and maintain the task mapping in Main's Codex reference.
-Apply selection defaults only when no explicit or configured setting exists.
-Main's host references supply task defaults and escalation conditions without requiring comparisons or evaluations during consumer sessions.
-Sol, Sonnet, and Opus efforts above high remain available through explicit or configured choices.
+We confirm supported settings from the model page.
+Main's [Codex](../skills/main-agent-contract/references/codex.md#model-selection) and [Claude Code](../skills/main-agent-contract/references/claude.md#model-selection) references own operational selection defaults and escalation conditions.
+Consumer sessions do not need model comparisons or benchmark evaluations.
 Maintainers use model-specific benchmark and workload evidence when revising these defaults.
 Instruction text does not configure the host or establish model adherence.
 
 OpenAI's [model-selection guide](https://developers.openai.com/api/docs/guides/model-selection.md) gives different effort starting points for Luna, Sol, and Astra.
 It recommends experiments with the same inputs and the lightest setting that meets the required quality.
 The [GPT-6 Luna model page](https://developers.openai.com/api/docs/models/gpt-6-luna.md) supports `none`, `low`, `medium` (default), `high`, `xhigh`, and `max`.
-For other models, use their supported settings, exact-model guidance, and evaluation on comparable tasks.
-Use documented host settings when applicable workload guidance and benchmark evidence are absent.
-Sol's task defaults do not cap effort for Luna, Astra, or Claude.
 We have not established a universal effort-performance curve or a plateau above `high` for Sol.
 
 The OpenAI [Build skills guide](https://learn.chatgpt.com/docs/build-skills.md) recommends instructions over scripts unless deterministic behavior or external tooling is needed.
@@ -132,15 +127,17 @@ The [detailed evidence record](model-effort-evidence.md) retains numerical effor
 Independent review checks the available figures, methods, and verification limits.
 Source verification does not establish model performance outside the published workloads.
 
-| Model | External benchmark finding | Selection implication |
-| --- | --- | --- |
-| [GPT-6 Luna](https://artificialanalysis.ai/models/releases/gpt-6-luna) | High, xhigh, and max score 33, 35, and 38, at estimated $0.03, $0.04, and $0.07 per task. | Higher effort can improve this composite through max, with increasing cost and answer latency. |
-| [GPT-6.1 Sol](https://artificialanalysis.ai/models/releases/gpt-6-1-sol) | High to max raises the rounded composite index from 50 to 52 and estimated task cost from $0.32 to $0.72. | Use medium for ordinary development and high for complex debugging, algorithms, and architecture. |
-| [GPT-6 Astra](https://deepswe.datacurve.ai/artifacts/v1.1/leaderboard-live.json) | Across 452 attempts per effort, medium passes 72.79%, xhigh 74.12%, and max 73.23%. | Use medium for difficult terminal repairs and xhigh for harder tasks. |
-| [Claude Haiku 5.5](https://www.anthropic.com/document/claude-haiku-5-5-system-card) | FrontierCode Main rises from about 42% at medium and high to 45.8% at xhigh and 46.4% at max. | Use xhigh for coding, max for harder tasks, and medium for small code changes. |
-| [Claude Sonnet 5.5](https://artificialanalysis.ai/models/releases/claude-sonnet-5-5) | Medium to max raises the composite index from 41 to 56 and estimated task cost from $0.59 to $7.67. | Use medium for routine coding and high for harder coding or reasoning. |
-| [Claude Opus 5.5](https://artificialanalysis.ai/models/releases/claude-opus-5-5) | Xhigh and max tie at 59.60% terminal passes, while estimated task cost rises from $8.78 to $13.11. | Use medium for complex coding and reasoning, or high for harder tasks. |
-| [Claude Fable 5.1](https://artificialanalysis.ai/models/releases/claude-fable-5-1) | Terminal pass rate peaks at xhigh, while max adds about 0.15 composite points at about 28% more cost. | Use high for long work, xhigh for difficult terminal tasks, and max for the hardest reasoning. |
+| Model | External benchmark finding |
+| --- | --- |
+| [GPT-6 Luna](https://artificialanalysis.ai/models/releases/gpt-6-luna) | High, xhigh, and max score 33, 35, and 38, at estimated $0.03, $0.04, and $0.07 per task. |
+| [GPT-6.1 Sol](https://artificialanalysis.ai/models/releases/gpt-6-1-sol) | High to max raises the rounded composite index from 50 to 52 and estimated task cost from $0.32 to $0.72. |
+| [GPT-6 Astra](https://deepswe.datacurve.ai/artifacts/v1.1/leaderboard-live.json) | Across 452 attempts per effort, medium passes 72.79%, xhigh 74.12%, and max 73.23%. |
+| [Claude Haiku 5.5](https://www.anthropic.com/document/claude-haiku-5-5-system-card) | FrontierCode Main rises from about 42% at medium and high to 45.8% at xhigh and 46.4% at max. |
+| [Claude Sonnet 5.5](https://artificialanalysis.ai/models/releases/claude-sonnet-5-5) | Medium to max raises the composite index from 41 to 56 and estimated task cost from $0.59 to $7.67. |
+| [Claude Opus 5.5](https://artificialanalysis.ai/models/releases/claude-opus-5-5) | Xhigh and max tie at 59.60% terminal passes, while estimated task cost rises from $8.78 to $13.11. |
+| [Claude Fable 5.1](https://artificialanalysis.ai/models/releases/claude-fable-5-1) | Terminal pass rate peaks at xhigh, while max adds about 0.15 composite points at about 28% more cost. |
+
+Higher Luna effort can improve this composite through max, with increasing cost and answer latency.
 
 Artificial Analysis's ten-evaluation composite mixes coding, agent, science, and general tasks.
 Its prices estimate token costs with typical cache behavior rather than actual invoices.
@@ -150,12 +147,7 @@ DeepSWE uses mini-swe-agent and an alias from a job before Astra's public releas
 These differences prevent an isolated comparison with native Codex or Claude Code results.
 Rounded score changes do not establish statistical significance or gains on every workload.
 
-Luna's lower token rates and gains through max support broader coding, review, and agentic assignments with clear requirements.
 The [official model-selection guide](https://developers.openai.com/api/docs/guides/model-selection.md) includes Luna xhigh for constrained problem-solving and multi-app work.
-Select Sol when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
-Step count alone does not require Sol.
-Use Luna xhigh for coding, debugging, refactoring, and code review, or max for harder tasks.
-Use Luna low for simple exploration and extraction.
 These sources do not establish equivalent Luna and Sonnet performance across workloads.
 
 We read the supplied Haiku system card and visually inspected every capability effort curve in Section 8.

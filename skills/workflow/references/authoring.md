@@ -123,6 +123,8 @@ A cache hit avoids repeated work but does not prove acceptance.
 ## Append-Only Example
 
 The first script counts source files and validates its structured result.
+Main selects `args.model` and `args.effort` under its active host reference before the run.
+Pass those settings as structured arguments on the initial invocation and continuation.
 
 ```js
 export const meta = {
@@ -142,8 +144,8 @@ const inventory = await agent('Count source files and return {count: integer}.',
   label: 'inventory',
   phase: 'Count',
   schema: COUNT,
-  model: 'haiku',
-  effort: 'low'
+  model: args.model,
+  effort: args.effort
 })
 if (inventory === null || !Number.isInteger(inventory.count)) {
   throw new Error('Count result is incomplete')
@@ -169,8 +171,8 @@ const verification = await agent(
     label: 'verify',
     phase: 'Verify',
     schema: VERIFY,
-    model: 'haiku',
-    effort: 'medium'
+    model: args.model,
+    effort: args.effort
   }
 )
 if (verification === null || verification.accepted !== true) {
@@ -189,6 +191,7 @@ return { complete: true, phaseEvidence, prior, verification }
 ```
 
 Resume with the same session's `scriptPath` and `resumeFromRunId`.
-Pass actual JSON arguments such as `{ criteria: 'equals 3' }` for the appended call.
+Retain the original `model` and `effort` arguments when resuming.
+Add the new `criteria` argument, such as `'equals 3'`.
 The new prompt carries both the accepted predecessor data and the new criterion.
 Accept the result only when it includes both completed phase records and `{ accepted: true }`.
