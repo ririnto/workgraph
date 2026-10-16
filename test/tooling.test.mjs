@@ -163,6 +163,8 @@ test("sentence semicolons distinguish enumerations from bounded independent clau
     "Supported operating systems: Linux; Windows; macOS.",
     "Choose Linux; Windows; or macOS.",
     "The lifecycle has three phases: setup; restart, if needed; and cleanup.",
+    "The lifecycle has three phases: setup\uFF1B restart, if needed\uFF1B and cleanup.",
+    "The lifecycle has three phases: setup&#xFF1B; restart, if needed&#xFF1B; and cleanup.",
     "Use salt &amp; pepper today.",
     "First stays; \u201Cretry\u201D later."
   ]) {
@@ -197,6 +199,7 @@ test("sentence abbreviations preserve names, examples, time zones, and decimals"
     "At 5 p.m. UTC, start the check.",
     "At 5 a.m. UTC, start the check.",
     "Use e.g. Linux today.",
+    "Use Linux, Windows, etc.\nRestart now.",
     "Dr. Smith is ready.",
     "Ask J. Smith today.",
     "The U.S. team is ready.",
@@ -208,6 +211,7 @@ test("sentence abbreviations preserve names, examples, time zones, and decimals"
   for (const [source, range] of [
     ["The vendor is Acme Inc. Restart the server.", [23, 1]],
     ["The vendor is Acme Ltd. It is ready.", [23, 1]],
+    ["Use Linux, Windows, etc. Restart now.", [24, 1]],
     ["At 5 p.m. Restart the server.", [9, 1]],
     ["Use version 1.2 today. Restart now.", [22, 1]],
     ["First sentence. Second sentence.", [15, 1]]

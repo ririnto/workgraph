@@ -16,7 +16,7 @@ const whitespacePattern = /\s/u;
 const semicolonPattern = /(?<semicolon>[;；;])/gu;
 const abbreviationTailPattern =
   /(?:\b(?:e\.g|i\.e|etc|vs|cf|approx|Inc|Ltd|Co|Corp|Jr|Sr|Dr|Mr|Mrs|Ms|St|Fig|No|ed|al|a\.m|p\.m)|(?:[A-Z]\.)+[A-Z])$/u;
-const companyOrTimeAbbreviationPattern = /\b(?:Inc|Ltd|Co|Corp|a\.m|p\.m)$/u;
+const terminalAbbreviationPattern = /\b(?:Inc|Ltd|Co|Corp|etc|a\.m|p\.m)$/u;
 const initialNameContextPattern =
   /(?:^|\b(?:Ask|Contact|by|from|with|(?:Dr|Mr|Mrs|Ms)\.?)\s+)[A-Z]$/u;
 const surnameStartPattern = /^[A-Z][a-z]+\b/u;
@@ -26,7 +26,7 @@ const conjunctiveAdverbPattern =
 const imperativeTailVerbs =
   "retry|rerun|resume|restart|return|repeat|replace|remove|restore|reset|rebuild|record|report|repoint|reject|require|request|reuse|run|write|use|set|send|keep|leave|copy|check|confirm|continue|verify|wait|add|apply|change|delete|drop|edit|fix|load|open|pin|scan|show|skip|test|treat|validate|view";
 const ambiguousImperativeListTailPattern = new RegExp(
-  `^(?:${imperativeTailVerbs})\\b[^;]*,\\s*[^;]*;\\s*(?:and|or)\\b[^;]*$`,
+  `^(?:${imperativeTailVerbs})\\b[^;；]*,\\s*[^;；]*[;；]\\s*(?:and|or)\\b[^;；]*$`,
   "iu"
 );
 const finiteTailVerbs =
@@ -243,7 +243,7 @@ const joinedSentence = (line: string): Finding | undefined => {
       (next === undefined || whitespacePattern.test(next)) &&
       wordBeforePattern.test(line[index - 1] ?? "") &&
       (!abbreviationTailPattern.test(before) ||
-        (companyOrTimeAbbreviationPattern.test(before) &&
+        (terminalAbbreviationPattern.test(before) &&
           clauseStartPattern.test(remainder))) &&
       !nameInitial(before, remainder) &&
       remainder !== "" &&
