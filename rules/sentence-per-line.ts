@@ -7,7 +7,7 @@ import type { MicromarkToken, Rule, RuleParams } from "markdownlint";
 
 const terminatorPattern = /[.!?]/gu;
 const whitespacePattern = /\s/u;
-const semicolonPattern = /[;；;]/gu;
+const semicolonPattern = /(?<semicolon>[;；;])/gu;
 const abbreviationTailPattern =
   /(?:\b(?:e\.g|i\.e|etc|vs|cf|approx|Inc|Ltd|Co|Corp|Jr|Sr|Dr|Mr|Mrs|Ms|St|Fig|No|ed|al)|(?:[A-Z]\.)+[A-Z])$/u;
 const initialNameContextPattern =
@@ -36,7 +36,7 @@ const wordBeforePattern = /[\w"”’\])]/u;
 const wordAfterPattern = /[\w"'“([/]/u;
 const closingQuotePattern = /^["'”’]+/u;
 const protectedTextPattern =
-  /"(?:\\[\s\S]|[^"\\])*"|“(?:\\[\s\S]|[^”\\])*”|(?<!\w)'(?:\\[\s\S]|(?<=\w)'(?=\w)|[^'\\])*'(?!\w)|‘(?:\\[\s\S]|(?<=\w)’(?=\w)|[^’\\])*’/gu;
+  /(?<quotation>"(?:\\[\s\S]|[^"\\])*"|“(?:\\[\s\S]|[^”\\])*”|(?<!\w)'(?:\\[\s\S]|(?<=\w)'(?=\w)|[^'\\])*'(?!\w)|‘(?:\\[\s\S]|(?<=\w)’(?=\w)|[^’\\])*’)/gu;
 const alertPattern =
   /^ {0,3}(?:>[ \t]*)+\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(?:\r\n|\r|\n|$)/iu;
 const opaqueInlineTypes = new Set([
@@ -103,8 +103,10 @@ const segmentsByLine = (paragraph: MicromarkToken): Map<number, Segment[]> => {
     const opaque = opaqueInlineTypes.has(token.type);
     if ((token.type === "data" || opaque) && token.text.trim() !== "") {
       const prose = opaque
-        ? token.text.replaceAll(/[^\r\n]/gu, (character) =>
-            "_".repeat(character.length)
+        ? token.text.replaceAll(
+            /(?<character>[^\r\n])/gu,
+            (_match, _character, _offset, _input, { character }) =>
+              "_".repeat(character.length)
           )
         : token.text;
       const lines = prose.split(/\r\n|\r|\n/u);
@@ -151,15 +153,26 @@ const rebuildLine = (segments: readonly Segment[]): string => {
  * A quotation's final terminator can still separate surrounding prose sentences.
  */
 const protectText = (text: string): string =>
-  text.replaceAll(protectedTextPattern, (match) => {
-    const ending = match.match(/[.!?]["'”’]$/u)?.[0] ?? "";
-    const masked = match.replaceAll(/[^\r\n]/gu, (character) =>
-      " ".repeat(character.length)
-    );
-    return ending === ""
-      ? `${masked.slice(0, -1)}_`
-      : `${masked.slice(0, -ending.length - 1)}_${ending}`;
-  });
+  text.replaceAll(
+    protectedTextPattern,
+    (_match, _quotation, _offset, _input, { quotation }) => {
+      const ending =
+        quotation.match(/(?<ending>[.!?]["'”’]$)/u)?.groups?.ending ?? "";
+      const masked = quotation.replaceAll(
+        /(?<character>[^\r\n])/gu,
+        (
+          _characterMatch,
+          _character,
+          _characterOffset,
+          _characterInput,
+          { character }
+        ) => " ".repeat(character.length)
+      );
+      return ending === ""
+        ? `${masked.slice(0, -1)}_`
+        : `${masked.slice(0, -ending.length - 1)}_${ending}`;
+    }
+  );
 
 /**
  * Identifies license files and generated documents before inspecting their prose.
@@ -249,13 +262,17 @@ const joinedSemicolon = (line: string): Finding | undefined => {
       wordBeforePattern.test(previous) &&
       wordAfterPattern.test(next)
     ) {
-      const firstTailWord = tail.match(/^[\w'’-]+/u)?.[0] ?? "";
+      const firstTailWord =
+        tail.match(/(?<word>^[\w'’-]+)/u)?.groups?.word ?? "";
       const independent =
         sentenceLikeStartPattern.test(firstTailWord) ||
         conjunctiveAdverbPattern.test(tail) ||
         lowercaseClauseStartPattern.test(tail);
       if (independent) {
-        finding = { column: index + 1, length: [...match.value[0]].length };
+        finding = {
+          column: index + 1,
+          length: [...match.value.groups.semicolon].length
+        };
       }
     }
     if (finding === undefined) {

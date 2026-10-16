@@ -70,6 +70,15 @@ Agents copy nearby code as precedent, so avoid copying neighboring workarounds a
 Use official SDK or framework properties directly when they satisfy the required behavior.
 Prefer immutable bindings and minimize mutable state.
 
+Use named regex capture groups and name-based access for extracted matches and subgroups, including the full match.
+Use named backreferences and replacement references instead of positional references.
+Prefer an existing parser or literal operation when it expresses the requirement more clearly.
+Use the language or platform's native named-group facilities instead of adding unnecessary custom wrappers.
+If the engine lacks named groups, report that limit.
+Choose a supported parser or literal operation only when behavior remains equivalent.
+Preserve match selection, optional groups, flags, Unicode, iteration, offsets, replacement semantics, failure behavior, and resource cleanup.
+Do not treat ordinary array indexing as regex capture access.
+
 Inline single-use local values only when readability, evaluation order, side effects, lifetime, exceptions, and lazy execution stay unchanged.
 Also preserve cost, inferred types, overload selection, and captured snapshots.
 

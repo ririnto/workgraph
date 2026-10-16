@@ -9,6 +9,7 @@ import { test } from "node:test";
 import { lint } from "markdownlint/sync";
 
 import tsdoc from "../plugins/tsdoc-plugin.ts";
+import noBoxDrawing from "../rules/no-box-drawing.ts";
 import sentencePerLine from "../rules/sentence-per-line.ts";
 
 test("Ultracite preserves mandatory rules, ignores, and formatter convergence", async () => {
@@ -128,6 +129,51 @@ test("sentence searches retain the first matching column and preserve protected 
       ({ lineNumber, errorRange }) => ({ lineNumber, range: errorRange })
     ),
     [{ lineNumber: 3, range: [17, 1] }]
+  );
+});
+
+test("sentence captures preserve Unicode widths, quotation endings, and first diagnostics", () => {
+  for (const [source, range] of [
+    [
+      'The value is "Smile \u{1F600}. Stay." today; therefore retry.\n',
+      [37, 1]
+    ],
+    ['"Smile \u{1F600}." Next sentence.\n', [10, 1]],
+    ["Use `\u{1F600}; hidden` today; therefore retry.\n", [23, 1]],
+    ["First stays\uFF1B therefore retry; therefore stop.\r\n", [12, 1]],
+    ['"No ending \u{1F600}" today; therefore retry.\r\n', [21, 1]]
+  ]) {
+    assert.deepEqual(
+      sentenceErrors(source).map(({ lineNumber, errorRange }) => ({
+        lineNumber,
+        range: errorRange
+      })),
+      [{ lineNumber: 1, range }]
+    );
+  }
+  assert.deepEqual(
+    sentenceErrors("First stays; \u201Cretry\u201D later.\n"),
+    []
+  );
+});
+
+test("box drawing captures preserve first-match selection and UTF-16 columns", () => {
+  const errors = lint({
+    config: { default: false, "docs/no-box-drawing": true },
+    customRules: [noBoxDrawing],
+    strings: {
+      "input.md": "\u{1F600} \u2500\u2502\r\ntext\u257F\nPlain text.\n"
+    }
+  })["input.md"];
+  assert.deepEqual(
+    errors.map(({ lineNumber, errorRange }) => ({
+      lineNumber,
+      range: errorRange
+    })),
+    [
+      { lineNumber: 1, range: [4, 1] },
+      { lineNumber: 2, range: [5, 1] }
+    ]
   );
 });
 
