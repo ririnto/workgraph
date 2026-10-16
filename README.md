@@ -226,6 +226,17 @@ These additions follow the [Sinon tooling examples](https://github.com/ririnto/s
 JavaScript parameter and return annotations and type imports follow the official preset defaults.
 Markdownlint also checks sentence boundaries and table separators using the adopted Harness rules.
 
+The sentence rule checks English prose in paragraphs, lists, alert quotes, and individual table cells.
+It recognizes ASCII sentence terminators and ASCII or fullwidth semicolons between recognizable independent clauses.
+Capitalized enumeration labels alone do not establish a clause.
+Known company, clock, honorific, initial, example, and decimal forms use bounded context to distinguish sentence boundaries.
+Inline code, links, images, autolinks, and quoted interiors remain protected.
+Ordinary block quotes, fenced and indented code, HTML blocks, frontmatter, licenses, and generated documents retain their exemptions.
+Escaped and entity-encoded punctuation uses rendered text while diagnostics retain original UTF-16 source columns and complete punctuation token spans.
+Unfinished prose followed by a continuation on the next physical line also reports, including capitalized and opaque inline starts.
+The heuristic cannot resolve every English abbreviation, proper name, fragment, or unlisted clause form.
+Other languages and Unicode sentence terminators remain outside its supported scope.
+
 The pnpm workspace overrides markdownlint-cli2's pinned smol-toml with a patched release in the same major version.
 Remove that scoped override when markdownlint-cli2 supports the patched parser directly.
 The workspace also scopes patched KaTeX to micromark-extension-math, whose declared range still permits only the affected series.
