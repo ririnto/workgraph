@@ -9,7 +9,7 @@ The smaller workload studies supply supporting evidence and limits.
 These results describe the authors' tasks, harnesses, and settings.
 Use their methods and limits when choosing comparable local experiments.
 Read [the research notes](research.md#model-effort-and-cost) for supported controls, official defaults, host settings, and pricing.
-The selection implications below are workload-specific judgments.
+Operational selection policy lives in Main's [Codex](../skills/main-agent-contract/references/codex.md#model-selection) and [Claude Code](../skills/main-agent-contract/references/claude.md#model-selection) references.
 Local behavior checks do not establish universal model-effort rankings.
 
 ### Shared Measurement Limits
@@ -110,7 +110,6 @@ The [real-world suite](https://electricitybench.com/suites/real-world@v3/) uses 
 It supplies no controlled high, xhigh, or max comparison.
 
 For bounded diagram generation, evaluate the complete deployment configuration with fresh fixtures and recovery costs.
-Use Luna xhigh for coding and max for harder coding tasks.
 
 ## GPT-6.1 Sol
 
@@ -143,8 +142,6 @@ The author marks all attempts correct.
 High's medians were 516 reasoning tokens and 26.837 seconds, compared with max at 1,399 tokens and 53.478 seconds.
 One prompt cannot establish performance on harder reasoning tasks.
 
-Use Sol medium for ordinary development and high for complex debugging, algorithms, and architecture.
-
 ## GPT-6 Astra
 
 [DeepSWE's live artifact](https://deepswe.datacurve.ai/artifacts/v1.1/leaderboard-live.json) reports 113 tasks with four attempts each.
@@ -175,7 +172,6 @@ The composite weights user journeys at 60%, security at 25%, and one Sol judge a
 The authors estimate token costs and keep the generated outputs private.
 This small application sample needs repetition before selecting low for another workload.
 
-Use Astra medium for difficult terminal repairs and xhigh for harder tasks.
 The reported max setting increases time and cost without improving its mean pass rate over high.
 
 ## Claude Haiku 5.5
@@ -212,10 +208,6 @@ Max adds 0.6 percentage points over xhigh on Main with about 80% more output tok
 The result files supply no uncertainty intervals, so that difference does not establish statistical significance.
 Output counts do not establish complete request cost, especially across Haiku's prompt-length pricing boundary.
 These coding tasks do not separately measure debugging, refactoring, or code review.
-
-Use Haiku xhigh for coding, max for harder tasks, and medium for small code changes.
-The debugging, refactoring, and review recommendations extend the coding comparison as workload judgments.
-Complex or broad coding can still require Sonnet or Opus.
 
 ### Research And Computer-Use Effort Sweeps
 
@@ -277,7 +269,7 @@ It does not supply a complete numerical five-level sweep.
 GDPval-AA covers 220 tasks across 44 occupations and uses blind pairwise judging.
 AA-Briefcase covers linked project tasks and combines rubric and pairwise grading.
 The higher professional-work scores at max come with substantially more output tokens.
-The launch-only GDPval and Terminal-Bench graph points remain unextracted and do not determine the coding recommendation.
+The launch-only GDPval and Terminal-Bench graph points remain unextracted and do not establish comparative effort gains.
 
 ### Healthcare Effort And Latency
 
@@ -346,10 +338,7 @@ Opus high exceeds Sonnet xhigh's composite score at about 34% lower estimated co
 Their terminal pass rates differ by 0.51 percentage points, without a paired significance result.
 Opus medium costs about half as much as Sonnet xhigh, with lower composite and terminal scores.
 Sonnet max exceeds every reviewed Opus setting on terminal pass rate, although its estimated terminal cost is higher.
-Use Sonnet medium for routine coding and high for harder coding or reasoning.
-They do not support prohibiting Sonnet xhigh or max across workloads.
-Leave Astra and Fable outside automatic promotion because their use requires an explicit user request.
-Use Luna max for harder coding tasks.
+These results do not establish that higher effort cannot improve performance across workloads.
 
 The [September 28 release article](https://artificialanalysis.ai/articles/claude-sonnet-5-5) reports about 0.1% fallback, mainly on Terminal-Bench.
 Those fallback calls went to Sonnet 5.
@@ -407,8 +396,7 @@ On 80 open-source cases, Standard versus Max recall is 51/80 versus 50/80, with 
 On 13 hard Signal cases, actionable findings are 8/13 versus 10/13, with precision of 66.7% versus 52%.
 The authors omit total cost and time.
 
-Use Opus medium for complex coding and reasoning, or high for harder tasks.
-This default does not establish that higher effort cannot improve reasoning or other workloads.
+These results do not establish that higher effort cannot improve reasoning or other workloads.
 For SVG generation, check output-budget failures when evaluating max.
 Choose review pipeline modes against the desired precision and recall, with API effort recorded apart from those modes.
 
@@ -442,6 +430,4 @@ Low produced 4,124 output tokens, including 893 thinking tokens, in 52 seconds.
 The author supplies neither quality grading nor cost for these calls.
 Low therefore still permits thinking on this request.
 
-Use Fable high for long work and xhigh for difficult terminal tasks.
-Use max for the hardest reasoning.
 The captured request supports a latency experiment, but it supplies no acceptance evidence for lowering effort.
