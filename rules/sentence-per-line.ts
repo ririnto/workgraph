@@ -1,4 +1,10 @@
+import { createRequire } from "node:module";
+
 import type { MicromarkToken, Rule, RuleParams } from "markdownlint";
+
+const { unescapeAll } = createRequire(
+  createRequire(import.meta.url).resolve("markdownlint-cli2")
+)("markdown-it")().utils;
 
 /**
  * Workgraph adapts the Sinon Harness control flow while preserving its diagnostic contract.
@@ -9,29 +15,34 @@ const terminatorPattern = /[.!?]/gu;
 const whitespacePattern = /\s/u;
 const semicolonPattern = /(?<semicolon>[;；;])/gu;
 const abbreviationTailPattern =
-  /(?:\b(?:e\.g|i\.e|etc|vs|cf|approx|Inc|Ltd|Co|Corp|Jr|Sr|Dr|Mr|Mrs|Ms|St|Fig|No|ed|al)|(?:[A-Z]\.)+[A-Z])$/u;
+  /(?:\b(?:e\.g|i\.e|etc|vs|cf|approx|Inc|Ltd|Co|Corp|Jr|Sr|Dr|Mr|Mrs|Ms|St|Fig|No|ed|al|a\.m|p\.m)|(?:[A-Z]\.)+[A-Z])$/u;
+const terminalAbbreviationPattern = /\b(?:Inc|Ltd|Co|Corp|etc|a\.m|p\.m)$/u;
 const initialNameContextPattern =
   /(?:^|\b(?:Ask|Contact|by|from|with|(?:Dr|Mr|Mrs|Ms)\.?)\s+)[A-Z]$/u;
 const surnameStartPattern = /^[A-Z][a-z]+\b/u;
 const entityTailPattern = /&(?:#\d+|#[\da-fA-F]+|[a-zA-Z][\d]{2,31})$/u;
 const conjunctiveAdverbPattern =
-  /\b(?:however|therefore|thus|hence|instead|otherwise|besides|accordingly|consequently|furthermore|moreover|nevertheless|nonetheless|similarly|likewise|meanwhile|subsequently|additionally|alternatively)\b/iu;
+  /^(?:however|therefore|thus|hence|instead|otherwise|besides|accordingly|consequently|furthermore|moreover|nevertheless|nonetheless|similarly|likewise|meanwhile|subsequently|additionally|alternatively)\b/iu;
 const imperativeTailVerbs =
   "retry|rerun|resume|restart|return|repeat|replace|remove|restore|reset|rebuild|record|report|repoint|reject|require|request|reuse|run|write|use|set|send|keep|leave|copy|check|confirm|continue|verify|wait|add|apply|change|delete|drop|edit|fix|load|open|pin|scan|show|skip|test|treat|validate|view";
+const ambiguousImperativeListTailPattern = new RegExp(
+  `^(?:${imperativeTailVerbs})\\b[^;；]*,\\s*[^;；]*[;；]\\s*(?:and|or)\\b[^;；]*$`,
+  "iu"
+);
 const finiteTailVerbs =
   "is|are|was|were|be|been|being|has|have|had|does|do|did|will|would|can|could|shall|should|may|might|must|stays?|remains?|starts?|ends?|fails?|passes?|follows?|returns?|owns?|moves?|loses?|gains?|keeps?|uses?|covers?|certif(?:ies|y)|validates?|loads?|ships?|runs?|exists?";
-const subjectLeads =
-  "this|that|these|those|it|they|we|you|he|she|who|which|another|each|every|some|all|both|one|two|three|the|a|an";
-const lowercaseClauseStartPattern = new RegExp(
-  `^(?:(?:${imperativeTailVerbs})\\b|(?!${subjectLeads}\\b)[a-z][\\w'’-]*\\s+(?:${finiteTailVerbs})\\b|(?:${subjectLeads})\\b(?:\\s+[a-z][\\w'’-]*){1,2}\\s+(?:${finiteTailVerbs})\\b)`,
-  "u"
+const pronounLeads = "this|that|these|those|it|they|we|you|he|she|who|which";
+const subjectLeads = `${pronounLeads}|another|each|every|some|all|both|one|two|three|the|a|an`;
+const clauseStartPattern = new RegExp(
+  `^(?:(?:${imperativeTailVerbs})\\b|(?:${pronounLeads})\\s+(?:${finiteTailVerbs})\\b|(?!${subjectLeads}\\b)[a-z][\\w'’-]*\\s+(?:${finiteTailVerbs})\\b|(?:${subjectLeads})\\b(?:\\s+[a-z][\\w'’-]*){1,2}\\s+(?:${finiteTailVerbs})\\b)`,
+  "iu"
 );
 const imperativeContinuationPattern = new RegExp(
   `^(?:${imperativeTailVerbs}|preserve|do)\\b`,
   "iu"
 );
-const sentenceLikeStartPattern = /^[A-Z0-9]/u;
-const sentenceStartPattern = /^[A-Z0-9"'“([「『*]/u;
+const sentenceLikeStartPattern = /^[A-Z]/u;
+const sentenceStartPattern = /^[A-Z0-9_"'“([「『*]/u;
 const wordBeforePattern = /[\w"”’\])]/u;
 const wordAfterPattern = /[\w"'“([/]/u;
 const closingQuotePattern = /^["'”’]+/u;
@@ -46,6 +57,12 @@ const opaqueInlineTypes = new Set([
   "literalAutolink",
   "autolink"
 ]);
+const decodedInlineTypes = new Set(["characterEscape", "characterReference"]);
+const renderedInlineTypes = new Set([
+  ...opaqueInlineTypes,
+  ...decodedInlineTypes,
+  "data"
+]);
 const licenseNamePattern =
   /(?:^|[/\\])(?:licen[cs]e|copying)(?:[.-][^/\\]*)?$/iu;
 const generatedMarkerPattern =
@@ -59,7 +76,23 @@ const skippedContainerTypes = new Set([
 
 interface Segment {
   startColumn: number;
+  sourceWidth: number;
   text: string;
+  opaque: boolean;
+  opaqueStart: boolean;
+  opaqueEnd: boolean;
+}
+
+interface SourceRange {
+  column: number;
+  length: number;
+}
+
+interface RebuiltLine {
+  text: string;
+  ranges: SourceRange[];
+  startsOpaque: boolean;
+  endsInsideOpaque: boolean;
 }
 
 interface Finding {
@@ -68,13 +101,17 @@ interface Finding {
 }
 
 /**
- * Walks token children depth-first and collects prose blocks outside excluded containers.
+ * Walks token children iteratively and collects paragraphs and individual table cells.
  */
 const proseBlocks = (tokens: readonly MicromarkToken[]): MicromarkToken[] => {
   const blocks: MicromarkToken[] = [];
   const iterators = [tokens[Symbol.iterator]()];
   const visit = (token: MicromarkToken): void => {
-    if (token.type === "paragraph") {
+    if (
+      token.type === "paragraph" ||
+      token.type === "tableHeader" ||
+      token.type === "tableData"
+    ) {
       blocks.push(token);
     } else if (
       !skippedContainerTypes.has(token.type) &&
@@ -95,21 +132,52 @@ const proseBlocks = (tokens: readonly MicromarkToken[]): MicromarkToken[] => {
 };
 
 /**
- * Rebuilds one physical line from prose segments, keeping UTF-16 source columns.
+ * Rebuilds one physical line from rendered prose while retaining source ranges.
  */
-const rebuildLine = (segments: readonly Segment[]): string => {
-  const units: (string | undefined)[] = [];
+const rebuildLine = (segments: readonly Segment[]): RebuiltLine => {
+  let text = "";
+  let sourceCursor = 1;
+  const ranges: SourceRange[] = [];
+  const opaque: boolean[] = [];
+  const opaqueStarts: boolean[] = [];
+  const opaqueEnds: boolean[] = [];
   for (const segment of segments) {
-    const offset = segment.startColumn - 1;
-    for (let index = 0; index < segment.text.length; index += 1) {
-      units[offset + index] = segment.text[index];
+    const gapWidth = Math.max(0, segment.startColumn - sourceCursor);
+    for (let index = 0; index < gapWidth; index += 1) {
+      text += " ";
+      ranges.push({ column: sourceCursor + index, length: 1 });
+      opaque.push(false);
+      opaqueStarts.push(false);
+      opaqueEnds.push(false);
     }
+    const wholeTokenRange = segment.sourceWidth !== segment.text.length;
+    for (let index = 0; index < segment.text.length; index += 1) {
+      text += segment.text[index];
+      ranges.push({
+        column: wholeTokenRange
+          ? segment.startColumn
+          : segment.startColumn + index,
+        length: wholeTokenRange ? segment.sourceWidth : 1
+      });
+      opaque.push(segment.opaque);
+      opaqueStarts.push(segment.opaque && segment.opaqueStart && index === 0);
+      opaqueEnds.push(
+        segment.opaque && segment.opaqueEnd && index === segment.text.length - 1
+      );
+    }
+    sourceCursor = Math.max(
+      sourceCursor,
+      segment.startColumn + segment.sourceWidth
+    );
   }
-  let line = "";
-  for (const unit of units) {
-    line += unit ?? " ";
-  }
-  return line;
+  const firstIndex = text.search(/\S/u);
+  const lastIndex = text.trimEnd().length - 1;
+  return {
+    endsInsideOpaque: opaque[lastIndex] === true && !opaqueEnds[lastIndex],
+    ranges,
+    startsOpaque: opaqueStarts[firstIndex] === true,
+    text
+  };
 };
 
 /**
@@ -130,13 +198,21 @@ const protectedDocument = (params: RuleParams): boolean =>
  */
 const continuation = (
   previous: string | undefined,
-  line: string
+  line: string,
+  previousIsAdjacent: boolean,
+  previousEndsInsideOpaque: boolean,
+  lineStartsOpaque: boolean
 ): Finding | undefined => {
   const start = line.trimStart();
   if (
     previous &&
-    /[a-z0-9]$/iu.test(previous.trimEnd()) &&
-    (/^[a-z]/u.test(start) || imperativeContinuationPattern.test(start))
+    previousIsAdjacent &&
+    !previousEndsInsideOpaque &&
+    /[a-z0-9_]$/iu.test(previous.trimEnd()) &&
+    (/^[a-z]/u.test(start) ||
+      sentenceLikeStartPattern.test(start) ||
+      (start.startsWith("_") && lineStartsOpaque) ||
+      imperativeContinuationPattern.test(start))
   ) {
     return { column: line.length - start.length + 1, length: 1 };
   }
@@ -166,7 +242,9 @@ const joinedSentence = (line: string): Finding | undefined => {
     if (
       (next === undefined || whitespacePattern.test(next)) &&
       wordBeforePattern.test(line[index - 1] ?? "") &&
-      !abbreviationTailPattern.test(before) &&
+      (!abbreviationTailPattern.test(before) ||
+        (terminalAbbreviationPattern.test(before) &&
+          clauseStartPattern.test(remainder))) &&
       !nameInitial(before, remainder) &&
       remainder !== "" &&
       sentenceStartPattern.test(remainder)
@@ -199,11 +277,11 @@ const joinedSemicolon = (line: string): Finding | undefined => {
       next !== undefined &&
       wordBeforePattern.test(previous) &&
       wordAfterPattern.test(next) &&
-      (sentenceLikeStartPattern.test(
-        tail.match(/(?<word>^[\w'’-]+)/u)?.groups?.word ?? ""
-      ) ||
-        conjunctiveAdverbPattern.test(tail) ||
-        lowercaseClauseStartPattern.test(tail))
+      !(
+        /(?:^|[.!?]\s+)[^.!?]*:/u.test(before) &&
+        ambiguousImperativeListTailPattern.test(tail)
+      ) &&
+      (conjunctiveAdverbPattern.test(tail) || clauseStartPattern.test(tail))
     ) {
       finding = {
         column: index + 1,
@@ -227,27 +305,36 @@ const inspectProse: Rule["function"] = (params, onError) => {
     const byLine = new Map<number, Segment[]>();
     const visit = (token: MicromarkToken) => {
       const opaque = opaqueInlineTypes.has(token.type);
-      if ((token.type === "data" || opaque) && token.text.trim() !== "") {
-        for (const [index, text] of (opaque
-          ? token.text.replaceAll(
-              /(?<character>[^\r\n])/gu,
-              (_match, _character, _offset, _input, { character }) =>
-                "_".repeat(character.length)
-            )
-          : token.text
-        )
-          .split(/\r\n|\r|\n/u)
-          .entries()) {
-          if (text.trim() !== "") {
-            const lineNumber = token.startLine + index;
-            const startColumn = index === 0 ? token.startColumn : 1;
-            const bucket = byLine.get(lineNumber) ?? [];
-            bucket.push({ startColumn, text });
-            byLine.set(lineNumber, bucket);
-          }
+      const decoded = decodedInlineTypes.has(token.type);
+      if (renderedInlineTypes.has(token.type)) {
+        let prose = token.text;
+        if (decoded) {
+          prose = unescapeAll(token.text).replaceAll(/[\r\n]/gu, " ");
+        } else if (opaque) {
+          prose = token.text.replaceAll(
+            /(?<character>[^\r\n])/gu,
+            (_match, _character, _offset, _input, { character }) =>
+              "_".repeat(character.length)
+          );
         }
-      }
-      if (!opaque) {
+        const physicalLines = prose.split(/\r\n|\r|\n/u);
+        for (const [index, text] of physicalLines.entries()) {
+          const lineNumber = token.startLine + index;
+          const startColumn = index === 0 ? token.startColumn : 1;
+          const bucket = byLine.get(lineNumber) ?? [];
+          bucket.push({
+            opaque,
+            opaqueEnd: index === physicalLines.length - 1,
+            opaqueStart: index === 0,
+            sourceWidth: decoded
+              ? token.endColumn - token.startColumn
+              : text.length,
+            startColumn,
+            text
+          });
+          byLine.set(lineNumber, bucket);
+        }
+      } else {
         for (const child of token.children) {
           visit(child);
         }
@@ -255,8 +342,11 @@ const inspectProse: Rule["function"] = (params, onError) => {
     };
     visit(paragraph);
     const sourceLines = [...byLine];
-    const protectedLines = sourceLines
-      .map(([, segments]) => rebuildLine(segments))
+    const rebuiltLines = sourceLines.map(([, segments]) =>
+      rebuildLine(segments)
+    );
+    const protectedLines = rebuiltLines
+      .map(({ text }) => text)
       .join("\n")
       .replaceAll(
         protectedTextPattern,
@@ -281,38 +371,43 @@ const inspectProse: Rule["function"] = (params, onError) => {
       .split("\n");
     for (const [index, [lineNumber]] of sourceLines.entries()) {
       const line = protectedLines[index] ?? "";
-      const continuationFinding =
-        sourceLines[index - 1]?.[0] === lineNumber - 1
-          ? continuation(protectedLines[index - 1], line)
-          : undefined;
+      const rebuiltLine = rebuiltLines[index];
+      const previousLine = protectedLines[index - 1];
+      const continuationFinding = continuation(
+        previousLine,
+        line,
+        sourceLines[index - 1]?.[0] === lineNumber - 1,
+        rebuiltLines[index - 1]?.endsInsideOpaque === true,
+        rebuiltLines[index]?.startsOpaque === true
+      );
       if (continuationFinding) {
+        const sourceRange = rebuiltLine.ranges[continuationFinding.column - 1];
         onError({
           context: (params.lines[lineNumber - 1] ?? "").trim(),
           detail: /^[a-z]/u.test(line.trimStart())
             ? "Sentence continues from the previous source line; keep the sentence on one line."
             : "End the previous instruction with a sentence terminator before this continuation.",
           lineNumber,
-          range: [continuationFinding.column, continuationFinding.length]
+          range: [sourceRange.column, continuationFinding.length]
         });
       }
       for (const [kind, finding] of [
         ["sentences", joinedSentence(line)],
         ["semicolon", joinedSemicolon(line)]
       ] as const) {
-        if (finding) {
-          const key = `${lineNumber}:${kind}`;
-          if (!reported.has(key)) {
-            reported.add(key);
-            onError({
-              context: (params.lines[lineNumber - 1] ?? "").trim(),
-              detail:
-                kind === "sentences"
-                  ? "Multiple sentences on one line; put each sentence on its own line."
-                  : "Semicolon-joined sentences on one line; put each sentence on its own line.",
-              lineNumber,
-              range: [finding.column, finding.length]
-            });
-          }
+        const key = `${lineNumber}:${kind}`;
+        if (finding && !reported.has(key)) {
+          reported.add(key);
+          const sourceRange = rebuiltLine.ranges[finding.column - 1];
+          onError({
+            context: (params.lines[lineNumber - 1] ?? "").trim(),
+            detail:
+              kind === "sentences"
+                ? "Multiple sentences on one line; put each sentence on its own line."
+                : "Semicolon-joined sentences on one line; put each sentence on its own line.",
+            lineNumber,
+            range: [sourceRange.column, sourceRange.length]
+          });
         }
       }
     }
