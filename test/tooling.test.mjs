@@ -158,15 +158,14 @@ test("sentence captures preserve Unicode widths, quotation endings, and first di
 });
 
 test("box drawing captures preserve first-match selection and UTF-16 columns", () => {
-  const errors = lint({
-    config: { default: false, "docs/no-box-drawing": true },
-    customRules: [noBoxDrawing],
-    strings: {
-      "input.md": "\u{1F600} \u2500\u2502\r\ntext\u257F\nPlain text.\n"
-    }
-  })["input.md"];
   assert.deepEqual(
-    errors.map(({ lineNumber, errorRange }) => ({
+    lint({
+      config: { default: false, "docs/no-box-drawing": true },
+      customRules: [noBoxDrawing],
+      strings: {
+        "input.md": "\u{1F600} \u2500\u2502\r\ntext\u257F\nPlain text.\n"
+      }
+    })["input.md"].map(({ lineNumber, errorRange }) => ({
       lineNumber,
       range: errorRange
     })),
