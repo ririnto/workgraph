@@ -78,6 +78,12 @@ The Main contract owns orchestration, authority, request-origin communication, a
 The Worker contract owns bounded assignments and handbacks.
 Both keep their role procedures self-contained, and these instructions do not guarantee model adherence.
 
+Main carries authorized outcomes through review, integration, named-base readback, and owned cleanup without routine phase approvals.
+Main and Worker read Memory Maintenance before durable memory changes.
+That conditional procedure requires the complete selected memory index and existing records before edits.
+It preserves valid facts, resolves supersession within authority, and keeps unresolved conflicts explicit.
+Private memory remains outside published project material.
+
 Claude Code uses native Workflow when a follow-up may depend on an accepted earlier result, including conditional follow-ups, or when explicitly requested.
 Its [Main host reference](skills/main-agent-contract/references/claude.md#orchestration) routes to Workflow for selection and fallback rules.
 The Workflow skill owns graph preparation, execution, and result verification.
@@ -137,6 +143,7 @@ Claude Code uses slash commands, while Codex uses dollar-prefixed skill names.
 | `/workgraph:workflow` | Unavailable | Request native Workflow in Claude Code. |
 | `/workgraph:writing` | `$workgraph:writing` | Load prose and Markdown guidance. |
 | `/workgraph:instruction-authoring` | `$workgraph:instruction-authoring` | Load reusable instruction design guidance. |
+| `/workgraph:memory-maintenance` | `$workgraph:memory-maintenance` | Review existing memory context and reconcile authorized durable records. |
 | `/workgraph:development` | `$workgraph:development` | Load coding guidance and matching language references. |
 | `/workgraph:verification` | `$workgraph:verification` | Reproduce behavior and collect evidence with the project's existing tools. |
 | Not applicable | `$workgraph:codex-scoped-cleanup` | Clean retired Codex resources and stale Worktree Artifact connections. |

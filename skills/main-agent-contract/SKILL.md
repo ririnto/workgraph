@@ -9,15 +9,24 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 
 Use this role in main.
 Invoking this skill does not change a dispatched worker's role or grant authority.
-Own planning, design, publication, integration, and the final user report.
+Own planning, design, publication, checks, independent review, integration, readback, cleanup, and reporting for each authorized outcome.
+Resolve reversible problems within granted authority without phase approvals.
+Preserve unmet acceptance when recording nonblocking follow-ups.
 Keep the plan in the user's chosen location or current context.
 Before substantial task graphs, define outcomes, exclusions, affected resources, and acceptance evidence.
+Restate the outcome before work and meaningful scope changes.
+
+## Context
+
+Read current instructions, assigned contracts, relevant knowledge, and prior handoffs before acting.
+Use current primary sources for authority, access, ownership, and repository state.
+Do not infer current authority or completion from dated records.
+Before editing durable memory, read Memory Maintenance unless fully loaded.
 
 ## Rules
 
 ### Scope
 
-Main includes in-scope integration for implementation requests.
 Keep session settings, permission changes, and credential handling in main.
 Do not force-push or rewrite shared history.
 Exclude private environment details, work-item identifiers, and review-system URLs from commits and publications.
@@ -62,7 +71,7 @@ Raise concurrency only after verification of the delegated outcome demonstrates 
 Identify unexpected changes' source with an exploration agent.
 Account for changes within a running agent's assignment and continue.
 Without native agent waiting, end idle turns awaiting only notifications, without claiming completion.
-Before reusing or combining evidence, validate relevant behavior, inputs, configuration, and toolchain.
+Validate behavior, inputs, configuration, and toolchain before reusing evidence.
 Compare named references and relevant changes without pinning file or branch hashes.
 Reuse passing evidence while relevant conditions remain unchanged.
 Unrelated changes or commit identity, parent, or branch name alone do not invalidate evidence.
@@ -78,9 +87,10 @@ Delete task-owned evidence after recording results unless checks, investigations
 Confirm cleanup ownership before deleting shared evidence.
 Before handback, inspect all running background processes and descendants against task resources, including unrecorded task-owned processes.
 Stop unneeded task-owned processes and verify termination.
-Before handback, remove unneeded task-created Docker containers, disposable caches, and clean worktrees within granted cleanup.
+Remove unneeded task-created containers, caches, and clean worktrees within granted cleanup before handback.
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
 Report retained resources and incomplete cleanup with purposes and next actions.
+Return source, Git, reader, process, and descendant ownership at handback.
 
 ## Orchestration
 
@@ -90,9 +100,9 @@ Connect nodes only when a result or condition gates a successor.
 Send successors required conclusions and completion evidence.
 Treat null, missing, or unsupported evidence as incomplete rather than successful.
 Join branches only when successors need their results.
-Keep valid results after requirement changes and continue unaffected tasks after failures.
+Preserve valid results after requirement changes and unaffected tasks after failures.
 Use Mermaid or LaTeX when it clarifies dependencies or readiness.
-Verify diagrams and formulas with their target renderer before delivery.
+Verify diagrams and formulas with their renderer before delivery.
 Start nodes only with ready inputs and authority.
 Choose only needed node types, without a fixed itinerary.
 Report unavailable user-selected or delegation tools.

@@ -73,6 +73,8 @@ Preserve valid Markdown row syntax instead of breaking a cell across source line
 ## YAML Scalars
 
 Use `|-` or `>-` for multiline YAML strings to omit the final line feed.
+Use `|-` for literal line breaks and `>-` for source wrapping of one logical line.
+Apply these rules to Markdown frontmatter, including memory records.
 Preserve literal or folded semantics and validate parsed values, including template strings.
 
 ## Final Pass

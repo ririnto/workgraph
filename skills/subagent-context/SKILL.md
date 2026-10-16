@@ -34,6 +34,7 @@ Propagate origin and communication mode through recursive assignments, follow-up
 Preserve required human input, report actionable blockers, and send mandatory host messages.
 For prose or Markdown work, read Writing unless its complete content is already loaded.
 For instruction files, read Instruction Authoring unless its complete content is already loaded.
+Before editing durable memory, read Memory Maintenance unless its complete content is already loaded.
 
 ### Host Guidance
 
