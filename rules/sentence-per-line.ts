@@ -95,43 +95,6 @@ const proseBlocks = (tokens: readonly MicromarkToken[]): MicromarkToken[] => {
 };
 
 /**
- * Collects prose text segments of one paragraph grouped by physical line.
- */
-const segmentsByLine = (paragraph: MicromarkToken): Map<number, Segment[]> => {
-  const byLine = new Map<number, Segment[]>();
-  const visit = (token: MicromarkToken) => {
-    const opaque = opaqueInlineTypes.has(token.type);
-    if ((token.type === "data" || opaque) && token.text.trim() !== "") {
-      for (const [index, text] of (opaque
-        ? token.text.replaceAll(
-            /(?<character>[^\r\n])/gu,
-            (_match, _character, _offset, _input, { character }) =>
-              "_".repeat(character.length)
-          )
-        : token.text
-      )
-        .split(/\r\n|\r|\n/u)
-        .entries()) {
-        if (text.trim() !== "") {
-          const lineNumber = token.startLine + index;
-          const startColumn = index === 0 ? token.startColumn : 1;
-          const bucket = byLine.get(lineNumber) ?? [];
-          bucket.push({ startColumn, text });
-          byLine.set(lineNumber, bucket);
-        }
-      }
-    }
-    if (!opaque) {
-      for (const child of token.children) {
-        visit(child);
-      }
-    }
-  };
-  visit(paragraph);
-  return byLine;
-};
-
-/**
  * Rebuilds one physical line from prose segments, keeping UTF-16 source columns.
  */
 const rebuildLine = (segments: readonly Segment[]): string => {
@@ -261,7 +224,37 @@ const inspectProse: Rule["function"] = (params, onError) => {
   const tokens = params.parsers.micromark?.tokens ?? [];
   const reported = new Set<string>();
   for (const paragraph of proseBlocks(tokens)) {
-    const sourceLines = [...segmentsByLine(paragraph)];
+    const byLine = new Map<number, Segment[]>();
+    const visit = (token: MicromarkToken) => {
+      const opaque = opaqueInlineTypes.has(token.type);
+      if ((token.type === "data" || opaque) && token.text.trim() !== "") {
+        for (const [index, text] of (opaque
+          ? token.text.replaceAll(
+              /(?<character>[^\r\n])/gu,
+              (_match, _character, _offset, _input, { character }) =>
+                "_".repeat(character.length)
+            )
+          : token.text
+        )
+          .split(/\r\n|\r|\n/u)
+          .entries()) {
+          if (text.trim() !== "") {
+            const lineNumber = token.startLine + index;
+            const startColumn = index === 0 ? token.startColumn : 1;
+            const bucket = byLine.get(lineNumber) ?? [];
+            bucket.push({ startColumn, text });
+            byLine.set(lineNumber, bucket);
+          }
+        }
+      }
+      if (!opaque) {
+        for (const child of token.children) {
+          visit(child);
+        }
+      }
+    };
+    visit(paragraph);
+    const sourceLines = [...byLine];
     const protectedLines = sourceLines
       .map(([, segments]) => rebuildLine(segments))
       .join("\n")
