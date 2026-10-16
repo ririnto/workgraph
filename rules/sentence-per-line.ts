@@ -7,7 +7,7 @@ import type { MicromarkToken, Rule, RuleParams } from "markdownlint";
 
 const terminatorPattern = /[.!?]/gu;
 const whitespacePattern = /\s/u;
-const semicolonPattern = /[;；;]/gu;
+const semicolonPattern = /(?<semicolon>[;；;])/gu;
 const abbreviationTailPattern =
   /(?:\b(?:e\.g|i\.e|etc|vs|cf|approx|Inc|Ltd|Co|Corp|Jr|Sr|Dr|Mr|Mrs|Ms|St|Fig|No|ed|al)|(?:[A-Z]\.)+[A-Z])$/u;
 const initialNameContextPattern =
@@ -36,7 +36,7 @@ const wordBeforePattern = /[\w"”’\])]/u;
 const wordAfterPattern = /[\w"'“([/]/u;
 const closingQuotePattern = /^["'”’]+/u;
 const protectedTextPattern =
-  /"(?:\\[\s\S]|[^"\\])*"|“(?:\\[\s\S]|[^”\\])*”|(?<!\w)'(?:\\[\s\S]|(?<=\w)'(?=\w)|[^'\\])*'(?!\w)|‘(?:\\[\s\S]|(?<=\w)’(?=\w)|[^’\\])*’/gu;
+  /(?<quotation>"(?:\\[\s\S]|[^"\\])*"|“(?:\\[\s\S]|[^”\\])*”|(?<!\w)'(?:\\[\s\S]|(?<=\w)'(?=\w)|[^'\\])*'(?!\w)|‘(?:\\[\s\S]|(?<=\w)’(?=\w)|[^’\\])*’)/gu;
 const alertPattern =
   /^ {0,3}(?:>[ \t]*)+\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(?:\r\n|\r|\n|$)/iu;
 const opaqueInlineTypes = new Set([
@@ -102,13 +102,16 @@ const segmentsByLine = (paragraph: MicromarkToken): Map<number, Segment[]> => {
   const visit = (token: MicromarkToken) => {
     const opaque = opaqueInlineTypes.has(token.type);
     if ((token.type === "data" || opaque) && token.text.trim() !== "") {
-      const prose = opaque
-        ? token.text.replaceAll(/[^\r\n]/gu, (character) =>
-            "_".repeat(character.length)
+      for (const [index, text] of (opaque
+        ? token.text.replaceAll(
+            /(?<character>[^\r\n])/gu,
+            (_match, _character, _offset, _input, { character }) =>
+              "_".repeat(character.length)
           )
-        : token.text;
-      const lines = prose.split(/\r\n|\r|\n/u);
-      for (const [index, text] of lines.entries()) {
+        : token.text
+      )
+        .split(/\r\n|\r|\n/u)
+        .entries()) {
         if (text.trim() !== "") {
           const lineNumber = token.startLine + index;
           const startColumn = index === 0 ? token.startColumn : 1;
@@ -145,21 +148,6 @@ const rebuildLine = (segments: readonly Segment[]): string => {
   }
   return line;
 };
-
-/**
- * Masks literal quotations while preserving source coordinates.
- * A quotation's final terminator can still separate surrounding prose sentences.
- */
-const protectText = (text: string): string =>
-  text.replaceAll(protectedTextPattern, (match) => {
-    const ending = match.match(/[.!?]["'”’]$/u)?.[0] ?? "";
-    const masked = match.replaceAll(/[^\r\n]/gu, (character) =>
-      " ".repeat(character.length)
-    );
-    return ending === ""
-      ? `${masked.slice(0, -1)}_`
-      : `${masked.slice(0, -ending.length - 1)}_${ending}`;
-  });
 
 /**
  * Identifies license files and generated documents before inspecting their prose.
@@ -247,16 +235,17 @@ const joinedSemicolon = (line: string): Finding | undefined => {
       previous !== undefined &&
       next !== undefined &&
       wordBeforePattern.test(previous) &&
-      wordAfterPattern.test(next)
-    ) {
-      const firstTailWord = tail.match(/^[\w'’-]+/u)?.[0] ?? "";
-      const independent =
-        sentenceLikeStartPattern.test(firstTailWord) ||
+      wordAfterPattern.test(next) &&
+      (sentenceLikeStartPattern.test(
+        tail.match(/(?<word>^[\w'’-]+)/u)?.groups?.word ?? ""
+      ) ||
         conjunctiveAdverbPattern.test(tail) ||
-        lowercaseClauseStartPattern.test(tail);
-      if (independent) {
-        finding = { column: index + 1, length: [...match.value[0]].length };
-      }
+        lowercaseClauseStartPattern.test(tail))
+    ) {
+      finding = {
+        column: index + 1,
+        length: [...match.value.groups.semicolon].length
+      };
     }
     if (finding === undefined) {
       match = matches.next();
@@ -273,9 +262,30 @@ const inspectProse: Rule["function"] = (params, onError) => {
   const reported = new Set<string>();
   for (const paragraph of proseBlocks(tokens)) {
     const sourceLines = [...segmentsByLine(paragraph)];
-    const protectedLines = protectText(
-      sourceLines.map(([, segments]) => rebuildLine(segments)).join("\n")
-    ).split("\n");
+    const protectedLines = sourceLines
+      .map(([, segments]) => rebuildLine(segments))
+      .join("\n")
+      .replaceAll(
+        protectedTextPattern,
+        (_match, _quotation, _offset, _input, { quotation }) => {
+          const ending =
+            quotation.match(/(?<ending>[.!?]["'”’]$)/u)?.groups?.ending ?? "";
+          const masked = quotation.replaceAll(
+            /(?<character>[^\r\n])/gu,
+            (
+              _characterMatch,
+              _character,
+              _characterOffset,
+              _characterInput,
+              { character }
+            ) => " ".repeat(character.length)
+          );
+          return ending === ""
+            ? `${masked.slice(0, -1)}_`
+            : `${masked.slice(0, -ending.length - 1)}_${ending}`;
+        }
+      )
+      .split("\n");
     for (const [index, [lineNumber]] of sourceLines.entries()) {
       const line = protectedLines[index] ?? "";
       const continuationFinding =

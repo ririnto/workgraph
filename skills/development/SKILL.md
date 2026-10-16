@@ -70,8 +70,25 @@ Agents copy nearby code as precedent, so avoid copying neighboring workarounds a
 Use official SDK or framework properties directly when they satisfy the required behavior.
 Prefer immutable bindings and minimize mutable state.
 
-Inline single-use local values only when readability, evaluation order, side effects, lifetime, exceptions, and lazy execution stay unchanged.
+Use named regex capture groups and name-based access for extracted matches and subgroups, including the full match.
+Use named backreferences and replacement references instead of positional references.
+Prefer an existing parser or literal operation when it expresses the requirement more clearly.
+Use the language or platform's native named-group facilities instead of adding unnecessary custom wrappers.
+If the engine lacks named groups, report that limit.
+Choose a supported parser or literal operation only when behavior remains equivalent.
+Preserve match selection, optional groups, flags, Unicode, iteration, offsets, replacement semantics, failure behavior, and resource cleanup.
+Do not treat ordinary array indexing as regex capture access.
+
+Inline variables used only once and keep single-use logic inline, subject to configured lint.
+Preserve behavior, evaluation order, side effects, resource lifetime, exceptions, lazy execution, and required production interfaces.
 Also preserve cost, inferred types, overload selection, and captured snapshots.
+Do not suppress, weaken, or reconfigure lint to enable inlining.
+
+Do not extract or retain helpers for hypothetical future reuse or test convenience.
+Test references do not establish production reuse.
+Never change production code to accommodate tests, expose internals, add test hooks, or manufacture test seams.
+Adapt tests to production interfaces and behavior.
+Production changes must serve a real product requirement or fix an actual defect.
 
 Prefer condition inversion to reduce mid-function `return`, `continue`, or `break` statements when equivalent behavior stays intact without deeper nesting.
 Treat this preference as guidance only, without a lint rule or autofix.

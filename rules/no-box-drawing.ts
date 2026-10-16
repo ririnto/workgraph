@@ -1,6 +1,6 @@
 import type { Rule } from "markdownlint";
 
-const boxDrawingPattern = /[\u2500-\u257F]/u;
+const boxDrawingPattern = /(?<boxDrawing>[\u2500-\u257F])/u;
 
 /**
  * Markdownlint rule detecting and reporting Unicode box drawing characters
@@ -16,7 +16,7 @@ const rule: Rule = {
           context: line.trim(),
           detail: "Use ASCII tree markers such as +-- and | instead.",
           lineNumber: index + 1,
-          range: [match.index + 1, match[0].length]
+          range: [match.index + 1, match.groups.boxDrawing.length]
         });
       }
     }
