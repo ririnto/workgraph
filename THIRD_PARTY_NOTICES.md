@@ -38,6 +38,8 @@ We also studied the original [cursor/plugins pstack](https://github.com/cursor/p
 Its MIT license credits Lauren Tan, copyright 2026.
 Its feature, bug-fix, refactoring, performance, TDD, verification, and shipping procedures informed Development's lifecycle decisions.
 Workgraph adapts those decisions without bundling pstack source or importing Cursor tools, models, or stack operations.
+We also inspected the installed pstack entry point, conditional playbooks, and principle skills as read-only organization references.
+They informed keeping Main as the entry point with focused conditional procedures rather than copying the framework.
 
 ## Giver Architecture
 

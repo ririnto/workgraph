@@ -14,6 +14,7 @@ Keep contributor guidance separate from consumer instructions so the plugin does
 | Role host references | Main and Worker agents | Each selected reference supplies execution timing, while Main references also supply orchestration and model guidance. |
 | `skills/writing/SKILL.md` | Agents doing prose or Markdown work | Agents follow concise prose, sentence boundaries, and table rules. |
 | `skills/instruction-authoring/SKILL.md` | Agents designing reusable instructions | Agents follow instruction boundaries, conditional loading, and source validation. |
+| `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review the complete selected store before reconciling authorized records and their index. |
 | `skills/development/SKILL.md` | Agents doing source or maintained code work | Agents load shared code defaults and only matching language references. |
 | `skills/verification/SKILL.md` | Agents reproducing behavior or assessing runtime outcomes | Agents reuse execution tools and connect feature context to observable evidence. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify native lifecycle authority, scoped activity, retained content, and Worktree Artifact removal. |
@@ -36,6 +37,14 @@ Hooks inject only the selected role and host reference, leaving task skills and 
 Consumer skills and their references stay inside this plugin.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating those common rules.
+
+Main remains the entry point for complete authorized outcomes, including review, integration, readback, and cleanup.
+Main and Worker select Memory Maintenance before any durable memory change.
+The procedure reviews the complete selected store without expanding read or write authority.
+It keeps facts in owning records, synchronizes index pointers, and preserves unresolved conflicts.
+Memory Maintenance loads Writing and never loads Main or grants a worker integration authority.
+The hooks still inject only the role and selected host reference.
+This conditional organization uses focused procedures without importing an external framework or adding runtime adapters.
 
 Main and Worker classify communication by the initiating sender rather than a relayed message envelope.
 Agent assignments remain agent-originated when they relay a human request.
