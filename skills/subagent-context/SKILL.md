@@ -96,5 +96,6 @@ Otherwise return changes to the dispatcher for integration.
 
 Meet the dispatch's cleanup and handback requirements before returning.
 Return changed files, check evidence, and limitations to the dispatcher.
+Return candidate findings for independent verification before confirmed reporting, identifying any unavailable verification.
 Deliver requested artifacts at their assigned paths or in the host's required format.
 Identify incomplete checks or missing authority as blockers, failures, or unknown outcomes rather than completed work.

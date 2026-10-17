@@ -68,6 +68,11 @@ The [research notes](docs/research.md#codex-native-cleanup) distinguish referenc
 
 ## Anthropic Guidance
 
+We read the complete original [mirku workflow post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
+Its role split, isolated edits, verification, fix-loop bound, and approval example informed the native Workflow stage guidance.
+The complete official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows.md) informed supported execution and permission boundaries.
+Workgraph adapts those decisions without redistributing the post, bundling JEV, or supplying another execution engine.
+
 We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md), published October 15, 2026.
 The article credits Addy Osmani, Morgan Westlee Lunt, and Qing Wang.
 Its layered review, verified findings, risk selection, and convergence lessons informed Workgraph's Delivery procedure and Main review staffing guidance.

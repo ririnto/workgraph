@@ -12,6 +12,16 @@ Encode accepted dependencies in Workflow control flow, not progress labels.
 Pass each agent its accepted inputs, bounded task, authority, and output evidence contract.
 Pass each dependent call only the predecessor results it needs.
 Do not assume local variables, progress labels, phases, or agent context transfer between calls.
+Keep deterministic tool selection, path routing, and retry decisions in native script control flow.
+Delegate filesystem and tool execution to agents because the script only coordinates them.
+Use existing host capabilities without requiring JEV, installing an engine, or claiming JEV execution.
+
+Pass Main's per-stage model and effort selections, respecting overrides and pinned agent definitions.
+Keep scan stages read-only and give each edit agent a separate host-supported isolated worktree.
+Use a supported read-only `agentType` or existing host tool restrictions for scans, without inventing a `readOnly` option.
+Use native `isolation: 'worktree'` for edits when supported by the current tool contract.
+Return each edit's diff, checks, and worktree ownership to Main before integration and cleanup.
+When explicit approval is required, end the proposal run before any edit and start edits only after approval.
 
 Use `pipeline()` by default when each item's later work depends only on that item's earlier result.
 Pipeline stages receive the previous result, original item, and item index.
@@ -62,6 +72,10 @@ Validate every required result before starting its dependent stage.
 A malformed JSON Schema can fail before the agent runs.
 A required name missing from a schema's `properties` may not fail as expected.
 Treat schema validation as a format check, not proof of acceptance.
+Validate finding identifiers and evidence before passing candidates to a verifier independent of the finder and fixer.
+Require a verification result for every candidate before synthesis or confirmed reporting.
+Retain confirmed, refuted, and unverified outcomes separately, including missing or inconclusive verifier results.
+Do not replace independent verification with schema validation, majority votes, or the finder's self-check.
 
 A pipeline stage that throws drops that item's result to `null` and skips its later stages.
 A parallel thunk that throws resolves to `null`, while Workflow can still finish.
@@ -100,6 +114,16 @@ Compare agent-backed phase entries, returned values, failure diagnostics, and us
 Check returned phase evidence for deterministic phases that have no agent journal entries.
 Read relevant agent transcripts when journal results are missing or unexpected.
 A completion notification or successful top-level return alone proves neither execution nor acceptance.
+
+## Bound Fix Loops
+
+Choose an observable progress measure before the first fix, such as remaining diagnostic identities or failing checks.
+Compare each completed fix-and-check round against its predecessor using the same acceptance criteria.
+Reset the consecutive no-progress count when verified results improve.
+Stop after two consecutive rounds without improvement and return unresolved failures and evidence to Main.
+Productive rounds do not consume that no-progress allowance.
+Keep this count separate from schema retries, stalled-agent restarts, inference sampling, and task-attempt limits.
+Stopping never waives blockers, required checks, or user approval.
 
 ## Resume Conservatively
 

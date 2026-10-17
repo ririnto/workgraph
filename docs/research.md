@@ -578,6 +578,40 @@ They do not establish compatibility for a particular repository or replace indep
 
 ## Writing And Host Contracts
 
+### Native Workflow Stage Adoption
+
+We read the complete original [mirku post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
+We also read the complete official [Workflow documentation](https://code.claude.com/docs/en/workflows.md).
+The post combines a Claude model split, isolated edits, independent verification, bounded fixes, JEV routing, and an explicit approval gate.
+The official documentation supports native scripts, cross-checking, isolated migration edits, and two consecutive no-progress fix rounds.
+It describes host permissions and separate runs for operator sign-off between stages.
+
+| Supplied requirement | Workgraph adoption |
+| --- | --- |
+| Opus 5.5 Main with ultracode. | Claude guidance prefers Opus planning and authorized ultracode while retaining active user and configuration overrides. |
+| Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Claude defaults select those roles and Workflow passes selected settings into stages with separate edit worktrees. |
+| Independent verification before every reported finding. | Main requires a separate verifier before confirmed reporting and Workflow preserves per-candidate verification outcomes. |
+| Two rounds without fix progress. | Fix loops compare observable results, reset after improvement, and stop after two consecutive unchanged rounds. |
+| Deterministic JEV routing. | Native script control flow handles deterministic choices without requiring, installing, or replacing JEV. |
+| Diff-first approval before edits. | Explicit consumer gates end proposal work before edits and require approval for the gated scope. |
+
+The post ends its quoted setup-rebuild request with this operator gate.
+
+> Show me every change as a diff first, no edits until I say go
+
+That sentence requires approval before edits for the quoted request.
+A separate source-adoption authorization permits its specified source delivery without claiming approval for that live rebuild.
+No quoted example grants permission to change live models, ultracode, credentials, permissions, or plugin activation.
+Existing Main ownership, independent complete-candidate review, and normal Delivery integration boundaries remain required.
+
+The model split is Workgraph guidance inspired by the post, not an official universal Workflow default or measured performance ranking.
+Provider routing and model overrides can resolve aliases differently, so requested names do not prove resolved releases.
+Codex keeps its own host model policy and cannot execute Claude's native Workflow.
+The post's throughput and cost claims are unverified here, and script-held results do not eliminate planning or worker costs.
+Schema validity does not establish factual correctness or replace an independent verifier.
+Native schema retries, stall restarts, inference sampling, and task retries remain separate from the no-progress fix-round count.
+Source checks establish instruction delivery, while native execution, installed activation, and model adherence require separate host evidence.
+
 ### Claude Code Workflow And Subagent Contracts
 
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe host execution.
