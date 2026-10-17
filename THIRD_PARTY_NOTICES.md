@@ -68,6 +68,11 @@ The [research notes](docs/research.md#codex-native-cleanup) distinguish referenc
 
 ## Anthropic Guidance
 
+We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md), published October 15, 2026.
+The article credits Addy Osmani, Morgan Westlee Lunt, and Qing Wang.
+Its layered review, verified findings, risk selection, and convergence lessons informed Workgraph's Delivery procedure and Main review staffing guidance.
+Workgraph adapts those workflow decisions without redistributing the article or activating Anthropic review products.
+
 We reviewed the supplied copy of [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5).
 Its guidance informed completion behavior for unattended tasks and proportional progress updates.
 We fetched relevant sections of the official [Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5.md), [Claude Fable 5.1](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1.md), and [Claude Sonnet 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5.md) prompting guides.

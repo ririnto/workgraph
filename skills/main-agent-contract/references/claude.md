@@ -17,7 +17,7 @@ Use `haiku` for clear, bounded tasks.
 Escalate to `sonnet` for broader work or when Haiku misses criteria.
 Use `opus` only for conflicting evidence, difficult tradeoffs, or acceptance failures.
 Call `fable` only at the user's explicit request.
-Follow the Main Agent Contract's model policy when assigning settings.
+Start with one independent reviewer, adding depth or specialists for costly or uncovered failure modes.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
