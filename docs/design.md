@@ -209,6 +209,13 @@ Codex uses available native delegation tools for independent and dependent assig
 Its Main session coordinates dependencies without Claude Code's native Workflow tool.
 Each host reference owns tool routing, while the common Main contract owns task graphs.
 
+Main requires independent per-finding verification before confirmed reporting, and Worker returns candidates for that verification.
+Claude's host reference selects planning, read-only scan, and isolated edit defaults while preserving active overrides.
+Workflow maps those settings and verification dependencies into native stages and keeps deterministic choices in script control flow.
+Fix loops track consecutive rounds without observable improvement independently of native retries.
+Explicit diff-first gates split proposal and edit runs because native Workflow cannot request intermediate operator sign-off.
+These consumer rules preserve separately authorized source delivery and do not activate host settings or require JEV.
+
 ## Support Manual Invocation
 
 Each role keeps its own procedures inline.

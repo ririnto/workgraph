@@ -25,6 +25,8 @@ For authorized engineering-delivery graphs, read `references/delivery.md` unless
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
 Follow the Main Agent Contract's model policy for agent settings.
+Separate proposal and edit runs when a user requires diff-first approval because native Workflow cannot request mid-run sign-off.
+Resume authorized edit work only after that approval, without adding gates to work already authorized.
 
 ## Run Workflow
 

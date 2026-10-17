@@ -96,6 +96,20 @@ Worker hooks load their own execution references without Main orchestration or m
 Forked workers can inherit Main's host guidance through parent history.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](docs/research.md#model-effort-and-cost).
 
+Claude guidance defaults to Opus planning, Haiku read-only scans, and Sonnet edits, with active user and configuration settings taking precedence.
+Each edit agent uses an isolated worktree and returns its diff to Main.
+Ultracode remains an authorized host choice rather than a setting changed by installing this guidance.
+For a new Claude session using this model split, the operator can choose the following startup command.
+
+```sh
+claude --model opus --effort ultracode
+```
+
+The ultracode launch flag also selects `xhigh` effort, while active host and user overrides retain precedence.
+Main requires independent finding verification before confirmed reporting and stops fix loops after two consecutive rounds without measurable progress.
+Productive rounds reset that count, which remains separate from native retries and inference sampling.
+Unavailable verification remains explicit as unverified.
+
 ## Goal-Driven Work
 
 Use only the nodes and checks that serve the goal.
@@ -127,6 +141,12 @@ The [host Workflow documentation](https://code.claude.com/docs/en/workflows) def
 Workgraph ships no reusable Workflow scripts.
 Read Workflow for graph procedures and explicit-tool handling.
 Workers complete relayed bounded assignments without starting another Workflow.
+
+Explicit diff-first requests preserve approval before any edits, including edits in isolated copies.
+Use separate proposal and edit runs when sign-off is required because native Workflow cannot request mid-run operator input.
+Already authorized work proceeds within its scope without invented stage approvals.
+Native script control flow handles deterministic routing without JEV or a replacement engine.
+The [source-adoption record](docs/research.md#native-workflow-stage-adoption) maps these choices and their evidence limits.
 
 ## Skill Invocation
 
