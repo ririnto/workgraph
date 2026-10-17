@@ -411,6 +411,26 @@ Workgraph does not implement transactions, automatic compensation, or durable re
 
 ### Bounded Feedback And Review Evidence
 
+We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md), published October 15, 2026.
+Addy Osmani, Morgan Westlee Lunt, and Qing Wang describe Anthropic's layered review process and its operational results.
+This practitioner report does not establish Workgraph effectiveness or authorize a review product, provider, or approval policy.
+
+| Article lesson | Workgraph application |
+| --- | --- |
+| Runnable verification precedes review. | Development and Verification already require observable checks, commands, outcomes, and evidence limits. |
+| Review evaluates intent and system impact. | Delivery now supplies the complete candidate, project review instructions, acceptance, and affected real consumers. |
+| Findings need verification and disposition. | Delivery now distinguishes introduced defects, pre-existing issues, evidence-based rejection, fixes, and tracked deferrals. |
+| Review effort follows risk. | Main host references now select reviewer staffing and depth by uncovered failure modes and failure consequences. |
+| Review must converge. | Delivery and its Workflow consumer now retain prior dispositions and reassess affected interactions without repeating resolved findings. |
+| Human authority and ownership remain explicit. | Main already owns authorized delivery, while Delivery preserves required human approvals and now records recovery considerations. |
+| Repeated failures should improve the responsible layer. | Development already prioritizes root causes, existing checks, and narrowly justified instruction changes. |
+
+Workgraph retains complete initial independent review and refreshes it when changed scope or invalidated evidence requires new coverage.
+The article's fixed round count and voting system do not become universal Workgraph requirements.
+Project-wide lint, mandatory harness rules, CI enforcement, and repository approval configuration remain outside this agent-workflow change.
+Cloud review, merge queues, flags, staged releases, telemetry, and incident datasets require separate product needs and authority.
+Source validation and hook inspection establish instruction delivery, while installed activation and model adherence remain separate acceptance.
+
 [When Agents Do Not Stop: Uncovering Infinite Agentic Loops in LLM Agents](https://arxiv.org/abs/2607.01641v1) studies unbounded feedback paths in agent systems.
 The authors report 68 confirmed failures across 47 repositories among 6,549 examined repositories.
 These are findings from the paper's sample, not Workgraph results.

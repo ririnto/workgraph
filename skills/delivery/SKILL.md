@@ -44,7 +44,7 @@ Create local evidence only when a current check, failure investigation, or recov
 
 Use project roles or the user's statement to determine whether the user maintains the project.
 Run one full independent review per delivery unit.
-Follow the Main Agent Contract's model policy when assigning review or scan agents.
+Select reviewer staffing and effort from the active Main host reference.
 Select the review order from the user's project role.
 
 ```mermaid
@@ -58,12 +58,23 @@ flowchart TD
 
 Reuse an existing PR/MR for the unit.
 Follow the consumer repository's review method.
+Give the reviewer the complete current candidate, stated intent, acceptance criteria, applicable project review instructions, and validation evidence.
+Require inspection of affected real consumers beyond the changed lines, including relevant correctness and security failure modes.
+Require concrete failure scenarios and source locations, separating introduced defects from pre-existing issues.
+Request an explicit no-findings result and coverage limits when no actionable defects remain.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.
+Record each finding as fixed, rejected with evidence, or deferred under the rules below.
+Do not change code solely for unsupported style requests, cleanup suggestions, or repeated resolved findings.
+Keep required human approvals distinct from agent review.
+Record failure consequences, uncovered risks, and the recovery approach with delivery evidence.
 
 Fix blockers before integration when they violate acceptance, required behavior, correctness, safety, or required checks.
 Only confirmed blockers require code changes before integration.
 Keep blocker fixes on the same working branch and update its existing PR/MR, if any.
-Request the same reviewer's assessment of affected changes only.
+Reassess affected changes and interactions against the earlier complete review, carrying forward findings and their dispositions.
+Refresh the complete review when changed scope or invalidated evidence makes the earlier coverage insufficient.
+When review cycles repeat without progress, reconsider the cause and approach instead of restarting the same review.
+Keep unresolved blockers explicit, and never treat a review limit as permission to waive acceptance or required checks.
 
 ## Defer And Integrate
 

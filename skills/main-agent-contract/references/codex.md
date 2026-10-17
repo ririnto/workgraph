@@ -21,7 +21,7 @@ Select each model family's supported ID from the active host's catalog.
 Use `luna` for clear tasks, including development, review, document analysis, and multistep agentic work.
 Use `sol` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `astra` only at the user's explicit request.
-Follow the Main Agent Contract's model policy when assigning settings.
+Start with one independent reviewer, adding depth or specialists for costly or uncovered failure modes.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |

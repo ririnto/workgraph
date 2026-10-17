@@ -166,6 +166,10 @@ Main Agent Contract owns orchestration and evidence acceptance, while Subagent C
 Each role carries its applicable requirements for retaining evidence, verifying cleanup ownership, and terminating owned processes.
 Skill names identify the operational sources without duplicating their procedures in design notes.
 
+Delivery supplies complete-candidate review inputs, evidence-based finding dispositions, and bounded reassessment of affected consumers.
+Main host references select review staffing and depth without changing required human approvals or activating a review product.
+Project-wide enforcement remains the target repository's responsibility.
+
 The graph below shows conditional loading and review timing for authorized repository delivery.
 Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.
 
