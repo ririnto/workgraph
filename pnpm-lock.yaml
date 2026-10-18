@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@oxc-project/types':
-      specifier: ^0.153.0
-      version: 0.153.0
+      specifier: ^0.154.0
+      version: 0.154.0
     husky:
       specifier: ^9.1.7
       version: 9.1.7
@@ -38,8 +38,8 @@ catalogs:
       version: 8.0.1
 
 overrides:
-  micromark-extension-math>katex: ^0.19.0
   markdownlint-cli2>smol-toml: ^1.9.1
+  micromark-extension-math>katex: ^0.19.0
 
 importers:
 
@@ -47,7 +47,7 @@ importers:
     devDependencies:
       '@oxc-project/types':
         specifier: 'catalog:'
-        version: 0.153.0
+        version: 0.154.0
       husky:
         specifier: 'catalog:'
         version: 9.1.7
@@ -115,8 +115,8 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@oxc-project/types@0.153.0':
-    resolution: {integrity: sha512-jSNrRIyvPVLL5E1z/tS5zLAprosGz/FuI1PWwEOz59j3E4TTTzSpqKb/RDGqJhhW0QHYISGXxq582wGx6T11Tw==}
+  '@oxc-project/types@0.154.0':
+    resolution: {integrity: sha512-KYOUGQFlLWR+s4QMV2Q9ko38TZm7EdO87Qm7rvZLqk/webse/cDjtyxKhg/47l0byCbs/k46LT8qc4PKjAikzA==}
 
   '@oxfmt/binding-android-arm-eabi@0.71.0':
     resolution: {integrity: sha512-l31EyBfB4egJeFua11aQFEUE9nnDtfpWCadqQovm0WL30t/yUHtdFl/5HyFXvd5xT8Ewh3U4TI9f30GowrQ1fw==}
@@ -1159,7 +1159,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.3
 
-  '@oxc-project/types@0.153.0': {}
+  '@oxc-project/types@0.154.0': {}
 
   '@oxfmt/binding-android-arm-eabi@0.71.0':
     optional: true
