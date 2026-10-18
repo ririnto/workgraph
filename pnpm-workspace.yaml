@@ -6,7 +6,7 @@ catalog:
   markdownlint-rule-relative-links: ^5.1.2
   npm-run-all2: ^9.0.3
   oxfmt: ^0.71.0
-  oxlint: ^1.87.0
+  oxlint: ^1.88.0
   typescript: ^7.0.2
   ultracite: ^8.0.1
 
