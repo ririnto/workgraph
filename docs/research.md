@@ -87,10 +87,11 @@ Its runtime delivers context through Claude Code hooks, and its instructions use
 
 ### Model Effort And Cost
 
-We reviewed seven exact models using official model, effort, pricing, host, and prompting documentation.
+We reviewed nine exact models using official model, effort, pricing, host, and prompting documentation.
 The table separates API defaults from documented host recommendations.
 The inspected Codex catalog defaults, recorded below, can differ from those recommendations.
 Prices are standard API dollars per million input, cached input, and output tokens.
+The marked Gemini rows instead carry promotional GitHub Copilot display rates, with their source and end dates recorded below.
 They do not describe subscription usage limits, fast-mode prices, or paid tool charges.
 
 | Exact model | Supported effort | API default | Documented host guidance | Input / cached input / output |
@@ -102,10 +103,13 @@ They do not describe subscription usage limits, fast-mode prices, or paid tool c
 | [Claude Sonnet 5.5](https://platform.claude.com/docs/en/models/sonnet-5-5/overview.md), `claude-sonnet-5-5`, September 28, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `medium`. | $2 / $0.10 / $10 |
 | [Claude Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview.md), `claude-opus-5-5`, September 22, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | Claude Code starts at `medium`. | $4 / $0.20 / $20 |
 | [Claude Fable 5.1](https://platform.claude.com/docs/en/models/fable-5-1/overview.md), `claude-fable-5-1`, September 1, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `high`. | $10 / $0.25 / $50 |
+| [Gemini 3.8 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash), `gemini-3.8-flash`, page updated September 2026 | `low`, `medium`, `high` thinking levels | `medium` | No documented host guidance. | $0.75 / $0.075 / $3.75 Copilot promotional |
+| [Gemini 4 Argon](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon), `gemini-4-argon`, page updated October 2026 | `low`, `medium`, `high` thinking levels | `medium` | No documented host guidance. | $2 / $0.10 / $10 Copilot promotional |
 
 The [Codex model guide](https://developers.openai.com/codex/models.md) supplies Astra and Luna starting settings.
 The [Claude Code model guide](https://code.claude.com/docs/en/model-config.md) supplies its host defaults, provider aliases, and minimum CLI version.
 Anthropic's [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort.md) supplies supported effort levels and API defaults.
+Google's [thinking reference](https://ai.google.dev/gemini-api/docs/thinking) supplies the Gemini thinking levels and defaults.
 The [Haiku launch announcement](https://www.anthropic.com/claude-haiku-5-5) records Sonnet's cache-read price reduction effective October 7, 2026.
 Keep previously published benchmark costs with their source dates rather than treating them as recalculated at the new price.
 Fable 5.1 and Opus 5.5 keep adaptive thinking on.
@@ -123,7 +127,8 @@ Organization effort limits can cap the effective Claude Code level below the sel
 These capabilities follow Anthropic's [thinking configuration table](https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting.md).
 
 Broad external benchmarks supply the primary effort comparisons.
-The [detailed evidence record](model-effort-evidence.md) retains numerical effort comparisons for all seven models, workload studies, and measurement limits.
+The [detailed evidence record](model-effort-evidence.md) retains numerical effort comparisons for the seven benchmarked models, workload studies, measurement limits, and the Gemini provider evidence.
+No reviewed external benchmark covers the two Gemini models.
 Independent review checks the available figures, methods, and verification limits.
 Source verification does not establish model performance outside the published workloads.
 
@@ -171,6 +176,26 @@ Compare acceptance results with the same workload, harness, tools, fallback, ser
 Include workers, retries, and tool charges in total workflow cost.
 Effort names do not define equal compute across models or fixed cost multipliers.
 Local hook and Workflow checks test instruction delivery and tool execution, not model quality or these effort curves.
+
+Google's [thinking reference](https://ai.google.dev/gemini-api/docs/thinking) lists `low`, `medium`, and `high` as the supported thinking levels for both exact Gemini models.
+The default is thinking on at `medium`, and both models use dynamic thinking that adjusts reasoning effort to request complexity.
+The reference documents no numerical thinking budget for either model.
+The [Gemini 3.8 Flash model page](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash) documents 1,048,576 input tokens and 65,536 output tokens and records a September 2026 update.
+The [Gemini 4 Argon model page](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon) documents one unified 1,048,576-token context window covering input, thinking, and output, with 65,536 synchronous output tokens and up to 1,048,576 output tokens through background long decode.
+It records an October 2026 update and supports implicit caching only.
+Thinking tokens bill as output tokens, with their total reported through `total_thought_tokens`.
+
+The practical recommendation is `medium` for routine work and `high` for harder work, as the documented provider default and the highest supported level.
+This recommendation is a labeled default and ceiling, not a measured efficiency optimum, and no public effort comparison for either model was found.
+Gemini thinking levels are provider labels and do not equate to Claude or OpenAI effort levels.
+Native Claude Code gateway translation, effective context, and live pricing for these models remain unverified.
+The inspected Claude Code 2.1.302 configuration schema accepts per-model `effortLevel` and `maxEffortLevel` for arbitrary model identifiers, but its compaction clamps the configured window to recognized model capacity with a 200,000-token fallback for unknown models.
+Passthrough `contextWindow` and `maxOutputTokens` fields do not configure native capacity in that version.
+Those observations describe one inspected host version and do not establish gateway behavior.
+
+GitHub's [Copilot models-and-pricing documentation](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing) supplies the marked Gemini rates as promotional Copilot display prices in United States dollars per million tokens.
+Flash's rates run through December 31, 2026, and Argon's rates run until December 1, 2026.
+The Copilot table publishes no separate cache-write rate, and these rates are not direct Google API prices.
 
 ### Host Model Selection
 
