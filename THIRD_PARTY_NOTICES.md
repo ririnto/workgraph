@@ -134,6 +134,9 @@ We read the full [Agent Skills combined source](https://agentskills.io/llms-full
 Its guidance informed the conditional reference boundary without supplying plugin code or bundled assets.
 We consulted Anthropic's official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) for host behavior.
 We reviewed the official [Claude Code skills documentation](https://code.claude.com/docs/en/skills) for activation descriptions, invocation controls, and supporting files.
+We reviewed Google's Gemini API [thinking reference](https://ai.google.dev/gemini-api/docs/thinking) and its [Gemini 3.8 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash) and [Gemini 4 Argon](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon) model pages for provider thinking levels, defaults, and token limits.
+We reviewed GitHub's [Copilot models-and-pricing documentation](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing) for the cited promotional display rates.
+These official references inform the maintained model research without supplying bundled code or provider configuration.
 
 We reviewed the arXiv paper [When Agents Do Not Stop: Uncovering Infinite Agentic Loops in LLM Agents](https://arxiv.org/abs/2607.01641v1) by Xinyi Hou, Shenao Wang, Yanjie Zhao, and Haoyu Wang.
 We reviewed the arXiv paper [Are LLMs Reliable Code Reviewers? Systematic Overcorrection in Requirement Conformance Judgement](https://arxiv.org/abs/2603.00539v1) by Haolin Jin and Huaming Chen.
