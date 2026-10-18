@@ -38,7 +38,6 @@ Preserve technical meaning, authority boundaries, required syntax, and exact quo
 
 Write complete sentences in prose and list items.
 Put each sentence on its own source line.
-End each sentence before starting the next source line.
 Do not force separate sentences together with semicolons or other punctuation.
 Do not replace sentence boundaries to fit several instructions onto one line.
 Do not reflow prose to a fixed column width.
@@ -49,13 +48,11 @@ Use lists for parallel, sequential, or comparative items, without nesting unless
 ## Human-Facing Documents
 
 For human-facing documents, lead with the action or outcome and use clear headings, compact lists, and short paragraphs.
-Use the action-first, scannable presentation rules in this section.
 Check the rendered document for readability after editing it.
 
 ## Agent-Facing Documents
 
-Agent-facing documents and prompts are exempt from the human-facing presentation rules and rendered-readability check above.
-They still use one sentence per source line and do not join separate sentences with semicolons.
+Agent-facing documents and prompts are exempt from the presentation rules and rendered-readability check in the human-facing section above.
 Use LaTeX or Mermaid when notation or a diagram makes the instructions clearer.
 
 ## Tables

@@ -71,9 +71,8 @@ Raise concurrency only after verifying delegated results are trustworthy.
 Identify unexpected changes' source with an exploration agent.
 Account for assigned agents' changes and continue.
 Without native waiting, end notification-only idle turns without claiming completion.
-Validate behavior, inputs, configuration, and toolchain before reusing evidence.
+Validate behavior, inputs, configuration, and toolchain, then reuse passing evidence only while those conditions remain unchanged.
 Compare named references and relevant changes without hash pins.
-Reuse passing evidence while relevant conditions remain unchanged.
 Unrelated changes, commit identity, parent, or branch name alone do not invalidate evidence.
 Rerun affected checks only after relevant changes, failures, or unresolved concerns.
 Check attempt status and partial effects before retrying, reassigning, or stopping.
@@ -81,7 +80,7 @@ Bound retries by changed evidence, progress signals, and an exit condition.
 Stop fix loops after two consecutive rounds without measurable progress, preserving unresolved acceptance.
 Reset after progress, independently of host retries and inference sampling.
 Before reporting findings, have a verifier independent of the finder and fixer check each finding's evidence.
-Label unavailable or inconclusive verification unverified, never confirmed or refuted.
+Label unsupported findings and unavailable or inconclusive verification unverified, never confirmed or refuted.
 
 ### Cleanup
 
@@ -122,4 +121,3 @@ Before source or maintained code work, read Development unless fully loaded.
 Read Delivery before repository edits, branching, implementation dispatch, commits, or publication unless fully loaded.
 For inspection, research, or review alone, omit implementation, branch publication, new PRs/MRs, and integration.
 Review existing PRs/MRs without inferring publication authority from inspection requests.
-Report unsupported findings as unverified.

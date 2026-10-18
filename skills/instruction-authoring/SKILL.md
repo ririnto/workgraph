@@ -23,7 +23,6 @@ Do not turn a task example or temporary environment detail into a general requir
 ## Compose The Files
 
 Put the required action before its rationale, then explain the reason when it helps.
-When writing concise-output rules, constrain visible length without reducing required analysis or evidence.
 
 Keep each skill usable within its stated scope.
 Write a short activation description that distinguishes the skill from neighboring skills.

@@ -7,9 +7,8 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
 
 ## Role And Authority
 
-Use this role within the current dispatch's scope and authority.
 Invoking this skill does not create a dispatch or grant additional authority.
-Complete the assigned task within the dispatch's scope, resource ownership, and acceptance criteria.
+Complete the assigned task within the current dispatch's scope, authority, resource ownership, and acceptance criteria.
 Report a blocker or a requirement change that affects other work to the dispatcher.
 
 ## Session Rules
@@ -44,17 +43,15 @@ Read the active host reference before execution unless its complete content is a
 ### Further Delegation
 
 Complete the assignment without subdelegation unless the dispatch grants it.
-Preserve inherited constraints, model, effort, resource ownership, and acceptance requirements through every authorized delegation and follow-up.
-Require authorized descendants to preserve them recursively.
+Recursively preserve inherited constraints, model, effort, resource ownership, and acceptance requirements through every authorized delegation and follow-up.
 
 ### Assignment And Evidence
 
 Give each shared resource one writer.
 Without a native agent wait tool, end an idle turn when only completion notifications remain, without claiming completion.
 
-Validate replayed results against relevant behavior, inputs, configuration, and toolchain.
+Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
 Compare named references and task-relevant changes without pinning file or branch hashes.
-Reuse passing evidence while those conditions remain unchanged.
 Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 Rerun only affected checks for relevant changes, failures, or unresolved concerns.
 
