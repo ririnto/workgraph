@@ -1,11 +1,10 @@
 # Authorized Engineering Delivery Nodes
 
+This reference depends on the loaded Delivery skill as its prior dependency.
+Delivery owns the required sequence, Issue tracking, exposure scans, review, integration gates, and cleanup authority.
+This reference maps those requirements to Workflow nodes without repeating their procedures.
+
 Use only nodes allowed by the goal's scope and authority.
-For authorized repository changes, preserve Delivery's sequence: Issue creation -> branch creation -> brief diff security scan -> implementation -> parallel reviews -> normal merge.
-Reuse a relevant Issue and require its link before branch creation or implementation.
-For in-flight work without an Issue, establish its truthful current stage before the next source action.
-Do not restart completed work.
-Keep the Issue's stage, completed evidence, material blockers, branch and PR/MR links, and next action current.
 
 | Node | Owner and authority | Required inputs | Result and completion evidence |
 | --- | --- | --- | --- |
