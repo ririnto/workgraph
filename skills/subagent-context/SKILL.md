@@ -85,6 +85,9 @@ Before handback, remove unneeded Docker containers and disposable caches created
 Before handback, remove clean assignment-created worktrees within granted cleanup when no longer needed.
 
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
+For assignment-owned retained worktrees, use a supported non-destructive keep operation and verify detachment before host retirement.
+Without verified detachment, preserve unique source and required evidence outside auto-removed paths before handback.
+An idle prompt alone does not prove preservation.
 Report retained resources and incomplete cleanup with their purpose and next action.
 
 ## Source Work

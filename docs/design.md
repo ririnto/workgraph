@@ -185,6 +185,7 @@ Unrelated pre-existing issues, umbrella issues, older failed units, and severity
 Existing unrelated issues require no new tracker record before another unit merges.
 Already-authorized owned cleanup requires source preservation and absence of unique work and consumers, not renewed stage approval or a zero local ahead count.
 Actual ungranted destructive operations and protected-resource refusals retain their boundaries.
+Delivery and the self-contained Worker contract protect retained source and evidence through verified native detachment or recovery outside auto-removed worktrees rather than assuming an idle host is safe.
 
 ```mermaid
 flowchart TD

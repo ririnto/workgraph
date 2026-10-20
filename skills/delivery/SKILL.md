@@ -111,6 +111,11 @@ Integrate after current-unit checks pass, confirmed blockers are resolved, and r
 Require only relevant resource returns, not unrelated global ownership returns.
 Finish delivery by reading back the named authorized base branch after normal merge.
 Complete already-authorized task-owned cleanup without renewed stage approval.
+
+Before native retirement with retained work, use a supported non-destructive keep operation and verify worktree detachment.
+An idle prompt alone does not prove preservation because native exit can remove attached worktrees.
+If detachment is unestablished, preserve unique source and required evidence outside auto-removed worktrees before retirement.
+
 Before a discard option, verify named-base source preservation, no unique work, and no active consumers.
 A local ahead-commit count alone does not prove source would be lost.
 Keep ungranted destructive operations and protected-resource refusals outside that authority.
