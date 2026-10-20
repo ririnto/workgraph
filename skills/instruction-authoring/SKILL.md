@@ -52,6 +52,9 @@ For changed instruction behavior, read Verification unless its complete content 
 Enforce structural requirements through existing validators when they can check the contract safely.
 Test representative success, boundary, and failure decisions through existing native evaluation cases.
 Keep semantic judgment separate from lexical assertions about instruction wording.
+Calibrate semantic graders with known-good and known-bad responses before relying on their scores.
+Report failed requests, ungraded coverage, and grader controls separately from behavioral results.
+Preserve effective guidance when comparisons give no reason to change it, unless an explicit requirement takes precedence.
 Treat model-specific prompting observations as hypotheses for the selected workload, not universal rules.
 
 Confirm frontmatter and invocation fields against the target host's supported skill format.

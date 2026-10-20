@@ -546,6 +546,27 @@ Without a native agent wait tool, agents end an idle turn until a completion not
 This idle-turn rule also applies to background Bash.
 The papers provide coordination context but do not prove this prompt resolves the observed behavior.
 
+### Harness2 Verification Evidence Evaluation
+
+We compared the unchanged public [Verification skill](../skills/verification/SKILL.md) with an unmerged three-line expansion on a fixed synthetic evidence-attribution task.
+The task had eight status-and-citation criteria and five semantic criteria across three trials.
+The third trial was configured to reverse record order, without separately recording runtime request payloads.
+GPT-6 Luna scored 13/13 on every trial for both variants.
+GPT-6.1 Sol independently judged responses with maintained [Harness2](https://github.com/google-research/harness2/tree/main) tools `core.judge.judge_one` and `core.judge.write`.
+The evaluation used a custom score adapter in hardened Linux containers.
+Three Haiku baseline trials made six requests: the first returned HTTP 403, and five returned HTTP 503.
+Those Haiku results are ungraded, and candidate trials were excluded without requests.
+All 20 HTTP attempts comprised 12 solver attempts, with six successes and six failures, and eight valid judge attempts.
+A manually reviewed baseline positive control scored 13/13.
+A handwritten false-execution, all-pass negative scored 3/13, with all five semantic criteria false.
+These controls calibrate the grader and are not additional solver successes.
+The graded comparison ties, so it gives no measured reason to expand Verification or add redundant rules.
+The proposed expansion remains unmerged, and Verification behavior remains unchanged.
+The authoring change requires grader calibration and explicit coverage reporting.
+The new native [case](../evals/verification-evidence/case.yaml) defines regression coverage but remains UNRUN.
+Neither provides evidence of runtime or model-adherence gains.
+No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
+
 ## Language Tooling And Rule Mappings
 
 Preserve a project's working lint and formatter choices before applying defaults to an unconfigured project.
