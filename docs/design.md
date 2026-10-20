@@ -39,6 +39,11 @@ Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating those common rules.
 
 Main remains the entry point for complete authorized outcomes, including review, integration, readback, and cleanup.
+Delivery defines authorize-once Git operations, repository eligibility, and current-unit integration gates without enlarging host permissions.
+Main and Worker independently carry authorized recovery and true-boundary handling because their loading contexts are separate.
+They assess observed changes for current suitability without tracing authorship or history, and withhold nonblocking coordination messages.
+Changed state and optional setup are not blockers without a concrete unmet requirement, and setup waits until an authorized operation needs it.
+Writing defines the agent-facing task contract, while Instruction Authoring audits loading points and replaces conflicting consumers.
 Main and Worker select Memory Maintenance before any durable memory change.
 The procedure reviews the complete selected store without expanding read or write authority.
 It keeps facts in owning records, synchronizes index pointers, and preserves unresolved conflicts.
@@ -141,9 +146,13 @@ The [model research](research.md#model-effort-and-cost) records model-specific e
 Workgraph keeps goal definition, scope, authority, acceptance evidence, and dynamic graph planning in the main session.
 Each node describes a bounded operation, decision, or check with required inputs, expected outputs, owner, authority, and completion evidence.
 Edges identify results or conditions that gate later nodes, not execution order alone.
-The main session starts ready independent nodes in parallel, serializes conflicting writes, and joins branches only when a later node needs their results.
+The main session starts ready independent nodes in parallel, serializes actual conflicting writes, and joins only required predecessor results.
+Independent native Task Mains can change overlapping logical sources in separate native worktrees.
+Files, worktrees, refs, and shared records retain one actual writer, and unrelated ownership returns do not gate a successor.
+A per-Task host manager controls only the assigned native host, while the native Main retains source and complete delivery ownership.
+Native Task starts preserve existing session configuration without separate model or effort overrides.
 Pass actual predecessor results and evidence to successor nodes.
-Choose useful node types for the goal rather than requiring an exploration-to-integration sequence.
+Choose useful node types for the goal while retaining Delivery's required sequence for authorized repository changes.
 Workgraph defines no scheduler, executor, or shared task store.
 
 Main can use LaTeX when notation makes dependencies or readiness conditions clearer.
@@ -159,38 +168,41 @@ Main starts $v$ after accepting both results and starts $p$ after passing checks
 This example does not require the same nodes for other goals.
 
 The [README](../README.md#goal-driven-work) introduces goal-driven work for plugin users.
-The delivery skill owns branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
-Exposure scans cover user environment details and secrets only.
+The delivery skill owns Issue creation -> branch creation -> brief diff security scan -> implementation -> parallel reviews -> normal merge.
+It requires a relevant Issue link before branch creation or implementation, with truthful current stage, completed evidence, material blockers, branch and PR/MR links, and next action.
+Already-started work without an Issue establishes one before the next source action without restarting completed work.
+Exposure scans cover user environment details and secrets in the initial or incoming diff before implementation and the current changed diff before each push.
+An empty initial diff does not establish coverage of later changes.
 Commit author and committer names and email addresses are contributor information, excluded from exposure findings, rewrites, and publication blocks.
 Main Agent Contract owns orchestration and evidence acceptance, while Subagent Context owns bounded assignment handbacks.
 Each role carries its applicable requirements for retaining evidence, verifying cleanup ownership, and terminating owned processes.
 Skill names identify the operational sources without duplicating their procedures in design notes.
 
-Delivery supplies complete-candidate review inputs, evidence-based finding dispositions, and bounded reassessment of affected consumers.
-Main host references select review staffing and depth without changing required human approvals or activating a review product.
+Delivery supplies complete-candidate review inputs, parallel independent reviews, evidence-based finding dispositions, and bounded reassessment of affected consumers.
+Finding verification receives the complete predecessor result and stays independent of the finder and fixer.
+Completed sequential reviews remain valid without being relabeled as parallel or restarted solely to change timing.
+Main host references and explicit user requirements select review staffing and depth without changing required human approvals or activating a review product.
 Project-wide enforcement remains the target repository's responsibility.
 
-The graph below shows conditional loading and review timing for authorized repository delivery.
-Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.
+The sequence below summarizes authorized repository delivery after Main loads Delivery.
+Main verifies current-unit checks, confirmed blocker fixes, and required current-unit deferral records before integration.
+Unrelated pre-existing issues, umbrella issues, older failed units, and severity alone do not block independently verified delivery.
+Existing unrelated issues require no new tracker record before another unit merges.
+Already-authorized owned cleanup requires source preservation and absence of unique work and consumers, not renewed stage approval or a zero local ahead count.
+Actual ungranted destructive operations and protected-resource refusals retain their boundaries.
+Delivery and the self-contained Worker contract protect retained source and evidence through verified native detachment or recovery outside auto-removed worktrees rather than assuming an idle host is safe.
 
-```mermaid
-flowchart TD
-    H[Hook: Main role and host reference] --> T{Repository changes or delivery?}
-    T -->|No| S[Continue within the current scope]
-    T -->|Yes| D[Read Delivery skill]
-    D --> B[Record base and working branches]
-    B --> C[Prepare changes and required evidence]
-    C --> E[Exploration agent scans diff for environment details and secrets only]
-    E --> F[Resolve exposures and push working branch]
-    F --> M{Project maintainer?}
-    M -->|Yes| P[Create PR or MR]
-    P --> R[Independent review of PR or MR]
-    M -->|No| W[Independent review of working branch]
-    W --> Q[Resolve blockers and create PR or MR]
-    R --> G[Verify integration gates]
-    Q --> G
-    G --> I[Integrate and verify base branch update]
+```text
+Issue creation or reuse
+  -> Branch creation
+  -> Brief initial or incoming diff security scan
+  -> Implementation and required checks
+  -> Parallel independent reviews and dependent finding verification
+  -> Normal merge and named-base readback
 ```
+
+Maintainers publish the PR/MR before complete-candidate review, while contributors review their complete branch before publication.
+Changed-diff exposure checks still precede each push, and required gates still precede normal merge.
 
 Claude Code's main session must resolve required scope and authority before launching a Workflow run.
 An agent prompt cannot grant tool permissions or enlarge the user's authorization.
@@ -200,8 +212,13 @@ The dispatched agent should complete the assigned task within its authority inst
 
 Each role owns evidence freshness and replay validation within its scope.
 The native tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
+Claude Main prefers Agent for one-phase work and permits a one-phase Workflow when actual follow-up phases are expected.
+Main preserves unchanged earlier prompts, options, labels, and arguments for supported same-session continuation without rerunning valid completed work.
+Main ends callback-only turns and inspects returned results before choosing the next action.
 Claude Main's host reference conditionally loads the bundled Workflow skill before authoring or resuming explicit or implicit runs.
 The skill requires its authoring reference for graph mapping, result acceptance, early-stop detection, and cache-preserving recovery.
+That reference maps actual domains to bounded keyed pipelines with narrow outputs, needed stages, and necessary cross-domain joins rather than a domain-by-phase staffing matrix.
+Complete independent review remains scoped to the cohesive delivery unit instead of multiplying across domain-stage cells.
 Worker and Codex contexts do not load this procedure.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.
 
@@ -211,8 +228,9 @@ Each host reference owns tool routing, while the common Main contract owns task 
 
 Main requires independent per-finding verification before confirmed reporting, and Worker returns candidates for that verification.
 Claude's host reference selects planning, read-only scan, and isolated edit defaults while preserving active overrides.
-Workflow maps those settings and verification dependencies into native stages and keeps deterministic choices in script control flow.
-Fix loops track consecutive rounds without observable improvement independently of native retries.
+Workflow maps internal-agent settings and verification dependencies into native stages and keeps deterministic choices in script control flow.
+A multi-model assessment continues with remaining authorized models after an actual request failure while preserving exclusions and unmet coverage without false passing claims.
+Fix loops track consecutive no-progress rounds independently of native retries and return evidence for Main's next authorized approach.
 Explicit diff-first gates split proposal and edit runs because native Workflow cannot request intermediate operator sign-off.
 These consumer rules preserve separately authorized source delivery and do not activate host settings or require JEV.
 
@@ -278,6 +296,10 @@ Dependabot checks npm dependencies and GitHub Actions weekly.
 Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.
 Additional cases check an idle background command, an Agent completion callback, and an English worker handoff during a Spanish human conversation.
+The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, isolated parallel work, and repository eligibility.
+It contrasts harmless observed state with concrete defects, deferred setup needs, security constraints, and actual writer conflicts without authorship tracing or coordination messages.
+The Workflow-selection case uses keyed parser and documentation assessments with one necessary reconciliation rather than a domain-by-phase review matrix.
+These policy assessments do not perform Git delivery or establish installed activation.
 Completion graders inspect actual traces rather than relying on final claims.
 Retained local traces let maintainers distinguish completed command and worker outcomes from reported acceptance.
 Record which model, host, and loaded plugin produced the result.

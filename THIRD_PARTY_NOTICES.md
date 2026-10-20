@@ -50,6 +50,10 @@ Workgraph does not include its runtime or require its message schema.
 
 ## OpenAI Guidance
 
+We read the complete official [Codex best-practices article](https://learn.chatgpt.com/guides/best-practices) and [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md).
+Their goal, context, constraint, completion, skill-scoping, and instruction-audit guidance informed agent-facing instruction authoring.
+Workgraph adapts these decisions without bundling their text or changing SDKs, model configuration, settings, or scheduling.
+
 We reviewed the supplied copies of [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) and [Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md).
 These documents informed scoped autonomy, instruction priority, concise writing, progressive disclosure, and proportional verification.
 We fetched the official [GPT-6 guide](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) and [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md).
@@ -67,6 +71,10 @@ Workgraph distributes its own instructions without bundling Codex source or a cl
 The [research notes](docs/research.md#codex-native-cleanup) distinguish reference-source effects from installed protocol and destructive-operation evidence.
 
 ## Anthropic Guidance
+
+We read the complete official [Claude prompting best-practices guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md).
+Its explicit outcomes, contextual instructions, examples, source separation, and scoped tool guidance informed agent-facing instruction authoring.
+These adaptations retain model-specific evidence limits and do not redistribute the guide or configure host behavior.
 
 We read the complete original [mirku workflow post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
 Its role split, isolated edits, verification, fix-loop bound, and approval example informed the native Workflow stage guidance.

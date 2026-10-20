@@ -12,6 +12,27 @@ See [the design](design.md) for delivery mechanics and [third-party notices](../
 
 ## Prompt And Skill Design
 
+### Agent-Facing Prompt Contracts
+
+We read the complete official [Claude prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md), including its examples and model-specific qualifications.
+We also read the complete [Codex best-practices article](https://learn.chatgpt.com/guides/best-practices) and [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md).
+These sources recommend explicit goals, relevant context, constraints, output requirements, and observable completion criteria.
+They support focused skills, useful examples, proportional checks, and independent work suited to the host.
+The OpenAI guide warns that conflicting loaded instructions can stop authorized work.
+Anthropic recommends separating instructions from source material and using ordinary, direct language rather than aggressive tool triggers.
+
+Instruction Authoring applies those lessons to agent-facing contracts and instruction-management skills.
+Writing keeps that prompt contract separate from its human-facing presentation guidance.
+Authors audit actual loading points, replace conflicting consumers, and evaluate decision boundaries instead of testing exact prose.
+The user's approved scope determines Git delivery authority, while host permissions and server protections remain unchanged.
+A guide's sample approval prompt does not require renewed approval for operations already authorized by the user.
+Repository eligibility requires current authenticated metadata and meaningful development within three calendar months, not pushedAt alone.
+That eligibility policy is a user requirement rather than a claim from these prompting guides.
+
+These adaptations do not add SDK integrations, model configuration, settings changes, scheduling, or installed activation.
+The guides' model-specific observations require evaluation on the selected workload and do not establish Workgraph adherence.
+Source validation, native behavior evidence, and installed activation remain separate claims.
+
 ### OpenAI Guidance
 
 [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) recommends action within the user's scope.
@@ -240,6 +261,8 @@ They cannot reproduce native message roles or tool-call envelopes.
 The [delivery design](design.md#deliver-context) records this boundary.
 Workflow's description states its activation boundary, and its body defines dependency gates without repeating Main's finding classifications.
 Its delivery reference maps node inputs and outputs for authorized engineering delivery.
+Main and Worker inspect failures and partial effects before reasonable authorized retries or alternative supported forms.
+They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
 
 ### Host Instruction Comparison
@@ -616,7 +639,7 @@ It describes host permissions and separate runs for operator sign-off between st
 | Opus 5.5 Main with ultracode. | Claude guidance prefers Opus planning and authorized ultracode while retaining active user and configuration overrides. |
 | Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Claude defaults select those roles and Workflow passes selected settings into stages with separate edit worktrees. |
 | Independent verification before every reported finding. | Main requires a separate verifier before confirmed reporting and Workflow preserves per-candidate verification outcomes. |
-| Two rounds without fix progress. | Fix loops compare observable results, reset after improvement, and stop after two consecutive unchanged rounds. |
+| Two rounds without fix progress. | Fix loops compare results, reset after improvement, and return evidence after two unchanged rounds for Main's next authorized approach. |
 | Deterministic JEV routing. | Native script control flow handles deterministic choices without requiring, installing, or replacing JEV. |
 | Diff-first approval before edits. | Explicit consumer gates end proposal work before edits and require approval for the gated scope. |
 

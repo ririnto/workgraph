@@ -21,6 +21,9 @@ Do not force-push or rewrite shared history.
 Keep private environment details, work-item identifiers, and review-system URLs out of committed or published material.
 Use repository-relative paths and portable examples in committed content.
 
+Keep security, authentication, permissions, output guards, hooks, and branch protections intact.
+Never fabricate results, circumvent credentials or privileges, or weaken checks to finish a task.
+
 ### Communication
 
 Use English without routine narration in agent-to-agent messages, including assignments, follow-ups, handoffs, results, and blockers.
@@ -30,7 +33,8 @@ Classify each message's origin by its initiating sender, not the relay envelope.
 Agent assignments remain agent-origin even when relaying a human project request.
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
-Preserve required human input, report actionable blockers, and send mandatory host messages.
+Preserve required human input, genuine blocking dependencies, and mandatory host messages.
+Do not send nonblocking observations, acknowledgements, or harmless-state coordination questions.
 For prose or Markdown work, read Writing unless its complete content is already loaded.
 For instruction files, read Instruction Authoring unless its complete content is already loaded.
 Before editing durable memory, read Memory Maintenance unless its complete content is already loaded.
@@ -47,16 +51,25 @@ Recursively preserve inherited constraints, model, effort, resource ownership, a
 
 ### Assignment And Evidence
 
-Give each shared resource one writer.
-Without a native agent wait tool, end an idle turn when only completion notifications remain, without claiming completion.
+Give each actual file, worktree, ref, and shared record one writer.
+Coordinate only relevant conflicting resources, not unrelated ownership returns.
+Assess observed changes for current correctness, safety, and suitability, then adopt, repair, or reject within dispatch authority.
+Do not trace their author, origin, or history.
+Changed state or missing optional setup alone does not block the assignment.
+Perform maintained setup only when the next authorized operation requires it.
+Preserve concrete required-gate, security, authority, and conflicting-write constraints.
+When only native callbacks remain, yield without polling, progress requests, duplicate dispatch, or completion claims.
 
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
 Compare named references and task-relevant changes without pinning file or branch hashes.
 Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 Rerun only affected checks for relevant changes, failures, or unresolved concerns.
 
-Check partial effects before retrying interrupted writes.
+Inspect each failure, attempt status, and partial effects before retrying, reassigning, or stopping.
+Try every reasonable authorized avenue, including repairs, retries, and simpler or different supported command or tool forms.
+Report each attempt's action, actual outcome, evidence, and unresolved limits honestly.
 Bound retries by changed evidence, a progress signal, and an exit condition.
+Continue independent allowed work when another operation remains blocked.
 
 ### Resource Cleanup
 
@@ -72,6 +85,9 @@ Before handback, remove unneeded Docker containers and disposable caches created
 Before handback, remove clean assignment-created worktrees within granted cleanup when no longer needed.
 
 Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
+For assignment-owned retained worktrees, use a supported non-destructive keep operation and verify detachment before host retirement.
+Without verified detachment, preserve unique source and required evidence outside auto-removed paths before handback.
+An idle prompt alone does not prove preservation.
 Report retained resources and incomplete cleanup with their purpose and next action.
 
 ## Source Work
@@ -95,4 +111,4 @@ Meet the dispatch's cleanup and handback requirements before returning.
 Return changed files, check evidence, and limitations to the dispatcher.
 Return candidate findings for independent verification before confirmed reporting, identifying any unavailable verification.
 Deliver requested artifacts at their assigned paths or in the host's required format.
-Identify incomplete checks or missing authority as blockers, failures, or unknown outcomes rather than completed work.
+Identify incomplete required checks or missing required authority as blockers, failures, or unknown outcomes rather than completed work.

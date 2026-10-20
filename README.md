@@ -71,20 +71,26 @@ It uses a goal-dependent task graph when dependencies make coordination useful.
 Each node names its operation, inputs, outputs, owner, authority, and completion evidence.
 Edges represent result dependencies or conditions, not chronology.
 The main agent starts ready independent work in parallel when writes do not conflict and serializes conflicting writes.
-Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
+Exploration, planning, implementation, review, and integration are possible node types rather than a universal itinerary, while authorized repository delivery follows its required sequence.
 Workers complete bounded assignments within their authority.
 
 The Main contract owns orchestration, authority, request-origin communication, and evidence freshness.
 The Worker contract owns bounded assignments and handbacks.
 Both keep their role procedures self-contained, and these instructions do not guarantee model adherence.
 
-Main carries authorized outcomes through review, integration, named-base readback, and owned cleanup without routine phase approvals.
+Main carries authorized Git delivery through implementation, checks, issue and PR operations, comments, normal merge, named-base readback, and owned cleanup.
+These approved operations need no repeated stage permission.
+Explicit user gates, security controls, and separate deployment, credential, live-asset, fork, and upstream authority remain boundaries.
+Agents inspect failures and partial effects, try reasonable authorized repairs or supported alternatives, and report each attempt honestly.
+Delivery requires authenticated eligibility evidence for unarchived nonfork projects with meaningful development within three calendar months.
 Main and Worker read Memory Maintenance before durable memory changes.
 That conditional procedure requires the complete selected memory index and existing records before edits.
 It preserves valid facts, resolves supersession within authority, and keeps unresolved conflicts explicit.
 Private memory remains outside published project material.
 
-Claude Code uses native Workflow when a follow-up may depend on an accepted earlier result, including conditional follow-ups, or when explicitly requested.
+Claude Code prefers direct Agent for work that ends in one phase.
+An initial one-phase Workflow is appropriate when actual follow-up phases are expected or the user requests Workflow.
+Main preserves unchanged calls for supported same-session resume, ends callback-only turns, and inspects returned results before advancing.
 Its [Main host reference](skills/main-agent-contract/references/claude.md#orchestration) routes to Workflow for selection and fallback rules.
 The Workflow skill owns graph preparation, execution, and result verification.
 Codex uses native delegation under its [Main host reference](skills/main-agent-contract/references/codex.md), without native Claude Code Workflow.
@@ -106,8 +112,9 @@ claude --model opus --effort ultracode
 ```
 
 The ultracode launch flag also selects `xhigh` effort, while active host and user overrides retain precedence.
-Main requires independent finding verification before confirmed reporting and stops fix loops after two consecutive rounds without measurable progress.
+Main requires independent finding verification before confirmed reporting and reassesses the approach after two consecutive rounds without measurable progress.
 Productive rounds reset that count, which remains separate from native retries and inference sampling.
+Reassessment preserves unmet acceptance while Main considers remaining reasonable authorized avenues.
 Unavailable verification remains explicit as unverified.
 
 ## Goal-Driven Work
@@ -130,7 +137,11 @@ Use the native `script` input first, then its returned `scriptPath` for an autho
 Pass structured `args` and `resumeFromRunId` only as the current tool supports them.
 Read [Workflow script authoring](skills/workflow/references/authoring.md) before authoring or resuming a script.
 
-Follow the delivery skill for branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
+Authorized repository delivery follows Issue creation -> branch creation -> brief diff security scan -> implementation -> parallel reviews -> normal merge.
+A relevant Issue link precedes branch creation or implementation, and the Issue records actual stages, completed evidence, material blockers, branch and PR links, and the next action.
+Already-started work without an Issue establishes one before the next source action without restarting completed work.
+Follow the delivery skill for the initial scan, changed-diff scans before pushes, independent review and finding verification, current-unit deferrals, integration, and branch cleanup.
+Verified units can merge while unrelated pre-existing issues remain open, without creating new tracker records for those issues.
 Exposure scans cover user environment details and secrets only.
 Commit author and committer names and email addresses are contributor information, excluded from exposure findings, rewrites, and publication blocks.
 Selecting a base branch does not grant publication, integration, or cleanup authority.
