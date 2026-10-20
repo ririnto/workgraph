@@ -77,6 +77,9 @@ const copyPlugin = (t) => {
     { recursive: true }
   );
   cpSync(skills, path.join(root, "skills"), { recursive: true });
+  cpSync(new URL("../agents/", import.meta.url), path.join(root, "agents"), {
+    recursive: true
+  });
   return root;
 };
 
@@ -558,12 +561,47 @@ test("bundled skills retain invocation metadata and supporting reference files",
     );
     assert.ok(body.trim());
     for (const match of body.matchAll(
-      /(?:\]\(|`)(?<file>references\/[^)`#\s]+\.md)/gu
+      /(?:\]\(|`)(?<file>(?:references|playbooks)\/[^)`#\s]+\.md|\.\.\/[^)`#\s]+\/SKILL\.md)/gu
     )) {
-      const reference = realpathSync(path.join(directory, match.groups.file));
-      assert.ok(reference.startsWith(`${realpathSync(directory)}${path.sep}`));
+      const reference = realpathSync(
+        path.resolve(directory, decodeURI(match.groups.file))
+      );
+      assert.ok(
+        reference.startsWith(
+          `${realpathSync(path.join(root, "skills"))}${path.sep}`
+        )
+      );
       assert.ok(readFileSync(reference, "utf-8").trim());
     }
+  }
+});
+
+test("bundled worker agent wires role fallbacks to the Subagent sources", (t) => {
+  const root = copyPlugin(t);
+  const [prefix, metadata, body] = readFileSync(
+    path.join(root, "agents", "workgraph-worker.md"),
+    "utf-8"
+  ).split(/^---$/mu);
+  assert.equal(prefix, "");
+  assert.match(metadata, /^name: workgraph-worker$/mu);
+  assert.match(metadata, /^description: \S+/mu);
+  assert.match(metadata, /^model: inherit$/mu);
+  assert.doesNotMatch(metadata, /^tools:/mu);
+  assert.match(body, /CLAUDE_PLUGIN_ROOT/u);
+  const sources = [...body.matchAll(/`(?<file>skills\/[^`\s]+)`/gu)].map(
+    (match) => match.groups.file
+  );
+  assert.ok(sources.length >= 2);
+  for (const source of sources) {
+    const target = realpathSync(path.join(root, source));
+    assert.ok(
+      target.startsWith(
+        `${realpathSync(path.join(root, "skills", "subagent-context"))}${
+          path.sep
+        }`
+      )
+    );
+    assert.ok(readFileSync(target, "utf-8").trim());
   }
 });
 
