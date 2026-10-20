@@ -53,9 +53,9 @@ Recursively preserve inherited constraints, model, effort, resource ownership, a
 
 Give each actual file, worktree, ref, and shared record one writer.
 Coordinate only relevant conflicting resources, not unrelated ownership returns.
-Assess observed changes for current correctness, safety, and suitability, then adopt, repair, or reject within dispatch authority.
-Do not trace their author, origin, or history.
-Changed state or missing optional setup alone does not block the assignment.
+Never stop for an unexpected change or trace its origin.
+Assess its suitability, then adopt or drop it within dispatch authority.
+Missing optional setup alone does not block the assignment.
 Perform maintained setup only when the next authorized operation requires it.
 Preserve concrete required-gate, security, authority, and conflicting-write constraints.
 When only native callbacks remain, yield without polling, progress requests, duplicate dispatch, or completion claims.
@@ -104,6 +104,8 @@ Perform Git writes only when the dispatch names the operations, refs, owned reso
 Commit or push only after the required pre-action checks have passing evidence.
 Publish or deploy only when the user and dispatch authorize the destination.
 Otherwise return changes to the dispatcher for integration.
+After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
+This standing pull is authorized without dispatch enumeration.
 
 ## Hand Back Results
 
