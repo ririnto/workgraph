@@ -37,12 +37,12 @@ test("Ultracite preserves mandatory rules, ignores, and formatter convergence", 
     await writeFile(path.join(directory, "ignored.md"), markdown);
     await writeFile(
       path.join(directory, "sample.ts"),
-      "export const sample = () => {\n// explain\n\nreturn 1;\n};\n"
+      'export const sample = () => {\n// explain\n\nreturn 1;\n};\nsetTimeout("run()", 0);\n'
     );
     const command = path.join(root, "node_modules/ultracite/dist/index.js");
     const invalid = spawnSync(
       process.execPath,
-      [command, "check", "--format", "json"],
+      [command, "check", "sample.ts", "dist/ignored.ts", "--format", "json"],
       {
         cwd: directory,
         encoding: "utf-8",
@@ -58,19 +58,26 @@ test("Ultracite preserves mandatory rules, ignores, and formatter convergence", 
     );
     assert.deepEqual(diagnostics.map(({ code }) => code).toSorted(), [
       "eslint(arrow-body-style)",
+      "eslint(no-implied-eval)",
       "style(no-blank-lines-in-functions)",
       "style(no-inline-comments-in-functions)",
       "tsdoc(require-export-tsdoc)"
     ]);
     const valid =
       "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true\n};\n";
-    await writeFile(path.join(directory, "sample.ts"), valid);
+    const unformatted =
+      "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true,\n};\n";
+    await writeFile(path.join(directory, "sample.ts"), unformatted);
     for (const action of ["fix", "fix", "check"]) {
-      const result = spawnSync(process.execPath, [command, action], {
-        cwd: directory,
-        encoding: "utf-8",
-        timeout: 30_000
-      });
+      const result = spawnSync(
+        process.execPath,
+        [command, action, "sample.ts", "ignored.md"],
+        {
+          cwd: directory,
+          encoding: "utf-8",
+          timeout: 30_000
+        }
+      );
       assert.ifError(result.error);
       assert.equal(result.status, 0, result.stdout + result.stderr);
       assert.equal(
