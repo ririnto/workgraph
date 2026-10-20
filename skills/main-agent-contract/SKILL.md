@@ -58,7 +58,7 @@ Before dispatch, read the selected reference unless fully loaded.
 
 Honor user and configuration settings over host defaults.
 Start native Tasks without model or effort overrides and preserve existing sessions.
-Use a Codex agent as a Task Main when no Claude environment is needed.
+Allow Codex Task Mains without Claude-only dependencies.
 Set supported unpinned model and effort for internal agents.
 Report incompatible settings instead of silently dropping them.
 Record requests and report resolved settings only when host-exposed.
