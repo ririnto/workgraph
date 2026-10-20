@@ -105,6 +105,7 @@ Commit or push only after the required pre-action checks have passing evidence.
 Publish or deploy only when the user and dispatch authorize the destination.
 Otherwise return changes to the dispatcher for integration.
 After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
+This standing pull is authorized without dispatch enumeration.
 
 ## Hand Back Results
 
