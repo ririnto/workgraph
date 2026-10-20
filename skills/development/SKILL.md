@@ -22,7 +22,7 @@ Select only the matching playbook and read it before applying its steps unless i
 | New or changed behavior | [Feature](playbooks/feature.md) |
 | Reported defect | [Bug fix](playbooks/bug-fix.md) |
 | Behavior-preserving structural change | [Refactoring](playbooks/refactoring.md) |
-| Measured slowness or resource use | [Performance](playbooks/performance.md) |
+| Performance investigation or optimization | [Performance](playbooks/performance.md) |
 
 Verify each coherent unit before building dependent work on it.
 Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
