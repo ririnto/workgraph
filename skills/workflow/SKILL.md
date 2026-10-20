@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use in Claude Code main sessions for fan-out, dependent stages, or verification that benefits from orchestration.
+  Use in Claude Code main sessions for dependent stages, expected follow-up phases, or explicit Workflow requests.
 argument-hint: "[goal]"
 ---
 
@@ -15,8 +15,11 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 
 ## Prepare The Run
 
-Use native Workflow for independent fan-out or dependent verification, including follow-ups that consume an accepted result or run only when that result permits them.
-Use a single host Agent for one bounded task, exclude speculative future tasks and display-only phases, and report unavailable implicit Workflow before using Agent only when it safely meets the task contract.
+Prefer direct Agent for work that ends in one phase.
+Start a one-phase Workflow when the accepted task expects actual follow-up phases.
+Exclude speculative future tasks and display-only phases.
+Honor explicit Workflow requests within the host's supported authority.
+If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 Encode its actual dependencies in script control flow, not in progress labels.
 Pass each required predecessor result to the dependent call.
@@ -37,7 +40,10 @@ Await every required agent, pipeline, parallel, or nested Workflow promise befor
 
 Keep a valid Workflow running because cancellation loses in-progress agent results.
 Stop only broken or unauthorized runs.
-Wait for completion before changing its script, then append later phases or accept a full rerun.
+Wait for completion before editing the script, then append phases and resume valid unchanged calls.
+Rerun only changed or invalidated work.
+After asynchronous dispatch, end the turn when only native callbacks remain.
+Inspect each returned result before deciding the next action.
 
 If the native Workflow tool is unavailable, report that it did not run.
 

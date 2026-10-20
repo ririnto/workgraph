@@ -212,6 +212,9 @@ The dispatched agent should complete the assigned task within its authority inst
 
 Each role owns evidence freshness and replay validation within its scope.
 The native tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
+Claude Main prefers Agent for one-phase work and permits a one-phase Workflow when actual follow-up phases are expected.
+Main preserves unchanged earlier prompts, options, labels, and arguments for supported same-session continuation without rerunning valid completed work.
+Main ends callback-only turns and inspects returned results before choosing the next action.
 Claude Main's host reference conditionally loads the bundled Workflow skill before authoring or resuming explicit or implicit runs.
 The skill requires its authoring reference for graph mapping, result acceptance, early-stop detection, and cache-preserving recovery.
 That reference maps actual domains to bounded keyed pipelines with narrow outputs, needed stages, and necessary cross-domain joins rather than a domain-by-phase staffing matrix.

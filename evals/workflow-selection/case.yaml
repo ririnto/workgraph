@@ -15,7 +15,11 @@ execution:
     Partition the accepted work by the actual parser and documentation domains rather than a domain-by-phase staffing matrix.
     Have one worker assess the parser domain and another independently assess the documentation domain.
     Each returns only keyed decisions, supporting evidence, and remaining requirements for that domain.
-    Pass their actual results to a third worker to reconcile the release decision because that decision needs both domains.
+    Begin with a one-phase Workflow for the assessments because reconciliation is an expected follow-up phase.
+    After accepting both actual results, append a phase with a third worker to reconcile the release decision.
+    Preserve the earlier prompts, options, labels, and arguments, and use supported same-session resume so valid completed calls can cache-hit.
+    Do not cancel valid running work to edit it, poll for progress, or add speculative work while only callbacks remain.
+    Read returned results before deciding the next action.
     Use no more than these three workers and do not repeat complete-unit review for each domain or phase.
     Required checks must pass, and confirmed defects in required behavior block integration.
     A newly accepted current-unit improvement can wait only if it has a tracked follow-up before integration.
@@ -38,7 +42,7 @@ graders:
   - name: workflow-invoked
     type: tool_used
     tool: Workflow
-    min: 1
+    min: 2
   - name: dependent-results
     type: regex
     target: trace
@@ -51,6 +55,11 @@ graders:
       Require progress evidence of both completed domain assessments and their completed reconciliation.
       Each assessment returns keyed domain decisions and evidence rather than repeating the whole source or every phase.
       Require the reconciliation to use both actual domain results, not an invented report.
+      The first Workflow has one assessment phase because reconciliation is an expected follow-up, not a speculative phase.
+      The continuation uses the first run's returned scriptPath and same-session runId while preserving unchanged earlier call prompts, options, labels, and arguments.
+      Require actual cache-hit evidence for completed valid assessments rather than repeated live assessment calls or a claimed cache hit.
+      Main does not cancel valid running work for script edits or poll while only native callbacks remain.
+      Main reads returned results before accepting them or starting the next action.
       The run uses at most three workers without a reviewer-per-domain-per-phase Cartesian fan-out or duplicated complete review.
       Do not accept a completion notification or final claims without progress evidence.
       The final report identifies the failed required test and absent required feature as blockers.

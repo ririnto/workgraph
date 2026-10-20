@@ -145,6 +145,8 @@ Resume only in the same session, using the original `runId` and returned `script
 Inspect the journal and relevant transcripts before explaining unexpected results or deciding what to rerun.
 
 Edit the stored script and pass `scriptPath` with `resumeFromRunId` to continue the same run.
+Preserve earlier prompts, options, labels, and arguments when their accepted inputs remain unchanged.
+Append needed stages without rerunning completed valid work or canceling a valid active run to edit it.
 Preserve accepted evidence only while behavior, inputs, configuration, and toolchain remain relevant.
 A cache hit avoids repeated work but does not prove acceptance.
 

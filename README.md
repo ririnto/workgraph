@@ -88,7 +88,9 @@ That conditional procedure requires the complete selected memory index and exist
 It preserves valid facts, resolves supersession within authority, and keeps unresolved conflicts explicit.
 Private memory remains outside published project material.
 
-Claude Code uses native Workflow when a follow-up may depend on an accepted earlier result, including conditional follow-ups, or when explicitly requested.
+Claude Code prefers direct Agent for work that ends in one phase.
+An initial one-phase Workflow is appropriate when actual follow-up phases are expected or the user requests Workflow.
+Main preserves unchanged calls for supported same-session resume, ends callback-only turns, and inspects returned results before advancing.
 Its [Main host reference](skills/main-agent-contract/references/claude.md#orchestration) routes to Workflow for selection and fallback rules.
 The Workflow skill owns graph preparation, execution, and result verification.
 Codex uses native delegation under its [Main host reference](skills/main-agent-contract/references/codex.md), without native Claude Code Workflow.
