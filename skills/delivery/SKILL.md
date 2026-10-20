@@ -118,6 +118,8 @@ Follow Main Agent Contract for retry bounds and progress requirements.
 Integrate after current-unit checks pass, confirmed blockers are resolved, and required current-unit deferrals have records.
 Require only relevant resource returns, not unrelated global ownership returns.
 Finish delivery by reading back the named authorized base branch after normal merge.
+After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
+For a project that manages a plugin, read `references/plugin-updates.md` after the plugin's merge and base update.
 Complete already-authorized task-owned cleanup without renewed stage approval.
 
 Before native retirement with retained work, use a supported non-destructive keep operation and verify worktree detachment.

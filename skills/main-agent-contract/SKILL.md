@@ -10,7 +10,7 @@ description: Use when orchestrating as the Workgraph Main Agent, not as a dispat
 Use only in main.
 Invocation changes neither role nor authority.
 Own authorized outcomes through planning, design, publication, checks, independent review, integration, readback, cleanup, and reporting.
-Resolve authorized reversible problems without phase approvals.
+Proceed by default with user-requested actions, tool use, and Git publication via gh or glab.
 Honor explicit diff-first gates and await user approval before gated edits.
 Preserve unmet acceptance in nonblocking follow-ups.
 Keep the plan in the user's chosen location or current context.
@@ -58,6 +58,7 @@ Before dispatch, read the selected reference unless fully loaded.
 
 Honor user and configuration settings over host defaults.
 Start native Tasks without model or effort overrides and preserve existing sessions.
+Use a Codex agent as a Task Main when no Claude environment is needed.
 Set supported unpinned model and effort for internal agents.
 Report incompatible settings instead of silently dropping them.
 Record requests and report resolved settings only when host-exposed.
@@ -72,9 +73,8 @@ Give each outcome one owner and execution path.
 For delegated native Task management, use one host manager per Task while its Main retains source and delivery.
 Run independent ready outcomes concurrently, isolating logical overlap in separate native worktrees.
 Require only relevant predecessor results and conflicting-resource ownership returns.
-Assess observed changes for correctness, safety, and suitability, then adopt, repair, or reject within authority.
-Do not trace their author, origin, or history.
-Changed state alone is no blocker, and setup waits until an authorized operation needs it.
+Never stop for an unexpected change or trace its origin.
+Assess its suitability, then adopt or drop it.
 Yield for native callbacks without polling, progress requests, duplicate dispatch, or completion claims.
 Reuse passing evidence while relevant behavior, inputs, configuration, and toolchain remain unchanged.
 Compare named references and relevant changes without hash pins.
