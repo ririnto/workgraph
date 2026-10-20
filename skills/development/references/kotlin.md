@@ -38,7 +38,7 @@ Use `?.let` or an equivalent safe call for null-present work when behavior stays
 Prefer `.run` over `.let`, and `?.run` over `?.let`, when the lambda uses only properties of the bound argument.
 Apply this preference to named lambda parameters and the implicit `it`.
 Keep `let` when the body requires the bound value itself or no equivalent preserves its semantics.
-Keep `let` on a nullable receiver whose lambda must still run for `null`.
+When replacing `.let` on a nullable receiver, use `.run` rather than `?.run` to preserve execution for `null`.
 Use explicit receiver labels or qualification when nested receivers would otherwise bind a property to another receiver.
 Preserve stable-value semantics, getter evaluation count, smart casts, nullable-result and Elvis behavior, captures, and non-local returns.
 Use the captured non-null value instead of rereading a nullable property when access timing and getter evaluation stay equivalent.
