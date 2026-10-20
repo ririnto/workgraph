@@ -38,7 +38,8 @@ Use named branch references and current PR changes, not fixed commit hashes.
 
 Follow this sequence: Issue creation -> branch creation -> brief diff security scan -> implementation -> parallel reviews -> normal merge.
 Create or reuse a relevant Issue and record its link before branch creation or implementation.
-For already-started work without an Issue, establish one with its truthful current stage before the next source action without restarting completed work.
+For in-flight work without an Issue, establish one with its truthful stage before the next source action.
+Do not restart completed work.
 Keep its current stage, completed evidence, material blockers, branch and PR/MR links, and next action current as work changes.
 Report actual completed stages rather than guessed percentages.
 
@@ -81,7 +82,8 @@ Require inspection of affected real consumers beyond the changed lines, includin
 Require concrete failure scenarios and source locations, separating introduced defects from pre-existing issues.
 Request an explicit no-findings result and coverage limits when no actionable defects remain.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.
-Have a verifier independent of the finder and fixer check each candidate before reporting it, with the complete predecessor result and Main's finding-verification requirement.
+Give an independent verifier each candidate and the complete predecessor result before reporting findings.
+Keep verification independent of the finder and fixer, following Main's finding-verification requirement.
 Record each finding as fixed, rejected with evidence, or deferred under the rules below.
 Do not change code solely for unsupported style requests, cleanup suggestions, or repeated resolved findings.
 Keep required human approvals distinct from agent review.
