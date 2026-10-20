@@ -7,19 +7,27 @@ Complete authorized changes and relevant checks before returning a final result,
 ## Instruction Ownership
 
 Keep contributor conventions and validation commands here.
-Keep consumer behavior in `skills/`.
+Keep consumer behavior in `skills/`, `agents/`, and the host adapters in `docs/harness/`.
 Keep consumer links and required resources inside this plugin.
 Keep role procedures self-contained in each role's `SKILL.md`.
 
 Keep host-specific execution timing in each role's references, and inject only the selected host's reference.
+Keep user-facing host setup, invocation, and update instructions in the matching `docs/harness/` adapter.
+Link policy owners instead of restating their procedures.
 Keep orchestration and model guidance in Main Agent references.
 Add no orchestration or model guidance in Worker references.
+
+Keep lifecycle procedures in `skills/development/playbooks/`, with Development selecting only the matching playbook and language references.
+Keep behavior and interface constraints in `skills/principle-preserve-behavior/` and `skills/principle-production-interfaces/` as conditional skills.
+Keep Workflow focused on its lower-level operation without repeating the Main contract or the Delivery checklist.
+Align native worker definitions in `agents/` with the Worker contract without inventing host registration.
+Do not duplicate an operational rule, procedure, or checklist across sources that load in the same context.
+Link the sole owner instead, and keep each conditional procedure at its stated scope and read trigger.
 
 Identify each loaded source by its actual file path and state which complete content is already present.
 Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
 Load every selected file before emitting context, without requiring model retrieval during hook startup.
 Keep all skills model-invocable and user-invocable.
-Keep Workflow focused on its lower-level operation without repeating the Main contract.
 
 Use `README.md` for installation and runtime behavior.
 Read `docs/design.md` when changing instruction boundaries or hook delivery.
@@ -30,6 +38,7 @@ Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 
 Write maintained instructions and documentation in concise English.
 Follow the active role's request-origin communication policy for conversations and handbacks.
+Instruction Authoring owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
 
 In all Markdown documents, use complete sentences in prose and list items, with one sentence per source line.
 Keep conditions and exceptions with their actions.
