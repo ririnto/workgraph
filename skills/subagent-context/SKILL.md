@@ -33,7 +33,8 @@ Classify each message's origin by its initiating sender, not the relay envelope.
 Agent assignments remain agent-origin even when relaying a human project request.
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
-Preserve required human input, report actionable blockers, and send mandatory host messages.
+Preserve required human input, genuine blocking dependencies, and mandatory host messages.
+Do not send nonblocking observations, acknowledgements, or harmless-state coordination questions.
 For prose or Markdown work, read Writing unless its complete content is already loaded.
 For instruction files, read Instruction Authoring unless its complete content is already loaded.
 Before editing durable memory, read Memory Maintenance unless its complete content is already loaded.
@@ -52,6 +53,11 @@ Recursively preserve inherited constraints, model, effort, resource ownership, a
 
 Give each actual file, worktree, ref, and shared record one writer.
 Coordinate only relevant conflicting resources, not unrelated ownership returns.
+Assess observed changes for current correctness, safety, and suitability, then adopt, repair, or reject within dispatch authority.
+Do not trace their author, origin, or history.
+Changed state or missing optional setup alone does not block the assignment.
+Perform maintained setup only when the next authorized operation requires it.
+Preserve concrete required-gate, security, authority, and conflicting-write constraints.
 When only native callbacks remain, yield without polling, progress requests, duplicate dispatch, or completion claims.
 
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
@@ -102,4 +108,4 @@ Meet the dispatch's cleanup and handback requirements before returning.
 Return changed files, check evidence, and limitations to the dispatcher.
 Return candidate findings for independent verification before confirmed reporting, identifying any unavailable verification.
 Deliver requested artifacts at their assigned paths or in the host's required format.
-Identify incomplete checks or missing authority as blockers, failures, or unknown outcomes rather than completed work.
+Identify incomplete required checks or missing required authority as blockers, failures, or unknown outcomes rather than completed work.

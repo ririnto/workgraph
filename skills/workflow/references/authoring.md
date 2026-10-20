@@ -23,6 +23,17 @@ Use native `isolation: 'worktree'` for edits when supported by the current tool 
 Return each edit's diff, checks, and worktree ownership to Main before integration and cleanup.
 When explicit approval is required, end the proposal run before any edit and start edits only after approval.
 
+## Partition By Domain
+
+Evaluate each phase for independent work in actual domains, keyed by owned scope and required results.
+Use bounded domain pipelines with only the stages each domain needs rather than a Cartesian domain-by-phase staffing matrix.
+Keep deterministic routing and transformations in the script instead of assigning extra agents.
+Pass each domain successor its key, relevant file references, accepted evidence, and unresolved requirements.
+Load only needed source for that assignment rather than reloading the whole source at every domain-stage cell.
+Join domains only for actual shared dependencies, integration, or acceptance decisions.
+Keep one complete independent review per cohesive delivery unit instead of repeating it for every domain and phase.
+Refresh only affected coverage unless the earlier complete review becomes insufficient.
+
 Use `pipeline()` by default when each item's later work depends only on that item's earlier result.
 Pipeline stages receive the previous result, original item, and item index.
 An awaited pipeline runs item chains independently and returns their results together.
@@ -56,6 +67,9 @@ Set `opts.phase` explicitly inside concurrent stages to avoid global phase races
 
 Choose another permitted family or limit fan-out items when a caller enforces a per-family concurrency cap.
 Workflow fan-out does not enforce that caller's family cap.
+For a multi-model assessment, exclude a model whose evaluation request actually fails and finish with the remaining authorized available models.
+Retain failed attempts, exclusions, and unrun coverage without counting them as passing evidence.
+Preserve unmet acceptance when exclusions leave required coverage unverified.
 
 Without a token target, `budget.total` is `null` and `budget.remaining()` is `Infinity`.
 Serialization may display that `Infinity` as `null`, which does not mean zero.

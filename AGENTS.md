@@ -112,6 +112,8 @@ Keep matching versions in both host plugin manifests using `yyyy.mm.dd.seq`.
 Follow the release procedure in `README.md`.
 Omit version fields from the marketplace and private package manifest.
 Publish only to a user-authorized destination after inspecting the diff and required evidence.
-Preserve unrelated changes and stop on unexplained concurrent edits.
+Assess observed changes for current correctness, safety, and suitability without tracing authorship, origin, or history.
+Adopt, repair, or reject them within authority while preserving unrelated changes.
+Pause only affected operations for unmet acceptance, true security or authority boundaries, or actual conflicting writes.
 Keep credentials, private environment details, and external work-item identifiers out of committed content.
 Use repository-relative paths and portable examples.

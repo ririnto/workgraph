@@ -41,6 +41,8 @@ Workflow adds its operation to the Main session without repeating those common r
 Main remains the entry point for complete authorized outcomes, including review, integration, readback, and cleanup.
 Delivery defines authorize-once Git operations, repository eligibility, and current-unit integration gates without enlarging host permissions.
 Main and Worker independently carry authorized recovery and true-boundary handling because their loading contexts are separate.
+They assess observed changes for current suitability without tracing authorship or history, and withhold nonblocking coordination messages.
+Changed state and optional setup are not blockers without a concrete unmet requirement, and setup waits until an authorized operation needs it.
 Writing defines the agent-facing task contract, while Instruction Authoring audits loading points and replaces conflicting consumers.
 Main and Worker select Memory Maintenance before any durable memory change.
 The procedure reviews the complete selected store without expanding read or write authority.
@@ -147,6 +149,8 @@ Edges identify results or conditions that gate later nodes, not execution order 
 The main session starts ready independent nodes in parallel, serializes actual conflicting writes, and joins only required predecessor results.
 Independent native Task Mains can change overlapping logical sources in separate native worktrees.
 Files, worktrees, refs, and shared records retain one actual writer, and unrelated ownership returns do not gate a successor.
+A per-Task host manager controls only the assigned native host, while the native Main retains source and complete delivery ownership.
+Native Task starts preserve existing session configuration without separate model or effort overrides.
 Pass actual predecessor results and evidence to successor nodes.
 Choose useful node types for the goal rather than requiring an exploration-to-integration sequence.
 Workgraph defines no scheduler, executor, or shared task store.
@@ -179,6 +183,8 @@ The graph below shows conditional loading and review timing for authorized repos
 Main verifies current-unit checks, confirmed blocker fixes, and required current-unit deferral records before integration.
 Unrelated pre-existing issues, umbrella issues, older failed units, and severity alone do not block independently verified delivery.
 Existing unrelated issues require no new tracker record before another unit merges.
+Already-authorized owned cleanup requires source preservation and absence of unique work and consumers, not renewed stage approval or a zero local ahead count.
+Actual ungranted destructive operations and protected-resource refusals retain their boundaries.
 
 ```mermaid
 flowchart TD
@@ -209,6 +215,8 @@ Each role owns evidence freshness and replay validation within its scope.
 The native tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 Claude Main's host reference conditionally loads the bundled Workflow skill before authoring or resuming explicit or implicit runs.
 The skill requires its authoring reference for graph mapping, result acceptance, early-stop detection, and cache-preserving recovery.
+That reference maps actual domains to bounded keyed pipelines with narrow outputs, needed stages, and necessary cross-domain joins rather than a domain-by-phase staffing matrix.
+Complete independent review remains scoped to the cohesive delivery unit instead of multiplying across domain-stage cells.
 Worker and Codex contexts do not load this procedure.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.
 
@@ -218,7 +226,8 @@ Each host reference owns tool routing, while the common Main contract owns task 
 
 Main requires independent per-finding verification before confirmed reporting, and Worker returns candidates for that verification.
 Claude's host reference selects planning, read-only scan, and isolated edit defaults while preserving active overrides.
-Workflow maps those settings and verification dependencies into native stages and keeps deterministic choices in script control flow.
+Workflow maps internal-agent settings and verification dependencies into native stages and keeps deterministic choices in script control flow.
+A multi-model assessment continues with remaining authorized models after an actual request failure while preserving exclusions and unmet coverage without false passing claims.
 Fix loops track consecutive no-progress rounds independently of native retries and return evidence for Main's next authorized approach.
 Explicit diff-first gates split proposal and edit runs because native Workflow cannot request intermediate operator sign-off.
 These consumer rules preserve separately authorized source delivery and do not activate host settings or require JEV.
@@ -286,7 +295,9 @@ Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.
 Additional cases check an idle background command, an Agent completion callback, and an English worker handoff during a Spanish human conversation.
 The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, isolated parallel work, and repository eligibility.
-Its policy assessment does not perform Git delivery or establish installed activation.
+It contrasts harmless observed state with concrete defects, deferred setup needs, security constraints, and actual writer conflicts without authorship tracing or coordination messages.
+The Workflow-selection case uses keyed parser and documentation assessments with one necessary reconciliation rather than a domain-by-phase review matrix.
+These policy assessments do not perform Git delivery or establish installed activation.
 Completion graders inspect actual traces rather than relying on final claims.
 Retained local traces let maintainers distinguish completed command and worker outcomes from reported acceptance.
 Record which model, host, and loaded plugin produced the result.

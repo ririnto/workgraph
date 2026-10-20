@@ -14,12 +14,14 @@ Use only nodes allowed by the goal's scope and authority.
 | Scoped review | An independent reviewer reassesses affected changes and interactions against the earlier complete review. | Prior findings and dispositions, updated files, and current PR/MR when available. | Reassessment with source evidence and a complete-review refresh when earlier coverage becomes insufficient. |
 | Deferral registration | Main uses the authorized long-term tracker. | Newly accepted current-unit follow-up and verified tracker access. | Record evidence, scope, acceptance, owner, and next action without requiring new records for unrelated pre-existing issues. |
 | Integration in Main | Main integrates after current-unit gates pass. | Passing required checks, resolved current-unit blockers, required deferral records, and authorized base branch. | Normal merge and named-base readback without waiting for unrelated open work. |
+| Owned cleanup | Main or the assigned resource owner retires only authorized task-owned resources. | Named-base preservation, no unique work, no active consumers, and granted cleanup scope. | Removed disposable resources or exact retained resources and genuine blockers without renewed stage approval. |
 
 ## Readiness And Transitions
 
 Before starting a node, confirm its accepted inputs, owner, authority, tools, paths, and branch.
 Confirm required predecessor results and conflicting-resource ownership returns without waiting for unrelated global returns.
 Connect nodes only when a predecessor result or condition gates its successor.
+Select needed nodes for each domain rather than copying the whole delivery graph across every domain and phase.
 Start ready independent nodes in parallel and serialize conflicting writes.
 Join branches only when a later node requires their combined results.
 Keep reports dependent on finding verification and edits dependent on any explicit user approval.

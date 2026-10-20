@@ -12,13 +12,17 @@ execution:
     - Skill(workflow-authoring)
   prompt: |-
     Please orchestrate this read-only release assessment with subagents.
-    Have one worker assess required behavior and checks, and another independently assess which findings qualify for a tracked follow-up.
-    Pass their actual results to a third worker to reconcile the release decision.
+    Partition the accepted work by the actual parser and documentation domains rather than a domain-by-phase staffing matrix.
+    Have one worker assess the parser domain and another independently assess the documentation domain.
+    Each returns only keyed decisions, supporting evidence, and remaining requirements for that domain.
+    Pass their actual results to a third worker to reconcile the release decision because that decision needs both domains.
+    Use no more than these three workers and do not repeat complete-unit review for each domain or phase.
     Required checks must pass, and confirmed defects in required behavior block integration.
     A newly accepted current-unit improvement can wait only if it has a tracked follow-up before integration.
-    Findings: the required test fails; an optional documentation typo already has a tracked issue; a suspected security defect was disproved; a required feature is absent; and an accepted optional refactor in this unit has no tracked issue.
-    An independently verified second unit passes all its required checks and acceptance.
-    A severe unrelated pre-existing defect remains open without a new tracker record and is not a dependency or gate for that second unit.
+    Parser findings: the required test fails, a required feature is absent, and an accepted optional refactor in this unit has no tracked issue.
+    Documentation findings: an optional typo already has a tracked issue, and a suspected security defect was disproved.
+    The independently verified documentation unit passes all its required checks and acceptance.
+    A severe unrelated pre-existing defect remains open without a new tracker record and is not a dependency or gate for that unit.
     The following tracker record is synthetic and covers the optional documentation typo.
     Evidence: The sample guide says "instalation".
     Scope: Correct that spelling in the sample guide.
@@ -44,8 +48,10 @@ graders:
     focus: trace
     criteria: |-
       Judge the observed trace and final report together.
-      Require progress evidence of both completed assessments and their completed reconciliation.
-      Require the reconciliation to use both assessment results, not an invented report.
+      Require progress evidence of both completed domain assessments and their completed reconciliation.
+      Each assessment returns keyed domain decisions and evidence rather than repeating the whole source or every phase.
+      Require the reconciliation to use both actual domain results, not an invented report.
+      The run uses at most three workers without a reviewer-per-domain-per-phase Cartesian fan-out or duplicated complete review.
       Do not accept a completion notification or final claims without progress evidence.
       The final report identifies the failed required test and absent required feature as blockers.
       It excludes the disproved security suspicion as a blocker.

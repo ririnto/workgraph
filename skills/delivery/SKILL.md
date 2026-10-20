@@ -110,4 +110,8 @@ Follow Main Agent Contract for retry bounds and progress requirements.
 Integrate after current-unit checks pass, confirmed blockers are resolved, and required current-unit deferrals have records.
 Require only relevant resource returns, not unrelated global ownership returns.
 Finish delivery by reading back the named authorized base branch after normal merge.
+Complete already-authorized task-owned cleanup without renewed stage approval.
+Before a discard option, verify named-base source preservation, no unique work, and no active consumers.
+A local ahead-commit count alone does not prove source would be lost.
+Keep ungranted destructive operations and protected-resource refusals outside that authority.
 Delete feature branches except the base, only within granted cleanup after base integration and ancestry proof.

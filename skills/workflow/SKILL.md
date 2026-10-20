@@ -45,5 +45,9 @@ If the native Workflow tool is unavailable, report that it did not run.
 
 Treat failed, missing, null, or unsupported results as incomplete rather than successful.
 Check returned evidence against acceptance criteria, including required predecessor data and phase outcomes.
-Inspect the journal when a result, phase, or completion status is unexpected.
+A changed setting, lifecycle observation, or missing optional setup alone does not invalidate a run.
+Assess current stage suitability without tracing changed-state authorship, origin, or history.
+Perform maintained setup only when the next authorized operation needs it.
+Preserve real required-gate, security, authority, and conflicting-write constraints.
+Inspect the journal when required result or completion evidence is missing or inconsistent.
 Report missing results, failed stages, skipped required work, or unverified checks.
