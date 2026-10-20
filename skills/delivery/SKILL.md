@@ -20,6 +20,7 @@ Split broad goals into cohesive, independently verifiable units with acceptance 
 Keep coupled work together when splitting prevents independent verification or mergeability.
 Avoid tiny phases and stacked PRs that require repeated rebases.
 Publish, review, and integrate each ready unit within granted authority.
+Setup waits until an authorized operation needs it.
 A clear approved Git task includes implementation, checks, Issue/MR/PR creation, comments, normal merge, readback, and owned cleanup.
 Complete those operations without renewed stage approval or repeated permission questions.
 Preserve explicit user gates, new-scope boundaries, and authorization limits for irreversible actions.

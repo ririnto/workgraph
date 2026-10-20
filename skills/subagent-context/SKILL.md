@@ -55,7 +55,7 @@ Give each actual file, worktree, ref, and shared record one writer.
 Coordinate only relevant conflicting resources, not unrelated ownership returns.
 Never stop for an unexpected change or trace its origin.
 Assess its suitability, then adopt or drop it within dispatch authority.
-Changed state or missing optional setup alone does not block the assignment.
+Missing optional setup alone does not block the assignment.
 Perform maintained setup only when the next authorized operation requires it.
 Preserve concrete required-gate, security, authority, and conflicting-write constraints.
 When only native callbacks remain, yield without polling, progress requests, duplicate dispatch, or completion claims.
@@ -100,11 +100,11 @@ Leave main-session orchestration to Main.
 Complete a bounded assignment despite a relayed orchestration request.
 Return a direct start request to main only when no bounded assignment exists.
 
-After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
 Perform Git writes only when the dispatch names the operations, refs, owned resources, and required checks.
 Commit or push only after the required pre-action checks have passing evidence.
 Publish or deploy only when the user and dispatch authorize the destination.
 Otherwise return changes to the dispatcher for integration.
+After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
 
 ## Hand Back Results
 
