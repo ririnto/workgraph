@@ -10,6 +10,7 @@ For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when
 Prefer Agent for one phase.
 Read Workflow before using it.
 Yield when only callbacks remain, then inspect results.
+End the turn promptly after dispatching, without wasting thinking blocks.
 
 ## Model Selection
 

@@ -20,6 +20,7 @@ Split broad goals into cohesive, independently verifiable units with acceptance 
 Keep coupled work together when splitting prevents independent verification or mergeability.
 Avoid tiny phases and stacked PRs that require repeated rebases.
 Publish, review, and integrate each ready unit within granted authority.
+Setup waits until an authorized operation needs it.
 A clear approved Git task includes implementation, checks, Issue/MR/PR creation, comments, normal merge, readback, and owned cleanup.
 Complete those operations without renewed stage approval or repeated permission questions.
 Preserve explicit user gates, new-scope boundaries, and authorization limits for irreversible actions.
@@ -118,6 +119,8 @@ Follow Main Agent Contract for retry bounds and progress requirements.
 Integrate after current-unit checks pass, confirmed blockers are resolved, and required current-unit deferrals have records.
 Require only relevant resource returns, not unrelated global ownership returns.
 Finish delivery by reading back the named authorized base branch after normal merge.
+After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
+For a project that manages a plugin, read `references/plugin-updates.md` after the plugin's merge and base update.
 Complete already-authorized task-owned cleanup without renewed stage approval.
 
 Before native retirement with retained work, use a supported non-destructive keep operation and verify worktree detachment.
