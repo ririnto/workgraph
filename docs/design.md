@@ -46,7 +46,7 @@ Audience tables and adapters link to procedure owners rather than restating thei
 Role bodies remain self-contained, while role-specific references supply only the selected host's applicable guidance.
 
 Main Agent mode remains the stable public entry at `skills/main-agent-contract/SKILL.md` under `/workgraph:main-agent-contract`.
-The mode description and title describe the mode explicitly rather than wrapping or duplicating another entry.
+Its activation description identifies the mode without adding another public entry.
 Main and Worker select conditional skills by plain skill name when their stated task scope applies.
 Development selects only the matching playbook and language references, with each selection carrying its own read trigger.
 The principle skills are conditional and remain user-invocable and model-invocable without lint enforcement.

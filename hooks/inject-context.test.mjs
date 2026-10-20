@@ -568,7 +568,7 @@ test("bundled skills retain invocation metadata and supporting reference files",
       );
       assert.ok(
         reference.startsWith(
-          `${realpathSync(path.join(root, "skills"))}${path.sep}`
+          `${realpathSync(match.groups.file.startsWith("../") ? path.join(root, "skills") : directory)}${path.sep}`
         )
       );
       assert.ok(readFileSync(reference, "utf-8").trim());
