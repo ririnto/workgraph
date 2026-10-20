@@ -71,7 +71,7 @@ It uses a goal-dependent task graph when dependencies make coordination useful.
 Each node names its operation, inputs, outputs, owner, authority, and completion evidence.
 Edges represent result dependencies or conditions, not chronology.
 The main agent starts ready independent work in parallel when writes do not conflict and serializes conflicting writes.
-Exploration, planning, implementation, review, and integration are possible node types, not a required itinerary.
+Exploration, planning, implementation, review, and integration are possible node types rather than a universal itinerary, while authorized repository delivery follows its required sequence.
 Workers complete bounded assignments within their authority.
 
 The Main contract owns orchestration, authority, request-origin communication, and evidence freshness.
@@ -135,7 +135,10 @@ Use the native `script` input first, then its returned `scriptPath` for an autho
 Pass structured `args` and `resumeFromRunId` only as the current tool supports them.
 Read [Workflow script authoring](skills/workflow/references/authoring.md) before authoring or resuming a script.
 
-Follow the delivery skill for branch selection, exposure scans, independent review, current-unit deferrals, integration, and branch cleanup.
+Authorized repository delivery follows Issue creation -> branch creation -> brief diff security scan -> implementation -> parallel reviews -> normal merge.
+A relevant Issue link precedes branch creation or implementation, and the Issue records actual stages, completed evidence, material blockers, branch and PR links, and the next action.
+Already-started work without an Issue establishes one before the next source action without restarting completed work.
+Follow the delivery skill for the initial scan, changed-diff scans before pushes, independent review and finding verification, current-unit deferrals, integration, and branch cleanup.
 Verified units can merge while unrelated pre-existing issues remain open, without creating new tracker records for those issues.
 Exposure scans cover user environment details and secrets only.
 Commit author and committer names and email addresses are contributor information, excluded from exposure findings, rewrites, and publication blocks.

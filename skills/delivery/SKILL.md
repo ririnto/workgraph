@@ -34,6 +34,18 @@ If they match, create a separate branch from the base before committing or pushi
 Push only the working branch for PR delivery, and never push task changes directly to the base before PR review.
 Use named branch references and current PR changes, not fixed commit hashes.
 
+## Make Development Progress Visible
+
+Follow this sequence: Issue creation -> branch creation -> brief diff security scan -> implementation -> parallel reviews -> normal merge.
+Create or reuse a relevant Issue and record its link before branch creation or implementation.
+For already-started work without an Issue, establish one with its truthful current stage before the next source action without restarting completed work.
+Keep its current stage, completed evidence, material blockers, branch and PR/MR links, and next action current as work changes.
+Report actual completed stages rather than guessed percentages.
+
+Before implementation, delegate a brief security scan of the initial branch or incoming PR/MR diff for user environment details and secrets.
+Report an empty initial diff honestly rather than treating it as review of later changes.
+Preserve completed valid work without fabricating an earlier scan or review.
+
 ## Check Before Publication
 
 Inspect changed files and required evidence before publishing to the authorized base.
@@ -55,18 +67,12 @@ Create local evidence only when a current check, failure investigation, or recov
 ## Review And Publish
 
 Use project roles or the user's statement to determine whether the user maintains the project.
-Run one full independent review per delivery unit.
-Select reviewer staffing and effort from the active Main host reference.
-Select the review order from the user's project role.
-
-```mermaid
-flowchart TD
-    M{User maintains the project?}
-    M -->|Yes| P[Create PR or MR]
-    P --> R[Independent review of current PR or MR changes]
-    M -->|No| W[Independent review of complete working-branch changes]
-    W --> C[Create PR or MR]
-```
+Cover each complete delivery unit with independent review, without multiplying review by domain and phase.
+Select reviewer staffing and effort from the active Main host reference and explicit user requirements.
+Run selected independent reviewers in parallel when there is more than one.
+For maintainers, create the PR/MR before reviewing its complete current changes.
+For contributors, review the complete working branch before creating the PR/MR.
+Keep completed valid reviews without mislabeling sequential work as parallel or restarting it solely to change timing.
 
 Reuse an existing PR/MR for the unit.
 Follow the consumer repository's review method.
@@ -75,7 +81,7 @@ Require inspection of affected real consumers beyond the changed lines, includin
 Require concrete failure scenarios and source locations, separating introduced defects from pre-existing issues.
 Request an explicit no-findings result and coverage limits when no actionable defects remain.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.
-Have an independent verifier check each candidate before reporting it, following Main's finding-verification requirement.
+Have a verifier independent of the finder and fixer check each candidate before reporting it, with the complete predecessor result and Main's finding-verification requirement.
 Record each finding as fixed, rejected with evidence, or deferred under the rules below.
 Do not change code solely for unsupported style requests, cleanup suggestions, or repeated resolved findings.
 Keep required human approvals distinct from agent review.

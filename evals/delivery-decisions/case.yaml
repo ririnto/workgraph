@@ -13,6 +13,17 @@ execution:
     Do not edit files, run commands, publish anything, or start workers.
     Give each situation its next action, any real blocker, and any missing evidence.
 
+    A new bounded Git task has no Issue or branch yet.
+    State the required order of Issue creation, branch creation, brief diff security scan, implementation, parallel reviews, and normal merge.
+    A relevant existing Issue may already cover that task.
+    State what link is required before branch creation or implementation and how to avoid duplicate Issues.
+    State which actual stage, completed evidence, material blockers, branch and PR links, and next action stay current in the Issue.
+    Another task is already in progress without an Issue, and its initial branch diff would have been empty.
+    State its next action without restarting completed work or fabricating an earlier scan.
+    Contrast the initial or incoming diff scan before implementation with the current changed-diff scan before every push.
+    Two selected independent reviewers are ready, while verification of a finding requires its predecessor's result.
+    State which reviews run in parallel, what evidence the dependent verifier receives, and how to report earlier sequential reviews honestly.
+
     A user approved a bounded parser fix and its normal Git Workflow delivery in an owned repository.
     The repository is authenticated, unarchived, nonfork, and has actual source development within the preceding three calendar months.
     Unit A meets its acceptance criteria, passes every required gate, and has complete independent review and verification.
@@ -80,6 +91,13 @@ graders:
     focus: trace
     criteria: |-
       Judge decisions by meaning, not fixed wording.
+      The new task follows Issue creation, branch creation, brief diff security scan, implementation, parallel reviews, and normal merge in that order.
+      A relevant Issue is reused rather than duplicated, and its link precedes branch creation or implementation.
+      Its current stage, completed evidence, material blockers, branch and PR links, and next action remain truthful and current without guessed percentages.
+      Already-started work without an Issue establishes one before the next source action without restarting completed work or inventing earlier evidence.
+      An initial or incoming diff scan precedes implementation, an empty diff is labeled honestly, and current changed-diff scans still precede pushes.
+      Selected independent reviewers run in parallel, while an independent finding verifier receives the complete predecessor result after it exists.
+      Prior completed sequential reviews are preserved without being relabeled as parallel or rerun only to change timing.
       The assessment permits A's already-authorized normal Git delivery without another stage approval.
       A can merge while B, the umbrella issue, and the older failed unit remain open.
       A does not require a new tracker write for unrelated pre-existing B.
