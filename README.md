@@ -78,7 +78,11 @@ The Main contract owns orchestration, authority, request-origin communication, a
 The Worker contract owns bounded assignments and handbacks.
 Both keep their role procedures self-contained, and these instructions do not guarantee model adherence.
 
-Main carries authorized outcomes through review, integration, named-base readback, and owned cleanup without routine phase approvals.
+Main carries authorized Git delivery through implementation, checks, issue and PR operations, comments, normal merge, named-base readback, and owned cleanup.
+These approved operations need no repeated stage permission.
+Explicit user gates, security controls, and separate deployment, credential, live-asset, fork, and upstream authority remain boundaries.
+Agents inspect failures and partial effects, try reasonable authorized repairs or supported alternatives, and report each attempt honestly.
+Delivery requires authenticated eligibility evidence for unarchived nonfork projects with meaningful development within three calendar months.
 Main and Worker read Memory Maintenance before durable memory changes.
 That conditional procedure requires the complete selected memory index and existing records before edits.
 It preserves valid facts, resolves supersession within authority, and keeps unresolved conflicts explicit.
@@ -106,8 +110,9 @@ claude --model opus --effort ultracode
 ```
 
 The ultracode launch flag also selects `xhigh` effort, while active host and user overrides retain precedence.
-Main requires independent finding verification before confirmed reporting and stops fix loops after two consecutive rounds without measurable progress.
+Main requires independent finding verification before confirmed reporting and reassesses the approach after two consecutive rounds without measurable progress.
 Productive rounds reset that count, which remains separate from native retries and inference sampling.
+Reassessment preserves unmet acceptance while Main considers remaining reasonable authorized avenues.
 Unavailable verification remains explicit as unverified.
 
 ## Goal-Driven Work
@@ -130,7 +135,8 @@ Use the native `script` input first, then its returned `scriptPath` for an autho
 Pass structured `args` and `resumeFromRunId` only as the current tool supports them.
 Read [Workflow script authoring](skills/workflow/references/authoring.md) before authoring or resuming a script.
 
-Follow the delivery skill for branch selection, exposure scans, independent review, tracked deferrals, integration, and branch cleanup.
+Follow the delivery skill for branch selection, exposure scans, independent review, current-unit deferrals, integration, and branch cleanup.
+Verified units can merge while unrelated pre-existing issues remain open, without creating new tracker records for those issues.
 Exposure scans cover user environment details and secrets only.
 Commit author and committer names and email addresses are contributor information, excluded from exposure findings, rewrites, and publication blocks.
 Selecting a base branch does not grant publication, integration, or cleanup authority.

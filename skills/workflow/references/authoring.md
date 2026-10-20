@@ -120,10 +120,10 @@ A completion notification or successful top-level return alone proves neither ex
 Choose an observable progress measure before the first fix, such as remaining diagnostic identities or failing checks.
 Compare each completed fix-and-check round against its predecessor using the same acceptance criteria.
 Reset the consecutive no-progress count when verified results improve.
-Stop after two consecutive rounds without improvement and return unresolved failures and evidence to Main.
-Productive rounds do not consume that no-progress allowance.
+After two consecutive rounds without improvement, return unresolved failures, evidence, and remaining authorized avenues to Main.
+Reconsider the approach instead of repeating the same ineffective loop.
 Keep this count separate from schema retries, stalled-agent restarts, inference sampling, and task-attempt limits.
-Stopping never waives blockers, required checks, or user approval.
+Reassessment never waives blockers, required checks, or user approval.
 
 ## Resume Conservatively
 

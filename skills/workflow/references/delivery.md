@@ -12,13 +12,13 @@ Use only nodes allowed by the goal's scope and authority.
 | Finding verification | A verifier independent of the finder and fixer checks every candidate before reporting. | Candidate identifiers, evidence, affected source, and acceptance criteria. | Confirmed, refuted, or unverified outcomes for each candidate, with evidence and limits. |
 | Blocker fix | The same branch owner changes only confirmed affected scope. | Confirmed blocker, affected files, and existing PR/MR when available. | Fix with relevant verification evidence. |
 | Scoped review | An independent reviewer reassesses affected changes and interactions against the earlier complete review. | Prior findings and dispositions, updated files, and current PR/MR when available. | Reassessment with source evidence and a complete-review refresh when earlier coverage becomes insufficient. |
-| Deferral registration | Main uses the authorized long-term tracker. | Accepted nonblocking finding and verified tracker access. | Follow-up record with evidence, scope, acceptance, owner, and next action. |
-| Integration in Main | Main integrates only after all required gates pass. | Passing checks, resolved blockers, registered deferrals, and authorized base branch. | Base branch update and post-integration verification. |
+| Deferral registration | Main uses the authorized long-term tracker. | Newly accepted current-unit follow-up and verified tracker access. | Record evidence, scope, acceptance, owner, and next action without requiring new records for unrelated pre-existing issues. |
+| Integration in Main | Main integrates after current-unit gates pass. | Passing required checks, resolved current-unit blockers, required deferral records, and authorized base branch. | Normal merge and named-base readback without waiting for unrelated open work. |
 
 ## Readiness And Transitions
 
 Before starting a node, confirm its accepted inputs, owner, authority, tools, paths, and branch.
-Confirm that required predecessor nodes ended and no conflicting writer owns the same resource.
+Confirm required predecessor results and conflicting-resource ownership returns without waiting for unrelated global returns.
 Connect nodes only when a predecessor result or condition gates its successor.
 Start ready independent nodes in parallel and serialize conflicting writes.
 Join branches only when a later node requires their combined results.

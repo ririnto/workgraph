@@ -39,6 +39,9 @@ Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating those common rules.
 
 Main remains the entry point for complete authorized outcomes, including review, integration, readback, and cleanup.
+Delivery defines authorize-once Git operations, repository eligibility, and current-unit integration gates without enlarging host permissions.
+Main and Worker independently carry authorized recovery and true-boundary handling because their loading contexts are separate.
+Writing defines the agent-facing task contract, while Instruction Authoring audits loading points and replaces conflicting consumers.
 Main and Worker select Memory Maintenance before any durable memory change.
 The procedure reviews the complete selected store without expanding read or write authority.
 It keeps facts in owning records, synchronizes index pointers, and preserves unresolved conflicts.
@@ -141,7 +144,9 @@ The [model research](research.md#model-effort-and-cost) records model-specific e
 Workgraph keeps goal definition, scope, authority, acceptance evidence, and dynamic graph planning in the main session.
 Each node describes a bounded operation, decision, or check with required inputs, expected outputs, owner, authority, and completion evidence.
 Edges identify results or conditions that gate later nodes, not execution order alone.
-The main session starts ready independent nodes in parallel, serializes conflicting writes, and joins branches only when a later node needs their results.
+The main session starts ready independent nodes in parallel, serializes actual conflicting writes, and joins only required predecessor results.
+Independent native Task Mains can change overlapping logical sources in separate native worktrees.
+Files, worktrees, refs, and shared records retain one actual writer, and unrelated ownership returns do not gate a successor.
 Pass actual predecessor results and evidence to successor nodes.
 Choose useful node types for the goal rather than requiring an exploration-to-integration sequence.
 Workgraph defines no scheduler, executor, or shared task store.
@@ -171,7 +176,9 @@ Main host references select review staffing and depth without changing required 
 Project-wide enforcement remains the target repository's responsibility.
 
 The graph below shows conditional loading and review timing for authorized repository delivery.
-Main verifies required checks, confirmed blocker fixes, and registered deferrals before integration.
+Main verifies current-unit checks, confirmed blocker fixes, and required current-unit deferral records before integration.
+Unrelated pre-existing issues, umbrella issues, older failed units, and severity alone do not block independently verified delivery.
+Existing unrelated issues require no new tracker record before another unit merges.
 
 ```mermaid
 flowchart TD
@@ -212,7 +219,7 @@ Each host reference owns tool routing, while the common Main contract owns task 
 Main requires independent per-finding verification before confirmed reporting, and Worker returns candidates for that verification.
 Claude's host reference selects planning, read-only scan, and isolated edit defaults while preserving active overrides.
 Workflow maps those settings and verification dependencies into native stages and keeps deterministic choices in script control flow.
-Fix loops track consecutive rounds without observable improvement independently of native retries.
+Fix loops track consecutive no-progress rounds independently of native retries and return evidence for Main's next authorized approach.
 Explicit diff-first gates split proposal and edit runs because native Workflow cannot request intermediate operator sign-off.
 These consumer rules preserve separately authorized source delivery and do not activate host settings or require JEV.
 
@@ -278,6 +285,8 @@ Dependabot checks npm dependencies and GitHub Actions weekly.
 Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.
 Additional cases check an idle background command, an Agent completion callback, and an English worker handoff during a Spanish human conversation.
+The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, isolated parallel work, and repository eligibility.
+Its policy assessment does not perform Git delivery or establish installed activation.
 Completion graders inspect actual traces rather than relying on final claims.
 Retained local traces let maintainers distinguish completed command and worker outcomes from reported acceptance.
 Record which model, host, and loaded plugin produced the result.

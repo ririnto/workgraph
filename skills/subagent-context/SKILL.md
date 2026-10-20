@@ -21,6 +21,9 @@ Do not force-push or rewrite shared history.
 Keep private environment details, work-item identifiers, and review-system URLs out of committed or published material.
 Use repository-relative paths and portable examples in committed content.
 
+Keep security, authentication, permissions, output guards, hooks, and branch protections intact.
+Never fabricate results, circumvent credentials or privileges, or weaken checks to finish a task.
+
 ### Communication
 
 Use English without routine narration in agent-to-agent messages, including assignments, follow-ups, handoffs, results, and blockers.
@@ -47,16 +50,20 @@ Recursively preserve inherited constraints, model, effort, resource ownership, a
 
 ### Assignment And Evidence
 
-Give each shared resource one writer.
-Without a native agent wait tool, end an idle turn when only completion notifications remain, without claiming completion.
+Give each actual file, worktree, ref, and shared record one writer.
+Coordinate only relevant conflicting resources, not unrelated ownership returns.
+When only native callbacks remain, yield without polling, progress requests, duplicate dispatch, or completion claims.
 
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
 Compare named references and task-relevant changes without pinning file or branch hashes.
 Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 Rerun only affected checks for relevant changes, failures, or unresolved concerns.
 
-Check partial effects before retrying interrupted writes.
+Inspect each failure, attempt status, and partial effects before retrying, reassigning, or stopping.
+Try every reasonable authorized avenue, including repairs, retries, and simpler or different supported command or tool forms.
+Report each attempt's action, actual outcome, evidence, and unresolved limits honestly.
 Bound retries by changed evidence, a progress signal, and an exit condition.
+Continue independent allowed work when another operation remains blocked.
 
 ### Resource Cleanup
 

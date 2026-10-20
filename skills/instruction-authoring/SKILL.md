@@ -17,6 +17,11 @@ Remove rules that repeat instructions already present in the same loaded context
 Allow necessary repetition when loading points are fully separate and each context must work independently.
 
 Preserve explicit user requirements and authority boundaries when simplifying text.
+Explicit user requirements take precedence over skill defaults within host and safety boundaries.
+Audit applicable loading points and consumers for conflicting authority, completion, and stopping rules.
+Distinguish true authority or safety boundaries from recoverable failures and unsupported invocation forms.
+Keep reasonable authorized recovery available while preserving guards and honest attempt evidence.
+Put each action's completion or stop condition beside the action.
 Include only rules that change a relevant decision or action.
 Do not turn a task example or temporary environment detail into a general requirement.
 
@@ -32,6 +37,7 @@ Keep required supporting instructions in bundled skills or references.
 Use external instruction links as optional attribution, without requiring agents to retrieve them.
 Refer to conditional skills by their plain skill names and state when they apply.
 Link supporting reference files from their callers with triggers and resolvable bundled paths.
+Resolve active installed skill paths at invocation rather than keeping durable cache-version pointers.
 Read each selected file before applying its rules.
 Identify sources already loaded completely so agents do not retrieve them again.
 
@@ -44,7 +50,9 @@ Remove replaced paths and update their consumers in the same change.
 
 For changed instruction behavior, read Verification unless its complete content is already loaded.
 Enforce structural requirements through existing validators when they can check the contract safely.
+Test representative success, boundary, and failure decisions through existing native evaluation cases.
 Keep semantic judgment separate from lexical assertions about instruction wording.
+Treat model-specific prompting observations as hypotheses for the selected workload, not universal rules.
 
 Confirm frontmatter and invocation fields against the target host's supported skill format.
 Keep model invocation enabled unless the user requires another policy.

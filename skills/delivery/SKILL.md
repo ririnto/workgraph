@@ -7,13 +7,25 @@ description: Use in the main session for repository changes or authorized branch
 
 Use this skill in the main session.
 
+## Confirm Repository Eligibility
+
+Before source changes or publication, verify authenticated metadata for an unarchived nonfork repository.
+Require evidence of meaningful development within the preceding three calendar months.
+Inspect actual source changes rather than relying on `pushedAt`, orchestration records, or template-only activity.
+If eligibility is unverified or unmet, stop repository writes and report the missing evidence.
+
 ## Plan Delivery Units
 
 Split broad goals into cohesive, independently verifiable units with acceptance evidence and one accountable owner.
 Keep coupled work together when splitting prevents independent verification or mergeability.
 Avoid tiny phases and stacked PRs that require repeated rebases.
 Publish, review, and integrate each ready unit within granted authority.
-Proceed with publication and integration already authorized by the goal without requesting renewed approval.
+A clear approved Git task includes implementation, checks, Issue/MR/PR creation, comments, normal merge, readback, and owned cleanup.
+Complete those operations without renewed stage approval or repeated permission questions.
+Preserve explicit user gates, new-scope boundaries, and authorization limits for irreversible actions.
+Git delivery does not authorize deployment, credential handling, live assets, forks, or upstream destinations.
+Keep authentication, hooks, output guards, host permissions, and server protections unchanged.
+Never change permission settings or weaken guards to finish delivery.
 
 Use the user's specified base branch, otherwise retain the recorded base or use the current branch.
 Without a base, confirm the active development branch.
@@ -69,26 +81,33 @@ Do not change code solely for unsupported style requests, cleanup suggestions, o
 Keep required human approvals distinct from agent review.
 Record failure consequences, uncovered risks, and the recovery approach with delivery evidence.
 
-Fix blockers before integration when they violate acceptance, required behavior, correctness, safety, or required checks.
+Fix current-unit blockers before integration when they violate acceptance, required behavior, correctness, safety, or required checks.
 Only confirmed blockers require code changes before integration.
 Keep blocker fixes on the same working branch and update its existing PR/MR, if any.
 Reassess affected changes and interactions against the earlier complete review, carrying forward findings and their dispositions.
 Refresh the complete review when changed scope or invalidated evidence makes the earlier coverage insufficient.
 When review cycles repeat without progress, reconsider the cause and approach instead of restarting the same review.
-Apply Main's two consecutive no-progress fix-round limit without counting productive fixes or native runtime retries.
+Apply Main's no-progress reassessment separately from productive fixes and native runtime retries.
 Keep unresolved blockers explicit, and never treat a review limit as permission to waive acceptance or required checks.
 
 ## Defer And Integrate
 
-After required checks pass, defer only noncritical findings that do not affect required behavior, acceptance, correctness, or safety.
-Before integration, register each deferred follow-up in the authorized long-term issue tracker.
+Classify findings against the current unit's acceptance, changed behavior, dependencies, and required gates.
+Block integration for own unmet acceptance, introduced or worsened defects, actual dependencies, or required-gate failures.
+An unrelated pre-existing issue, umbrella issue, older failed unit, or severity label alone does not block independently verified delivery.
+Merge independently verified A while unrelated pre-existing B remains open.
+Require no new deferred tracker record for existing unrelated B.
+
+For newly accepted current-unit follow-ups, defer only noncritical findings outside required behavior, acceptance, correctness, and safety.
+Before integration, register those deferrals in the authorized long-term issue tracker.
 Include evidence, scope, acceptance criteria, a named owner, and a next action.
 Reuse or update an existing tracker item when possible.
-Without authorized, available tracker access, do not integrate with untracked deferrals.
+Without required tracker access, retain that unit's deferral blocker without blocking independent units.
 Implement deferred follow-ups only after updating the base branch.
 Repeat base syncs or rebases only for conflicts or invalidated evidence.
 Follow Main Agent Contract for retry bounds and progress requirements.
 
-Integrate after required checks pass, confirmed blockers are resolved, and deferred follow-ups are recorded.
-Finish delivery by verifying the authorized base branch update.
+Integrate after current-unit checks pass, confirmed blockers are resolved, and required current-unit deferrals have records.
+Require only relevant resource returns, not unrelated global ownership returns.
+Finish delivery by reading back the named authorized base branch after normal merge.
 Delete feature branches except the base, only within granted cleanup after base integration and ancestry proof.
