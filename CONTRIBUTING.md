@@ -1,7 +1,6 @@
 # Contributing
 
-Read [AGENTS.md](AGENTS.md) before changing this repository.
-Follow its [Writing](AGENTS.md#writing) rules for maintained documents, including sentence-per-line Markdown prose.
+Follow the auto-injected repository conventions, including sentence-per-line Markdown prose for maintained documents.
 Use [README.md](README.md#development) for development setup and the existing validation commands.
 
 ## Documents

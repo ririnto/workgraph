@@ -127,7 +127,7 @@ The real pre-commit and pre-push hooks run `pnpm run pre-commit` and `pnpm run p
 Each script runs the complete existing check gate and blocks its Git operation on failure.
 The aggregate gate requires `pnpm audit --prod` to pass.
 
-Follow [AGENTS.md](AGENTS.md) for contributor conventions and validation commands.
+Follow the auto-injected repository guidance for contributor conventions and validation commands.
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for issue, commit, and pull request formats.
 The [tooling design](docs/design.md#validation-and-tooling) explains lint ownership, supported prose diagnostics, validation gates, and CI coverage.
 Executable rules and tooling configuration remain separate from consumer guidance.
@@ -180,7 +180,7 @@ It does not inherit the Claude version when its selected descriptor omits one.
 Both declarations are required for an explicit matching release across hosts.
 
 1. Set the same new release number in both host descriptors.
-2. Run the applicable checks from [AGENTS.md](AGENTS.md), including both plugin validators.
+2. Run the applicable checks from the auto-injected repository guidance, including both plugin validators.
 3. Inspect the complete diff and confirm both version fields match.
 4. Commit the changes and versions together.
 5. Push the authorized distribution branch and confirm the remote contains the commit.

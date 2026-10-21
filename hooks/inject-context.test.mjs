@@ -590,7 +590,12 @@ test("bundled skills retain invocation metadata and supporting reference files",
 });
 
 test("agent-facing instructions never name the auto-injected repository guidance file", () => {
-  const files = readdirSync(agents).map((name) => path.join(agents, name));
+  const files = [
+    ...readdirSync(agents).map((name) => path.join(agents, name)),
+    ...["CONTRIBUTING.md", "README.md", "docs/design.md"].map((file) =>
+      fileURLToPath(new URL(`../${file}`, import.meta.url))
+    )
+  ];
   for (const name of readdirSync(skills)) {
     const directory = path.join(skills, name);
     files.push(path.join(directory, "SKILL.md"));
@@ -610,6 +615,24 @@ test("agent-facing instructions never name the auto-injected repository guidance
       readFileSync(file, "utf-8"),
       /AGENTS\.md/u,
       `${path.relative(skills, file)} names auto-injected repository guidance`
+    );
+  }
+});
+
+test("shared skills and update routing retain host-neutral wording", () => {
+  const files = [
+    path.join(skills, "delivery", "references", "plugin-updates.md")
+  ];
+  for (const name of readdirSync(skills)) {
+    if (name !== "workflow" && name !== "codex-scoped-cleanup") {
+      files.push(path.join(skills, name, "SKILL.md"));
+    }
+  }
+  for (const file of files) {
+    assert.doesNotMatch(
+      readFileSync(file, "utf-8"),
+      /\b(?:Claude|Codex)\b/iu,
+      `${path.relative(skills, file)} contains host-specific wording`
     );
   }
 });

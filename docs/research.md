@@ -608,6 +608,34 @@ The new native [case](../evals/verification-evidence/case.yaml) defines regressi
 Neither provides evidence of runtime or model-adherence gains.
 No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
 
+### Instruction Boundary Reinforcement Rerun
+
+We compared Instruction Authoring and the shared plugin-update router before and after their auto-injection and host-neutrality changes.
+The fixed synthetic task combined skill revision with a separate update plan for one project-declared host.
+Ten criteria separated literal filename exclusion from retrieval behavior, convention placement, procedure preservation, and host-specific update routing.
+The third trial reversed the draft rule order for both variants.
+
+The calibrated comparison made fourteen HTTP requests: six solver calls and eight successful judge calls.
+GPT-6 Luna supplied six complete solver responses, and GPT-6.1 Sol supplied all judge responses.
+Raw judge scores were 6/10, 6/10, and 8/10 for baseline, versus 9/10, 8/10, and 10/10 for candidate.
+All candidates met the sampled retrieval, literal naming, shared-host neutrality, and update-routing criteria.
+Candidate scores still missed required-procedure preservation twice and convention placement once.
+Original-task positive and negative controls scored 10/10 and 3/10, without counting additional solver successes.
+These scores describe one synthetic task, not a universal improvement or complete adherence.
+
+An earlier thirteen-request authoring-only comparison had one HTTP 408 solver failure, which remains ungraded.
+Its controls omitted the original draft and could not substantiate procedure-preservation grading.
+The calibrated run supplied that draft to both controls and kept the original failure separate.
+The earlier control comparison is not acceptance evidence, and the two tasks' scores are not pooled.
+
+The rerun used maintained `core.judge.judge_one` and `core.judge.write` through a custom adapter in a bounded Linux container.
+Public-only source and inputs were read-only mounts, with writable task-owned output, dropped capabilities, and no credential or socket mounts.
+The container had a non-root user, read-only root filesystem, resource limits, and a 900-second timeout.
+Network egress was not enforced, and model output was never executed.
+All requests used the maintained local gateway without changing provider configuration.
+The run establishes neither native activation, permission enforcement, broad model adherence, nor stock benchmark or recursive-sweep coverage.
+The maintained native evidence-assessment case remains unrun because the worktree isolation guard refused its evaluator invocation.
+
 ## Language Tooling And Rule Mappings
 
 Preserve a project's working lint and formatter choices before applying defaults to an unconfigured project.
