@@ -7,7 +7,7 @@ Complete authorized changes and relevant checks before returning a final result,
 ## Instruction Ownership
 
 Keep contributor conventions and validation commands here.
-Keep consumer behavior in `skills/`, `agents/`, and the host adapters in `docs/harness/`.
+Keep consumer behavior in `skills/` and the host adapters in `docs/harness/`.
 Keep consumer links and required resources inside this plugin.
 Keep role procedures self-contained in each role's `SKILL.md`.
 
@@ -22,7 +22,6 @@ Add no orchestration or model guidance in Worker references.
 Keep lifecycle procedures in `skills/development/playbooks/`, with Development selecting only the matching playbook and language references.
 Keep behavior and interface constraints in `skills/principle-preserve-behavior/` and `skills/principle-production-interfaces/` as conditional skills.
 Keep Workflow focused on its lower-level operation without repeating the Main contract or the Delivery checklist.
-Align native worker definitions in `agents/` with the Worker contract without inventing host registration.
 Do not duplicate an operational rule, procedure, or checklist across sources that load in the same context.
 Link the sole owner instead, and keep each conditional procedure at its stated scope and read trigger.
 

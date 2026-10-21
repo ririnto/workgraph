@@ -24,7 +24,6 @@ Source labels identify complete content already loaded, so agents need no startu
 The [delivery design](../design.md#deliver-context) describes message-envelope differences and failure behavior.
 
 Codex uses its native delegation tools under the Main host reference.
-The bundled [Claude worker agent](../../agents/workgraph-worker.md) does not register a Codex agent.
 Claude Code's native Workflow is unavailable in Codex.
 
 ## Manual Invocation
