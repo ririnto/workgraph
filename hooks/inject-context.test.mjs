@@ -563,7 +563,7 @@ test("bundled skills retain invocation metadata and supporting reference files",
     );
     assert.ok(body.trim());
     for (const match of body.matchAll(
-      /(?:\]\(|`)(?<file>(?:references|playbooks)\/[^)`#\s]+\.md|\.\.\/[^)`#\s]+\/SKILL\.md)/gu
+      /(?:\]\(|`)(?<file>(?:references|playbooks)\/[^)`#\s]+\.md|scripts\/[^)`#\s]+\.workflow\.txt|\.\.\/[^)`#\s]+\/SKILL\.md)/gu
     )) {
       const reference = realpathSync(
         path.resolve(directory, decodeURI(match.groups.file))
@@ -586,6 +586,19 @@ test("bundled skills retain invocation metadata and supporting reference files",
         assert.ok(readFileSync(reference, "utf-8").trim());
       }
     }
+  }
+});
+
+test("bundled native Workflow sources remain relocatable text resources", (t) => {
+  const root = copyPlugin(t);
+  const directory = path.join(root, "skills", "workflow", "scripts");
+  const files = readdirSync(directory);
+  assert.ok(files.length > 0);
+  for (const file of files) {
+    assert.match(file, /\.workflow\.txt$/u);
+    const source = realpathSync(path.join(directory, file));
+    assert.ok(source.startsWith(`${realpathSync(directory)}${path.sep}`));
+    assert.match(readFileSync(source, "utf-8"), /^export const meta = \{/u);
   }
 });
 

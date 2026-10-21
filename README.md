@@ -61,7 +61,9 @@ For Claude Code graph execution, [Workflow](skills/workflow/SKILL.md) adds nativ
 Its [authoring reference](skills/workflow/references/authoring.md) supplies script-specific guidance.
 Its [delivery reference](skills/workflow/references/delivery.md) maps Delivery operations to node inputs and outputs without owning another delivery checklist.
 Codex uses native delegation rather than Claude Code Workflow.
-Workgraph ships no reusable Workflow scripts or replacement execution engine.
+Workgraph bundles [native sum-and-check source](skills/workflow/scripts/sum-check.workflow.txt) selected by the Workflow skill for that read-only outcome.
+Its [caller contract](skills/workflow/references/authoring.md#use-the-bundled-source) distinguishes inline execution, named discovery, skill selection, and installed activation.
+Workgraph supplies no replacement execution engine.
 
 ## Skill Invocation
 

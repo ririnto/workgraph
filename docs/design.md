@@ -22,7 +22,8 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
 | `skills/delivery/references/{claude,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
-| `skills/workflow/references/authoring.md` | Workflow authors | Authors follow script construction, mapping, and recovery procedures. |
+| `skills/workflow/references/authoring.md` | Workflow authors | Authors follow script construction, mapping, recovery, and bundled-source caller contracts. |
+| `skills/workflow/scripts/` | Claude Main using Workflow | Native text resources supply reusable source for the controlling skill without another runner. |
 | `skills/workflow/references/delivery.md` | Workflow delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
@@ -197,6 +198,9 @@ The dispatched agent should complete the assigned task within its authority inst
 Claude Main prefers Agent for one-phase work and permits a one-phase Workflow when actual follow-up phases are expected.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
+Its [bundled native source](../skills/workflow/scripts/sum-check.workflow.txt) replaces the former prose-only calculation example with reusable inline input.
+The [caller contract](../skills/workflow/references/authoring.md#use-the-bundled-source) separates native source from Node modules and run-specific script copies.
+The resource has no named registration or replacement executor.
 Its delivery reference maps authorized engineering operations to node inputs and outputs without owning a second delivery checklist.
 Worker and Codex contexts do not load Workflow procedures.
 Codex uses available native delegation tools, and its Main host reference owns tool routing.
@@ -251,7 +255,7 @@ Use the validation commands and prose review requirements from the auto-injected
 Workgraph's scoped contributor review policy lives in [docs/reviews.md](reviews.md).
 
 Behavioral evaluation requires a host run with the changed plugin loaded.
-The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.
+The maintained cases cover single and parallel independent Agent selection, bundled-source Workflow invocation, expected continuation, and both conditional follow-up outcomes.
 Additional cases check an idle background command, an Agent completion callback, and an English worker handoff during a Spanish human conversation.
 The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, isolated parallel work, and repository eligibility.
 The Workflow-selection case uses keyed parser and documentation assessments with one necessary reconciliation rather than a domain-by-phase review matrix.

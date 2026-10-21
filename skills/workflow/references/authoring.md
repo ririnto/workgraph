@@ -160,78 +160,41 @@ A cache hit avoids repeated work but does not prove acceptance.
 - Do not trust a schema without checking the returned fields and evidence.
 - Do not resume a Workflow from another session.
 
-## Append-Only Example
+## Use The Bundled Source
 
-The first script counts source files and validates its structured result.
-Main selects `args.model` and `args.effort` under its active host reference before the run.
-Pass those settings as structured arguments on the initial invocation and continuation.
+Read [the sum-and-check source](../scripts/sum-check.workflow.txt) when the accepted goal requires adding supplied integers and independently checking them.
+Pass its complete text unchanged through native Workflow's inline `script` input.
+Resolve the resource from this reference or the loaded skill directory, not the repository working directory.
 
-```js
-export const meta = {
-  name: 'count-then-check',
-  description: 'Count source files and verify the accepted count',
-  phases: [{ title: 'Count' }]
-}
+The `.workflow.txt` file contains a native async script body, not an importable Node module.
+Native top-level `return` conflicts with module grammar and the unchanged source lint rules.
+The text resource needs no wrapper, transform, dependency, or lint exception.
+Packaging checks cover its relocation, while native execution checks its syntax and behavior.
 
-const COUNT = {
-  type: 'object',
-  properties: { count: { type: 'integer' } },
-  required: ['count']
-}
+Supply the following structured arguments under Main's active host policy.
 
-phase('Count')
-const inventory = await agent('Count source files and return {count: integer}.', {
-  label: 'inventory',
-  phase: 'Count',
-  schema: COUNT,
-  model: args.model,
-  effort: args.effort
-})
-if (inventory === null || !Number.isInteger(inventory.count)) {
-  throw new Error('Count result is incomplete')
-}
-return { inventory }
-```
+| Argument | Contract |
+| --- | --- |
+| `numbers` | Supply a nonempty array of safe integers whose sum is also a safe integer. |
+| `model` | Supply Main's selected supported internal-agent model without changing native Task launch settings. |
+| `effort` | Supply `low`, `medium`, `high`, `xhigh`, or `max` under Main's selected policy. |
 
-After accepting the count, append a `Verify` phase and preserve the original `inventory` call unchanged.
-Replace its first-run terminal return with `const prior = { inventory }` so the new stage remains reachable.
-Add `{ title: 'Verify' }` after the unchanged `Count` entry in `meta.phases`.
+For the maintained calculation case, use numbers `[17, 23, 31]` and the selected internal model and effort.
+The first worker returns a sum and calculation evidence.
+The dependent worker receives the original numbers and actual accepted predecessor, then independently checks that sum.
+No worker launches host Agent or Workflow calls.
 
-```js
-const prior = { inventory }
-phase('Verify')
-const VERIFY = {
-  type: 'object',
-  properties: { accepted: { type: 'boolean' } },
-  required: ['accepted']
-}
-const verification = await agent(
-  `Check prior=${JSON.stringify(prior)} against ${args.criteria}. Return {accepted: boolean}.`,
-  {
-    label: 'verify',
-    phase: 'Verify',
-    schema: VERIFY,
-    model: args.model,
-    effort: args.effort
-  }
-)
-if (verification === null || verification.accepted !== true) {
-  throw new Error('Verification did not pass')
-}
-const phaseEvidence = [
-  { title: 'Count', status: 'completed' },
-  { title: 'Verify', status: 'completed' }
-]
-const declaredTitles = ['Count', 'Verify']
-if (JSON.stringify(phaseEvidence.map(item => item.title)) !==
-    JSON.stringify(declaredTitles)) {
-  throw new Error('Required phase evidence is incomplete')
-}
-return { complete: true, phaseEvidence, prior, verification }
-```
+Accept the returned result only when `complete` is true and both `Sum` and `Check` phase records are completed.
+The keyed `partitions.sum` and `partitions.check` records retain their results and failure reasons.
+A missing or malformed Sum fails that partition and skips the dependent Check without dispatching it.
+A missing, malformed, failed, or rejecting Check leaves the accepted Sum intact and returns `complete: false`.
+Keep these incomplete outcomes instead of treating native completion as acceptance.
 
-Resume with the same session's `scriptPath` and `resumeFromRunId`.
-Retain the original `model` and `effort` arguments when resuming.
-Add the new `criteria` argument, such as `'equals 3'`.
-The new prompt carries both the accepted predecessor data and the new criterion.
-Accept the result only when it includes both completed phase records and `{ accepted: true }`.
+The first invocation executes inline source, not a registered workflow name.
+The source is not registered for named discovery, and skill selection does not prove installed activation.
+Do not replace the selected source run with an additional host Agent or Workflow dispatch.
+
+For an authorized continuation, edit only the returned per-run `scriptPath`, not the bundled resource.
+Preserve valid earlier calls and inputs under [Resume Conservatively](#resume-conservatively).
+A final-result-only edit can reuse both completed calls, while a changed earlier call can invalidate later cached results.
+Inspect actual native cache-hit evidence before claiming reuse.
