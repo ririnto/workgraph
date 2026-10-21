@@ -10,13 +10,16 @@
     "check:plugin-version": "node test/validation/plugin-version.mjs",
     "check:production-audit": "pnpm audit --prod",
     "check:tooling-tests": "node --test test/tooling.test.mjs",
-    "check:ultracite": "ultracite check",
+    "check:ultracite": "run-p --continue-on-error ultracite:check:**",
     "check:validation-tests": "node --test test/validation.test.mjs",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
     "fix:ultracite": "ultracite fix",
     "pre-commit": "run-s check",
     "pre-push": "run-s check",
+    "ultracite:check:base": "ultracite check",
+    "ultracite:check:style:no-blank-lines-in-functions": "ultracite check --config oxlint.style-no-blank-lines-in-functions.config.ts",
+    "ultracite:check:style:no-inline-comments-in-functions": "ultracite check --config oxlint.style-no-inline-comments-in-functions.config.ts",
     "prepare": "husky"
   },
   "devDependencies": {

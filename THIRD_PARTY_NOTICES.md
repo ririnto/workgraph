@@ -145,7 +145,8 @@ Workgraph adapts their decision boundaries without requiring a Sinon installatio
 Its development tooling copies the Harness source-style plugins and Markdown sentence and table-separator rules.
 These files retain the Harness [Apache-2.0 license](LICENSES/sinon-harness.txt), with attribution to ririnto.
 The repository owns the copied configuration and checks without modifying the upstream Harness.
-Workgraph modifies its sentence and TSDoc copies to preserve diagnostics with explicit source control flow.
+Workgraph modifies its Markdown sentence rule to preserve diagnostics with explicit source control flow.
+Workgraph consumes the maintained TSDoc plugin source without modification.
 
 ## Research And Official Documentation
 
