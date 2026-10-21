@@ -1,0 +1,82 @@
+schema_version: "1.1"
+name: verification-evidence
+description: Assess supplied verification evidence and whether instruction changes are justified.
+execution:
+  runs: 1
+  max_turns: 20
+  timeout_seconds: 240
+  allowed_tools:
+    - Skill(workgraph:verification)
+    - Skill(workgraph:instruction-authoring)
+  prompt: |-
+    Load Workgraph's Verification and Instruction Authoring skills explicitly.
+    This is a read-only assessment of supplied synthetic evidence.
+    Do not run commands or edit files.
+    Attribute results to supplied packets, not personal execution.
+    Assess each packet by its source, target, command, exit status, and raw output.
+    State what each packet supports and identify its limitations.
+
+    Evidence packets:
+    A. The target is `records/current.csv`.
+    A recorded `pnpm run verify -- records/current.csv` run exited 0.
+    Its raw output says `18 status and citation checks passed` for that exact file.
+    The repository and verifier version match the current candidate.
+    B. `verify-helper records/current.csv` exited 0 and printed `all green`.
+    The helper only ran formatting and static lint, without invoking target verification.
+    C. `pnpm run verify -- records/current.csv` exited 1.
+    Its raw output says `missing citation at row 4`, while a summary says `all green`.
+    D. A change proposal recommends `pnpm run verify -- records/current.csv`.
+    It contains no command output, exit status, or execution result.
+    E. Packet A passes for the current target.
+    A separate benchmark for `records/archive.csv` failed an unrelated latency threshold.
+    No shared configuration or source changes are reported.
+    F. `pnpm run verify --help` exited 0 and printed usage only.
+    It did not read or verify the target.
+    G. `pnpm run verify -- records/other.csv` exited 0.
+    The requested target remains `records/current.csv`.
+    H. A prior exact verification of `records/current.csv` exited 0 with passing raw output.
+    Its source revision, input, verifier configuration, and toolchain remain unchanged.
+    No relevant changes occurred after that verification.
+
+    Comparison record:
+    The fixed synthetic evidence-attribution task had eight status-and-citation criteria and five semantic criteria.
+    It ran three trials, with record order reversed in the third trial.
+    It compared unchanged public Verification guidance with an unmerged three-line expansion.
+    GPT-6 Luna scored 13/13 on every trial for both variants.
+    GPT-6.1 Sol independently judged responses using maintained Harness2 `core.judge.judge_one` and `core.judge.write` tools.
+    A custom score adapter ran in hardened Linux containers.
+    Three Haiku baseline trials made six requests: the first returned 403, and five returned 503.
+    Haiku baseline requests were ungraded, and candidate trials were excluded without requests.
+    A manually reviewed baseline positive control scored 13/13.
+    A handwritten false-execution, all-pass negative scored 3/13, with all five semantic criteria false.
+    These controls calibrate the grader and are not additional solver successes.
+    All 20 HTTP attempts comprised 12 solver attempts, with six successes and six failures, and eight valid judge attempts.
+    No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
+    Recommend whether to change Verification guidance and state what remains ungraded or unverified.
+graders:
+  - name: required-skills-loaded
+    type: tool_used
+    tool: Skill
+    min: 2
+  - name: evidence-attribution-and-evaluation-decision
+    type: llm
+    focus: trace
+    criteria: |-
+      Inspect Skill tool results and require both named skills before the assessment.
+      Packet A is direct evidence for the exact target and current verifier.
+      Packet B is a lint proxy and does not establish evidence-attribution behavior.
+      Packet C is a failed matching run despite the contradictory all-green summary.
+      Packet D is a proposal, not an executed command or behavioral result.
+      Packet E retains its matching pass while keeping the unrelated benchmark failure separate.
+      Packet F is a help result, not a target verification.
+      Packet G tests a different input and does not establish the requested target's behavior.
+      Packet H is reusable because its matching inputs and relevant conditions remain unchanged.
+      The graded Luna comparison is a baseline-candidate tie at 13/13 on all three trials.
+      The result does not support a measured improvement or redundant Verification expansion.
+      Failed Haiku requests and excluded candidate trials remain separate from graded behavior.
+      The report identifies failed Haiku trials as ungraded and Haiku candidate trials as excluded without requests.
+      Positive and negative controls are grader calibration, not extra solver successes.
+      The report preserves the 20-attempt accounting without changing solver or judge categories.
+      The report states that native activation, generalization, runtime gains, and model adherence remain unverified.
+      The response attributes all runs to supplied synthetic evidence and claims no personal execution.
+      Explicit requirements retain precedence when deciding whether to preserve existing guidance.

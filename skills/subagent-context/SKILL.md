@@ -41,8 +41,8 @@ Before editing durable memory, read Memory Maintenance unless its complete conte
 
 ### Host Guidance
 
-Use `references/codex.md` in Codex or `references/claude.md` in Claude Code for execution timing.
-Read the active host reference before execution unless its complete content is already loaded.
+Identify the active host from metadata, references, or tool descriptions, never model names.
+Read the matching bundled `references/` file before execution unless fully loaded.
 
 ### Further Delegation
 
@@ -58,7 +58,11 @@ Assess its suitability, then adopt or drop it within dispatch authority.
 Missing optional setup alone does not block the assignment.
 Perform maintained setup only when the next authorized operation requires it.
 Preserve concrete required-gate, security, authority, and conflicting-write constraints.
-When only native callbacks remain, yield without polling, progress requests, duplicate dispatch, or completion claims.
+
+For async agents/subagents, workflows, tools, MCP, equivalents, and subagent-initiated calls, end the turn when only completion callbacks remain.
+Consume each response without thinking about waiting.
+Do actionable work only, then yield again when only callbacks remain.
+Never speculate, poll or request progress, narrate redundantly, redispatch, or claim completion while waiting.
 
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
 Compare named references and task-relevant changes without pinning file or branch hashes.

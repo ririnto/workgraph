@@ -12,6 +12,8 @@ Keep consumer links and required resources inside this plugin.
 Keep role procedures self-contained in each role's `SKILL.md`.
 
 Keep host-specific execution timing in each role's references, and inject only the selected host's reference.
+Keep shared role and task procedures host-neutral.
+Keep native host mechanics in the matching host reference.
 Keep user-facing host setup, invocation, and update instructions in the matching `docs/harness/` adapter.
 Link policy owners instead of restating their procedures.
 Keep orchestration and model guidance in Main Agent references.
@@ -79,6 +81,22 @@ Leave no blank lines inside function bodies.
 Use no trailing commas in TypeScript.
 Use `.yaml` for maintained YAML files unless the consumer requires another exact filename.
 Use block sequences except for an explicit empty sequence.
+
+## Repository Reviews
+
+Workgraph PR owners run complete posted-candidate reviews with Claude-hosted `pstack:comment-sicko`, `pstack:poteto-agent`, and a native Codex reviewer.
+Run these reviews concurrently after publication.
+Require Poteto to read its complete mode skill before review.
+Give every reviewer the complete current PR, acceptance criteria, affected consumers, and validation evidence.
+
+Keep Claude reviewers on correctness, instruction ownership, portability, and safety.
+Assign Codex only built-in instruction and tool conflicts and compatibility with native Codex behavior.
+Require one consolidated read-only Codex report without duplicating Claude review.
+Do not substitute a Claude-hosted model alias for the native Codex session.
+
+Independently verify each candidate before acting or reporting it as confirmed.
+Record findings, dispositions, coverage limits, and actual review timing in a formal COMMENT review.
+Preserve completed valid reviews without claiming retroactive coverage or concurrency.
 
 ## Validation
 

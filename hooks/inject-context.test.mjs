@@ -573,6 +573,17 @@ test("bundled skills retain invocation metadata and supporting reference files",
       );
       assert.ok(readFileSync(reference, "utf-8").trim());
     }
+    if (name === "delivery") {
+      for (const host of hosts) {
+        const reference = realpathSync(
+          path.join(directory, "references", `${host}.md`)
+        );
+        assert.ok(
+          reference.startsWith(`${realpathSync(directory)}${path.sep}`)
+        );
+        assert.ok(readFileSync(reference, "utf-8").trim());
+      }
+    }
   }
 });
 
