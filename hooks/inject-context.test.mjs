@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
   cpSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -19,6 +20,7 @@ import { fileURLToPath } from "node:url";
 
 const script = fileURLToPath(new URL("inject-context.mjs", import.meta.url));
 const skills = fileURLToPath(new URL("../skills/", import.meta.url));
+const agents = fileURLToPath(new URL("../agents/", import.meta.url));
 const roles = [
   ["SessionStart", "main-agent-contract"],
   ["SubagentStart", "subagent-context"]
@@ -584,6 +586,31 @@ test("bundled skills retain invocation metadata and supporting reference files",
         assert.ok(readFileSync(reference, "utf-8").trim());
       }
     }
+  }
+});
+
+test("agent-facing instructions never name the auto-injected repository guidance file", () => {
+  const files = readdirSync(agents).map((name) => path.join(agents, name));
+  for (const name of readdirSync(skills)) {
+    const directory = path.join(skills, name);
+    files.push(path.join(directory, "SKILL.md"));
+    for (const group of ["playbooks", "references"]) {
+      const groupDirectory = path.join(directory, group);
+      if (existsSync(groupDirectory)) {
+        files.push(
+          ...readdirSync(groupDirectory).map((file) =>
+            path.join(groupDirectory, file)
+          )
+        );
+      }
+    }
+  }
+  for (const file of files) {
+    assert.doesNotMatch(
+      readFileSync(file, "utf-8"),
+      /AGENTS\.md/u,
+      `${path.relative(skills, file)} names auto-injected repository guidance`
+    );
   }
 });
 
