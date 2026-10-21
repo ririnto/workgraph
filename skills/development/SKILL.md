@@ -6,7 +6,7 @@ description: Use when implementing, refactoring, debugging, or reviewing source 
 # Development
 
 Apply the target repository's rules and lint configuration before these defaults.
-Read only matching language references unless their complete content is already loaded.
+Read only matching playbooks and language references unless their complete content is already loaded.
 For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
 Use `.yaml` for YAML files unless the consuming platform requires another exact filename.
 
@@ -15,26 +15,14 @@ Use `.yaml` for YAML files unless the consuming platform requires another exact 
 Choose the lifecycle from the requested outcome before editing.
 Record the behavior contract, affected consumers, exclusions, and observable acceptance evidence.
 Inspect the affected implementation and stop discovery once evidence supports the smallest safe change.
+Select only the matching playbook and read it before applying its steps unless its complete content is already loaded.
 
-For features, define the expected user behavior and preserved contracts before selecting the implementation.
-Name the data model or state transitions when they remove invalid states or repeated branching.
-Use existing tools and dependencies before introducing new infrastructure.
-
-For bugs, reproduce the trigger on the matching execution surface before fixing it.
-Use observations to eliminate competing causes and confirm the surviving mechanism.
-When a cheap local regression path exists, make it fail for the intended reason before changing production code.
-Otherwise, use the closest executable reproduction and record its limits.
-Rerun the original trigger after the fix and check affected consumers.
-
-For refactoring, capture the current behavior before moving structure.
-Use characterization, recorded output, or an equivalence check that exercises the real contract.
-Keep that evidence passing through each bounded change.
-Treat discovered features or bugs as separate scoped outcomes.
-
-For performance work, record a baseline trace and measurement conditions before proposing an optimization.
-Change one supported hypothesis at a time and compare the same workload under comparable conditions.
-Check results and errors alongside timings.
-Keep measured improvements and remove changes whose evidence refutes their premise.
+| Outcome | Playbook |
+| --- | --- |
+| New or changed behavior | [Feature](playbooks/feature.md) |
+| Reported defect | [Bug fix](playbooks/bug-fix.md) |
+| Behavior-preserving structural change | [Refactoring](playbooks/refactoring.md) |
+| Performance investigation or optimization | [Performance](playbooks/performance.md) |
 
 Verify each coherent unit before building dependent work on it.
 Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
@@ -64,7 +52,6 @@ Examples include Gradle's `gradlew` and `gradlew.bat`, and Maven's `mvnw` and `m
 For external contributions, restrict style cleanup to lines already included in the user's contribution diff.
 
 Preserve the project's declared runtime, toolchain, public contracts, and required failure behavior.
-Avoid unnecessary helpers, abstractions, and custom configuration layers.
 Replace superseded implementations and their consumers together, removing obsolete paths in the same change.
 Agents copy nearby code as precedent, so avoid copying neighboring workarounds and fix recurring causes in code or data architecture first.
 Use official SDK or framework properties directly when they satisfy the required behavior.
@@ -75,26 +62,10 @@ Use named backreferences and replacement references instead of positional refere
 Prefer an existing parser or literal operation when it expresses the requirement more clearly.
 Use the language or platform's native named-group facilities instead of adding unnecessary custom wrappers.
 If the engine lacks named groups, report that limit.
-Choose a supported parser or literal operation only when behavior remains equivalent.
-Preserve match selection, optional groups, flags, Unicode, iteration, offsets, replacement semantics, failure behavior, and resource cleanup.
 Do not treat ordinary array indexing as regex capture access.
 
-Inline variables used only once and keep single-use logic inline, subject to configured lint.
-Preserve behavior, evaluation order, side effects, resource lifetime, exceptions, lazy execution, and required production interfaces.
-Also preserve cost, inferred types, overload selection, and captured snapshots.
-Do not suppress, weaken, or reconfigure lint to enable inlining.
-
-Do not extract or retain helpers for hypothetical future reuse or test convenience.
-Test references do not establish production reuse.
-Never change production code to accommodate tests, expose internals, add test hooks, or manufacture test seams.
-Adapt tests to production interfaces and behavior.
-Production changes must serve a real product requirement or fix an actual defect.
-
-Prefer condition inversion to reduce mid-function `return`, `continue`, or `break` statements when equivalent behavior stays intact without deeper nesting.
-Treat this preference as guidance only, without a lint rule or autofix.
-Lint rules and formatter output take precedence.
-Preserve evaluation order, side effects, cost, cancellation, cleanup, and security or admission conditions.
-Keep natural final returns and required failure propagation.
+Before source work, read [Preserve Behavior](../principle-preserve-behavior/SKILL.md) unless its complete content is already loaded.
+Before source work, read [Production Interfaces](../principle-production-interfaces/SKILL.md) unless its complete content is already loaded.
 
 ## Spacing
 

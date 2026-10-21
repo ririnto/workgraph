@@ -1,6 +1,6 @@
 ---
 name: main-agent-contract
-description: Use when orchestrating as the Workgraph Main Agent, not as a dispatched node.
+description: Use in the Workgraph main-session mode when orchestrating authorized outcomes, not as a dispatched node.
 ---
 
 # Main Agent Contract

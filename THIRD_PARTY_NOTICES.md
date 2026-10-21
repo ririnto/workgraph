@@ -38,8 +38,10 @@ We also studied the original [cursor/plugins pstack](https://github.com/cursor/p
 Its MIT license credits Lauren Tan, copyright 2026.
 Its feature, bug-fix, refactoring, performance, TDD, verification, and shipping procedures informed Development's lifecycle decisions.
 Workgraph adapts those decisions without bundling pstack source or importing Cursor tools, models, or stack operations.
-We also inspected the installed pstack entry point, conditional playbooks, and principle skills as read-only organization references.
-They informed keeping Main as the entry point with focused conditional procedures rather than copying the framework.
+We also inspected the installed pstack `0.15.29` mode, leaf principle skills, worker, guide, and host adapters as read-only organization references.
+They informed Workgraph's mode entry, focused lifecycle playbooks, conditional principles, user host adapters, and guide-first README structure.
+This restructure uses pstack's organization without copying its text, adopting its policies, or adding a dependency.
+The [research notes](docs/research.md#skill-structure) record the structure evidence and its limits.
 
 ## Giver Architecture
 
@@ -96,6 +98,14 @@ We reviewed the [Fable 5.1](https://www.anthropic.com/claude-fable-and-mythos-5-
 Their benchmark results retain the task, harness, effort, and pricing limits described in the research notes.
 We read the supplied [Haiku 5.5 system card](https://www.anthropic.com/document/claude-haiku-5-5-system-card), including its capability methods and effort curves.
 Its reported FrontierCode comparisons inform Haiku's coding effort choices, with graph estimates distinguished from labeled figures.
+
+## xAI And Meta Prompting Guides
+
+We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) and the official [Meta prompting guide](https://dev.meta.ai/llama/docs/how-to-guides/prompting) in full on October 20, 2026.
+We also fetched the official [Anthropic prompt-engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md) and the [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full for the same decisions.
+Their conflict audits, short focused rules, tool-schema alignment, example guidance, and emphasis limits informed the agent-facing instruction contracts.
+Workgraph adapts these lessons without redistributing their text or adopting their voice, audio, API, or format-specific guidance.
+The [research notes](docs/research.md#official-prompt-engineering-guides) record the reviewed sources, fetch conditions, and scope limits.
 
 ## Model Benchmarks And Workload Reports
 
