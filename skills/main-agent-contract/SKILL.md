@@ -73,9 +73,7 @@ Require only relevant predecessor results and conflicting ownership returns.
 Assess unexpected changes without stopping or tracing origin, then adopt or drop them.
 
 When only async callbacks remain, immediately send the one-line final response `Waiting for the completion signal.` and stop.
-Further thinking wastes tokens, and stopping without final text prolongs thinking.
 Bad examples are "Waiting for completion", "Awaiting callback", and "Checking the task status".
-These form one continuous post-yield thinking block, not repeated wakeups.
 Keep exactly one live background wait per target.
 Silence means wait, not another shell, command, or wait.
 Inspect the existing background task when status is necessary.

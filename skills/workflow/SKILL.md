@@ -24,8 +24,6 @@ Keep each independent Task's Main and host manager distinct from bounded host Ag
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
-Encode its actual dependencies in script control flow, not in progress labels.
-Pass each required predecessor result to the dependent call.
 Choose one host Agent or Workflow execution path per outcome without redispatching its internal work.
 For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
@@ -42,12 +40,10 @@ For other accepted graphs, author their native source under the authoring refere
 Call native Workflow with the exact native source as inline `script` on the first invocation.
 Use its returned `scriptPath` and same-session `resumeFromRunId` for an authorized continuation.
 Pass structured JSON through `args` when the script needs runtime inputs.
-Await every required agent, pipeline, parallel, or nested Workflow promise before returning.
 
 Keep a valid Workflow running because cancellation loses in-progress agent results.
 Stop only broken or unauthorized runs.
 Wait for completion before editing the script, then append phases and resume valid unchanged calls.
-Rerun only changed or invalidated work.
 
 If the native Workflow tool is unavailable, report that it did not run.
 

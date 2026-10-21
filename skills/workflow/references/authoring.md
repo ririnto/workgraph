@@ -1,10 +1,5 @@
 # Workflow Script Authoring
 
-Use this reference when authoring, extending, or resuming a native Workflow script.
-
-The native Workflow tool description defines its current API and takes precedence over examples here.
-This reference adds Workgraph's graph mapping, result acceptance, and recovery rules.
-
 ## Map The Main Graph
 
 Use Main's accepted node contracts and dependencies as script inputs.
@@ -43,8 +38,7 @@ Do not use a barrier merely to transform results between item-local stages.
 
 ## Author The Script
 
-Pass the first script inline through Workflow's `script` input.
-Begin it with `export const meta = {...}` using a pure literal.
+Begin the script with `export const meta = {...}` using a pure literal.
 The required metadata fields are `name` and `description`.
 Add `phases` when progress groups help, and match each title to a `phase()` call.
 The tool returns a `scriptPath` and `runId` for later inspection or continuation.
@@ -134,31 +128,19 @@ A completion notification or successful top-level return alone proves neither ex
 Choose an observable progress measure before the first fix, such as remaining diagnostic identities or failing checks.
 Compare each completed fix-and-check round against its predecessor using the same acceptance criteria.
 Reset the consecutive no-progress count when verified results improve.
-After two consecutive rounds without improvement, return unresolved failures, evidence, and remaining authorized avenues to Main.
-Reconsider the approach instead of repeating the same ineffective loop.
+Return unresolved failures, evidence, and remaining authorized avenues to Main when its retry policy requires reassessment.
 Keep this count separate from schema retries, stalled-agent restarts, inference sampling, and task-attempt limits.
 Reassessment never waives blockers, required checks, or user approval.
 
 ## Resume Conservatively
 
 Resume only in the same session, using the original `runId` and returned `scriptPath`.
-Inspect the journal and relevant transcripts before explaining unexpected results or deciding what to rerun.
 
 Edit the stored script and pass `scriptPath` with `resumeFromRunId` to continue the same run.
 Preserve earlier prompts, options, labels, and arguments when their accepted inputs remain unchanged.
 Append needed stages without rerunning completed valid work or canceling a valid active run to edit it.
 Preserve accepted evidence only while behavior, inputs, configuration, and toolchain remain relevant.
 A cache hit avoids repeated work but does not prove acceptance.
-
-## Anti-Patterns
-
-- Do not call an agent or pipeline without awaiting its result.
-- Do not treat `null`, an empty failed pipeline, or failure diagnostics as successful empty findings.
-- Do not assume `phase()` or `meta.phases` enforces execution order.
-- Do not return successfully before required verification or synthesis runs.
-- Do not start the same outcome through both Agent and Workflow.
-- Do not trust a schema without checking the returned fields and evidence.
-- Do not resume a Workflow from another session.
 
 ## Use The Bundled Source
 
