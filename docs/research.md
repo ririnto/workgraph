@@ -653,6 +653,10 @@ Raw baseline grades were 8/10, 9/10, and 9/10, while all three candidate respons
 The raw judge marked the root-boundary criterion false in every baseline and Scope preservation false in one baseline.
 Original-task positive and negative controls received 10/10 and 0/10, without counting additional solver successes.
 These raw model judgments describe one bounded authoring-and-plan task, not general adherence or a universal improvement.
+Independent reconciliation confirmed all request records, source inputs, control grades, and eighty criterion decisions against the ledger.
+Content review disputed Scope-preservation passes in every candidate and one baseline because requested sections were abbreviated or omitted.
+Several responses also misstated the configured future presentation order.
+The simple controls do not establish nuanced grading reliability, so the raw grades are not verified perfect-pass or robust-improvement evidence.
 
 Independent static preflight rejected the first evaluator before any model requests ran.
 The repaired control states that each reviewer receives the complete materials, and runtime status distinguishes request execution from calibration.
