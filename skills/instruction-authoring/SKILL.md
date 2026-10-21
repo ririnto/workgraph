@@ -1,6 +1,6 @@
 ---
 name: instruction-authoring
-description: Use when creating, editing, or reviewing SKILL.md, AGENTS.md, role contracts, agent prompts, hook instructions, or supporting instruction references.
+description: Use when creating, editing, or reviewing SKILL.md, repository guidance files, role contracts, agent prompts, hook instructions, or supporting instruction references.
 ---
 
 # Instruction Authoring
@@ -10,7 +10,8 @@ Read Writing unless its complete content is already loaded.
 ## Define The Boundary
 
 Identify the instruction's audience, loading point, required behavior, and acceptance evidence before editing.
-Use `AGENTS.md` for repository conventions and skills for task procedures.
+Keep repository conventions in the auto-injected repository guidance and task procedures in skills.
+Hosts load that guidance automatically, so never name it as a file for agents to read.
 Keep host, model, and tool mechanics in their existing instruction sources.
 
 Remove rules that repeat instructions already present in the same loaded context.

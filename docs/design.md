@@ -7,7 +7,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 
 | Source | Audience | Responsibility |
 | --- | --- | --- |
-| `AGENTS.md` | Contributors | Contributors follow repository conventions, validation, and publication requirements. |
+| Auto-injected repository guidance | Contributors | Contributors follow repository conventions, validation, and publication requirements. |
 | `CONTRIBUTING.md` | Contributors | Contributors follow issue, commit, and pull request formats. |
 | `README.md` | Plugin users | Users find installation, task routing, invocation, errors, development, and release guidance here. |
 | `docs/harness/claude-code.md` | Claude Code users | Users follow this adapter for installation, loading formats, manual invocation, updates, and host evidence limits. |
@@ -44,7 +44,8 @@ Audience tables and adapters link to procedure owners rather than restating thei
 
 ### Composition Rules
 
-[Instruction Ownership](../AGENTS.md#instruction-ownership) defines contributor constraints for these boundaries.
+Auto-injected repository guidance defines contributor constraints for these boundaries.
+Keep that guidance at its conventional location without directing agents to retrieve it.
 Role bodies remain self-contained, while role-specific references supply only the selected host's applicable guidance.
 Each role owns its async submission and callback policy because their automatic contexts load independently.
 Host references retain required native completion mechanics without a second wait policy.
@@ -242,10 +243,11 @@ It checks Claude's inline limit with complete instructions, long plugin paths, a
 Each test removes its disposable plugin copies.
 
 The tests also check skill names, descriptions, and invocation metadata.
+A source guard rejects repository-guidance filenames in bundled instructions and contributor entry points, without judging model behavior.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
 Plugin validation checks configuration rather than model behavior.
-Use the validation commands and prose review requirements in [AGENTS.md](../AGENTS.md#validation).
-[Repository Reviews](../AGENTS.md#repository-reviews) owns Workgraph's contributor review staffing and scope.
+Use the validation commands and prose review requirements from the auto-injected repository guidance.
+That guidance also owns Workgraph's contributor review staffing and scope.
 
 Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.
