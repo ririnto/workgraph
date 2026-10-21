@@ -828,7 +828,7 @@ The [shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skill
 
 Workgraph adapts these decisions into its conditional Development skill.
 Existing Main, Delivery, and Verification contracts retain orchestration, publication authority, evidence freshness, and cleanup.
-We do not import Cursor-specific tools, model choices, mandatory stack operations, force pushes, or reordered shared history.
+We do not import Cursor-specific tools, model choices, mandatory stack operations, or reordered shared history.
 Consumer lifecycle guidance runs in the user's session.
 Workgraph keeps the user's engineering preferences self-contained and remains independent of the Sinon Harness.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.

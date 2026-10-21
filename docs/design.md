@@ -8,6 +8,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | Source | Audience | Responsibility |
 | --- | --- | --- |
 | Auto-injected repository guidance | Contributors | Contributors follow repository conventions, validation, and publication requirements. |
+| `docs/reviews.md` | Workgraph contributors | Contributors follow the scoped Workgraph pull-request review policy. |
 | `CONTRIBUTING.md` | Contributors | Contributors follow issue, commit, and pull request formats. |
 | `README.md` | Plugin users | Users find installation, task routing, invocation, errors, development, and release guidance here. |
 | `docs/harness/claude-code.md` | Claude Code users | Users follow this adapter for installation, loading formats, manual invocation, updates, and host evidence limits. |
@@ -185,7 +186,7 @@ The [Main contract](../skills/main-agent-contract/SKILL.md) owns node selection,
 The [Worker contract](../skills/subagent-context/SKILL.md) owns bounded assignment execution and handbacks.
 The [Delivery skill](../skills/delivery/SKILL.md) owns the required repository sequence, exposure scans, independent review, current-unit deferrals, integration, and owned cleanup.
 The delivery skill's sequence and gates govern authorized repository delivery, and this design does not restate them.
-Maintainers publish the PR/MR before complete-candidate review, while contributors review their complete branch before publication.
+Workgraph contributor reviews follow the scoped policy in [docs/reviews.md](reviews.md).
 
 Claude Code's main session must resolve required scope and authority before launching a Workflow run.
 An agent prompt cannot grant tool permissions or enlarge the user's authorization.
@@ -247,7 +248,7 @@ A source guard rejects repository-guidance filenames in bundled instructions and
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
 Plugin validation checks configuration rather than model behavior.
 Use the validation commands and prose review requirements from the auto-injected repository guidance.
-That guidance also owns Workgraph's contributor review staffing and scope.
+Workgraph's scoped contributor review policy lives in [docs/reviews.md](reviews.md).
 
 Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.

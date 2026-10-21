@@ -28,7 +28,6 @@ Read Memory Maintenance before durable memory edits unless fully loaded.
 ### Scope
 
 Keep session settings, permission changes, and credential handling in main.
-Do not force-push or rewrite shared history.
 Exclude private environment details, work-item identifiers, and review-system URLs from committed or published content.
 Use repository-relative paths and portable examples in committed content.
 

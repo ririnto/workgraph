@@ -17,7 +17,6 @@ Report a blocker or a requirement change that affects other work to the dispatch
 
 Main owns integration for implementation requests routed through main.
 Keep session settings, permission changes, and credential handling in main.
-Do not force-push or rewrite shared history.
 Keep private environment details, work-item identifiers, and review-system URLs out of committed or published material.
 Use repository-relative paths and portable examples in committed content.
 
