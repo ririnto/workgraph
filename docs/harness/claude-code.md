@@ -43,10 +43,6 @@ Its reference fragment uses native Read line numbering.
 Source labels identify complete content already loaded, so agents need no startup retrieval for those files.
 The [delivery design](../design.md#deliver-context) describes whitespace handling, envelope differences, inline limits, and failure behavior.
 
-The [Workgraph Worker agent](../../agents/workgraph-worker.md) routes bounded Claude assignments to the Worker contract and inherits the host model.
-It reuses complete loaded instructions or resolves missing bundled sources through `CLAUDE_PLUGIN_ROOT`.
-Its registration does not change assignment authority.
-
 ## Manual Invocation
 
 Use slash-prefixed, plugin-qualified skill names.

@@ -20,7 +20,6 @@ import { fileURLToPath } from "node:url";
 
 const script = fileURLToPath(new URL("inject-context.mjs", import.meta.url));
 const skills = fileURLToPath(new URL("../skills/", import.meta.url));
-const agents = fileURLToPath(new URL("../agents/", import.meta.url));
 const roles = [
   ["SessionStart", "main-agent-contract"],
   ["SubagentStart", "subagent-context"]
@@ -79,9 +78,6 @@ const copyPlugin = (t) => {
     { recursive: true }
   );
   cpSync(skills, path.join(root, "skills"), { recursive: true });
-  cpSync(new URL("../agents/", import.meta.url), path.join(root, "agents"), {
-    recursive: true
-  });
   return root;
 };
 
@@ -618,14 +614,11 @@ test("root review guidance routes to the scoped contributor policy", () => {
 
 test("agent-facing instructions never name the auto-injected repository guidance file", () => {
   const files = [
-    ...readdirSync(agents).map((name) => path.join(agents, name)),
-    ...[
-      "CONTRIBUTING.md",
-      "README.md",
-      "docs/design.md",
-      "docs/reviews.md"
-    ].map((file) => fileURLToPath(new URL(`../${file}`, import.meta.url)))
-  ];
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/design.md",
+    "docs/reviews.md"
+  ].map((file) => fileURLToPath(new URL(`../${file}`, import.meta.url)));
   for (const name of readdirSync(skills)) {
     const directory = path.join(skills, name);
     files.push(path.join(directory, "SKILL.md"));
@@ -667,32 +660,22 @@ test("shared skills and update routing retain host-neutral wording", () => {
   }
 });
 
-test("bundled worker agent wires role fallbacks to the Subagent sources", (t) => {
+test("hooks load exact role context without bundled agent configuration", (t) => {
   const root = copyPlugin(t);
-  const [prefix, metadata, body] = readFileSync(
-    path.join(root, "agents", "workgraph-worker.md"),
-    "utf-8"
-  ).split(/^---$/mu);
-  assert.equal(prefix, "");
-  assert.match(metadata, /^name: workgraph-worker$/mu);
-  assert.match(metadata, /^description: \S+/mu);
-  assert.match(metadata, /^model: inherit$/mu);
-  assert.doesNotMatch(metadata, /^tools:/mu);
-  assert.match(body, /CLAUDE_PLUGIN_ROOT/u);
-  const sources = [...body.matchAll(/`(?<file>skills\/[^`\s]+)`/gu)].map(
-    (match) => match.groups.file
-  );
-  assert.ok(sources.length >= 2);
-  for (const source of sources) {
-    const target = realpathSync(path.join(root, source));
-    assert.ok(
-      target.startsWith(
-        `${realpathSync(path.join(root, "skills", "subagent-context"))}${
-          path.sep
-        }`
-      )
-    );
-    assert.ok(readFileSync(target, "utf-8").trim());
+  assert.equal(existsSync(path.join(root, "agents")), false);
+  for (const [event] of roles) {
+    for (const host of hosts) {
+      const result = runHook(
+        [event, host],
+        path.join(root, "hooks", "inject-context.mjs")
+      );
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(result.stderr, "");
+      assert.deepEqual(
+        JSON.parse(result.stdout),
+        expectedOutput(event, host, path.join(root, "skills"))
+      );
+    }
   }
 });
 

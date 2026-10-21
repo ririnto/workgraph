@@ -17,7 +17,6 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/main-agent-contract/references/{claude,codex}.md` | Main agents | Each reference supplies execution timing, orchestration, and model guidance for one host. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow bounded assignments, evidence, and handbacks in one self-contained body. |
 | `skills/subagent-context/references/{claude,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
-| `agents/workgraph-worker.md` | Claude Code workers | The native agent routes bounded assignments to the Worker contract and inherits the host model. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
 | `skills/delivery/references/{claude,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |

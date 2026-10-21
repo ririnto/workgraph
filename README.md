@@ -87,12 +87,10 @@ Conditional skills load only when their stated task scope matches and their comp
 | Scoped procedure | [Verification](skills/verification/SKILL.md) | Behavior changes, performance claims, and reproductions load runtime evidence guidance. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads the bundled lifecycle and attachment procedures. |
-| Native worker | [Workgraph Worker](agents/workgraph-worker.md) | Claude Code bounded assignments reuse the loaded Worker contract or resolve missing bundled sources. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
 The principle skills own existing engineering constraints rather than adding lint enforcement.
 Writing owns prose, while Instruction Authoring owns agent-facing prompt contracts and example separation.
-The native worker inherits the host model and does not register a Codex agent.
 Consumer links and required resources stay bundled, without another plugin dependency or required online research.
 
 Manual role loading also loads the active host reference unless its complete content is already present.
