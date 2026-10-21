@@ -181,12 +181,14 @@ Supply the following structured arguments under Main's active host policy.
 
 For the maintained calculation case, use numbers `[17, 23, 31]` and the selected internal model and effort.
 The first worker returns a sum and calculation evidence.
+The source checks that sum against exact integer accumulation before accepting the predecessor.
+It rejects out-of-range totals before dispatch, without losing precision when intermediate totals exceed the safe range.
 The dependent worker receives the original numbers and actual accepted predecessor, then independently checks that sum.
 No worker launches host Agent or Workflow calls.
 
 Accept the returned result only when `complete` is true and both `Sum` and `Check` phase records are completed.
 The keyed `partitions.sum` and `partitions.check` records retain their results and failure reasons.
-A missing or malformed Sum fails that partition and skips the dependent Check without dispatching it.
+A missing, malformed, or incorrect Sum fails that partition and skips the dependent Check without dispatching it.
 A missing, malformed, failed, or rejecting Check leaves the accepted Sum intact and returns `complete: false`.
 Keep these incomplete outcomes instead of treating native completion as acceptance.
 

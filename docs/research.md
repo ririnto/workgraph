@@ -802,6 +802,11 @@ A byte comparison confirmed that the persisted first-run source matched the bund
 Both workers completed, the dependent check consumed the actual predecessor, and the result reported a checked sum of 71.
 The host did not expose a resolved model identity through that result.
 
+Independent finding verification identified a matching-wrong-answer case that peer agreement alone could accept.
+The source now validates the predecessor against an exact BigInt total and rejects out-of-range totals before dispatch.
+Native execution confirmed BigInt reduction for `[9007199254740991, 2, -2]` without intermediate Number rounding.
+The repaired source completed that full two-worker boundary case and rejected an injected matching-wrong-answer result for `[1, 1]`.
+
 Same-session postprocessing probes discarded one returned value in the per-run copy without changing either agent call.
 Discarding Check returned `complete: false` while retaining the completed Sum.
 Discarding Sum failed that partition and skipped dependent Check dispatch.

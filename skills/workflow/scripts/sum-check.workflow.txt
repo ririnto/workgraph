@@ -17,6 +17,14 @@ if (
   throw new Error('Provide nonempty safe integers, a selected model, and supported effort through args')
 }
 
+const total = args.numbers.reduce((sum, number) => sum + BigInt(number), 0n)
+if (
+  total < BigInt(Number.MIN_SAFE_INTEGER) ||
+  total > BigInt(Number.MAX_SAFE_INTEGER)
+) {
+  throw new Error('The exact total must be a safe integer')
+}
+
 phase('Sum')
 const sumAttempt = await agent(
   `Read-only calculation. Add ${JSON.stringify(args.numbers)}. Return the sum and calculation evidence. Do not use tools, delegate, or edit files.`,
@@ -40,6 +48,7 @@ const sumAttempt = await agent(
 )
 const prior =
   Number.isSafeInteger(sumAttempt.result?.sum) &&
+  BigInt(sumAttempt.result.sum) === total &&
   typeof sumAttempt.result?.evidence === 'string' &&
   sumAttempt.result.evidence.trim()
     ? {
@@ -83,7 +92,7 @@ const accepted =
 const partitions = {
   sum: prior === null
     ? {
-        reason: sumAttempt.error ?? 'Sum result is missing or malformed',
+        reason: sumAttempt.error ?? 'Sum result is missing, malformed, or incorrect',
         result: null,
         status: 'failed'
       }
