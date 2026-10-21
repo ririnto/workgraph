@@ -42,8 +42,6 @@ Keep a valid Workflow running because cancellation loses in-progress agent resul
 Stop only broken or unauthorized runs.
 Wait for completion before editing the script, then append phases and resume valid unchanged calls.
 Rerun only changed or invalidated work.
-After asynchronous dispatch, end the turn when only native callbacks remain.
-Inspect each returned result before deciding the next action.
 
 If the native Workflow tool is unavailable, report that it did not run.
 

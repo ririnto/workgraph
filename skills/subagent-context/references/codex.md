@@ -1,7 +1,7 @@
 # Codex Execution Guidance
 
-When only delegated results remain, prefer `wait_agent` with `timeout_ms: 240000`.
-When waiting for a yielded `functions.exec` cell, prefer `yield_time_ms: 240000` in `functions.wait` calls.
+For required native result collection, use blocking `wait_agent` with `timeout_ms: 240000`, not progress polling.
+For required yielded `functions.exec` results, use blocking `functions.wait` with `yield_time_ms: 240000`, not progress polling.
 
 Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read Codex Scoped Cleanup.
 Skip this read when its complete content is already loaded.
