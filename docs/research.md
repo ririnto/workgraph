@@ -622,6 +622,9 @@ All candidates met the sampled retrieval, literal naming, shared-host neutrality
 Candidate scores still missed required-procedure preservation twice and convention placement once.
 Original-task positive and negative controls scored 10/10 and 3/10, without counting additional solver successes.
 These scores describe one synthetic task, not a universal improvement or complete adherence.
+Independent review disputed one baseline procedure-preservation failure because the response retained both steps in records-focused language.
+Raw scores remain judge outputs, not independently validated success counts.
+Host-update decisions passed in every baseline and candidate, so that subtask provides no measured distinction.
 
 An earlier thirteen-request authoring-only comparison had one HTTP 408 solver failure, which remains ungraded.
 Its controls omitted the original draft and could not substantiate procedure-preservation grading.
