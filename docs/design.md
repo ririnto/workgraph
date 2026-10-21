@@ -197,7 +197,7 @@ The dispatched agent should complete the assigned task within its authority inst
 Claude Main prefers Agent for one-phase work and permits a one-phase Workflow when actual follow-up phases are expected.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
-Its [bundled native source](../skills/workflow/scripts/sum-check.workflow.txt) replaces the former prose-only calculation example with reusable inline input.
+Its [bundled native source](../skills/workflow/scripts/sum-check.workflow.txt) supplies reusable inline input.
 The [caller contract](../skills/workflow/references/authoring.md#use-the-bundled-source) separates native source from Node modules and run-specific script copies.
 The resource has no named registration or replacement executor.
 Its delivery reference maps authorized engineering operations to node inputs and outputs without owning a second delivery checklist.

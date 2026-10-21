@@ -26,8 +26,7 @@ Writing routes prompt contracts to Instruction Authoring and keeps human-facing 
 Authors audit actual loading points, replace conflicting consumers, and evaluate decision boundaries instead of testing exact prose.
 The user's approved scope determines Git delivery authority, while host permissions and server protections remain unchanged.
 A guide's sample approval prompt does not require renewed approval for operations already authorized by the user.
-Repository eligibility requires current authenticated metadata and meaningful development within three calendar months, not pushedAt alone.
-That eligibility policy is a user requirement rather than a claim from these prompting guides.
+The [Delivery skill](../skills/delivery/SKILL.md#confirm-repository-eligibility) owns repository eligibility checks.
 
 These adaptations do not add SDK integrations, model configuration, settings changes, scheduling, or installed activation.
 The guides' model-specific observations require evaluation on the selected workload and do not establish Workgraph adherence.
@@ -477,7 +476,7 @@ The host already owns connectors, event delivery, and task execution.
 We retain those boundaries instead of adding a scheduler or copying Dune's framework.
 
 Tan describes banning comments in Dune after agents used them to justify workarounds.
-The user's comment preference permits declaration documentation and preserves required directives, licenses, existing suppressions, and documented safety invariants.
+Workgraph's [comment policy](../skills/development/SKILL.md#documentation-and-comments) permits declaration documentation and preserves required directives, licenses, existing suppressions, and documented safety invariants.
 Workgraph records risky transformations as policy text without adding explanatory logging or automatic rewrites.
 Her talk supplies no controlled Workgraph evaluation, proof of universal comment harm, or automatic-merge acceptance policy.
 Runtime observation does not establish formal correctness, and hook delivery does not establish model adherence.
@@ -535,10 +534,7 @@ Its prompt intervention did not significantly change final outcomes when it chan
 That result does not show that repository-required checks can be skipped.
 Workgraph keeps required checks in the consumer repository's validation process.
 
-The waiting rules address the user's observed repeated waiting behavior.
-Codex Main and Worker prefer `wait_agent` with `timeout_ms: 270000` when only delegated results remain.
-They prefer `functions.wait` with `yield_time_ms: 270000` when waiting for a yielded `functions.exec` cell.
-The user's recommended starting point is `270000` ms, not a required duration or execution limit.
+The [role host references](design.md#separate-the-audiences) own execution timing and waiting recommendations.
 The [wait input schema](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_spec.rs) identifies `yield_time_ms` and a ten-second default.
 The [wait handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_handler.rs) uses that fixed default when the argument is omitted.
 The [configuration schema](https://github.com/openai/codex/blob/main/codex-rs/features/src/feature_configs.rs) exposes no default or minimum for Code Mode `functions.wait` yield timing.
@@ -551,17 +547,17 @@ The [child configuration](https://github.com/openai/codex/blob/main/codex-rs/cor
 That includes the exec yield default, but existing sessions can retain their earlier configuration snapshot.
 Claude Code's [foreground timeout controls](https://code.claude.com/docs/en/env-vars) use `BASH_DEFAULT_TIMEOUT_MS` and `BASH_MAX_TIMEOUT_MS`.
 The installed Claude Code 2.1.288 resolves the same foreground default for Main and subagent Bash calls.
-We recommend a `270000` ms foreground default while retaining the native ten-minute ceiling for explicit requests.
+Claude Code permits explicit foreground timeouts up to ten minutes.
 Foreground timeout normally moves an unfinished command to the background when the host permits background execution.
 The [background execution limit](https://code.claude.com/docs/en/tools-reference#time-limit-for-background-commands) is separate from that transition.
 An explicit background command's timeout can stop the command when its background deadline applies.
-We keep that execution duration separate from the `270000` ms foreground recommendation.
+Foreground timeout, background execution duration, and wait yield duration are separate controls.
 The [Monitor tool](https://code.claude.com/docs/en/tools-reference#monitor-tool) delivers command output or external events while the conversation continues.
 Main and Worker consider Monitor when available, without adding a watch timeout recommendation.
 Its watch deadline is separate from Bash's foreground timeout and Codex's wait yield duration.
 The installed tool uses a feature gate, so availability depends on the active host.
-Claude Code's [scheduled tasks](https://code.claude.com/docs/en/scheduled-tasks) support fixed loops, with `/loop 270s` expressing the `270000` ms recommendation.
-Dynamic loops use `ScheduleWakeup`, so Main recommends `delaySeconds: 270` when the task permits.
+Claude Code's [scheduled tasks](https://code.claude.com/docs/en/scheduled-tasks) support fixed loops through `/loop`.
+Dynamic loops use `ScheduleWakeup`.
 There is no global loop-interval setting, and scheduled prompts can wait until the current turn ends.
 The [goal check-in setting](https://code.claude.com/docs/en/env-vars) accepts `CLAUDE_CODE_GOAL_CHECKIN_MINUTES=4` in the installed runtime.
 That changes the first deferred-goal check-in from thirty minutes to four minutes.
@@ -583,9 +579,7 @@ We found no equivalent blocking agent wait that accepts a four-minute timeout in
 Reading a background command's output file does not wait for an agent or provide a wait timeout.
 Keep these Claude Agent restrictions separate from Codex's native wait policy.
 The injected skills do not repeat restrictions already supplied by native tools.
-Without a native agent wait tool, agents end an idle turn until a completion notification arrives.
-This idle-turn rule also applies to background Bash.
-The papers provide coordination context but do not prove this prompt resolves the observed behavior.
+The papers do not establish the effectiveness of Workgraph's waiting instructions.
 
 ### Harness2 Verification Evidence Evaluation
 
@@ -887,8 +881,6 @@ The [shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skill
 Workgraph adapts these decisions into its conditional Development skill.
 Existing Main, Delivery, and Verification contracts retain orchestration, publication authority, evidence freshness, and cleanup.
 We do not import Cursor-specific tools, model choices, mandatory stack operations, or reordered shared history.
-Consumer lifecycle guidance runs in the user's session.
-Workgraph keeps the user's engineering preferences self-contained and remains independent of the Sinon Harness.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.
 
 ## pnpm And Git Hook Tooling

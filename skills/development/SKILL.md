@@ -28,9 +28,6 @@ Verify each coherent unit before building dependent work on it.
 Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
 Main and Delivery retain review, integration, and cleanup authority.
 
-These procedures guide the user's agent session.
-Workgraph carries the user's engineering preferences independently of other plugins.
-Keep those preferences self-contained here and in the matching bundled language references.
 Apply the target project's rules and existing tools without requiring a Harness installation.
 Guidance alone does not authorize tooling changes or changes across consumer projects.
 
