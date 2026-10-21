@@ -10,6 +10,12 @@ This document records attribution and prior sources.
 Workgraph uses [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) under the MIT license.
 The package credits Théo LUDWIG as its author and copyright holder.
 
+## Google Research Harness2
+
+Google LLC's [Harness2](https://github.com/google-research/harness2/tree/main) repository declares the Apache-2.0 license.
+We used its maintained evaluation tools externally on its named `main` branch.
+Workgraph bundles no Harness2 source or dependency.
+
 ## Superpowers
 
 We studied [obra/superpowers](https://github.com/obra/superpowers) on its `main` branch.
