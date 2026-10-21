@@ -2,20 +2,19 @@
 
 ## Orchestration
 
-Prefer foreground Bash `timeout: 240000`.
-Match background timeouts to required duration.
+Run native-session waits with Bash `run_in_background: true`, never foreground timeout renewals.
+Use `timeout: 270000` unless another duration is needed.
 Consider available `Monitor` for actionable output or events.
-For requested fixed loops, prefer `/loop 4m` unless another interval is needed.
-For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when the task permits.
-Prefer Agent for one phase.
-Read Workflow before using it.
+For requested fixed loops, prefer `/loop 270s` unless another interval is needed.
+For requested dynamic loops, prefer `delaySeconds: 270` in `ScheduleWakeup` when the task permits.
+Read Workflow for phase selection and execution.
 
 ## Model Selection
 
 Absent user or configuration overrides, use `opus` for Main, `haiku` for read-only scans, and `sonnet` for edits.
 Give each editor an isolated worktree and return its diff to Main for review and delivery.
 Prefer authorized, available ultracode for substantive orchestration without automatically changing session settings.
-Aliases target Opus, Haiku, and Sonnet 5.5, subject to host routing and overrides.
+Aliases target Opus, Haiku, and Sonnet 5.5 under host routing and overrides.
 Report unavailable or substituted settings using host evidence.
 Use `fable` only when explicitly requested.
 Start with one independent reviewer, adding specialists for costly or uncovered failures.
