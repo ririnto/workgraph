@@ -2,15 +2,13 @@
 
 ## Orchestration
 
-Prefer `timeout: 240000` for foreground Bash.
+Prefer foreground Bash `timeout: 240000`.
 Match background timeouts to required duration.
-Consider available `Monitor` for actionable output or external events.
+Consider available `Monitor` for actionable output or events.
 For requested fixed loops, prefer `/loop 4m` unless another interval is needed.
 For requested dynamic loops, prefer `delaySeconds: 240` in `ScheduleWakeup` when the task permits.
 Prefer Agent for one phase.
 Read Workflow before using it.
-Yield when only callbacks remain, then inspect results.
-End the turn promptly after dispatching, without wasting thinking blocks.
 
 ## Model Selection
 

@@ -10,7 +10,7 @@ description: Use in the Workgraph main-session mode when orchestrating authorize
 Use only in main.
 Invocation changes neither role nor authority.
 Own authorized outcomes through planning, design, publication, checks, independent review, integration, readback, cleanup, and reporting.
-Proceed by default with user-requested actions, tool use, and Git publication via gh or glab.
+Proceed by default with user-requested actions, tool use, and Git publication.
 Honor explicit diff-first gates and await user approval before gated edits.
 Preserve unmet acceptance in nonblocking follow-ups.
 Keep the plan in the user's chosen location or current context.
@@ -49,16 +49,14 @@ Read Writing for prose and Instruction Authoring for instructions unless fully l
 
 ### Host
 
-Identify the host from its hook marker, loaded references, then native tool descriptions.
-Model names do not identify the host.
-Use `references/codex.md` in Codex or `references/claude.md` in Claude Code.
-Before dispatch, read the selected reference unless fully loaded.
+Identify the active host from metadata, references, or tool descriptions, never model names.
+Read the matching bundled `references/` file before dispatch unless fully loaded.
 
 ### Models
 
 Honor user and configuration settings over host defaults.
 Start native Tasks without model or effort overrides and preserve existing sessions.
-Allow Codex Task Mains without Claude-only dependencies.
+Preserve each native Task host's own dependencies.
 Set supported unpinned model and effort for internal agents.
 Report incompatible settings instead of silently dropping them.
 Record requests and report resolved settings only when host-exposed.
@@ -75,7 +73,12 @@ Run independent ready outcomes concurrently, isolating logical overlap in separa
 Require only relevant predecessor results and conflicting-resource ownership returns.
 Never stop for an unexpected change or trace its origin.
 Assess its suitability, then adopt or drop it.
-Yield for native callbacks without polling, progress requests, duplicate dispatch, or completion claims.
+
+For async agents/subagents, workflows, tools, MCP, equivalents, and subagent-initiated calls, end the turn when only completion callbacks remain.
+Consume each response without thinking about waiting.
+Do actionable work only, then yield again when only callbacks remain.
+Never speculate, poll or request progress, narrate redundantly, redispatch, or claim completion while waiting.
+
 Reuse passing evidence while relevant behavior, inputs, configuration, and toolchain remain unchanged.
 Compare named references and relevant changes without hash pins.
 Unrelated edits, commit identity, parents, and branch names alone do not invalidate evidence.

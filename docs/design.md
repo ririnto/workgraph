@@ -18,6 +18,8 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/subagent-context/references/{claude,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
 | `agents/workgraph-worker.md` | Claude Code workers | The native agent routes bounded assignments to the Worker contract and inherits the host model. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
+| `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
+| `skills/delivery/references/{claude,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
 | `skills/workflow/references/authoring.md` | Workflow authors | Authors follow script construction, mapping, and recovery procedures. |
 | `skills/workflow/references/delivery.md` | Workflow delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
@@ -44,6 +46,10 @@ Audience tables and adapters link to procedure owners rather than restating thei
 
 [Instruction Ownership](../AGENTS.md#instruction-ownership) defines contributor constraints for these boundaries.
 Role bodies remain self-contained, while role-specific references supply only the selected host's applicable guidance.
+Each role owns its async submission and callback policy because their automatic contexts load independently.
+Host references retain required native completion mechanics without a second wait policy.
+Common role bodies select the active host reference without naming another host or its CLI.
+Delivery routes plugin updates through project-declared host references instead of assuming both CLIs are installed.
 
 Main Agent mode remains the stable public entry at `skills/main-agent-contract/SKILL.md` under `/workgraph:main-agent-contract`.
 Its activation description identifies the mode without adding another public entry.
@@ -239,6 +245,7 @@ The tests also check skill names, descriptions, and invocation metadata.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
 Plugin validation checks configuration rather than model behavior.
 Use the validation commands and prose review requirements in [AGENTS.md](../AGENTS.md#validation).
+[Repository Reviews](../AGENTS.md#repository-reviews) owns Workgraph's contributor review staffing and scope.
 
 Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover independent Agent selection, Workflow invocation and selection, and both conditional follow-up outcomes.

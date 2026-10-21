@@ -6,8 +6,8 @@ Use available native delegation tools for independent and dependent assignments.
 Inspect unreadable native-assignment failures and try a supported form that preserves the required task scope.
 Use a plain read-only CLI context when it is an authorized, equivalent fallback.
 Let Main review the full posted diff when independent review remains blocked and an authorized fallback permits it.
-When only delegated results remain, prefer `wait_agent` with `timeout_ms: 240000`.
-When waiting for a yielded `functions.exec` cell, prefer `yield_time_ms: 240000` in `functions.wait` calls.
+For required native result collection, use blocking `wait_agent` with `timeout_ms: 240000`, not progress polling.
+For required yielded `functions.exec` results, use blocking `functions.wait` with `yield_time_ms: 240000`, not progress polling.
 Codex does not provide Claude Code's native Workflow tool.
 
 ## Resource Cleanup
