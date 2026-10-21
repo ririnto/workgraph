@@ -639,6 +639,36 @@ All requests used the maintained local gateway without changing provider configu
 The run establishes neither native activation, permission enforcement, broad model adherence, nor stock benchmark or recursive-sweep coverage.
 The maintained native evidence-assessment case remains unrun because the worktree isolation guard refused its evaluator invocation.
 
+### Scoped Contributor Review Reinforcement
+
+We compared shared review routing and role Scope text before and after the scoped contributor-policy move and requested deletions.
+The fixed synthetic task combined source transformations, requirement preservation, and a plan for a complete posted candidate.
+Ten criteria covered the neutral root pointer, complete scoped policy, exact deletions, review execution planning, preservation, and honest evidence.
+The third trial reversed the independent source-block order for both variants.
+Both variants received the original draft and explicit transformation requirements, so this was not a blind causal comparison.
+
+Fourteen requests completed with HTTP 200 and stopped responses: six GPT-6 Luna solver calls and eight GPT-6.1 Sol judge calls.
+Requested and returned model identifiers matched, with no failed requests, truncated responses, or ungraded rows.
+Raw baseline grades were 8/10, 9/10, and 9/10, while all three candidate responses received 10/10.
+The raw judge marked the root-boundary criterion false in every baseline and Scope preservation false in one baseline.
+Original-task positive and negative controls received 10/10 and 0/10, without counting additional solver successes.
+These raw model judgments describe one bounded authoring-and-plan task, not general adherence or a universal improvement.
+Independent reconciliation confirmed all request records, source inputs, control grades, and eighty criterion decisions against the ledger.
+Content review disputed Scope-preservation passes in every candidate and one baseline because requested sections were abbreviated or omitted.
+Several responses also misstated the configured future presentation order.
+The simple controls do not establish nuanced grading reliability, so the raw grades are not verified perfect-pass or robust-improvement evidence.
+
+Independent static preflight rejected the first evaluator before any model requests ran.
+The repaired control states that each reviewer receives the complete materials, and runtime status distinguishes request execution from calibration.
+Response bounds, error-sensitive process status, and working-directory environment checks also passed independent static re-verification.
+That rejected preflight is not a failed model request or part of the fourteen-request comparison.
+
+The run used maintained Harness2 judge and write functions through the external custom adapter and existing local gateway.
+The task-owned Linux container used a non-root user, read-only root and source mounts, writable output, and an empty temporary working directory.
+Dropped capabilities, resource limits, and a 1,200-second timeout bounded execution without mounting credentials, home, sockets, or the repository checkout.
+Network egress was not enforced, and model output was never executed.
+The result establishes neither native activation, permission enforcement, stock benchmark coverage, nor general model adherence.
+
 ## Language Tooling And Rule Mappings
 
 Preserve a project's working lint and formatter choices before applying defaults to an unconfigured project.
@@ -828,7 +858,7 @@ The [shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skill
 
 Workgraph adapts these decisions into its conditional Development skill.
 Existing Main, Delivery, and Verification contracts retain orchestration, publication authority, evidence freshness, and cleanup.
-We do not import Cursor-specific tools, model choices, mandatory stack operations, force pushes, or reordered shared history.
+We do not import Cursor-specific tools, model choices, mandatory stack operations, or reordered shared history.
 Consumer lifecycle guidance runs in the user's session.
 Workgraph keeps the user's engineering preferences self-contained and remains independent of the Sinon Harness.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.

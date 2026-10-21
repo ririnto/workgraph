@@ -589,12 +589,29 @@ test("bundled skills retain invocation metadata and supporting reference files",
   }
 });
 
+test("root review guidance routes to the scoped contributor policy", () => {
+  const rootInstructions = readFileSync(
+    new URL("../AGENTS.md", import.meta.url),
+    "utf-8"
+  );
+  const reviewSection = rootInstructions
+    .split("## Repository Reviews\n")[1]
+    ?.split("\n## ")[0]
+    ?.trim();
+  assert.ok(reviewSection);
+  assert.match(reviewSection, /\]\(docs\/reviews\.md\)/u);
+  assert.doesNotMatch(reviewSection, /\b(?:Claude|Codex|pstack)\b/iu);
+});
+
 test("agent-facing instructions never name the auto-injected repository guidance file", () => {
   const files = [
     ...readdirSync(agents).map((name) => path.join(agents, name)),
-    ...["CONTRIBUTING.md", "README.md", "docs/design.md"].map((file) =>
-      fileURLToPath(new URL(`../${file}`, import.meta.url))
-    )
+    ...[
+      "CONTRIBUTING.md",
+      "README.md",
+      "docs/design.md",
+      "docs/reviews.md"
+    ].map((file) => fileURLToPath(new URL(`../${file}`, import.meta.url)))
   ];
   for (const name of readdirSync(skills)) {
     const directory = path.join(skills, name);
