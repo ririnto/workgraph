@@ -58,10 +58,15 @@ Missing optional setup alone does not block the assignment.
 Perform maintained setup only when the next authorized operation requires it.
 Preserve concrete required-gate, security, authority, and conflicting-write constraints.
 
-For async agents/subagents, workflows, tools, MCP, equivalents, and subagent-initiated calls, end the turn when only completion callbacks remain.
-Consume each response without thinking about waiting.
-Do actionable work only, then yield again when only callbacks remain.
-Never speculate, poll or request progress, narrate redundantly, redispatch, or claim completion while waiting.
+When only async callbacks remain, immediately send the one-line final response `Waiting for the completion signal.` and stop.
+Further thinking wastes tokens, and stopping without final text prolongs thinking.
+Bad examples are "Waiting for completion", "Awaiting callback", and "Checking the task status".
+These form one continuous post-yield thinking block, not repeated wakeups.
+Keep exactly one live background wait per target.
+Silence means wait, not another shell, command, or wait.
+Inspect the existing background task when status is necessary.
+Resume waiting work only on actionable completion signals.
+Never speculate, poll or request progress, redispatch, or claim completion while waiting.
 
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
 Compare named references and task-relevant changes without pinning file or branch hashes.
