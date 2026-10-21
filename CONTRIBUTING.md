@@ -1,18 +1,13 @@
 # Contributing
 
 Read [AGENTS.md](AGENTS.md) before changing this repository.
+Follow its [Writing](AGENTS.md#writing) rules for maintained documents, including sentence-per-line Markdown prose.
 Use [README.md](README.md#development) for development setup and the existing validation commands.
 
 ## Documents
 
-Write one complete sentence per source line and separate paragraphs with a blank line.
-Apply these conventions to maintained Markdown, contributor instructions, `AGENTS.md`, and `SKILL.md` files.
-Keep conditions and exceptions with their actions.
-Preserve technical meaning, permissions, code, metadata, exact quotations, licenses, and required table syntax.
-Exclude generated and vendored material from mechanical prose edits.
-
-Use `.yaml` for maintained YAML files unless their consumer requires another exact filename.
-Check references and the consuming tool when renaming a file.
+Check references and the consuming tool when renaming or moving a maintained file.
+Update every owned consumer of a renamed file in the same change.
 
 ## Issues
 

@@ -22,7 +22,7 @@ The OpenAI guide warns that conflicting loaded instructions can stop authorized 
 Anthropic recommends separating instructions from source material and using ordinary, direct language rather than aggressive tool triggers.
 
 Instruction Authoring applies those lessons to agent-facing contracts and instruction-management skills.
-Writing keeps that prompt contract separate from its human-facing presentation guidance.
+Writing routes prompt contracts to Instruction Authoring and keeps human-facing presentation guidance separate.
 Authors audit actual loading points, replace conflicting consumers, and evaluate decision boundaries instead of testing exact prose.
 The user's approved scope determines Git delivery authority, while host permissions and server protections remain unchanged.
 A guide's sample approval prompt does not require renewed approval for operations already authorized by the user.
@@ -32,6 +32,40 @@ That eligibility policy is a user requirement rather than a claim from these pro
 These adaptations do not add SDK integrations, model configuration, settings changes, scheduling, or installed activation.
 The guides' model-specific observations require evaluation on the selected workload and do not establish Workgraph adherence.
 Source validation, native behavior evidence, and installed activation remain separate claims.
+
+### Official Prompt-Engineering Guides
+
+We fetched the official [Anthropic prompt-engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md) in full on October 20, 2026.
+It is a hub page that links the separately cited best-practices guide, rather than replacing that guide.
+It recommends defining success criteria, running empirical tests, and drafting instructions before refining them, and notes that prompts do not fix every failure.
+
+We fetched the official [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full on October 20, 2026, last modified the same day.
+It recommends explicit user priority over skill text, auditing loaded `AGENTS.md` and skill files for conflicts, concise explicit output expectations, and checks proportional to the change.
+It permits initiative only within the authorized scope and treats its model-specific observations as hypotheses for the selected model and workload.
+
+We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) in full, with a footer date of August 17, 2026.
+The `.md` URL returned 404 with `Accept: text/markdown`, while a direct fetch with the default `Accept` header returned the complete document.
+The [extensionless page](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide) was also read.
+Its reusable lessons are auditing instructions for conflicts and ambiguity, short focused rules, alignment with real tool schemas, examples where needed, and avoiding accumulated emphasis.
+
+We fetched the official [Meta prompting guide](https://dev.meta.ai/llama/docs/how-to-guides/prompting) in full.
+That guide has no Markdown-equivalent URL.
+It recommends a clear task, relevant context, roles, restrictions, and an explicit output specification, useful few-shot examples, and iterative testing with source evidence.
+
+| Source lesson | Workgraph mapping |
+| --- | --- |
+| State the task, context, constraints, output, and completion criteria explicitly. | Instruction Authoring already requires these elements in agent-facing task contracts. |
+| Audit loaded instruction sources for conflicts and ambiguity. | Instruction Authoring already audits loading points and replaces conflicting consumers. |
+| Use concise and explicit output expectations. | Instruction Authoring owns agent-facing contracts, while Writing owns presentation. |
+| Scale checks to the change and keep initiative within scope. | Development, Verification, and the role contracts route checks and authority. |
+| Keep rules short and aligned with real tool schemas. | Role bodies and host references match native loading formats and tool contracts. |
+| Use examples where they clarify a decision boundary. | Instruction Authoring owns contrasting examples for decision boundaries. |
+| Avoid accumulating emphasis and repeated directives. | Writing's final pass already removes repetition while preserving requirements. |
+
+Workgraph does not adopt the guides' voice-only output, confirm-before-mutation examples, fixed heading or second-person format rules, audio and API parameters, model defaults, or realtime preambles.
+It does not request private chain-of-thought, build majority-vote or program-execution infrastructure, or claim universal effectiveness for these instruction choices.
+Meta's HTML extraction flattens code-block and table styling, so its read does not establish rendered inspection.
+The guides document different models and products, so their lessons remain unverified for Workgraph model adherence without a behavioral evaluation.
 
 ### OpenAI Guidance
 
@@ -264,6 +298,13 @@ Its delivery reference maps node inputs and outputs for authorized engineering d
 Main and Worker inspect failures and partial effects before reasonable authorized retries or alternative supported forms.
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
+
+We inspected the installed pstack `0.15.29` mode, leaf principle skills, worker agent, guide entry, and host adapters as a read-only organizational reference.
+Its mode remains the single stable entry with focused leaf procedures, and its user adapters separate host setup from role policy.
+Workgraph modeled only that composition on it, keeping the stable Main mode entry, development playbooks, two principle leaves, user host adapters, and a guide-first README.
+The reference supplied no text, policy, dependency, or runtime tooling, and Workgraph retains its own contracts and evidence rules.
+The official skills and prompting documents above informed the adapter and contract separation, while pstack informed only organization.
+These structural choices remain unverified for model adherence until a behavioral evaluation covers them.
 
 ### Host Instruction Comparison
 
