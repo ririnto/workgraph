@@ -536,9 +536,9 @@ That result does not show that repository-required checks can be skipped.
 Workgraph keeps required checks in the consumer repository's validation process.
 
 The waiting rules address the user's observed repeated waiting behavior.
-Codex Main and Worker prefer `wait_agent` with `timeout_ms: 240000` when only delegated results remain.
-They prefer `functions.wait` with `yield_time_ms: 240000` when waiting for a yielded `functions.exec` cell.
-Four minutes is the user's recommended starting point, not a required duration or execution limit.
+Codex Main and Worker prefer `wait_agent` with `timeout_ms: 270000` when only delegated results remain.
+They prefer `functions.wait` with `yield_time_ms: 270000` when waiting for a yielded `functions.exec` cell.
+The user's recommended starting point is `270000` ms, not a required duration or execution limit.
 The [wait input schema](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_spec.rs) identifies `yield_time_ms` and a ten-second default.
 The [wait handler](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/code_mode/wait_handler.rs) uses that fixed default when the argument is omitted.
 The [configuration schema](https://github.com/openai/codex/blob/main/codex-rs/features/src/feature_configs.rs) exposes no default or minimum for Code Mode `functions.wait` yield timing.
@@ -551,17 +551,17 @@ The [child configuration](https://github.com/openai/codex/blob/main/codex-rs/cor
 That includes the exec yield default, but existing sessions can retain their earlier configuration snapshot.
 Claude Code's [foreground timeout controls](https://code.claude.com/docs/en/env-vars) use `BASH_DEFAULT_TIMEOUT_MS` and `BASH_MAX_TIMEOUT_MS`.
 The installed Claude Code 2.1.288 resolves the same foreground default for Main and subagent Bash calls.
-We set the foreground default to four minutes while retaining the native ten-minute ceiling for explicit requests.
+We recommend a `270000` ms foreground default while retaining the native ten-minute ceiling for explicit requests.
 Foreground timeout normally moves an unfinished command to the background when the host permits background execution.
 The [background execution limit](https://code.claude.com/docs/en/tools-reference#time-limit-for-background-commands) is separate from that transition.
 An explicit background command's timeout can stop the command when its background deadline applies.
-We keep that execution duration separate from the four-minute foreground default.
+We keep that execution duration separate from the `270000` ms foreground recommendation.
 The [Monitor tool](https://code.claude.com/docs/en/tools-reference#monitor-tool) delivers command output or external events while the conversation continues.
 Main and Worker consider Monitor when available, without adding a watch timeout recommendation.
 Its watch deadline is separate from Bash's foreground timeout and Codex's wait yield duration.
 The installed tool uses a feature gate, so availability depends on the active host.
-Claude Code's [scheduled tasks](https://code.claude.com/docs/en/scheduled-tasks) support a fixed `/loop 4m` cadence.
-Dynamic loops use `ScheduleWakeup` with a chosen delay, so Main recommends `delaySeconds: 240` when the task permits.
+Claude Code's [scheduled tasks](https://code.claude.com/docs/en/scheduled-tasks) support fixed loops, with `/loop 270s` expressing the `270000` ms recommendation.
+Dynamic loops use `ScheduleWakeup`, so Main recommends `delaySeconds: 270` when the task permits.
 There is no global loop-interval setting, and scheduled prompts can wait until the current turn ends.
 The [goal check-in setting](https://code.claude.com/docs/en/env-vars) accepts `CLAUDE_CODE_GOAL_CHECKIN_MINUTES=4` in the installed runtime.
 That changes the first deferred-goal check-in from thirty minutes to four minutes.
@@ -569,7 +569,7 @@ Later [goal check-ins](https://code.claude.com/docs/en/goal#background-work-defe
 This setting does not create a cron task or restart an exited process.
 The [cache lifetime](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#faq) normally lasts five minutes and refreshes when a request uses the cached content.
 Claude Code's [cache defaults](https://code.claude.com/docs/en/prompt-caching) vary by provider and request type.
-Four-minute scheduling does not prove a cache hit because queueing, model changes, or prefix changes can prevent reuse.
+A `270000` ms interval does not prove cache reuse because queueing, model changes, or prefix changes can prevent it.
 The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
 The official [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21277) records its removal in version 2.1.277.
 The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
