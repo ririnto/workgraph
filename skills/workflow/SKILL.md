@@ -15,15 +15,18 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 
 ## Prepare The Run
 
-Prefer direct Agent for work that ends in one phase.
+Honor explicit supported tool choices within the host's authority before applying default routing.
+Use direct Agent for work that ends in one phase without an expected dependent follow-up.
 Start a one-phase Workflow when the accepted task expects actual follow-up phases.
 Exclude speculative future tasks and display-only phases.
-Honor explicit Workflow requests within the host's supported authority.
+Use Workflow for one outcome's dependent stages or required joins, not to replace independent native Task controllers.
+Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
+Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 Encode its actual dependencies in script control flow, not in progress labels.
 Pass each required predecessor result to the dependent call.
-Use one execution path per outcome instead of duplicating work in host Agent and Workflow.
+Choose one host Agent or Workflow execution path per outcome without redispatching its internal work.
 For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
@@ -33,7 +36,10 @@ Resume authorized edit work only after that approval, without adding gates to wo
 
 ## Run Workflow
 
-Call native Workflow with an inline JavaScript script on the first invocation.
+For numeric sum-and-check goals, read [the bundled native source](scripts/sum-check.workflow.txt) relative to this skill's base directory.
+Follow its [argument and result contract](references/authoring.md#use-the-bundled-source) rather than recreating that graph.
+For other accepted graphs, author their native source under the authoring reference.
+Call native Workflow with the exact native source as inline `script` on the first invocation.
 Use its returned `scriptPath` and same-session `resumeFromRunId` for an authorized continuation.
 Pass structured JSON through `args` when the script needs runtime inputs.
 Await every required agent, pipeline, parallel, or nested Workflow promise before returning.

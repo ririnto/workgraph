@@ -1,6 +1,6 @@
 schema_version: "1.1"
-name: workflow-fan-out
-description: Verify that Main selects Workflow for independent fan-out without dependent stages.
+name: agent-fan-out
+description: Verify direct Agent fan-out for independent assessments that end in one phase.
 execution:
   runs: 1
   max_turns: 20
@@ -10,11 +10,12 @@ execution:
     - Workflow
     - Skill(workgraph:main-agent-contract)
     - Skill(workgraph:workflow)
-    - Skill(workflow-authoring)
   prompt: |-
     Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
     Please orchestrate a read-only assessment with subagents.
-    Give one worker batch A and another worker batch B, and combine their independent results in Main.
+    Give one worker batch A and another worker batch B through parallel host Agent calls.
+    Combine their independent results in Main.
+    Both assessments end in one phase without any expected dependent follow-up.
     No worker needs another worker's result.
     A finding blocks release if its required timeout is absent.
     Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
@@ -23,23 +24,26 @@ execution:
     Report the blocker IDs and explain the rule.
     Do not edit files, run Git commands, or publish anything.
 graders:
-  - name: workflow-invoked
+  - name: agents-invoked
+    type: tool_used
+    tool: Agent
+    min: 2
+    max: 2
+  - name: workflow-not-invoked
     type: tool_used
     tool: Workflow
-    min: 1
+    min: 0
+    max: 0
   - name: fan-out-completed
     type: llm
     focus: trace
     criteria: |-
-      Require Main's contract and selected Claude reference to be loaded before orchestration.
-      Require completed native Workflow results from both independent workers before the final report.
+      Require Main's contract and selected Claude reference before delegation.
+      Require two concurrent host Agent calls for the two independent batches.
+      Each assessment ends in one phase without an expected dependent follow-up.
+      Main uses direct Agent rather than Workflow and does not duplicate the work through another execution path.
       The workers assess separate batches without consuming each other's results.
-      Main combines their actual results and reports A1 and B2 as the only blockers.
+      Main combines their actual completed results and reports A1 and B2 as the only blockers.
       It applies the missing required timeout rule and claims no edits or publication.
       A proposed run, missing worker result, permission denial, or report before completion fails this check.
       Judge observed tool results and evidence rather than fixed wording.
-  - name: standalone-agent-not-invoked
-    type: tool_used
-    tool: Agent
-    min: 0
-    max: 0

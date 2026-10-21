@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: workflow-selection
-description: Verify that Main selects native Workflow for a dependent multi-agent task without a tool-specific request.
+description: Verify an initial one-phase Workflow with expected reconciliation and cache-preserving continuation.
 execution:
   runs: 1
   max_turns: 25
