@@ -747,7 +747,7 @@ They do not establish compatibility for a particular repository or replace indep
 
 We read the complete original [mirku post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
 We also read the complete official [Workflow documentation](https://code.claude.com/docs/en/workflows.md).
-The post combines a Claude model split, isolated edits, independent verification, bounded fixes, JEV routing, and an explicit approval gate.
+The post combines a Claude model split, isolated edits, independent verification, bounded fixes, deterministic decision routing, and an explicit approval gate.
 The official documentation supports native scripts, cross-checking, isolated migration edits, and two consecutive no-progress fix rounds.
 It describes host permissions and separate runs for operator sign-off between stages.
 
@@ -757,7 +757,7 @@ It describes host permissions and separate runs for operator sign-off between st
 | Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Claude defaults select those roles and Workflow passes selected settings into stages with separate edit worktrees. |
 | Independent verification before every reported finding. | Main requires a separate verifier before confirmed reporting and Workflow preserves per-candidate verification outcomes. |
 | Two rounds without fix progress. | Fix loops compare results, reset after improvement, and return evidence after two unchanged rounds for Main's next authorized approach. |
-| Deterministic JEV routing. | Native script control flow handles deterministic choices without requiring, installing, or replacing JEV. |
+| Deterministic decision routing. | Native script control flow handles deterministic choices without requiring another execution engine. |
 | Diff-first approval before edits. | Explicit consumer gates end proposal work before edits and require approval for the gated scope. |
 
 The post ends its quoted setup-rebuild request with this operator gate.

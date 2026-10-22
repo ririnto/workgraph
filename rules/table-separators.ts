@@ -1,5 +1,10 @@
 import type { MicromarkToken, Rule } from "markdownlint";
 
+/**
+ * Workgraph adapts the Sinon Harness control flow while preserving its diagnostic contract.
+ * The upstream Apache-2.0 license is retained in LICENSES/sinon-harness.txt.
+ */
+
 const separatorFiller = "---";
 
 /**
