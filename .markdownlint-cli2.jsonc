@@ -43,5 +43,6 @@
     "markdownlint-rule-relative-links"
   ],
   "gitignore": true,
-  "globs": ["**/*.md"]
+  "globs": ["**/*.md"],
+  "ignores": ["**/.claude/worktrees/**", "**/.worktrees/**"]
 }
