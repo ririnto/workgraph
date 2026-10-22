@@ -1,13 +1,13 @@
 catalog:
-  "@oxc-project/types": ^0.154.0
+  "@oxc-project/types": ^0.155.0
   husky: ^9.1.7
-  markdownlint: ^0.41.1
-  markdownlint-cli2: ^0.23.3
+  markdownlint: ^0.42.0
+  markdownlint-cli2: ^0.24.0
   markdownlint-rule-search-replace: ^1.2.0
-  markdownlint-rule-relative-links: ^5.1.2
+  markdownlint-rule-relative-links: ^5.1.4
   npm-run-all2: ^9.0.3
-  oxfmt: ^0.71.0
-  oxlint: ^1.88.0
+  oxfmt: ^0.74.0
+  oxlint: ^1.89.0
   typescript: ^7.0.2
   ultracite: ^8.0.1
 
