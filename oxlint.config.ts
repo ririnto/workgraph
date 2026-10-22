@@ -2,16 +2,14 @@ import { defineConfig } from "oxlint";
 import core from "ultracite/oxlint/core";
 
 /**
- * Extend the official preset with mandatory Sinon source-style checks.
+ * Extend the official preset with mandatory TSDoc checks.
  */
 export default defineConfig({
   env: core.env,
   extends: [core],
   ignorePatterns: core.ignorePatterns,
-  jsPlugins: ["./plugins/style-plugin.ts", "./plugins/tsdoc-plugin.ts"],
+  jsPlugins: ["./plugins/tsdoc-plugin.ts"],
   rules: {
-    "style/no-blank-lines-in-functions": "deny",
-    "style/no-inline-comments-in-functions": "deny",
     "tsdoc/require-export-tsdoc": "deny"
   }
 });

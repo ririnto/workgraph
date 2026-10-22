@@ -16,11 +16,17 @@ test("Ultracite preserves mandatory rules, ignores, and formatter convergence", 
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tooling-"));
   try {
     await Promise.all(
-      ["package.json", "oxlint.config.ts", "oxfmt.config.ts", "plugins"].map(
-        (entry) =>
-          cp(path.join(root, entry), path.join(directory, entry), {
-            recursive: true
-          })
+      [
+        "package.json",
+        "oxlint.config.ts",
+        "oxfmt.config.ts",
+        "oxlint.style-no-blank-lines-in-functions.config.ts",
+        "oxlint.style-no-inline-comments-in-functions.config.ts",
+        "plugins"
+      ].map((entry) =>
+        cp(path.join(root, entry), path.join(directory, entry), {
+          recursive: true
+        })
       )
     );
     await symlink(
@@ -39,28 +45,45 @@ test("Ultracite preserves mandatory rules, ignores, and formatter convergence", 
       'export const sample = () => {\n// explain\n\nreturn 1;\n};\nsetTimeout("run()", 0);\n'
     );
     const command = path.join(root, "node_modules/ultracite/dist/index.js");
-    const invalid = spawnSync(
-      process.execPath,
-      [command, "check", "sample.ts", "dist/ignored.ts", "--format", "json"],
-      {
+    const diagnostics = [];
+    for (const config of [
+      undefined,
+      "oxlint.style-no-blank-lines-in-functions.config.ts",
+      "oxlint.style-no-inline-comments-in-functions.config.ts"
+    ]) {
+      const args = [
+        command,
+        "check",
+        "sample.ts",
+        "dist/ignored.ts",
+        "--format",
+        "json"
+      ];
+      if (config) {
+        args.push("--config", config);
+      }
+      const result = spawnSync(process.execPath, args, {
         cwd: directory,
         encoding: "utf-8",
         timeout: 30_000
-      }
-    );
-    assert.ifError(invalid.error);
-    assert.equal(invalid.status, 1, invalid.stderr);
-    const start = invalid.stdout.search(/\{\s*"diagnostics"\s*:/u);
-    assert.notEqual(start, -1, invalid.stdout);
-    const { diagnostics } = JSON.parse(
-      invalid.stdout.slice(start, invalid.stdout.lastIndexOf("}") + 1)
-    );
-    assert.deepEqual(diagnostics.map(({ code }) => code).toSorted(), [
-      "eslint(arrow-body-style)",
-      "eslint(no-implied-eval)",
-      "style(no-blank-lines-in-functions)",
-      "style(no-inline-comments-in-functions)",
-      "tsdoc(require-export-tsdoc)"
+      });
+      assert.ifError(result.error);
+      assert.equal(result.status, 1, result.stderr);
+      const start = result.stdout.search(/\{\s*"diagnostics"\s*:/u);
+      assert.notEqual(start, -1, result.stdout);
+      const pass = JSON.parse(
+        result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1)
+      );
+      diagnostics.push(
+        ...pass.diagnostics.map(({ code, severity }) => `${code} ${severity}`)
+      );
+    }
+    assert.deepEqual(diagnostics.toSorted(), [
+      "eslint(arrow-body-style) error",
+      "eslint(no-implied-eval) error",
+      "style(no-blank-lines-in-functions) error",
+      "style(no-inline-comments-in-functions) error",
+      "tsdoc(require-export-tsdoc) error"
     ]);
     const valid =
       "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true\n};\n";
