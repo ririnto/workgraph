@@ -136,10 +136,11 @@ Reassessment never waives blockers, required checks, or user approval.
 
 Resume only in the same session, using the original `runId` and returned `scriptPath`.
 
-Edit the stored script and pass `scriptPath` with `resumeFromRunId` to continue the same run.
-Preserve earlier prompts, options, labels, and arguments when their accepted inputs remain unchanged.
-Append needed stages without rerunning completed valid work or canceling a valid active run to edit it.
+Before editing, consider cache hits for completed earlier phases and agent calls.
+Preserve their prompts, options, labels, and arguments when accepted inputs remain unchanged.
+Edit the stored script and pass `scriptPath` with `resumeFromRunId` to append needed stages and reuse valid completed calls.
 Preserve accepted evidence only while behavior, inputs, configuration, and toolchain remain relevant.
+Inspect actual native cache-hit evidence before claiming reuse.
 A cache hit avoids repeated work but does not prove acceptance.
 
 ## Use The Bundled Source
@@ -181,4 +182,3 @@ Do not replace the selected source run with an additional host Agent or Workflow
 For an authorized continuation, edit only the returned per-run `scriptPath`, not the bundled resource.
 Preserve valid earlier calls and inputs under [Resume Conservatively](#resume-conservatively).
 A final-result-only edit can reuse both completed calls, while a changed earlier call can invalidate later cached results.
-Inspect actual native cache-hit evidence before claiming reuse.

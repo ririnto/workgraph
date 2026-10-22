@@ -16,8 +16,8 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 ## Prepare The Run
 
 Honor explicit supported tool choices within the host's authority before applying default routing.
-Use direct Agent for work that ends in one phase without an expected dependent follow-up.
-Start a one-phase Workflow when the accepted task expects actual follow-up phases.
+Use direct Agent when the accepted work ends in one phase.
+Use Workflow when actual later phases are expected, even if the first invocation contains only one phase.
 Exclude speculative future tasks and display-only phases.
 Use Workflow for one outcome's dependent stages or required joins, not to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.

@@ -42,6 +42,7 @@ Before editing durable memory, read Memory Maintenance unless its complete conte
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
 Read the matching bundled `references/` file before execution unless fully loaded.
+Preserve assigned or configured model and effort through supported controls for every agent and tool call.
 
 ### Further Delegation
 
@@ -58,8 +59,9 @@ Missing optional setup alone does not block the assignment.
 Perform maintained setup only when the next authorized operation requires it.
 Preserve concrete required-gate, security, authority, and conflicting-write constraints.
 
-When only async callbacks remain, immediately send the one-line final response `Waiting for the completion signal.` and stop.
-Bad examples are "Waiting for completion", "Awaiting callback", and "Checking the task status".
+After agent or tool calls, continue only required result handling, ready work, or required human interaction.
+When only callbacks remain, immediately end the turn with `Waiting for the completion signal.`.
+After deciding to yield, add no thinking blocks, narration, or tool calls.
 Keep exactly one live background wait per target.
 Silence means wait, not another shell, command, or wait.
 Inspect the existing background task when status is necessary.
