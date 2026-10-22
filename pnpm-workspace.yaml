@@ -1,3 +1,6 @@
+allowBuilds:
+  pnpm: true
+
 catalog:
   "@oxc-project/types": ^0.155.0
   husky: ^9.1.7
@@ -10,6 +13,7 @@ catalog:
   oxlint: ^1.89.0
   typescript: ^7.0.2
   ultracite: ^8.0.1
+  pnpm: ^12.15.0
 
 overrides:
   markdownlint-cli2>smol-toml: ^1.9.1

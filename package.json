@@ -35,11 +35,12 @@
     "npm-run-all2": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
+    "pnpm": "catalog:",
     "typescript": "catalog:",
     "ultracite": "catalog:"
   },
   "engines": {
     "node": ">=24.15.0 <25"
   },
-  "packageManager": "pnpm@11.28.2"
+  "packageManager": "pnpm@12.15.0"
 }
