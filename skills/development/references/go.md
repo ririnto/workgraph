@@ -7,7 +7,8 @@ Keep sentinel errors at package scope with `ErrXxx` names and error types with `
 
 Pass `context.Context` first in request-scoped functions instead of storing it in structs.
 Let finite goroutines finish by returning from their functions.
-Give long-running or coordinated goroutines a shutdown path through cancellation, channel closure, or a joined `WaitGroup`.
+Stop long-running or coordinated goroutines with a cancellation or channel-closure signal.
+Use a `sync.WaitGroup` only to wait for them after that signal lets them exit.
 Synchronize shared memory between goroutines.
 
 Define interfaces at consumption sites, accept interfaces, and return concrete types.
