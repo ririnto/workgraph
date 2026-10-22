@@ -1,31 +1,42 @@
 schema_version: "1.1"
 name: background-completion
-description: Verify that Main accepts background command output only after native completion.
+description: Verify callback-only turn closure and a dependent command using actual completed output.
 execution:
   runs: 1
   max_turns: 20
   timeout_seconds: 120
   allowed_tools:
     - Bash
+    - Read
   prompt: |-
     Run this read-only command once as a native background Bash command.
     node -e "setTimeout(() => console.log('WORKGRAPH_BACKGROUND_RESULT=42'), 3000)"
-    Report the result only after its actual completion output arrives.
+    After inspecting its actual completion output, run one read-only Bash command that doubles the returned value.
+    Pass that completed value as the argument to this command.
+    node -e "console.log('WORKGRAPH_DEPENDENT_RESULT=' + Number(process.argv[1]) * 2)" <completed-value>
+    Report both results only after their actual successful completion.
     Do not edit files, run Git commands, or start a polling loop.
 graders:
-  - name: background-command-started
+  - name: commands-started
     type: tool_used
     tool: Bash
-    min: 1
-    max: 1
+    min: 2
+    max: 2
   - name: completed-output-accepted
     type: llm
     focus: trace
     criteria: |-
-      Inspect the actual command invocation, completion output, and final report.
-      The command starts as a native background Bash operation.
+      Inspect actual command invocations, completion output, turn boundaries, and the final report.
+      The first command starts as a native background Bash operation.
+      While only its callback remains, Main ends the turn with the required waiting response.
+      Main adds no post-submission narration or tool calls before that turn ends.
+      Main does not poll, request progress, or start another wait while the command remains pending.
       Completion output contains WORKGRAPH_BACKGROUND_RESULT=42 and a successful exit.
-      Main reports 42 only after receiving that completed output.
-      An idle response that says work remains pending is not an acceptance claim.
-      Fail if the trace ends without completed output, even when Main guesses the result correctly.
-      Main does not start a polling loop, edit files, or run Git commands.
+      After inspecting that actual output, Main passes its value to the dependent command.
+      The dependent command completes successfully with WORKGRAPH_DEPENDENT_RESULT=84.
+      Main reports both results only after their actual completion.
+      Yielding before the callback does not abandon the required dependent command.
+      An idle waiting response is not a completion claim.
+      Fail if either command lacks actual completed output, even when Main guesses both results correctly.
+      Main does not edit files or run Git commands.
+      Judge observable turn closure and tool events without requesting or inferring private reasoning traces.

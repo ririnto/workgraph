@@ -56,7 +56,8 @@ Read the matching bundled `references/` file before dispatch unless fully loaded
 Honor user and configuration settings over host defaults.
 Start native Tasks without model or effort overrides and preserve existing sessions.
 Preserve native Task hosts' dependencies.
-Set supported unpinned model and effort for internal agents.
+Use workload-appropriate model and effort through supported agent and tool controls.
+Preserve settings when a call has no selection control.
 Report incompatible settings without dropping them.
 Record requests and report resolved settings only when host-exposed.
 
@@ -72,8 +73,9 @@ Run authorized ready outcomes concurrently, isolating logical overlap in separat
 Require only relevant predecessor results and conflicting ownership returns.
 Assess unexpected changes without stopping or tracing origin, then adopt or drop them.
 
-When only async callbacks remain, immediately send the one-line final response `Waiting for the completion signal.` and stop.
-Bad examples are "Waiting for completion", "Awaiting callback", and "Checking the task status".
+After agent or tool calls, continue only required result handling, ready work, or required human interaction.
+When only callbacks remain, immediately end the turn with `Waiting for the completion signal.`.
+After deciding to yield, add no thinking blocks, narration, or tool calls.
 Keep exactly one live background wait per target.
 Silence means wait, not another shell, command, or wait.
 Inspect the existing background task when status is necessary.

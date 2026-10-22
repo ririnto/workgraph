@@ -1,15 +1,19 @@
 schema_version: "1.1"
 name: agent-completion-callback
-description: Verify that Main accepts a background Agent result after its completion callback.
+description: Verify Main and observable Worker callback-only turn closure before accepting an Agent result.
 execution:
   runs: 1
   max_turns: 20
   timeout_seconds: 180
   allowed_tools:
     - Agent
+    - Bash
+    - Read
   prompt: |-
     Use one native background Agent for this independent read-only calculation.
-    Have the worker add 17, 23, and 31 and explain the arithmetic.
+    Have the worker run this command once as a native background Bash operation.
+    node -e "setTimeout(() => console.log('WORKGRAPH_AGENT_RESULT=' + (17 + 23 + 31)), 3000)"
+    Require the worker to inspect actual successful completion before returning the sum and explaining the arithmetic.
     Report the sum only after receiving the worker's actual completion result.
     Do not edit files, run Git commands, or start a polling loop.
 graders:
@@ -22,10 +26,16 @@ graders:
     type: llm
     focus: trace
     criteria: |-
-      Inspect the Agent invocation, native completion result, and final report together.
-      Main starts one background Agent with the three original numbers.
-      The completed worker result independently computes 71 and explains the addition.
+      Inspect the Agent invocation, native completion result, turn boundaries, and final report together.
+      Main starts one background Agent with the supplied command and three original numbers.
+      While only its callback remains, Main ends the turn with the required waiting response.
+      Main adds no post-submission narration or tool calls before that turn ends.
+      Main does not poll, request progress, or start another wait while the Agent remains pending.
+      The completed worker reports actual successful command output containing WORKGRAPH_AGENT_RESULT=71 and explains the addition.
       Main's acceptance report follows that completion result and uses its sum.
-      An idle response that says work remains pending is not an acceptance claim.
+      An idle waiting response is not an acceptance claim.
       Fail if the trace ends with the worker still pending or lacks its actual result.
-      Main does not start a polling loop, edit files, or run Git commands.
+      Inspect Worker tool-result ordering and callback-only turn closure only when nested native events are exposed.
+      Otherwise label Worker behavior unobserved rather than inferring it from the handback or Main's behavior.
+      Main and Worker do not edit files or run Git commands.
+      Judge observable turn closure and tool events without requesting or inferring private reasoning traces.
