@@ -92,7 +92,7 @@ These adaptations retain model-specific evidence limits and do not redistribute 
 We read the complete original [mirku workflow post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
 Its role split, isolated edits, verification, fix-loop bound, and approval example informed the native Workflow stage guidance.
 The complete official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows.md) informed supported execution and permission boundaries.
-Workgraph adapts those decisions without redistributing the post, bundling JEV, or supplying another execution engine.
+Workgraph adapts those decisions without redistributing the post or supplying another execution engine.
 
 We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md), published October 15, 2026.
 The article credits Addy Osmani, Morgan Westlee Lunt, and Qing Wang.
@@ -150,7 +150,7 @@ Workgraph adapts their decision boundaries without requiring a Sinon installatio
 Its development tooling copies the Harness source-style plugins and Markdown sentence and table-separator rules.
 These files retain the Harness [Apache-2.0 license](LICENSES/sinon-harness.txt), with attribution to ririnto.
 The repository owns the copied configuration and checks without modifying the upstream Harness.
-Workgraph modifies its sentence and TSDoc copies to preserve diagnostics with explicit source control flow.
+Workgraph modifies the sentence, TSDoc, blank-line, and inline-comment copies while preserving their diagnostics.
 
 ## Research And Official Documentation
 

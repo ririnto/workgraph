@@ -9,7 +9,7 @@ Pass each dependent call only the predecessor results it needs.
 Do not assume local variables, progress labels, phases, or agent context transfer between calls.
 Keep deterministic tool selection, path routing, and retry decisions in native script control flow.
 Delegate filesystem and tool execution to agents because the script only coordinates them.
-Use existing host capabilities without requiring JEV, installing an engine, or claiming JEV execution.
+Use existing host capabilities without requiring another execution engine or claiming that one ran.
 
 Pass Main's per-stage model and effort selections, respecting overrides and pinned agent definitions.
 Keep scan stages read-only and give each edit agent a separate host-supported isolated worktree.
