@@ -14,7 +14,10 @@ const collect = (
   type: string
 ): MicromarkToken[] => {
   const matches: MicromarkToken[] = [];
-  const pending = [...tokens].reverse();
+  const pending: MicromarkToken[] = [];
+  for (let index = tokens.length - 1; index >= 0; index -= 1) {
+    pending.push(tokens[index]);
+  }
   for (let token = pending.pop(); token !== undefined; token = pending.pop()) {
     if (token.type === type) {
       matches.push(token);

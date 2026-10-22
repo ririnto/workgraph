@@ -419,7 +419,7 @@ test("sentence continuations include capitalized and opaque-leading physical lin
 });
 
 test("table separator traversal handles deeply nested blockquotes", () => {
-  const quote = "> ".repeat(2_000);
+  const quote = "> ".repeat(2000);
   const source = [
     `${quote}| Header | Value |`,
     `${quote}| --- | --- |`,
@@ -436,30 +436,19 @@ test("table separator traversal handles deeply nested blockquotes", () => {
 });
 
 test("table separator diagnostics retain fix information", () => {
-  const diagnostics = [];
   const source = "| Left | Right |\n| -- | ----: |\n| one | two |\n";
   const errors = lint({
     config: { default: false, "docs/table-separators": true },
-    customRules: [
-      {
-        ...tableSeparators,
-        function(params, onError) {
-          tableSeparators.function(params, (error) => {
-            diagnostics.push(error);
-            onError(error);
-          });
-        }
-      }
-    ],
+    customRules: [tableSeparators],
     strings: { "input.md": source }
   })["input.md"] ?? [];
   assert.equal(errors.length, 2);
   assert.deepEqual(
-    diagnostics.map(({ detail, fixInfo, lineNumber, range }) => ({
-      detail,
+    errors.map(({ errorDetail, errorRange, fixInfo, lineNumber }) => ({
+      detail: errorDetail,
       fixInfo,
       lineNumber,
-      range
+      range: errorRange
     })),
     [
       {
