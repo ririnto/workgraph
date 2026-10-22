@@ -8,6 +8,7 @@ execution:
   allowed_tools:
     - Agent
     - Workflow
+    - Read
     - Skill(workgraph:main-agent-contract)
     - Skill(workgraph:workflow)
   prompt: |-
