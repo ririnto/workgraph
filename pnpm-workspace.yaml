@@ -3,6 +3,7 @@ catalog:
   husky: ^9.1.7
   markdownlint: ^0.41.1
   markdownlint-cli2: ^0.23.3
+  markdownlint-rule-search-replace: ^1.2.0
   markdownlint-rule-relative-links: ^5.1.2
   npm-run-all2: ^9.0.3
   oxfmt: ^0.71.0

@@ -9,7 +9,6 @@ import { test } from "node:test";
 import { lint } from "markdownlint/sync";
 
 import tsdoc from "../plugins/tsdoc-plugin.ts";
-import noBoxDrawing from "../rules/no-box-drawing.ts";
 import sentencePerLine from "../rules/sentence-per-line.ts";
 
 test("Ultracite preserves mandatory rules, ignores, and formatter convergence", async () => {
@@ -409,23 +408,74 @@ test("sentence prose keeps list detection and protected Markdown admission", () 
   }
 });
 
-test("box drawing captures preserve first-match selection and UTF-16 columns", () => {
-  assert.deepEqual(
-    lint({
-      config: { default: false, "docs/no-box-drawing": true },
-      customRules: [noBoxDrawing],
-      strings: {
-        "input.md": "\u{1F600} \u2500\u2502\r\ntext\u257F\nPlain text.\n"
-      }
-    })["input.md"].map(({ lineNumber, errorRange }) => ({
-      lineNumber,
-      range: errorRange
-    })),
-    [
-      { lineNumber: 1, range: [4, 1] },
-      { lineNumber: 2, range: [5, 1] }
-    ]
+test("search-replace covers box drawing in all Markdown with first UTF-16 match and no fix", async () => {
+  const root = path.resolve(import.meta.dirname, "..");
+  const directory = await mkdtemp(
+    path.join(tmpdir(), "workgraph-box-drawing-")
   );
+  const boxCharacters = Array.from({ length: 128 }, (_, index) =>
+    String.fromCodePoint(0x25_00 + index)
+  );
+  const markdown = `# Fixture\n\n😀 ${boxCharacters.join("")}\r\ntext\u257F\n${boxCharacters.join("\n")}\n\n\`\`\`text\n😀 \u257F\n\`\`\`\n`;
+  try {
+    await cp(
+      path.join(root, ".markdownlint-cli2.jsonc"),
+      path.join(directory, ".markdownlint-cli2.jsonc")
+    );
+    await cp(path.join(root, "rules"), path.join(directory, "rules"), {
+      recursive: true
+    });
+    await symlink(
+      path.join(root, "node_modules"),
+      path.join(directory, "node_modules")
+    );
+    await writeFile(path.join(directory, "fixture.md"), markdown);
+    const command = path.join(
+      root,
+      "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs"
+    );
+    const result = spawnSync(
+      process.execPath,
+      [command, "--no-globs", "fixture.md"],
+      { cwd: directory, encoding: "utf-8", timeout: 30_000 }
+    );
+    assert.ifError(result.error);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    const diagnostics = `${result.stdout}${result.stderr}`;
+    assert.match(
+      diagnostics,
+      /fixture\.md:3:4 error search-replace Custom rule \[no-box-drawing:/u
+    );
+    assert.match(
+      diagnostics,
+      /fixture\.md:4:5 error search-replace Custom rule \[no-box-drawing:/u
+    );
+    assert.match(
+      diagnostics,
+      /fixture\.md:135:4 error search-replace Custom rule \[no-box-drawing:/u
+    );
+    assert.deepEqual(
+      [
+        ...diagnostics.matchAll(
+          /fixture\.md:(?<line>\d+):\d+ error search-replace Custom rule/gu
+        )
+      ].map(({ groups }) => Number(groups.line)),
+      [3, 4, ...Array.from({ length: 128 }, (_, index) => index + 5), 135]
+    );
+    const fixed = spawnSync(
+      process.execPath,
+      [command, "--no-globs", "fixture.md", "--fix"],
+      { cwd: directory, encoding: "utf-8", timeout: 30_000 }
+    );
+    assert.ifError(fixed.error);
+    assert.equal(fixed.status, 1, fixed.stdout + fixed.stderr);
+    assert.equal(
+      readFileSync(path.join(directory, "fixture.md"), "utf-8"),
+      markdown
+    );
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
 });
 
 test("sentence token traversal preserves leaf diagnostics through deep containers", () => {

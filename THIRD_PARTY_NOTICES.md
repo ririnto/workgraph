@@ -10,6 +10,11 @@ This document records attribution and prior sources.
 Workgraph uses [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) under the MIT license.
 The package credits Théo LUDWIG as its author and copyright holder.
 
+## Markdown Box-Drawing Validation
+
+Workgraph uses [markdownlint-rule-search-replace](https://github.com/OnkarRuikar/markdownlint-rule-search-replace) under the MIT license.
+The package credits Onkar Ruikar, copyright 2022.
+
 ## Google Research Harness2
 
 Google LLC's [Harness2](https://github.com/google-research/harness2/tree/main) repository declares the Apache-2.0 license.
