@@ -44,7 +44,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     await writeFile(path.join(directory, "ignored.md"), markdown);
     await writeFile(
       path.join(directory, "sample.ts"),
-      'export const sample = () => {\n// explain\n\nreturn 1;\n};\nconst tripwires = () => {\n  debugger;\n  if (true) {\n    eval("run()");\n  }\n  const unused = 0;\n};\ntripwires();\nsetTimeout("run()", 0);\n'
+      'export const sample = () => {\n// explain\n\nreturn 1;\n};\nconst tripwires = () => {\n  debugger;\n  if (true) {\n    eval("run()");\n  }\n  const unused = 0;\n};\ntripwires();\nconst directiveGap = () => {\n  "use strict";\n\n  return 1;\n};\nconst expression = () => ({\n  first: true,\n\n  second: true\n});\ndirectiveGap();\nexpression();\nconst literal = () => `first\n\nsecond`;\nliteral();\nsetTimeout("run()", 0);\n'
     );
     const command = path.join(root, "node_modules/ultracite/dist/index.js");
     const diagnostics = [];
@@ -88,8 +88,10 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       "eslint(no-implied-eval) error",
       "eslint(no-unused-vars) error",
       "style(no-blank-lines-in-functions) error",
+      "style(no-blank-lines-in-functions) error",
       "style(no-inline-comments-in-functions) error",
-      "tsdoc(require-export-tsdoc) error"
+      "tsdoc(require-export-tsdoc) error",
+      "unicorn(prefer-module) error"
     ]);
     const reporterEnvironment = {
       ...process.env,
@@ -114,7 +116,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     assert.deepEqual(
       [
         ...configuredCheckOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc|unicorn)\([^)]+\))/gu
         )
       ]
         .map(
@@ -165,6 +167,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
         "eslint(no-eval) error",
         "eslint(no-implied-eval) error",
         "eslint(no-unused-vars) error",
+        "style(no-blank-lines-in-functions) error",
         "style(no-blank-lines-in-functions) error",
         "style(no-blank-lines-in-functions) error",
         "style(no-inline-comments-in-functions) error",
