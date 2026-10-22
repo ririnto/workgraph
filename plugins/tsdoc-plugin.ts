@@ -89,22 +89,18 @@ const nodeName = (node: Node): string =>
  * Narrow a class element to public members that require TSDoc.
  *
  * @param element Class body element to inspect.
- * @returns True for non-constructor public methods, including abstract ones,
- *   and for public properties initialized with a function.
+ * @returns True for public or protected methods and properties, including
+ *   constructors and implicitly public members.
  */
 const isPublicClassElement = (
   element: ClassElement
 ): element is MethodDefinition | PropertyDefinition =>
   (element.type === "MethodDefinition" ||
     element.type === "TSAbstractMethodDefinition" ||
-    ((element.type === "PropertyDefinition" ||
-      element.type === "TSAbstractPropertyDefinition") &&
-      (element.value?.type === "ArrowFunctionExpression" ||
-        element.value?.type === "FunctionExpression"))) &&
-  !("kind" in element && element.kind === "constructor") &&
+    element.type === "PropertyDefinition" ||
+    element.type === "TSAbstractPropertyDefinition") &&
   element.key.type !== "PrivateIdentifier" &&
-  element.accessibility !== "private" &&
-  element.accessibility !== "protected";
+  element.accessibility !== "private";
 
 /**
  * Diagnostic labels for exported declaration node types.
@@ -267,7 +263,7 @@ const exportTsdocRule = {
       }
     };
     /**
-     * Resolve a class declaration in the export statement's enclosing statement list.
+     * Resolve a local class declaration or expression in the export statement's scope.
      *
      * @param node Export statement referencing a local binding.
      * @param name Local identifier to resolve.
@@ -292,6 +288,15 @@ const exportTsdocRule = {
             declaration.id?.name === name
           ) {
             validateClassMembers(declaration);
+          } else if (declaration?.type === "VariableDeclaration") {
+            for (const declarator of declaration.declarations) {
+              if (
+                nameOf(declarator.id) === name &&
+                declarator.init?.type === "ClassExpression"
+              ) {
+                validateClassMembers(declarator.init);
+              }
+            }
           }
         }
       }
