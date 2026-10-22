@@ -89,10 +89,19 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       "style(no-inline-comments-in-functions) error",
       "tsdoc(require-export-tsdoc) error"
     ]);
+    const reporterEnvironment = {
+      ...process.env,
+      GITHUB_ACTIONS: "false"
+    };
     const configuredCheck = spawnSync(
       "corepack",
       ["pnpm", "run", "check:ultracite"],
-      { cwd: directory, encoding: "utf-8", timeout: 60_000 }
+      {
+        cwd: directory,
+        encoding: "utf-8",
+        env: reporterEnvironment,
+        timeout: 60_000
+      }
     );
     assert.ifError(configuredCheck.error);
     assert.equal(
@@ -122,7 +131,12 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     const configuredFix = spawnSync(
       "corepack",
       ["pnpm", "run", "fix:ultracite"],
-      { cwd: directory, encoding: "utf-8", timeout: 60_000 }
+      {
+        cwd: directory,
+        encoding: "utf-8",
+        env: reporterEnvironment,
+        timeout: 60_000
+      }
     );
     assert.ifError(configuredFix.error);
     assert.equal(
