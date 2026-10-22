@@ -20,11 +20,13 @@ updates:
           - oxfmt
           - oxlint
           - ultracite
+          - "@oxc-project/types"
       markdownlint:
         patterns:
           - markdownlint
           - markdownlint-cli2
           - markdownlint-rule-relative-links
+          - markdownlint-rule-search-replace
     ignore:
       # 0.x minor updates need a reviewed manifest and lockfile change, so
       # Dependabot stays inside the chosen 0.x minor and proposes patches only.
@@ -35,6 +37,9 @@ updates:
         update-types:
           - version-update:semver-minor
       - dependency-name: markdownlint-cli2
+        update-types:
+          - version-update:semver-minor
+      - dependency-name: "@oxc-project/types"
         update-types:
           - version-update:semver-minor
       # Never widen a selected major automatically.
