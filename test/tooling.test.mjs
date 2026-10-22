@@ -688,6 +688,208 @@ test("sentence token traversal preserves leaf diagnostics through deep container
   assert.deepEqual(actual, expected);
 });
 
+test("TSDoc covers public and protected class members while excluding private ones", () => {
+  const constructor = {
+    key: { name: "constructor", type: "Identifier" },
+    kind: "constructor",
+    type: "MethodDefinition"
+  };
+  const protectedMethod = {
+    accessibility: "protected",
+    key: { name: "read", type: "Identifier" },
+    kind: "method",
+    type: "MethodDefinition"
+  };
+  const protectedProperty = {
+    accessibility: "protected",
+    key: { name: "status", type: "Identifier" },
+    type: "PropertyDefinition",
+    value: { type: "Literal" }
+  };
+  const publicProperty = {
+    key: { name: "enabled", type: "Identifier" },
+    type: "PropertyDefinition",
+    value: { type: "Literal" }
+  };
+  const documentedProperty = {
+    key: { name: "documented", type: "Identifier" },
+    type: "PropertyDefinition",
+    value: { type: "Literal" }
+  };
+  const privateProperty = {
+    accessibility: "private",
+    key: { name: "secret", type: "Identifier" },
+    type: "PropertyDefinition",
+    value: { type: "Literal" }
+  };
+  const privateMethod = {
+    key: { name: "hidden", type: "PrivateIdentifier" },
+    kind: "method",
+    type: "MethodDefinition"
+  };
+  const documentedComments = new Map([
+    [
+      documentedProperty,
+      [
+        {
+          end: 0,
+          start: 0,
+          type: "Block",
+          value: "*\n * Existing documentation.\n "
+        }
+      ]
+    ]
+  ]);
+  const reports = [];
+  const visitor = tsdoc.rules["require-export-tsdoc"].create({
+    filename: "source.ts",
+    report: ({ data, messageId }) => reports.push({ data, messageId }),
+    sourceCode: {
+      getCommentsBefore: (node) => documentedComments.get(node) ?? [],
+      text: ""
+    }
+  });
+  visitor.ExportNamedDeclaration({
+    declaration: {
+      body: {
+        body: [
+          constructor,
+          protectedMethod,
+          protectedProperty,
+          publicProperty,
+          documentedProperty,
+          privateProperty,
+          privateMethod
+        ]
+      },
+      id: { name: "Store" },
+      type: "ClassDeclaration"
+    },
+    type: "ExportNamedDeclaration"
+  });
+  assert.deepEqual(reports, [
+    {
+      data: { kind: "class", name: "Store" },
+      messageId: "missingTsdoc"
+    },
+    {
+      data: { kind: "method", name: "constructor" },
+      messageId: "missingTsdoc"
+    },
+    { data: { kind: "method", name: "read" }, messageId: "missingTsdoc" },
+    { data: { kind: "property", name: "status" }, messageId: "missingTsdoc" },
+    { data: { kind: "property", name: "enabled" }, messageId: "missingTsdoc" }
+  ]);
+});
+
+test("TSDoc validates exported local class expressions by binding name", () => {
+  const statements = [];
+  const program = { body: statements, type: "Program" };
+  const directExpression = {
+    body: {
+      body: [
+        {
+          key: { name: "run", type: "Identifier" },
+          kind: "method",
+          type: "MethodDefinition"
+        }
+      ]
+    },
+    type: "ClassExpression"
+  };
+  const aliasedExpression = {
+    body: {
+      body: [
+        {
+          key: { name: "status", type: "Identifier" },
+          type: "PropertyDefinition",
+          value: { type: "Literal" }
+        },
+        {
+          key: { name: "documented", type: "Identifier" },
+          type: "PropertyDefinition",
+          value: { type: "Literal" }
+        }
+      ]
+    },
+    type: "ClassExpression"
+  };
+  const documentedProperty = aliasedExpression.body.body[1];
+  const documentedComments = new Map([
+    [
+      documentedProperty,
+      [
+        {
+          end: 0,
+          start: 0,
+          type: "Block",
+          value: "*\n * Existing documentation.\n "
+        }
+      ]
+    ]
+  ]);
+  const directExport = {
+    parent: program,
+    specifiers: [
+      {
+        exported: { name: "Direct", type: "Identifier" },
+        local: { name: "Direct", type: "Identifier" }
+      }
+    ],
+    type: "ExportNamedDeclaration"
+  };
+  const aliasedExport = {
+    parent: program,
+    specifiers: [
+      {
+        exported: { name: "Public", type: "Identifier" },
+        local: { name: "Internal", type: "Identifier" }
+      }
+    ],
+    type: "ExportNamedDeclaration"
+  };
+  statements.push(
+    {
+      declarations: [
+        {
+          id: { name: "Direct", type: "Identifier" },
+          init: directExpression
+        },
+        {
+          id: { name: "Internal", type: "Identifier" },
+          init: aliasedExpression
+        }
+      ],
+      type: "VariableDeclaration"
+    },
+    directExport,
+    aliasedExport
+  );
+  const reports = [];
+  const visitor = tsdoc.rules["require-export-tsdoc"].create({
+    filename: "source.ts",
+    report: ({ data, messageId }) => reports.push({ data, messageId }),
+    sourceCode: {
+      getCommentsBefore: (node) => documentedComments.get(node) ?? [],
+      text: ""
+    }
+  });
+  visitor.ExportNamedDeclaration(directExport);
+  visitor.ExportNamedDeclaration(aliasedExport);
+  assert.deepEqual(reports, [
+    {
+      data: { kind: "export list", name: "Direct" },
+      messageId: "missingTsdoc"
+    },
+    { data: { kind: "method", name: "run" }, messageId: "missingTsdoc" },
+    {
+      data: { kind: "export list", name: "Public" },
+      messageId: "missingTsdoc"
+    },
+    { data: { kind: "property", name: "status" }, messageId: "missingTsdoc" }
+  ]);
+});
+
 test("TSDoc class reuse preserves diagnostic order and reads members only once", () => {
   const reports = [];
   let memberReads = 0;
