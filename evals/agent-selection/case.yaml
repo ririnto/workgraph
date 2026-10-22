@@ -7,10 +7,9 @@ execution:
   timeout_seconds: 360
   allowed_tools:
     - Agent
-    - Workflow
+    - Read
     - Skill(workgraph:main-agent-contract)
     - Skill(workgraph:workflow)
-    - Skill(workflow-authoring)
   prompt: |-
     Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
     Delegate one bounded read-only assessment that ends in one phase to a worker.

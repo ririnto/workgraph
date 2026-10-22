@@ -9,7 +9,6 @@ execution:
     - Workflow
     - Read
     - Skill(workgraph:workflow)
-    - Skill(workflow-authoring)
   prompt: |-
     Please use native Claude Code Workflow to verify a calculation without editing files or running Git commands.
     Load Workgraph Workflow unless its complete content is already present.

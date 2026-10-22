@@ -8,8 +8,8 @@ execution:
   allowed_tools:
     - Agent
     - Workflow
+    - Read
     - Skill(workgraph:workflow)
-    - Skill(workflow-authoring)
   prompt: |-
     Please orchestrate a read-only timeout assessment with subagents.
     Have one worker check whether C1, C2, or C3 lacks a required timeout.
