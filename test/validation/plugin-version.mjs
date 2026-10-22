@@ -50,6 +50,29 @@ export const validatePluginVersions = (claudeVersion, codexVersion) => {
   }
 };
 
+/**
+ * Reject version fields on manifests that obtain their version elsewhere.
+ * @param {object} marketplaceManifest Claude marketplace manifest.
+ * @param {object} packageManifest Private package manifest.
+ */
+export const validateOmittedManifestVersions = (
+  marketplaceManifest,
+  packageManifest
+) => {
+  for (const [name, manifest] of [
+    ["Claude marketplace", marketplaceManifest],
+    ["Private package", packageManifest]
+  ]) {
+    const hasMarketplaceEntryVersion =
+      name === "Claude marketplace" &&
+      Array.isArray(manifest.plugins) &&
+      manifest.plugins.some((plugin) => Object.hasOwn(plugin, "version"));
+    if (Object.hasOwn(manifest, "version") || hasMarketplaceEntryVersion) {
+      throw new Error(`${name} manifest must omit the version field.`);
+    }
+  }
+};
+
 const run = () => {
   const root = fileURLToPath(new URL("../../", import.meta.url));
   const claude = JSON.parse(
@@ -58,9 +81,16 @@ const run = () => {
   const codex = JSON.parse(
     readFileSync(path.join(root, ".codex-plugin/plugin.json"), "utf-8")
   );
+  const marketplace = JSON.parse(
+    readFileSync(path.join(root, ".claude-plugin/marketplace.json"), "utf-8")
+  );
+  const packageManifest = JSON.parse(
+    readFileSync(path.join(root, "package.json"), "utf-8")
+  );
   validatePluginVersions(claude.version, codex.version);
+  validateOmittedManifestVersions(marketplace, packageManifest);
   process.stdout.write(
-    "Host plugin versions match the yyyy.mm.dd.seq format.\n"
+    "Host plugin versions match, and marketplace and package manifests omit version fields.\n"
   );
 };
 
