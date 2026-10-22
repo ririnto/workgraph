@@ -90,7 +90,8 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       "style(no-blank-lines-in-functions) error",
       "style(no-blank-lines-in-functions) error",
       "style(no-inline-comments-in-functions) error",
-      "tsdoc(require-export-tsdoc) error"
+      "tsdoc(require-export-tsdoc) error",
+      "unicorn(prefer-module) error"
     ]);
     const reporterEnvironment = {
       ...process.env,
