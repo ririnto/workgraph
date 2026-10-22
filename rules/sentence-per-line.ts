@@ -210,6 +210,7 @@ const continuation = (
     !previousEndsInsideOpaque &&
     /[a-z0-9_]$/iu.test(previous.trimEnd()) &&
     (/^[a-z]/u.test(start) ||
+      start.startsWith(",") ||
       sentenceLikeStartPattern.test(start) ||
       (start.startsWith("_") && lineStartsOpaque) ||
       imperativeContinuationPattern.test(start))

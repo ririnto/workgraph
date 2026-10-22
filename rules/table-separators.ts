@@ -12,11 +12,22 @@ const separatorFiller = "---";
 const collect = (
   tokens: readonly MicromarkToken[],
   type: string
-): MicromarkToken[] =>
-  tokens.flatMap((token) => [
-    ...(token.type === type ? [token] : []),
-    ...collect(token.children, type)
-  ]);
+): MicromarkToken[] => {
+  const matches: MicromarkToken[] = [];
+  const pending: MicromarkToken[] = [];
+  for (let index = tokens.length - 1; index >= 0; index -= 1) {
+    pending.push(tokens[index]);
+  }
+  for (let token = pending.pop(); token !== undefined; token = pending.pop()) {
+    if (token.type === type) {
+      matches.push(token);
+    }
+    for (let index = token.children.length - 1; index >= 0; index -= 1) {
+      pending.push(token.children[index]);
+    }
+  }
+  return matches;
+};
 
 /**
  * Markdownlint rule requiring exactly three hyphens in each table separator cell.
