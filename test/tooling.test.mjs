@@ -116,7 +116,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     assert.deepEqual(
       [
         ...configuredCheckOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc|unicorn)\([^)]+\))/gu
         )
       ]
         .map(
