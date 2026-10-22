@@ -169,6 +169,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
         "eslint(no-unused-vars) error",
         "style(no-blank-lines-in-functions) error",
         "style(no-blank-lines-in-functions) error",
+        "style(no-blank-lines-in-functions) error",
         "style(no-inline-comments-in-functions) error",
         "style(no-inline-comments-in-functions) error",
         "tsdoc(require-export-tsdoc) error"
