@@ -11,6 +11,7 @@ import { lint } from "markdownlint/sync";
 
 import tsdoc from "../plugins/tsdoc-plugin.ts";
 import sentencePerLine from "../rules/sentence-per-line.ts";
+import tableSeparators from "../rules/table-separators.ts";
 
 test("Ultracite check and fix entry points preserve diagnostics and formatter convergence", async () => {
   const root = path.resolve(import.meta.dirname, "..");
@@ -212,6 +213,19 @@ const sentenceErrors = (source, name = "input.md") =>
     strings: { [name]: source }
   })[name] ?? [];
 
+test("sentence continuations recognize comma-led wrapped lines", () => {
+  const errors = sentenceErrors(
+    "Keep this sentence\n, then its continuation.\n"
+  );
+  assert.deepEqual(
+    errors.map(({ lineNumber, errorRange }) => ({
+      lineNumber,
+      range: errorRange
+    })),
+    [{ lineNumber: 2, range: [1, 1] }]
+  );
+});
+
 test("sentence searches retain the first matching column and preserve protected syntax", () => {
   const source = "First sentence. Second sentence. Third sentence.\n";
   assert.deepEqual(
@@ -402,6 +416,66 @@ test("sentence continuations include capitalized and opaque-leading physical lin
   ]) {
     assert.deepEqual(sentenceErrors(source), []);
   }
+});
+
+test("table separator traversal handles deeply nested blockquotes", () => {
+  const quote = "> ".repeat(2_000);
+  const source = [
+    `${quote}| Header | Value |`,
+    `${quote}| --- | --- |`,
+    `${quote}| one | two |`
+  ].join("\n");
+  assert.deepEqual(
+    lint({
+      config: { default: false, "docs/table-separators": true },
+      customRules: [tableSeparators],
+      strings: { "input.md": source }
+    })["input.md"] ?? [],
+    []
+  );
+});
+
+test("table separator diagnostics retain fix information", () => {
+  const diagnostics = [];
+  const source = "| Left | Right |\n| -- | ----: |\n| one | two |\n";
+  const errors = lint({
+    config: { default: false, "docs/table-separators": true },
+    customRules: [
+      {
+        ...tableSeparators,
+        function(params, onError) {
+          tableSeparators.function(params, (error) => {
+            diagnostics.push(error);
+            onError(error);
+          });
+        }
+      }
+    ],
+    strings: { "input.md": source }
+  })["input.md"] ?? [];
+  assert.equal(errors.length, 2);
+  assert.deepEqual(
+    diagnostics.map(({ detail, fixInfo, lineNumber, range }) => ({
+      detail,
+      fixInfo,
+      lineNumber,
+      range
+    })),
+    [
+      {
+        detail: "Separator cell 1 must use exactly ---.",
+        fixInfo: { deleteCount: 2, editColumn: 3, insertText: "---" },
+        lineNumber: 2,
+        range: [3, 2]
+      },
+      {
+        detail: "Separator cell 2 must use exactly ---.",
+        fixInfo: { deleteCount: 4, editColumn: 8, insertText: "---" },
+        lineNumber: 2,
+        range: [8, 4]
+      }
+    ]
+  );
 });
 
 test("sentence table explanations keep cell boundaries and first diagnostic order", () => {
