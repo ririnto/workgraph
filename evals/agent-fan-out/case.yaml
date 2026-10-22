@@ -7,7 +7,6 @@ execution:
   timeout_seconds: 360
   allowed_tools:
     - Agent
-    - Workflow
     - Skill(workgraph:main-agent-contract)
     - Skill(workgraph:workflow)
   prompt: |-
