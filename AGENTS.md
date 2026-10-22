@@ -96,7 +96,8 @@ Select the narrowest applicable read-only gate.
 - Use `pnpm run check:plugin-version` for host manifest version checks.
 - Use `pnpm run check:tooling-tests` for adopted lint rule behavior and control-flow equivalence.
 - Use `pnpm run check:validation-tests` for issue form and release version gate tests.
-- Use `pnpm run check` for mixed changes or repository-wide validation of Markdown, Ultracite, hooks, and issue form/version gates.
+- Use `pnpm run check` for mixed changes or repository-wide validation of Markdownlint, Ultracite, hooks, issue forms, plugin versions, tooling tests, validation tests, and the production dependency audit.
+- The production dependency audit contacts the package registry.
 
 After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
 For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.
