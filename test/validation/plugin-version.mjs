@@ -63,7 +63,11 @@ export const validateOmittedManifestVersions = (
     ["Claude marketplace", marketplaceManifest],
     ["Private package", packageManifest]
   ]) {
-    if (Object.hasOwn(manifest, "version")) {
+    const hasMarketplaceEntryVersion =
+      name === "Claude marketplace" &&
+      Array.isArray(manifest.plugins) &&
+      manifest.plugins.some((plugin) => Object.hasOwn(plugin, "version"));
+    if (Object.hasOwn(manifest, "version") || hasMarketplaceEntryVersion) {
       throw new Error(`${name} manifest must omit the version field.`);
     }
   }

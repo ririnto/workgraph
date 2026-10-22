@@ -269,12 +269,22 @@ test("plugin version validation rejects invalid format, date, sequence, and pari
 });
 
 test("release manifest validation accepts manifests without version fields", () => {
-  assert.doesNotThrow(() => validateOmittedManifestVersions({}, {}));
+  assert.doesNotThrow(() =>
+    validateOmittedManifestVersions({ plugins: [{ name: "workgraph" }] }, {})
+  );
 });
 
 test("release manifest validation rejects forbidden marketplace and package versions", () => {
   assert.throws(
     () => validateOmittedManifestVersions({ version: "1.0.0" }, {}),
+    /Claude marketplace manifest must omit the version field/u
+  );
+  assert.throws(
+    () =>
+      validateOmittedManifestVersions(
+        { plugins: [{ name: "workgraph", version: "1.0.0" }] },
+        {}
+      ),
     /Claude marketplace manifest must omit the version field/u
   );
   assert.throws(
