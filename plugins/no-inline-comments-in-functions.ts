@@ -16,6 +16,7 @@ interface Comment extends SourceRange {
 
 interface RuleContext {
   readonly sourceCode: {
+    readonly getCommentsBefore: (node: Node) => readonly Comment[];
     readonly getCommentsInside: (node: Node) => readonly Comment[];
   };
   readonly report: (diagnostic: {
@@ -43,27 +44,61 @@ const isFunctionNode = (node: Node): node is FunctionNode =>
 
 const noInlineCommentsRule = {
   create(context: RuleContext) {
+    const documentedCommentOffsets = new Set<number>();
     const reportedOffsets = new Set<number>();
+    const recordDeclarationDocumentation = (node: Node): void => {
+      for (const { start, type, value } of context.sourceCode.getCommentsBefore(
+        node
+      )) {
+        if (type === "Block" && value.startsWith("*")) {
+          documentedCommentOffsets.add(start);
+        }
+      }
+    };
     const inspectFunction = (node: Node): void => {
-      if (isFunctionNode(node) && node.body?.type === "BlockStatement") {
-        const { body } = node;
-        const forbiddenComments = context.sourceCode
-          .getCommentsInside(body)
-          .filter(
-            ({ type, value }) =>
-              (type === "Line" ||
-                (type === "Block" && !value.startsWith("*"))) &&
-              !toolDirectivePattern.test(value)
-          );
-        for (const { start } of forbiddenComments) {
-          if (!reportedOffsets.has(start)) {
-            reportedOffsets.add(start);
-            context.report({ messageId: "noInlineComments", node });
-          }
+      if (
+        !isFunctionNode(node) ||
+        !node.body ||
+        (node.body.type !== "BlockStatement" &&
+          node.type !== "ArrowFunctionExpression")
+      ) {
+        return;
+      }
+      const forbiddenComments = context.sourceCode
+        .getCommentsInside(node.body)
+        .filter(
+          ({ start, type, value }) =>
+            (type === "Line" ||
+              (type === "Block" &&
+                (!value.startsWith("*") ||
+                  !documentedCommentOffsets.has(start)))) &&
+            !toolDirectivePattern.test(value)
+        );
+      for (const { start } of forbiddenComments) {
+        if (!reportedOffsets.has(start)) {
+          reportedOffsets.add(start);
+          context.report({ messageId: "noInlineComments", node });
         }
       }
     };
     return {
+      ...Object.fromEntries(
+        [
+          "ClassDeclaration",
+          "FunctionDeclaration",
+          "MethodDefinition",
+          "PropertyDefinition",
+          "TSAbstractMethodDefinition",
+          "TSAbstractPropertyDefinition",
+          "TSDeclareFunction",
+          "TSEnumDeclaration",
+          "TSImportEqualsDeclaration",
+          "TSInterfaceDeclaration",
+          "TSModuleDeclaration",
+          "TSTypeAliasDeclaration",
+          "VariableDeclaration"
+        ].map((type) => [type, recordDeclarationDocumentation])
+      ),
       "ArrowFunctionExpression:exit": inspectFunction,
       "FunctionDeclaration:exit": inspectFunction,
       "FunctionExpression:exit": inspectFunction
@@ -71,10 +106,12 @@ const noInlineCommentsRule = {
   },
   meta: {
     docs: {
-      description: "Disallow non-documentation comments inside function bodies."
+      description:
+        "Disallow comments inside function bodies except for tool directives and declaration documentation."
     },
     messages: {
-      noInlineComments: "Remove inline comments from function bodies."
+      noInlineComments:
+        "Remove inline comments from function bodies unless they document a declaration or are tool directives."
     },
     type: "problem"
   } as const
