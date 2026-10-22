@@ -41,24 +41,31 @@ const noBlankLinesRule = {
   create(context: RuleContext) {
     const reportedOffsets = new Set<number>();
     const inspectFunction = (node: Node): void => {
-      if (isFunctionNode(node) && node.body?.type === "BlockStatement") {
+      if (isFunctionNode(node) && node.body) {
         const { body } = node;
+        if (
+          body.type !== "BlockStatement" &&
+          node.type !== "ArrowFunctionExpression"
+        ) {
+          return;
+        }
         const tokens = context.sourceCode.getTokens(body);
         const comments = context.sourceCode.getCommentsInside(body);
         const isProtected = (offset: number): boolean =>
           tokens.some(({ start, end }) => start <= offset && offset < end) ||
           comments.some(({ start, end }) => start <= offset && offset < end);
-        const firstStatementIndex = body.body.findIndex(
+        const statements = body.type === "BlockStatement" ? body.body : [];
+        const firstStatementIndex = statements.findIndex(
           (element) =>
             !("directive" in element && typeof element.directive === "string")
         );
         const exemptionStart =
           firstStatementIndex > 0
-            ? body.body[firstStatementIndex - 1]?.end
+            ? statements[firstStatementIndex - 1]?.end
             : undefined;
         const exemptionEnd =
           firstStatementIndex > 0
-            ? body.body[firstStatementIndex]?.start
+            ? statements[firstStatementIndex]?.start
             : undefined;
         const isExempted = (offset: number): boolean =>
           exemptionStart !== undefined &&
@@ -93,7 +100,9 @@ const noBlankLinesRule = {
   },
   meta: {
     docs: {
-      description: "Disallow physical blank lines inside function bodies."
+      description:
+        "Disallow physical blank lines inside function bodies, except for the gap " +
+        "between a JavaScript directive prologue and the first ordinary statement."
     },
     messages: {
       noBlankLines: "Remove blank lines from function bodies."
