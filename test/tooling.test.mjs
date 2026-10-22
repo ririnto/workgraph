@@ -5,6 +5,7 @@ import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
+import { stripVTControlCharacters } from "node:util";
 
 import { lint } from "markdownlint/sync";
 
@@ -91,6 +92,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     ]);
     const reporterEnvironment = {
       ...process.env,
+      FORCE_COLOR: "3",
       GITHUB_ACTIONS: "false"
     };
     const configuredCheck = spawnSync(
@@ -104,21 +106,23 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       }
     );
     assert.ifError(configuredCheck.error);
-    assert.equal(
-      configuredCheck.status,
-      1,
-      configuredCheck.stdout + configuredCheck.stderr
+    const configuredCheckOutput = stripVTControlCharacters(
+      `${configuredCheck.stdout}\n${configuredCheck.stderr}`
     );
+    assert.equal(configuredCheck.status, 1, configuredCheckOutput);
     assert.deepEqual(
       [
-        ...`${configuredCheck.stdout}\n${configuredCheck.stderr}`.matchAll(
-          /\b(?<severity>error|warning) (?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
+        ...configuredCheckOutput.matchAll(
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
         )
       ]
-        .map(({ groups: { code, severity } }) => `${code} ${severity}`)
+        .map(
+          ({ groups: { code, glyph, severity } }) =>
+            `${code} ${severity ?? (glyph === "×" ? "error" : "warning")}`
+        )
         .toSorted(),
       diagnostics.toSorted(),
-      configuredCheck.stdout + configuredCheck.stderr
+      configuredCheckOutput
     );
     const valid =
       "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true\n};\n";
@@ -139,18 +143,20 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       }
     );
     assert.ifError(configuredFix.error);
-    assert.equal(
-      configuredFix.status,
-      1,
-      configuredFix.stdout + configuredFix.stderr
+    const configuredFixOutput = stripVTControlCharacters(
+      `${configuredFix.stdout}\n${configuredFix.stderr}`
     );
+    assert.equal(configuredFix.status, 1, configuredFixOutput);
     assert.deepEqual(
       [
-        ...`${configuredFix.stdout}\n${configuredFix.stderr}`.matchAll(
-          /\b(?<severity>error|warning) (?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
+        ...configuredFixOutput.matchAll(
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
         )
       ]
-        .map(({ groups: { code, severity } }) => `${code} ${severity}`)
+        .map(
+          ({ groups: { code, glyph, severity } }) =>
+            `${code} ${severity ?? (glyph === "×" ? "error" : "warning")}`
+        )
         .toSorted(),
       [
         "eslint(no-constant-condition) error",
@@ -164,7 +170,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
         "style(no-inline-comments-in-functions) error",
         "tsdoc(require-export-tsdoc) error"
       ].toSorted(),
-      configuredFix.stdout + configuredFix.stderr
+      configuredFixOutput
     );
     await writeFile(path.join(directory, "sample.ts"), unformatted);
     for (const action of ["fix", "fix", "check"]) {
