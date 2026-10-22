@@ -11,7 +11,7 @@ import { lint } from "markdownlint/sync";
 import tsdoc from "../plugins/tsdoc-plugin.ts";
 import sentencePerLine from "../rules/sentence-per-line.ts";
 
-test("Ultracite preserves mandatory rules, ignores, and formatter convergence", async () => {
+test("Ultracite check and fix entry points preserve diagnostics and formatter convergence", async () => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tooling-"));
   try {
@@ -42,7 +42,7 @@ test("Ultracite preserves mandatory rules, ignores, and formatter convergence", 
     await writeFile(path.join(directory, "ignored.md"), markdown);
     await writeFile(
       path.join(directory, "sample.ts"),
-      'export const sample = () => {\n// explain\n\nreturn 1;\n};\nsetTimeout("run()", 0);\n'
+      'export const sample = () => {\n// explain\n\nreturn 1;\n};\nconst tripwires = () => {\n  debugger;\n  if (true) {\n    eval("run()");\n  }\n  const unused = 0;\n};\ntripwires();\nsetTimeout("run()", 0);\n'
     );
     const command = path.join(root, "node_modules/ultracite/dist/index.js");
     const diagnostics = [];
@@ -80,15 +80,78 @@ test("Ultracite preserves mandatory rules, ignores, and formatter convergence", 
     }
     assert.deepEqual(diagnostics.toSorted(), [
       "eslint(arrow-body-style) error",
+      "eslint(no-constant-condition) error",
+      "eslint(no-debugger) error",
+      "eslint(no-eval) error",
       "eslint(no-implied-eval) error",
+      "eslint(no-unused-vars) error",
       "style(no-blank-lines-in-functions) error",
       "style(no-inline-comments-in-functions) error",
       "tsdoc(require-export-tsdoc) error"
     ]);
+    const configuredCheck = spawnSync(
+      "corepack",
+      ["pnpm", "run", "check:ultracite"],
+      { cwd: directory, encoding: "utf-8", timeout: 60_000 }
+    );
+    assert.ifError(configuredCheck.error);
+    assert.equal(
+      configuredCheck.status,
+      1,
+      configuredCheck.stdout + configuredCheck.stderr
+    );
+    assert.deepEqual(
+      [
+        ...`${configuredCheck.stdout}\n${configuredCheck.stderr}`.matchAll(
+          /\b(?<severity>error|warning) (?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
+        )
+      ]
+        .map(({ groups: { code, severity } }) => `${code} ${severity}`)
+        .toSorted(),
+      diagnostics.toSorted(),
+      configuredCheck.stdout + configuredCheck.stderr
+    );
     const valid =
       "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true\n};\n";
     const unformatted =
       "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true,\n};\n";
+    await writeFile(
+      path.join(directory, "style-only.ts"),
+      "/**\n * Preserve this exported declaration.\n */\nexport const styleOnly = () => {\n  // explain\n\n  return 1;\n};\n"
+    );
+    const configuredFix = spawnSync(
+      "corepack",
+      ["pnpm", "run", "fix:ultracite"],
+      { cwd: directory, encoding: "utf-8", timeout: 60_000 }
+    );
+    assert.ifError(configuredFix.error);
+    assert.equal(
+      configuredFix.status,
+      1,
+      configuredFix.stdout + configuredFix.stderr
+    );
+    assert.deepEqual(
+      [
+        ...`${configuredFix.stdout}\n${configuredFix.stderr}`.matchAll(
+          /\b(?<severity>error|warning) (?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
+        )
+      ]
+        .map(({ groups: { code, severity } }) => `${code} ${severity}`)
+        .toSorted(),
+      [
+        "eslint(no-constant-condition) error",
+        "eslint(no-debugger) error",
+        "eslint(no-eval) error",
+        "eslint(no-implied-eval) error",
+        "eslint(no-unused-vars) error",
+        "style(no-blank-lines-in-functions) error",
+        "style(no-blank-lines-in-functions) error",
+        "style(no-inline-comments-in-functions) error",
+        "style(no-inline-comments-in-functions) error",
+        "tsdoc(require-export-tsdoc) error"
+      ].toSorted(),
+      configuredFix.stdout + configuredFix.stderr
+    );
     await writeFile(path.join(directory, "sample.ts"), unformatted);
     for (const action of ["fix", "fix", "check"]) {
       const result = spawnSync(

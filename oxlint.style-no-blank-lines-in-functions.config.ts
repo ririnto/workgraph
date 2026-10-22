@@ -2,9 +2,18 @@ import { defineConfig } from "oxlint";
 import core from "ultracite/oxlint/core";
 
 /**
- * Run the blank-line rule without repeating diagnostics from the root core pass.
+ * Isolate this supplemental rule while the root pass keeps the full core preset.
  */
 export default defineConfig({
+  categories: {
+    correctness: "off",
+    nursery: "off",
+    pedantic: "off",
+    perf: "off",
+    restriction: "off",
+    style: "off",
+    suspicious: "off"
+  },
   env: core.env,
   ignorePatterns: core.ignorePatterns,
   jsPlugins: ["./plugins/no-blank-lines-in-functions.ts"],
