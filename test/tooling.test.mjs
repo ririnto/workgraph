@@ -437,11 +437,12 @@ test("table separator traversal handles deeply nested blockquotes", () => {
 
 test("table separator diagnostics retain fix information", () => {
   const source = "| Left | Right |\n| -- | ----: |\n| one | two |\n";
-  const errors = lint({
-    config: { default: false, "docs/table-separators": true },
-    customRules: [tableSeparators],
-    strings: { "input.md": source }
-  })["input.md"] ?? [];
+  const errors =
+    lint({
+      config: { default: false, "docs/table-separators": true },
+      customRules: [tableSeparators],
+      strings: { "input.md": source }
+    })["input.md"] ?? [];
   assert.equal(errors.length, 2);
   assert.deepEqual(
     errors.map(({ errorDetail, errorRange, fixInfo, lineNumber }) => ({
