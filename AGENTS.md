@@ -58,7 +58,7 @@ Apply Markdown lint and these prose rules to `.md` files.
 Ultracite's code rules do not apply to Markdown.
 Exclude generated and vendored material from mechanical prose edits.
 
-Use direct verbs, concrete terms, and ASCII diagram characters.
+Use direct verbs and concrete terms.
 Remove filler and repetition without changing technical meaning or explicit requirements.
 
 ## Implementation

@@ -10,6 +10,11 @@ This document records attribution and prior sources.
 Workgraph uses [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) under the MIT license.
 The package credits Théo LUDWIG as its author and copyright holder.
 
+## Markdown Box-Drawing Validation
+
+Workgraph uses [markdownlint-rule-search-replace](https://github.com/OnkarRuikar/markdownlint-rule-search-replace) under the MIT license.
+The package credits Onkar Ruikar, copyright 2022.
+
 ## Google Research Harness2
 
 Google LLC's [Harness2](https://github.com/google-research/harness2/tree/main) repository declares the Apache-2.0 license.
@@ -145,8 +150,7 @@ Workgraph adapts their decision boundaries without requiring a Sinon installatio
 Its development tooling copies the Harness source-style plugins and Markdown sentence and table-separator rules.
 These files retain the Harness [Apache-2.0 license](LICENSES/sinon-harness.txt), with attribution to ririnto.
 The repository owns the copied configuration and checks without modifying the upstream Harness.
-Workgraph modifies its Markdown sentence rule to preserve diagnostics with explicit source control flow.
-Workgraph consumes the maintained TSDoc plugin source without modification.
+Workgraph modifies its sentence and TSDoc copies to preserve diagnostics with explicit source control flow.
 
 ## Research And Official Documentation
 

@@ -12,6 +12,11 @@ import type {
 } from "@oxc-project/types";
 
 /**
+ * Workgraph adapts the Sinon Harness control flow while preserving its diagnostic contract.
+ * The upstream Apache-2.0 license is retained in LICENSES/sinon-harness.txt.
+ */
+
+/**
  * Oxlint comment token shape used by sourceCode comment lookup.
  */
 interface Comment {
@@ -45,26 +50,26 @@ interface RuleContext {
  * @returns The printable name, or undefined when the node carries none.
  */
 const nameOf = (value: unknown): string | undefined => {
+  const node = typeof value === "object" && value !== null ? value : undefined;
   let name: string | undefined;
-  if (typeof value === "object" && value !== null) {
-    if ("name" in value && typeof value.name === "string") {
-      ({ name } = value);
-    } else if (
-      "value" in value &&
-      (typeof value.value === "string" ||
-        typeof value.value === "number" ||
-        typeof value.value === "boolean" ||
-        typeof value.value === "bigint")
-    ) {
-      name = String(value.value);
-    } else if ("left" in value && "right" in value) {
-      const left = nameOf(value.left);
-      const right = nameOf(value.right);
-      name =
-        left !== undefined && right !== undefined
-          ? `${left}.${right}`
-          : undefined;
-    }
+  if (node && "name" in node && typeof node.name === "string") {
+    ({ name } = node);
+  } else if (
+    node &&
+    "value" in node &&
+    (typeof node.value === "string" ||
+      typeof node.value === "number" ||
+      typeof node.value === "boolean" ||
+      typeof node.value === "bigint")
+  ) {
+    name = String(node.value);
+  } else if (node && "left" in node && "right" in node) {
+    const left = nameOf(node.left);
+    const right = nameOf(node.right);
+    name =
+      left !== undefined && right !== undefined
+        ? `${left}.${right}`
+        : undefined;
   }
   return name;
 };
@@ -210,7 +215,24 @@ const exportTsdocRule = {
       }
     };
     /**
-     * Validate an exposed class's public members once, regardless of export count.
+     * Report documentation diagnostics for an exposed class's public members.
+     *
+     * @param node Exposed class declaration node to validate.
+     * @returns Nothing.
+     */
+    const reportClassMembers = (node: Class): void => {
+      for (const element of node.body.body) {
+        if (isPublicClassElement(element)) {
+          report(
+            element,
+            element.type.endsWith("PropertyDefinition") ? "property" : "method",
+            nodeName(element)
+          );
+        }
+      }
+    };
+    /**
+     * Validate an exposed class once without reading already checked members.
      *
      * @param node Exposed class declaration node to validate.
      * @returns Nothing.
@@ -218,17 +240,7 @@ const exportTsdocRule = {
     const validateClassMembers = (node: Class): void => {
       if (!checkedClasses.has(node)) {
         checkedClasses.add(node);
-        for (const element of node.body.body) {
-          if (isPublicClassElement(element)) {
-            report(
-              element,
-              element.type.endsWith("PropertyDefinition")
-                ? "property"
-                : "method",
-              nodeName(element)
-            );
-          }
-        }
+        reportClassMembers(node);
       }
     };
     /**
@@ -240,20 +252,18 @@ const exportTsdocRule = {
     const validateExportedDeclaration = (
       node: Node | null | undefined
     ): void => {
-      if (node) {
-        const kind = declarationKinds[node.type];
-        if (isClassDeclaration(node)) {
-          report(node, "class", nodeName(node));
-          validateClassMembers(node);
-        } else if (kind !== undefined) {
-          report(
-            node,
-            kind,
-            node.type === "VariableDeclaration"
-              ? variableName(node)
-              : nodeName(node)
-          );
-        }
+      const kind = node ? declarationKinds[node.type] : undefined;
+      if (node && isClassDeclaration(node)) {
+        report(node, "class", nodeName(node));
+        validateClassMembers(node);
+      } else if (node && kind !== undefined) {
+        report(
+          node,
+          kind,
+          node.type === "VariableDeclaration"
+            ? variableName(node)
+            : nodeName(node)
+        );
       }
     };
     /**

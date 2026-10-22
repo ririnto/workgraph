@@ -8,25 +8,19 @@ import { test } from "node:test";
 
 import { lint } from "markdownlint/sync";
 
-import noBoxDrawing from "../rules/no-box-drawing.ts";
+import tsdoc from "../plugins/tsdoc-plugin.ts";
 import sentencePerLine from "../rules/sentence-per-line.ts";
 
-test("Ultracite consumes mandatory rules, ignores, and formatter convergence", async () => {
+test("Ultracite preserves mandatory rules, ignores, and formatter convergence", async () => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tooling-"));
   try {
     await Promise.all(
-      [
-        "package.json",
-        "oxlint.config.ts",
-        "oxlint.style-no-blank-lines-in-functions.config.ts",
-        "oxlint.style-no-inline-comments-in-functions.config.ts",
-        "oxfmt.config.ts",
-        "plugins"
-      ].map((entry) =>
-        cp(path.join(root, entry), path.join(directory, entry), {
-          recursive: true
-        })
+      ["package.json", "oxlint.config.ts", "oxfmt.config.ts", "plugins"].map(
+        (entry) =>
+          cp(path.join(root, entry), path.join(directory, entry), {
+            recursive: true
+          })
       )
     );
     await symlink(
@@ -45,69 +39,38 @@ test("Ultracite consumes mandatory rules, ignores, and formatter convergence", a
       'export const sample = () => {\n// explain\n\nreturn 1;\n};\nsetTimeout("run()", 0);\n'
     );
     const command = path.join(root, "node_modules/ultracite/dist/index.js");
-    const checks = [
+    const invalid = spawnSync(
+      process.execPath,
+      [command, "check", "sample.ts", "dist/ignored.ts", "--format", "json"],
       {
-        codes: [
-          "eslint(arrow-body-style)",
-          "eslint(no-implied-eval)",
-          "tsdoc(require-export-tsdoc)"
-        ],
-        config: "oxlint.config.ts"
-      },
-      {
-        codes: [
-          "eslint(arrow-body-style)",
-          "eslint(no-implied-eval)",
-          "style(no-blank-lines-in-functions)"
-        ],
-        config: "oxlint.style-no-blank-lines-in-functions.config.ts"
-      },
-      {
-        codes: [
-          "eslint(arrow-body-style)",
-          "eslint(no-implied-eval)",
-          "style(no-inline-comments-in-functions)"
-        ],
-        config: "oxlint.style-no-inline-comments-in-functions.config.ts"
+        cwd: directory,
+        encoding: "utf-8",
+        timeout: 30_000
       }
-    ];
-    for (const { config, codes } of checks) {
-      const invalid = spawnSync(
-        process.execPath,
-        [
-          command,
-          "check",
-          "sample.ts",
-          "dist/ignored.ts",
-          "--config",
-          config,
-          "--format",
-          "json"
-        ],
-        {
-          cwd: directory,
-          encoding: "utf-8",
-          timeout: 30_000
-        }
-      );
-      assert.ifError(invalid.error);
-      assert.equal(invalid.status, 1, invalid.stderr);
-      const start = invalid.stdout.search(/\{\s*"diagnostics"\s*:/u);
-      assert.notEqual(start, -1, invalid.stdout);
-      const { diagnostics } = JSON.parse(
-        invalid.stdout.slice(start, invalid.stdout.lastIndexOf("}") + 1)
-      );
-      assert.deepEqual(diagnostics.map(({ code }) => code).toSorted(), codes);
-    }
+    );
+    assert.ifError(invalid.error);
+    assert.equal(invalid.status, 1, invalid.stderr);
+    const start = invalid.stdout.search(/\{\s*"diagnostics"\s*:/u);
+    assert.notEqual(start, -1, invalid.stdout);
+    const { diagnostics } = JSON.parse(
+      invalid.stdout.slice(start, invalid.stdout.lastIndexOf("}") + 1)
+    );
+    assert.deepEqual(diagnostics.map(({ code }) => code).toSorted(), [
+      "eslint(arrow-body-style)",
+      "eslint(no-implied-eval)",
+      "style(no-blank-lines-in-functions)",
+      "style(no-inline-comments-in-functions)",
+      "tsdoc(require-export-tsdoc)"
+    ]);
     const valid =
       "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true\n};\n";
     const unformatted =
       "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true,\n};\n";
     await writeFile(path.join(directory, "sample.ts"), unformatted);
-    for (const action of ["fix", "fix"]) {
+    for (const action of ["fix", "fix", "check"]) {
       const result = spawnSync(
         process.execPath,
-        [command, action, "sample.ts"],
+        [command, action, "sample.ts", "ignored.md"],
         {
           cwd: directory,
           encoding: "utf-8",
@@ -120,19 +83,6 @@ test("Ultracite consumes mandatory rules, ignores, and formatter convergence", a
         readFileSync(path.join(directory, "sample.ts"), "utf-8"),
         valid
       );
-    }
-    for (const { config } of checks) {
-      const result = spawnSync(
-        process.execPath,
-        [command, "check", "sample.ts", "ignored.md", "--config", config],
-        {
-          cwd: directory,
-          encoding: "utf-8",
-          timeout: 30_000
-        }
-      );
-      assert.ifError(result.error);
-      assert.equal(result.status, 0, result.stdout + result.stderr);
       assert.equal(
         readFileSync(path.join(directory, "ignored.md"), "utf-8"),
         markdown
@@ -458,23 +408,70 @@ test("sentence prose keeps list detection and protected Markdown admission", () 
   }
 });
 
-test("box drawing captures preserve first-match selection and UTF-16 columns", () => {
-  assert.deepEqual(
-    lint({
-      config: { default: false, "docs/no-box-drawing": true },
-      customRules: [noBoxDrawing],
-      strings: {
-        "input.md": "\u{1F600} \u2500\u2502\r\ntext\u257F\nPlain text.\n"
-      }
-    })["input.md"].map(({ lineNumber, errorRange }) => ({
-      lineNumber,
-      range: errorRange
-    })),
-    [
-      { lineNumber: 1, range: [4, 1] },
-      { lineNumber: 2, range: [5, 1] }
-    ]
+test("search-replace covers box drawing in all Markdown with first UTF-16 match and no fix", async () => {
+  const root = path.resolve(import.meta.dirname, "..");
+  const directory = await mkdtemp(
+    path.join(tmpdir(), "workgraph-box-drawing-")
   );
+  const boxCharacters = Array.from({ length: 128 }, (_, index) =>
+    String.fromCodePoint(0x25_00 + index)
+  );
+  const markdown = `# Fixture\n\n😀 ${boxCharacters.join("")}\n${boxCharacters.join("\n")}\n\n\`\`\`text\n😀 \u257F\n\`\`\`\n`;
+  try {
+    await cp(
+      path.join(root, ".markdownlint-cli2.jsonc"),
+      path.join(directory, ".markdownlint-cli2.jsonc")
+    );
+    await cp(path.join(root, "rules"), path.join(directory, "rules"), {
+      recursive: true
+    });
+    await symlink(
+      path.join(root, "node_modules"),
+      path.join(directory, "node_modules")
+    );
+    await writeFile(path.join(directory, "fixture.md"), markdown);
+    const command = path.join(
+      root,
+      "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs"
+    );
+    const result = spawnSync(
+      process.execPath,
+      [command, "--no-globs", "fixture.md"],
+      { cwd: directory, encoding: "utf-8", timeout: 30_000 }
+    );
+    assert.ifError(result.error);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    const diagnostics = `${result.stdout}${result.stderr}`;
+    assert.match(
+      diagnostics,
+      /fixture\.md:3:4 error search-replace Custom rule \[no-box-drawing:/u
+    );
+    assert.match(
+      diagnostics,
+      /fixture\.md:134:4 error search-replace Custom rule \[no-box-drawing:/u
+    );
+    assert.deepEqual(
+      [
+        ...diagnostics.matchAll(
+          /fixture\.md:(?<line>\d+):\d+ error search-replace Custom rule/gu
+        )
+      ].map(({ groups }) => Number(groups.line)),
+      [3, ...Array.from({ length: 128 }, (_, index) => index + 4), 134]
+    );
+    const fixed = spawnSync(
+      process.execPath,
+      [command, "--no-globs", "fixture.md", "--fix"],
+      { cwd: directory, encoding: "utf-8", timeout: 30_000 }
+    );
+    assert.ifError(fixed.error);
+    assert.equal(fixed.status, 1, fixed.stdout + fixed.stderr);
+    assert.equal(
+      readFileSync(path.join(directory, "fixture.md"), "utf-8"),
+      markdown
+    );
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
 });
 
 test("sentence token traversal preserves leaf diagnostics through deep containers", () => {
@@ -515,4 +512,77 @@ test("sentence token traversal preserves leaf diagnostics through deep container
     (diagnostic) => actual.push(diagnostic)
   );
   assert.deepEqual(actual, expected);
+});
+
+test("TSDoc class reuse preserves diagnostic order and reads members only once", () => {
+  const reports = [];
+  let memberReads = 0;
+  const classNode = {
+    body: {
+      get body() {
+        memberReads += 1;
+        return [
+          {
+            key: { name: "read", type: "Identifier" },
+            kind: "method",
+            type: "MethodDefinition"
+          }
+        ];
+      }
+    },
+    id: { name: "Store" },
+    type: "ClassDeclaration"
+  };
+  const visitor = tsdoc.rules["require-export-tsdoc"].create({
+    filename: "source.ts",
+    report: ({ data, messageId }) => reports.push({ data, messageId }),
+    sourceCode: { getCommentsBefore: () => [], text: "" }
+  });
+  const exported = {
+    declaration: classNode,
+    type: "ExportNamedDeclaration"
+  };
+  visitor.ExportNamedDeclaration(exported);
+  visitor.ExportNamedDeclaration(exported);
+  assert.deepEqual(reports, [
+    {
+      data: { kind: "class", name: "Store" },
+      messageId: "missingTsdoc"
+    },
+    {
+      data: { kind: "method", name: "read" },
+      messageId: "missingTsdoc"
+    },
+    {
+      data: { kind: "class", name: "Store" },
+      messageId: "missingTsdoc"
+    }
+  ]);
+  assert.equal(memberReads, 1);
+});
+
+test("TSDoc filename fallback preserves lazy evaluation and JavaScript exclusion", () => {
+  let filenameReads = 0;
+  const context = {
+    filename: "source.js",
+    getFilename: () => {
+      filenameReads += 1;
+      return "source.ts";
+    },
+    report: () => assert.fail("JavaScript must not produce TSDoc diagnostics"),
+    sourceCode: { getCommentsBefore: () => [], text: "" }
+  };
+  assert.deepEqual(tsdoc.rules["require-export-tsdoc"].create(context), {});
+  assert.equal(filenameReads, 0);
+  const visitor = tsdoc.rules["require-export-tsdoc"].create({
+    ...context,
+    filename: undefined
+  });
+  assert.deepEqual(Object.keys(visitor), [
+    "ExportAllDeclaration",
+    "ExportDefaultDeclaration",
+    "ExportNamedDeclaration",
+    "TSExportAssignment"
+  ]);
+  assert.equal(filenameReads, 1);
 });
