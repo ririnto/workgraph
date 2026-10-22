@@ -24,7 +24,7 @@ Keep each independent Task's Main and host manager distinct from bounded host Ag
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
-Choose one host Agent or Workflow execution path per outcome without redispatching its internal work.
+For ownership of each outcome, follow the [Main Agent Contract](../main-agent-contract/SKILL.md#assignments).
 For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
