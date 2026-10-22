@@ -416,7 +416,7 @@ test("search-replace covers box drawing in all Markdown with first UTF-16 match 
   const boxCharacters = Array.from({ length: 128 }, (_, index) =>
     String.fromCodePoint(0x25_00 + index)
   );
-  const markdown = `# Fixture\n\n😀 ${boxCharacters.join("")}\n${boxCharacters.join("\n")}\n\n\`\`\`text\n😀 \u257F\n\`\`\`\n`;
+  const markdown = `# Fixture\n\n😀 ${boxCharacters.join("")}\r\ntext\u257F\n${boxCharacters.join("\n")}\n\n\`\`\`text\n😀 \u257F\n\`\`\`\n`;
   try {
     await cp(
       path.join(root, ".markdownlint-cli2.jsonc"),
@@ -448,7 +448,11 @@ test("search-replace covers box drawing in all Markdown with first UTF-16 match 
     );
     assert.match(
       diagnostics,
-      /fixture\.md:134:4 error search-replace Custom rule \[no-box-drawing:/u
+      /fixture\.md:4:5 error search-replace Custom rule \[no-box-drawing:/u
+    );
+    assert.match(
+      diagnostics,
+      /fixture\.md:135:4 error search-replace Custom rule \[no-box-drawing:/u
     );
     assert.deepEqual(
       [
@@ -456,7 +460,7 @@ test("search-replace covers box drawing in all Markdown with first UTF-16 match 
           /fixture\.md:(?<line>\d+):\d+ error search-replace Custom rule/gu
         )
       ].map(({ groups }) => Number(groups.line)),
-      [3, ...Array.from({ length: 128 }, (_, index) => index + 4), 134]
+      [3, 4, ...Array.from({ length: 128 }, (_, index) => index + 5), 135]
     );
     const fixed = spawnSync(
       process.execPath,
