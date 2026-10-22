@@ -53,10 +53,10 @@ Read the matching bundled `references/` file before dispatch unless fully loaded
 
 ### Models
 
-Honor user and configuration settings over host defaults.
+Honor user, configuration, and assignment settings over defaults.
 Start native Tasks without model or effort overrides and preserve existing sessions.
 Preserve native Task hosts' dependencies.
-Use workload-appropriate model and effort through supported agent and tool controls.
+Select unpinned model and effort by workload through supported agent and tool controls.
 Preserve settings when a call has no selection control.
 Report incompatible settings without dropping them.
 Record requests and report resolved settings only when host-exposed.
