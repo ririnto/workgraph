@@ -814,7 +814,7 @@ test("TSDoc validates exported local class expressions by binding name", () => {
     },
     type: "ClassExpression"
   };
-  const documentedProperty = aliasedExpression.body.body[1];
+  const [, documentedProperty] = aliasedExpression.body.body;
   const documentedComments = new Map([
     [
       documentedProperty,
