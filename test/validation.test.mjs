@@ -23,7 +23,10 @@ import {
   validateIssueFormContent,
   validateIssueForms
 } from "./validation/issue-forms.mjs";
-import { validatePluginVersions } from "./validation/plugin-version.mjs";
+import {
+  validateOmittedManifestVersions,
+  validatePluginVersions
+} from "./validation/plugin-version.mjs";
 
 const repositoryRoot = new URL("../", import.meta.url);
 const validIssueForm = `name: Bug report
@@ -262,6 +265,21 @@ test("plugin version validation rejects invalid format, date, sequence, and pari
   assert.throws(
     () => validatePluginVersions("2026.10.10.01", "2026.10.10.02"),
     /must match/u
+  );
+});
+
+test("release manifest validation accepts manifests without version fields", () => {
+  assert.doesNotThrow(() => validateOmittedManifestVersions({}, {}));
+});
+
+test("release manifest validation rejects forbidden marketplace and package versions", () => {
+  assert.throws(
+    () => validateOmittedManifestVersions({ version: "1.0.0" }, {}),
+    /Claude marketplace manifest must omit the version field/u
+  );
+  assert.throws(
+    () => validateOmittedManifestVersions({}, { version: "1.0.0" }),
+    /Private package manifest must omit the version field/u
   );
 });
 
