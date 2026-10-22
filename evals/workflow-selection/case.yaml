@@ -8,8 +8,8 @@ execution:
   allowed_tools:
     - Agent
     - Workflow
+    - Read
     - Skill(workgraph:workflow)
-    - Skill(workflow-authoring)
   prompt: |-
     Please orchestrate this read-only release assessment with subagents.
     Partition the accepted work by the actual parser and documentation domains rather than a domain-by-phase staffing matrix.
