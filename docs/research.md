@@ -142,11 +142,12 @@ Its runtime delivers context through Claude Code hooks, and its instructions use
 ### Model Effort And Cost
 
 We reviewed nine exact models using official model, effort, pricing, host, and prompting documentation.
-The table separates API defaults from documented host recommendations.
+The table compares seven models with standard API pricing and host guidance, separating API defaults from documented host recommendations.
 The inspected Codex catalog defaults, recorded below, can differ from those recommendations.
 Prices are standard API dollars per million input, cached input, and output tokens.
-The marked Gemini rows instead carry promotional GitHub Copilot display rates, with their source and end dates recorded below.
-They do not describe subscription usage limits, fast-mode prices, or paid tool charges.
+Gemini has provider rather than benchmark comparisons.
+Its supported levels, defaults, model limits, pricing, and host observations are maintained in the [Gemini provider evidence](model-effort-evidence.md#gemini-38-flash-and-gemini-4-argon).
+The promotional Copilot rates do not describe subscription usage limits, fast-mode prices, or paid tool charges.
 
 | Exact model | Supported effort | API default | Documented host guidance | Input / cached input / output |
 | --- | --- | --- | --- | --- |
@@ -157,8 +158,6 @@ They do not describe subscription usage limits, fast-mode prices, or paid tool c
 | [Claude Sonnet 5.5](https://platform.claude.com/docs/en/models/sonnet-5-5/overview.md), `claude-sonnet-5-5`, September 28, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `medium`. | $2 / $0.10 / $10 |
 | [Claude Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview.md), `claude-opus-5-5`, September 22, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | Claude Code starts at `medium`. | $4 / $0.20 / $20 |
 | [Claude Fable 5.1](https://platform.claude.com/docs/en/models/fable-5-1/overview.md), `claude-fable-5-1`, September 1, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `high`. | $10 / $0.25 / $50 |
-| [Gemini 3.8 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash), `gemini-3.8-flash`, page updated September 2026 | `low`, `medium`, `high` thinking levels | `medium` | No documented host guidance. | $0.75 / $0.075 / $3.75 Copilot promotional |
-| [Gemini 4 Argon](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon), `gemini-4-argon`, page updated October 2026 | `low`, `medium`, `high` thinking levels | `medium` | No documented host guidance. | $2 / $0.10 / $10 Copilot promotional |
 
 The [Codex model guide](https://developers.openai.com/codex/models.md) supplies Astra and Luna starting settings.
 The [Claude Code model guide](https://code.claude.com/docs/en/model-config.md) supplies its host defaults, provider aliases, and minimum CLI version.
