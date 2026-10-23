@@ -147,10 +147,10 @@ The repository's root MIT license credits ririnto, copyright 2026.
 The reviewed Harness component declares [Apache-2.0](https://github.com/ririnto/sinon/blob/main/plugins/harness/LICENSE).
 The Harness Java parity mapping, Kotlin rules, and Gradle compatibility guidance informed the Development references.
 Workgraph adapts their decision boundaries without requiring a Sinon installation.
-Its development tooling copies the Harness source-style plugins and Markdown sentence and table-separator rules.
+Its development tooling copies the Harness TSDoc plugin and Markdown sentence and table-separator rules.
 These files retain the Harness [Apache-2.0 license](LICENSES/sinon-harness.txt), with attribution to ririnto.
 The repository owns the copied configuration and checks without modifying the upstream Harness.
-Workgraph modifies the sentence, TSDoc, blank-line, and inline-comment copies while preserving their diagnostics.
+Workgraph modifies the sentence and TSDoc copies while preserving their diagnostics.
 
 ## Research And Official Documentation
 
