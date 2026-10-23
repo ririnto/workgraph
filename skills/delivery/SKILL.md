@@ -37,15 +37,23 @@ Use named branch references and current PR changes, not fixed commit hashes.
 
 ## Make Development Progress Visible
 
-Follow this sequence: Issue creation -> branch creation -> brief diff security scan -> implementation -> parallel reviews -> normal merge.
+Follow this sequence for new units: Issue creation -> branch creation -> initial diff handling -> implementation -> parallel reviews -> normal merge.
 Create or reuse a relevant Issue and record its link before branch creation or implementation.
 For in-flight work without an Issue, establish one with its truthful stage before the next source action.
 Do not restart completed work.
 Keep its current stage, completed evidence, material blockers, branch and PR/MR links, and next action current as work changes.
 Report actual completed stages rather than guessed percentages.
 
-Before implementation, delegate a brief security scan of the initial branch or incoming PR/MR diff for user environment details and secrets.
-Report an empty initial diff honestly rather than treating it as review of later changes.
+Before implementation, determine the complete initial or incoming candidate against its named base.
+Include committed changes against the base, staged changes, unstaged changes, and every untracked non-ignored file with its full content.
+For incoming PR/MR work, include the complete incoming diff and all relevant local changes.
+Do not use ordinary `git diff` alone to verify emptiness because it omits staged-only and untracked files.
+Skip delegation only when Main verifies that the complete candidate contains no changed paths or content.
+Record the empty result in the task's Issue, without claims about later changes.
+If the complete candidate contains content, delegate exactly one brief scan for user environment details and secrets.
+Provide the complete candidate to the Explorer.
+If any part of the candidate cannot be inspected or compared with its named base, do not use the empty-diff fast path.
+Obtain the complete candidate before deciding whether to skip the scan.
 Preserve completed valid work without fabricating an earlier scan or review.
 
 ## Check Before Publication

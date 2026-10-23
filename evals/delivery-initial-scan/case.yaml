@@ -1,0 +1,56 @@
+schema_version: "1.1"
+name: delivery-initial-scan
+description: Verify empty initial-diff handling and one scan of staged-only and untracked-only changes in one delivery case.
+execution:
+  # Three repetitions make run-to-run grader variation observable.
+  runs: 3
+  max_turns: 14
+  timeout_seconds: 240
+  allowed_tools:
+    - Agent
+    - Skill(workgraph:delivery)
+  prompt: |-
+    Load Workgraph's Repository Delivery skill.
+    This synthetic policy exercise does not authorize repository commands, file edits, Issue updates, or publication.
+    Handle these events in order as one delivery task.
+
+    At the initial stage, the Issue is linked and Main locally verified the complete initial diff, including staged, unstaged, and untracked files.
+    That complete initial diff is empty.
+    State the exact result Main records in the Issue and what the result establishes about later changes.
+    Do not call Agent for this empty initial diff.
+
+    Later, before implementation, Main rechecks the complete candidate against the named base.
+    There are no committed incoming changes or unstaged tracked changes.
+    The only candidate content is a staged-only `.env` file with `APP_ENV=development` and an untracked-only `config/local.env` file with `API_ENDPOINT=http://localhost:8080`.
+    Ordinary `git diff` would show neither file.
+    State Main's next action.
+    Make exactly one read-only Agent call with both complete paths and their full contents to scan only for user environment details and secrets.
+    Preserve inherited model and effort settings without adding selectors to the Agent call.
+    Report the Agent's actual result and limit its coverage to this nonempty candidate.
+    Do not treat the empty initial result as covering these later changes or claim this scan covers future changes.
+    Do not use other tools.
+graders:
+  - name: delivery-loaded
+    type: tool_used
+    tool: Skill
+    min: 1
+    max: 1
+  - name: one-agent-call-for-nonempty-candidate
+    type: tool_used
+    tool: Agent
+    min: 1
+    max: 1
+  - name: both-empty-and-nonempty-outcomes-are-correct
+    type: llm
+    focus: trace
+    criteria: |-
+      Judge the final response and observed tool events without inferring hidden reasoning or requiring fixed wording.
+      At the initial stage, Main identifies the complete locally verified initial diff as empty and states the result to record in the Issue.
+      Main skips Agent for that empty diff and bounds the recorded result to the checked initial snapshot without claiming later changes were scanned.
+      When later changes arrive, Main rechecks the candidate against the named base and recognizes that its staged-only and untracked-only files make it nonempty.
+      Main makes exactly one Agent call containing both complete paths and their full contents.
+      The Agent scans only user environment details and secrets, without code review or commit metadata inspection.
+      The Agent call adds no model or effort selectors.
+      Main reports the Agent's actual result and limits the scan claim to this nonempty candidate.
+      The empty initial result remains limited to its checked snapshot and does not cover later changes.
+      Fail if Main skips the nonempty scan, delegates for the empty initial diff, makes multiple Agent calls, omits either full file content, or overstates coverage.
