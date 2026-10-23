@@ -559,7 +559,7 @@ test("bundled skills retain invocation metadata and supporting reference files",
     );
     assert.ok(body.trim());
     for (const match of body.matchAll(
-      /(?:\]\(|`)(?<file>(?:references|playbooks)\/[^)`#\s]+\.md|scripts\/[^)`#\s]+\.workflow\.txt|\.\.\/[^)`#\s]+\/SKILL\.md)/gu
+      /(?:\]\(|`)(?<file>(?:references|playbooks)\/[^)`#\s]+\.md|scripts\/[^)`#\s]+\.workflow\.txt|\.\.\/[^)`#\s]+\.md)/gu
     )) {
       const reference = realpathSync(
         path.resolve(directory, decodeURI(match.groups.file))
@@ -647,7 +647,11 @@ test("shared skills and update routing retain host-neutral wording", () => {
     path.join(skills, "delivery", "references", "plugin-updates.md")
   ];
   for (const name of readdirSync(skills)) {
-    if (name !== "workflow" && name !== "codex-scoped-cleanup") {
+    if (
+      name !== "workflow" &&
+      name !== "codex-scoped-cleanup" &&
+      name !== "astra-dual-review"
+    ) {
       files.push(path.join(skills, name, "SKILL.md"));
     }
   }

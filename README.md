@@ -81,6 +81,8 @@ Conditional skills load only when their stated task scope matches and their comp
 | Behavior principle | [Preserve Behavior](skills/principle-preserve-behavior/SKILL.md) | Behavior-preserving transformations load semantic, evaluation-order, and side-effect guidance. |
 | Interface principle | [Production Interfaces](skills/principle-production-interfaces/SKILL.md) | Interface, abstraction, helper, or test-design decisions load production-contract guidance. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
+| Scoped procedure | [Fix-Queue Delivery](skills/fix-queue-delivery/SKILL.md) | Queue owners deliver an assigned repository queue with serialized integration and acceptance-based closure. |
+| Scoped procedure | [Astra Dual Review](skills/astra-dual-review/SKILL.md) | Explicit dual-host assignments end with independently verified findings, issue readbacks, and separate resolution handoffs. |
 | Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main loads native Workflow procedures for the host reference's selection conditions. |
 | Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose and Markdown work loads writing guidance. |
 | Scoped procedure | [Instruction Authoring](skills/instruction-authoring/SKILL.md) | Instruction work loads task-contract design, source separation, and loading-boundary guidance. |

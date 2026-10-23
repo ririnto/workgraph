@@ -249,12 +249,10 @@ Use the host's supported exact IDs and preserve pinned versions.
 Record requested settings and report resolved settings only when the host supplies them, otherwise mark them unknown.
 Follow the current tool contract for fork inheritance and override support.
 
-We reviewed Superpowers' [using-superpowers skill](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md) and [Codex tool reference](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/references/codex-tools.md) on its `main` branch.
-Its separate [branch-finishing skill](https://github.com/obra/superpowers/blob/main/skills/finishing-a-development-branch/SKILL.md) informed the conditional Delivery boundary.
-We retain Workgraph's authorization, check reuse, and independent review rules rather than its fixed menu and full-suite rerun.
-Its host adapters informed use of current tool names and model allowlists.
-We retained the current host's fork contract where its override rules conflict with that reference.
-Superpowers supplies no model-performance evidence for this comparison.
+Delivery remains conditional and retains Workgraph's authorization, check reuse, and independent review rules.
+Host adapters use current tool names and supported model settings.
+The current host's fork contract governs inheritance and overrides.
+These structural choices supply no model-performance evidence.
 
 ### Skill Structure
 
@@ -283,11 +281,10 @@ Main and Worker inspect failures and partial effects before reasonable authorize
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
 
-We inspected the installed pstack `0.15.29` mode, leaf principle skills, worker agent, guide entry, and host adapters as a read-only organizational reference.
-Its mode remains the single stable entry with focused leaf procedures, and its user adapters separate host setup from role policy.
-Workgraph modeled only that composition on it, keeping the stable Main mode entry, development playbooks, two principle leaves, user host adapters, and a guide-first README.
-The reference supplied no text, policy, dependency, or runtime tooling, and Workgraph retains its own contracts and evidence rules.
-The official skills and prompting documents above informed the adapter and contract separation, while pstack informed only organization.
+Workgraph keeps a stable Main mode entry, focused development playbooks, two conditional principle skills, and host-specific user adapters.
+The README leads users to installation and invocation guidance rather than repeating role procedures.
+User adapters separate host setup from role policy, while Workgraph retains its contracts and evidence rules.
+The official skills and prompting documents above support the adapter and contract separation.
 These structural choices remain unverified for model adherence until a behavioral evaluation covers them.
 
 ### Host Instruction Comparison
@@ -654,10 +651,9 @@ Preserve a project's working lint and formatter choices before applying defaults
 The Development skill selects Ruff, Ultracite with Oxlint and Oxfmt, ktlint, and golangci-lint for authorized setup.
 Java retains its selected native tools, including Spotless with Palantir Java Format and Checkstyle.
 
-We reviewed Sinon's integrated [Kotlin guidance](https://github.com/ririnto/sinon/blob/main/plugins/harness/docs/languages/kotlin.md) and [Java parity mapping](https://github.com/ririnto/sinon/blob/main/plugins/harness/docs/languages/java.md).
-We compared their documented coverage with the named `main` implementations and compatibility limits.
-Upstream verification reports 221 Kotlin tests and Java formatter, checker, wildcard-import, and final-newline fixtures.
-These are upstream results, not Workgraph consumer tests or evidence of model adherence.
+Workgraph's language references distinguish syntax-only tooling from compiler-backed checks.
+Tool coverage must be verified in the consuming project rather than inferred from another project's results.
+This guidance supplies neither consumer test evidence nor proof of model adherence.
 
 | Rule area | Applicable guidance |
 | --- | --- |
@@ -668,17 +664,16 @@ These are upstream results, not Workgraph consumer tests or evidence of model ad
 | Logging | Avoid false-positive lexical checks against text blocks or shadowed names. |
 | Control flow | Preserve semantic edge cases instead of promising syntax-only automatic fixes. |
 
-The Kotlin import rule skips conflicting declarations, imports, aliases, wildcard imports, same-package references, and existing unqualified uses.
-It lacks compiler symbol resolution and leaves expression chains unchanged to preserve receiver interpretation.
-The Java profile has no equivalent import transformation that proves collision safety.
-Its lexical logging pattern can match shadowed `System` names or text-block content.
-Workgraph retains these coverage limits when recommending safe automation.
+Syntax-only Kotlin import conversion cannot establish compiler symbol resolution or expression receiver meaning.
+Preserve conflicting declarations, aliases, wildcard imports, same-package references, and existing unqualified uses unless resolution proves safety.
+Java import transformations also need collision-safety evidence.
+Lexical logging checks can match shadowed `System` names or text-block content.
+Workgraph retains these limits when recommending safe automation.
 
-The [Gradle reference](https://github.com/ririnto/sinon/blob/main/plugins/harness/docs/tools/gradle.md) distinguishes Kotlin compatibility, Java compilation, and lint-runtime requirements.
-Its newer stable Gradle example falls outside the selected Kotlin compiler's fully supported range.
-Verify the target's supported combination instead of copying profile versions or assuming the newest stable tool is compatible.
+Check Kotlin compatibility, Java compilation, and lint-runtime requirements independently when choosing Gradle versions.
+Verify the target's supported combination instead of assuming the newest stable tool is compatible.
 Register custom rulesets with the consumer's ktlint runtime and prove native lint discovers them.
-Workgraph bundles guidance only and does not install Sinon tooling, consumer rules, plugins, or hooks.
+Workgraph bundles language guidance only and does not install consumer rules, plugins, or hooks.
 
 ## Codex Native Cleanup
 
@@ -799,11 +794,7 @@ The source-loaded case, automatic skill selection, named discovery, installed ac
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
 Workgraph uses sentence-level source lines for all documents, including table explanations.
-The [repository writing rules](../AGENTS.md#writing) record that choice and its syntax exceptions.
-
-[Stop Slop](https://github.com/hardikpandya/stop-slop) recommends direct verbs, specific subjects, and removal of formulaic writing.
-We use those principles during editing while retaining explicit requirements and technical conditions.
-Its style preferences do not override host contracts or the user's requested content.
+Required syntax and exact quotations retain their original form.
 
 We checked the event definitions and error behavior in the [Claude Code hooks reference](https://code.claude.com/docs/en/hooks).
 It defines context delivery for SessionStart and SubagentStart and confirms that failures do not block startup.
@@ -848,32 +839,25 @@ The workflow uses current [checkout](https://github.com/actions/checkout) and [s
 Separate dependency-free jobs exercise the declared hook runtime floor and macOS without claiming development-tool compatibility on Node.js 18.
 These checks establish source validation and runtime evidence, while model adherence requires a separate behavioral run.
 
-## Pstack Development Lifecycle
+## Development Lifecycle
 
-We studied the original [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) on its named `main` branch.
-The reviewed plugin declares version `0.15.24` and an MIT license attributed to Lauren Tan.
-We read its feature, bug-fix, refactoring, performance, and shipping playbooks, TDD skill, and verification principles.
-We also read its build and verification guides and confirmed the official bug-fix source.
+Workgraph's conditional [Development](../skills/development/SKILL.md) skill selects the lifecycle matching the requested outcome.
+Feature work defines behavior and acceptance before implementation.
+Bug fixes require matching-surface reproduction and evidence for the causal mechanism.
+Use failing-first regression checks when required or when practical for the defect.
+Refactoring captures required behavior before structural changes and verifies equivalence afterward.
+Performance work needs baseline traces and comparable measurements.
+Verification checks the actual artifact rather than a proxy.
+Delivery checks that review verdicts still cover the current candidate.
 
-The [feature playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/feature.md) defines design and acceptance before implementation.
-The [bug-fix playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/bug-fix.md) requires matching-surface reproduction and evidence for the causal mechanism.
-Its [TDD skill](https://github.com/cursor/plugins/blob/main/pstack/skills/tdd/SKILL.md) uses failing-first regression checks when practical.
-The [refactoring playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/refactoring.md) captures behavior before structural changes and proves equivalence afterward.
-The [performance playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/perf-issue.md) requires baseline traces and comparable measurements.
-The [verification principle](https://github.com/cursor/plugins/blob/main/pstack/skills/principle-prove-it-works/SKILL.md) checks the actual artifact rather than a proxy.
-The [shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/shipping.md) rechecks whether verdicts describe the current candidate.
-
-Workgraph adapts these decisions into its conditional Development skill.
-Existing Main, Delivery, and Verification contracts retain orchestration, publication authority, evidence freshness, and cleanup.
-We do not import Cursor-specific tools, model choices, mandatory stack operations, or reordered shared history.
+Main, Delivery, and Verification retain orchestration, publication authority, evidence freshness, and cleanup.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.
 
 ## pnpm And Git Hook Tooling
 
-We reviewed the read-only [Sinon pnpm profile](https://github.com/ririnto/sinon/tree/main/plugins/harness/tooling/pnpm).
-The root retains its compatible lint versions, common check and fix surface, Markdown settings, and Ultracite owner.
-It adopts the applicable source-style plugins and Markdown sentence and table-separator rules from that profile.
-The copied rules retain their upstream license and run through the repository's existing lint owners.
+The root maintains compatible lint versions, a common check and fix surface, Markdown settings, and Ultracite ownership.
+Workgraph maintains its source-style plugins and Markdown sentence and table-separator rules locally.
+Copied rules retain their upstream license and run through the repository's existing lint owners.
 The original adoption moved dependency versions into the pnpm catalog and retained the patched `smol-toml` override.
 The locked markdownlint-cli2 release now declares that parser directly, so the superseded override has been removed.
 The selected [pnpm release](https://pnpm.io/installation) supports Node.js 24, which remains an official [LTS line](https://nodejs.org/en/about/previous-releases).
