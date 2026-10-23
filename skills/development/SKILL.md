@@ -15,7 +15,9 @@ Use `.yaml` for YAML files unless the consuming platform requires another exact 
 Choose the lifecycle from the requested outcome before editing.
 Record the behavior contract, affected consumers, exclusions, and observable acceptance evidence.
 Scale exploration, implementation, and verification to the request.
-For a simple, bounded request, use minimal discovery, make the smallest direct change, and run only the checks the target already defines.
+For a simple, bounded request, use minimal discovery and make the smallest direct change.
+When verification is requested or required by acceptance, run only checks the target defines and the active host permits.
+Report any required check left unrun because of host constraints.
 Do not add optional review ceremony, speculative sweeps, or precautionary pauses for simple bounded work.
 Keep full rigor for irreversible, high-risk, or genuinely complex work while preserving mandatory safety, authority, and target gates.
 Inspect the affected implementation and stop discovery once evidence supports the smallest safe change.

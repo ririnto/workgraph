@@ -875,7 +875,8 @@ We reviewed the read-only [Sinon pnpm profile](https://github.com/ririnto/sinon/
 The root retains its compatible lint versions, common check and fix surface, Markdown settings, and Ultracite owner.
 It adopts the applicable source-style plugins and Markdown sentence and table-separator rules from that profile.
 The copied rules retain their upstream license and run through the repository's existing lint owners.
-Dependency versions move into the pnpm catalog, retaining the patched smol-toml override and existing lockfile resolutions.
+The original adoption moved dependency versions into the pnpm catalog and retained the patched `smol-toml` override.
+The locked markdownlint-cli2 release now declares that parser directly, so the superseded override has been removed.
 The selected [pnpm release](https://pnpm.io/installation) supports Node.js 24, which remains an official [LTS line](https://nodejs.org/en/about/previous-releases).
 The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.0.0) reads the manifest pin and installs the selected runtime.
 
