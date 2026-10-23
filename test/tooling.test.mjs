@@ -22,8 +22,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
         "package.json",
         "oxlint.config.ts",
         "oxfmt.config.ts",
-        "oxlint.style-no-blank-lines-in-functions.config.ts",
-        "oxlint.style-no-inline-comments-in-functions.config.ts",
+        "oxlint.style-supplemental.config.ts",
         "plugins"
       ].map((entry) =>
         cp(path.join(root, entry), path.join(directory, entry), {
@@ -48,11 +47,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     );
     const command = path.join(root, "node_modules/ultracite/dist/index.js");
     const diagnostics = [];
-    for (const config of [
-      undefined,
-      "oxlint.style-no-blank-lines-in-functions.config.ts",
-      "oxlint.style-no-inline-comments-in-functions.config.ts"
-    ]) {
+    for (const config of [undefined, "oxlint.style-supplemental.config.ts"]) {
       const args = [
         command,
         "check",
@@ -88,11 +83,11 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       "eslint(no-implied-eval) error",
       "eslint(no-inline-comments) error",
       "eslint(no-unused-vars) error",
-      "style(no-blank-lines-in-functions) error",
-      "style(no-blank-lines-in-functions) error",
-      "style(no-inline-comments-in-functions) error",
-      "style(no-inline-comments-in-functions) error",
-      "style(no-inline-comments-in-functions) error",
+      "style-blank-lines(no-blank-lines-in-functions) error",
+      "style-blank-lines(no-blank-lines-in-functions) error",
+      "style-inline-comments(no-inline-comments-in-functions) error",
+      "style-inline-comments(no-inline-comments-in-functions) error",
+      "style-inline-comments(no-inline-comments-in-functions) error",
       "tsdoc(require-export-tsdoc) error",
       "unicorn(prefer-module) error"
     ]);
@@ -119,7 +114,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     assert.deepEqual(
       [
         ...configuredCheckOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc|unicorn)\([^)]+\))/gu
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style(?:-(?:blank-lines|inline-comments))?|tsdoc|unicorn)\([^)]+\))/gu
         )
       ]
         .map(
@@ -156,7 +151,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     assert.deepEqual(
       [
         ...configuredFixOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style|tsdoc)\([^)]+\))/gu
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style(?:-(?:blank-lines|inline-comments))?|tsdoc)\([^)]+\))/gu
         )
       ]
         .map(
@@ -171,13 +166,13 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
         "eslint(no-implied-eval) error",
         "eslint(no-inline-comments) error",
         "eslint(no-unused-vars) error",
-        "style(no-blank-lines-in-functions) error",
-        "style(no-blank-lines-in-functions) error",
-        "style(no-blank-lines-in-functions) error",
-        "style(no-inline-comments-in-functions) error",
-        "style(no-inline-comments-in-functions) error",
-        "style(no-inline-comments-in-functions) error",
-        "style(no-inline-comments-in-functions) error",
+        "style-blank-lines(no-blank-lines-in-functions) error",
+        "style-blank-lines(no-blank-lines-in-functions) error",
+        "style-blank-lines(no-blank-lines-in-functions) error",
+        "style-inline-comments(no-inline-comments-in-functions) error",
+        "style-inline-comments(no-inline-comments-in-functions) error",
+        "style-inline-comments(no-inline-comments-in-functions) error",
+        "style-inline-comments(no-inline-comments-in-functions) error",
         "tsdoc(require-export-tsdoc) error"
       ].toSorted(),
       configuredFixOutput
