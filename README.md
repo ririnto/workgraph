@@ -125,7 +125,8 @@ pnpm install --frozen-lockfile
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
 The real pre-commit and pre-push hooks run `pnpm run pre-commit` and `pnpm run pre-push`.
 Each script runs the complete existing check gate and blocks its Git operation on failure.
-The production-only audit currently has no packages to inspect because the manifest declares no production dependencies.
+`pnpm run check:production-audit` runs `pnpm audit --prod` to inspect production dependencies.
+The manifest currently declares none.
 It remains a forward-looking check when the project adds production dependencies.
 
 Follow the auto-injected repository guidance for contributor conventions and validation commands.
