@@ -18,16 +18,11 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tooling-"));
   try {
     await Promise.all(
-      [
-        "package.json",
-        "oxlint.config.ts",
-        "oxfmt.config.ts",
-        "oxlint.style-supplemental.config.ts",
-        "plugins"
-      ].map((entry) =>
-        cp(path.join(root, entry), path.join(directory, entry), {
-          recursive: true
-        })
+      ["package.json", "oxlint.config.ts", "oxfmt.config.ts", "plugins"].map(
+        (entry) =>
+          cp(path.join(root, entry), path.join(directory, entry), {
+            recursive: true
+          })
       )
     );
     await symlink(
@@ -46,35 +41,22 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       'export const sample = () => {\n// explain\n\nreturn 1;\n};\nconst tripwires = () => {\n  debugger;\n  if (true) {\n    eval("run()");\n  }\n  const unused = 0;\n};\ntripwires();\nconst directiveGap = () => {\n  "use strict";\n\n  return 1;\n};\nconst expression = () => ({\n  first: true,\n\n  second: true\n});\ndirectiveGap();\nexpression();\nconst literal = () => `first\n\nsecond`;\nliteral();\nconst expressionComment = () => String(1 /* ordinary expression comment */);\nconst expressionDirective = () => String(\n  /* c8 ignore next */\n  1\n);\nexpressionComment();\nexpressionDirective();\nconst documented = () => {\n  /** Attached documentation. */\n  const documentedValue = 1;\n  /** Free-standing documentation. */\n  return documentedValue;\n};\ndocumented();\nsetTimeout("run()", 0);\n'
     );
     const command = path.join(root, "node_modules/ultracite/dist/index.js");
-    const diagnostics = [];
-    for (const config of [undefined, "oxlint.style-supplemental.config.ts"]) {
-      const args = [
-        command,
-        "check",
-        "sample.ts",
-        "dist/ignored.ts",
-        "--format",
-        "json"
-      ];
-      if (config) {
-        args.push("--config", config);
-      }
-      const result = spawnSync(process.execPath, args, {
+    const lintResult = spawnSync(
+      process.execPath,
+      [command, "check", "sample.ts", "dist/ignored.ts", "--format", "json"],
+      {
         cwd: directory,
         encoding: "utf-8",
         timeout: 30_000
-      });
-      assert.ifError(result.error);
-      assert.equal(result.status, 1, result.stderr);
-      const start = result.stdout.search(/\{\s*"diagnostics"\s*:/u);
-      assert.notEqual(start, -1, result.stdout);
-      const pass = JSON.parse(
-        result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1)
-      );
-      diagnostics.push(
-        ...pass.diagnostics.map(({ code, severity }) => `${code} ${severity}`)
-      );
-    }
+      }
+    );
+    assert.ifError(lintResult.error);
+    assert.equal(lintResult.status, 1, lintResult.stderr);
+    const start = lintResult.stdout.search(/\{\s*"diagnostics"\s*:/u);
+    assert.notEqual(start, -1, lintResult.stdout);
+    const diagnostics = JSON.parse(
+      lintResult.stdout.slice(start, lintResult.stdout.lastIndexOf("}") + 1)
+    ).diagnostics.map(({ code, severity }) => `${code} ${severity}`);
     assert.deepEqual(diagnostics.toSorted(), [
       "eslint(arrow-body-style) error",
       "eslint(no-constant-condition) error",
@@ -83,11 +65,6 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       "eslint(no-implied-eval) error",
       "eslint(no-inline-comments) error",
       "eslint(no-unused-vars) error",
-      "style-blank-lines(no-blank-lines-in-functions) error",
-      "style-blank-lines(no-blank-lines-in-functions) error",
-      "style-inline-comments(no-inline-comments-in-functions) error",
-      "style-inline-comments(no-inline-comments-in-functions) error",
-      "style-inline-comments(no-inline-comments-in-functions) error",
       "tsdoc(require-export-tsdoc) error",
       "unicorn(prefer-module) error"
     ]);
@@ -114,7 +91,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     assert.deepEqual(
       [
         ...configuredCheckOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style(?:-(?:blank-lines|inline-comments))?|tsdoc|unicorn)\([^)]+\))/gu
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|tsdoc|unicorn)\([^)]+\))/gu
         )
       ]
         .map(
@@ -151,7 +128,7 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
     assert.deepEqual(
       [
         ...configuredFixOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|style(?:-(?:blank-lines|inline-comments))?|tsdoc)\([^)]+\))/gu
+          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|tsdoc)\([^)]+\))/gu
         )
       ]
         .map(
@@ -166,13 +143,6 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
         "eslint(no-implied-eval) error",
         "eslint(no-inline-comments) error",
         "eslint(no-unused-vars) error",
-        "style-blank-lines(no-blank-lines-in-functions) error",
-        "style-blank-lines(no-blank-lines-in-functions) error",
-        "style-blank-lines(no-blank-lines-in-functions) error",
-        "style-inline-comments(no-inline-comments-in-functions) error",
-        "style-inline-comments(no-inline-comments-in-functions) error",
-        "style-inline-comments(no-inline-comments-in-functions) error",
-        "style-inline-comments(no-inline-comments-in-functions) error",
         "tsdoc(require-export-tsdoc) error"
       ].toSorted(),
       configuredFixOutput

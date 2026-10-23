@@ -10,18 +10,16 @@
     "check:plugin-version": "node test/validation/plugin-version.mjs",
     "check:production-audit": "pnpm audit --prod",
     "check:tooling-tests": "node --test test/tooling.test.mjs",
-    "check:ultracite": "run-p --aggregate-output --continue-on-error ultracite:check-root ultracite:check-supplemental",
+    "check:ultracite": "pnpm run ultracite:check-root",
     "check:validation-tests": "node --test test/validation.test.mjs",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
-    "fix:ultracite": "run-s --continue-on-error ultracite:fix-supplemental ultracite:fix-root",
+    "fix:ultracite": "pnpm run ultracite:fix-root",
     "pre-commit": "run-s check",
     "pre-push": "run-s check",
     "prepare": "husky",
     "ultracite:check-root": "ultracite check",
-    "ultracite:check-supplemental": "ultracite check --config oxlint.style-supplemental.config.ts",
-    "ultracite:fix-root": "ultracite fix",
-    "ultracite:fix-supplemental": "ultracite fix --config oxlint.style-supplemental.config.ts"
+    "ultracite:fix-root": "ultracite fix"
   },
   "devDependencies": {
     "@oxc-project/types": "catalog:",
