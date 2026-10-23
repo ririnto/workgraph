@@ -25,6 +25,7 @@ Remove tangents that do not help complete the requested task.
 
 Use direct verbs, familiar words, and one term per concept.
 Name the actor and use active voice when the actor matters.
+Use the factual actor, including a compiler or service, without inventing a human subject.
 Remove filler, empty emphasis, vague qualifiers, business jargon, and repetitive conclusions.
 Avoid rhetorical contrasts, staged reveals, fragments for emphasis, and invented terms.
 Vary sentence length without adding decorative punctuation or em dashes.
@@ -33,6 +34,8 @@ Keep English instruction sentences to 20 words or fewer.
 Keep each paragraph focused on one idea.
 Keep conditions and exceptions with the actions they qualify.
 Preserve technical meaning, authority boundaries, required syntax, and exact quotations when removing repetition.
+Keep uncertainty when removing a hedge would invent confidence.
+Remove adverbs only when their removal preserves technical behavior and the claim's scope.
 
 ## Markdown Sentences
 

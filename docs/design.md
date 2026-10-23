@@ -18,6 +18,8 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow bounded assignments, evidence, and handbacks in one self-contained body. |
 | `skills/subagent-context/references/{claude,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
+| `skills/fix-queue-delivery/SKILL.md` | Assigned repository queue owners | Queue Main, issue owners, and the integration owner coordinate bounded fixes and confirm original acceptance before closure. |
+| `skills/astra-dual-review/SKILL.md` | Assigned dual-host review managers | Managers collect independent native passes, verify candidates, read back issue writes, and hand fixes to separate units. |
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
 | `skills/delivery/references/{claude,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
@@ -266,11 +268,11 @@ Do not infer model adherence from a passing hook test or a shorter prompt.
 
 ## Validation And Tooling
 
-Ultracite owns source lint and formatting, including the adopted Sinon source-style plugins.
+Ultracite owns source lint and formatting, including Workgraph's maintained source-style plugins.
 The root configs use the official Ultracite 8 presets and preserve their ignore patterns.
 Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
 The local style and TSDoc plugins retain mandatory function-body spacing, declaration-comment, and exported TypeScript documentation checks.
-These additions follow the [Sinon tooling examples](https://github.com/ririnto/sinon/tree/main/plugins/harness/tooling/pnpm).
+The repository owns these additions and verifies their behavior through its tooling tests.
 JavaScript parameter and return annotations and type imports follow the official preset defaults.
 Markdownlint checks relative links and heading fragments, sentence boundaries, and table separators through the adopted rules.
 

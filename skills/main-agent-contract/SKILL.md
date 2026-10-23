@@ -19,7 +19,7 @@ Update outcomes for material scope changes.
 
 ## Context
 
-Read current instructions, contracts, knowledge, and handoffs.
+Read current contracts, knowledge, and handoffs.
 Verify current authority, access, ownership, repository state, and completion.
 Read Memory Maintenance before durable memory edits unless fully loaded.
 

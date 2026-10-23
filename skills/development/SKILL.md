@@ -34,7 +34,7 @@ Verify each coherent unit before building dependent work on it.
 Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
 Main and Delivery retain review, integration, and cleanup authority.
 
-Apply the target project's rules and existing tools without requiring a Harness installation.
+Apply the target project's rules and existing tools.
 Guidance alone does not authorize tooling changes or changes across consumer projects.
 
 | Language | Source | Reference |
