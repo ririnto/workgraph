@@ -22,14 +22,6 @@ Marketplace installations and development checkouts can contain different versio
 Check the loaded plugin version and actual source paths before evaluating changed instructions.
 
 Workgraph changes no model or effort settings through installation.
-For a new session using Workgraph's Claude model split, the operator can choose the following startup command.
-
-```sh
-claude --model opus --effort xhigh
-```
-
-The example uses the documented `xhigh` effort, while active host and user overrides retain precedence.
-The [Claude Main reference](../../skills/main-agent-contract/references/claude.md#model-selection) owns the operational model defaults.
 
 ## Automatic Loading
 
