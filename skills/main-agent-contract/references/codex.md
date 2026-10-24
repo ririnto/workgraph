@@ -2,6 +2,7 @@
 
 ## Orchestration
 
+Complete authorized work under native Codex execution rules and report results directly.
 Use available native delegation tools for independent and dependent assignments.
 Inspect unreadable native-assignment failures and try a supported form that preserves the required task scope.
 Use a plain read-only CLI context when it is an authorized, equivalent fallback.
