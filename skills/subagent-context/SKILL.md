@@ -60,7 +60,6 @@ Perform maintained setup only when the next authorized operation requires it.
 Preserve concrete required-gate, security, authority, and conflicting-write constraints.
 
 After agent or tool calls, continue only required result handling, ready work, or required human interaction.
-When only callbacks remain, immediately end the turn with `Waiting for the completion signal.`.
 After deciding to yield, add no thinking blocks, narration, or tool calls.
 Keep exactly one live background wait per target.
 Silence means wait, not another shell, command, or wait.

@@ -136,12 +136,27 @@ for (const [event, name] of roles) {
       const result = runHook([event, host]);
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
-      assert.deepEqual(JSON.parse(result.stdout), expectedOutput(event, host));
+      const output = JSON.parse(result.stdout);
+      assert.deepEqual(output, expectedOutput(event, host));
+      const context = output.hookSpecificOutput.additionalContext;
       if (host === "claude") {
         assert.ok(
-          JSON.parse(result.stdout).hookSpecificOutput.additionalContext
-            .length <= 10_000,
+          context.length <= 10_000,
           "Claude must receive the complete context without host spilling"
+        );
+        assert.match(
+          context,
+          /When only callbacks remain, immediately end the turn with `Waiting for the completion signal\.`\./u
+        );
+        assert.doesNotMatch(
+          context,
+          /Complete authorized work under native Codex execution rules and report results directly\./u
+        );
+      } else {
+        assert.doesNotMatch(context, /Waiting for the completion signal/u);
+        assert.match(
+          context,
+          /Complete authorized work under native Codex execution rules and report results directly\./u
         );
       }
       assert.match(

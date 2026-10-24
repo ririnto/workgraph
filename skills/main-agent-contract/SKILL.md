@@ -74,7 +74,6 @@ Require only relevant predecessor results and conflicting ownership returns.
 Assess unexpected changes without stopping or tracing origin, then adopt or drop them.
 
 After agent or tool calls, continue only required result handling, ready work, or required human interaction.
-When only callbacks remain, immediately end the turn with `Waiting for the completion signal.`.
 After deciding to yield, add no thinking blocks, narration, or tool calls.
 Keep exactly one live background wait per target.
 Silence means wait, not another shell, command, or wait.
