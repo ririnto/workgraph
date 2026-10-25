@@ -21,8 +21,7 @@ Do not create a scheduler or infer new work from available capacity.
 | Integration owner | Serializes shared merges, refreshes affected evidence after collisions, and confirms acceptance before issue closure. |
 
 One agent may hold compatible roles.
-The assignment must name one writer for each shared file, worktree, ref, and tracker record.
-Require relevant ownership returns before overlapping reuse or transfer.
+Queue Main follows [Main Agent Contract](../main-agent-contract/SKILL.md) for generic coordination, evidence freshness, and ownership return.
 
 Use [Delivery](../delivery/SKILL.md) for repository eligibility, publication, independent review, integration, and cleanup unless fully loaded.
 Use [Verification](../verification/SKILL.md) for acceptance evidence unless fully loaded.
@@ -57,8 +56,6 @@ Let the issue owner update its branch unless ownership has explicitly transferre
 After a collision, compare the affected changes with current named main.
 Have the responsible owner resolve conflicts without force-pushing or rewriting shared history.
 Refresh affected checks, acceptance evidence, and review coverage before the next dependent merge.
-Reuse unaffected passing evidence under unchanged relevant conditions.
-Do not repeat every check because commit identity or parentage changed.
 
 ## Confirm Acceptance Before Closure
 
@@ -84,5 +81,4 @@ Keep unmerged PRs open at a deadline and report their next action without weaken
 
 Return merged issues and PRs, original-acceptance checks, named-main readbacks, and confirmed closure states.
 Report umbrella acceptance separately, along with blocked items, their owners, and the remaining queue count.
-Return source, Git, reader, process, and descendant ownership before resource reuse or cleanup.
-Report cleaned and retained resources, their purpose, next action, and any incomplete delivery.
+Report any incomplete delivery.
