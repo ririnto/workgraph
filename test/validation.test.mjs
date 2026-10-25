@@ -61,12 +61,6 @@ body:
       required: true
 `;
 
-/**
- * Lint one source file with only relative-link validation enabled.
- * @param {string} filename Source path used for link resolution.
- * @param {string} content Markdown source text.
- * @returns {Promise<object[]>} Relative-link diagnostics.
- */
 const lintRelativeLinks = async (filename, content) => {
   const result = await lint({
     config: {
@@ -82,9 +76,6 @@ const lintRelativeLinks = async (filename, content) => {
   return result[filename] ?? [];
 };
 
-/**
- * Run the unchanged repository command against disposable manifests and forms.
- */
 const copyValidation = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-validation-"));
   t.after(() => rmSync(root, { force: true, recursive: true }));

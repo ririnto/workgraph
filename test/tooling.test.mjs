@@ -173,12 +173,6 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
   }
 });
 
-/**
- * Capture sentence diagnostics through Markdownlint's real parser.
- * @param {string} source Markdown source text.
- * @param {string} name Source name controlling document exemptions.
- * @returns {object[]} Sentence diagnostics.
- */
 const sentenceErrors = (source, name = "input.md") =>
   lint({
     config: { default: false, "docs/sentence-per-line": true },
