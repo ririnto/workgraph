@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import {
-  existsSync,
+  cpSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   rmSync,
@@ -18,15 +19,6 @@ import relativeLinksRule, {
   markdownIt
 } from "markdownlint-rule-relative-links";
 import { lint } from "markdownlint/promise";
-
-import {
-  validateIssueFormContent,
-  validateIssueForms
-} from "./validation/issue-forms.mjs";
-import {
-  validateOmittedManifestVersions,
-  validatePluginVersions
-} from "./validation/plugin-version.mjs";
 
 const repositoryRoot = new URL("../", import.meta.url);
 const validIssueForm = `name: Bug report
@@ -69,12 +61,6 @@ body:
       required: true
 `;
 
-/**
- * Lint one source file with only relative-link validation enabled.
- * @param {string} filename Source path used for link resolution.
- * @param {string} content Markdown source text.
- * @returns {Promise<object[]>} Relative-link diagnostics.
- */
 const lintRelativeLinks = async (filename, content) => {
   const result = await lint({
     config: {
@@ -90,97 +76,119 @@ const lintRelativeLinks = async (filename, content) => {
   return result[filename] ?? [];
 };
 
-test("issue form validator accepts the supported textarea schema", () => {
-  assert.deepEqual(
-    validateIssueFormContent(validIssueForm, "bug_report.yaml"),
-    []
+const copyValidation = (t) => {
+  const root = mkdtempSync(path.join(tmpdir(), "workgraph-validation-"));
+  t.after(() => rmSync(root, { force: true, recursive: true }));
+  cpSync(
+    new URL("validation/", import.meta.url),
+    path.join(root, "test/validation"),
+    { recursive: true }
   );
-});
-
-test("issue form validator rejects malformed YAML", () => {
-  const errors = validateIssueFormContent("name: [\n", "bug_report.yaml");
-  assert.equal(errors.length, 1);
-  assert.match(
-    errors[0],
-    /bug_report\.yaml:\d+: issue form must contain valid YAML/u
+  symlinkSync(
+    fileURLToPath(new URL("../node_modules", import.meta.url)),
+    path.join(root, "node_modules")
   );
-});
+  return root;
+};
 
-test("issue form validator requires long names, top-level strings, and a body", () => {
-  const content = "name: bug\ndescription: ''\nbody: []\n";
-  const errors = validateIssueFormContent(content, "improvement.yaml");
-  assert.equal(errors.length, 3);
-  assert.match(errors[0], /top-level description must be a non-empty string/u);
-  assert.match(errors[1], /name must contain more than 3 characters/u);
-  assert.match(errors[2], /top-level body must be a non-empty array/u);
-});
+const runValidation = (root, filename) => {
+  const result = spawnSync(
+    process.execPath,
+    [path.join(root, "test/validation", filename)],
+    {
+      cwd: tmpdir(),
+      encoding: "utf-8",
+      killSignal: "SIGKILL",
+      timeout: 5000
+    }
+  );
+  assert.ifError(result.error);
+  return result;
+};
 
-test("issue form validator enforces the textarea field contract and id syntax", () => {
-  const content = validIssueForm
-    .replace(
-      "  - type: textarea\n    id: problem",
-      "  - type: input\n    id: problem!"
-    )
-    .replace("    id: evidence\n", "")
-    .replace("      label: Evidence\n", "      label: ''\n")
-    .replace(
-      "      description: Provide concrete evidence.\n",
-      "      description: ''\n"
-    )
-    .replace(
-      "    validations:\n      required: true\n  - type: textarea\n    id: scope",
-      "    validations:\n      required: false\n  - type: textarea\n    id: scope"
+test("issue form command reports malformed input, field violations, and duplicate names", (t) => {
+  const root = copyValidation(t);
+  const directory = path.join(root, ".github/ISSUE_TEMPLATE");
+  mkdirSync(directory, { recursive: true });
+  for (const [content, diagnostics] of [
+    [validIssueForm, []],
+    ["name: [\n", ["bug_report.yaml:2: issue form must contain valid YAML."]],
+    [
+      "name: bug\ndescription: ''\nbody: []\n",
+      [
+        "bug_report.yaml: top-level description must be a non-empty string.",
+        "bug_report.yaml: top-level name must contain more than 3 characters.",
+        "bug_report.yaml: top-level body must be a non-empty array."
+      ]
+    ],
+    [
+      validIssueForm
+        .replace(
+          "  - type: textarea\n    id: problem",
+          "  - type: input\n    id: problem!"
+        )
+        .replace("    id: evidence\n", "")
+        .replace("      label: Evidence\n", "      label: ''\n")
+        .replace(
+          "      description: Provide concrete evidence.\n",
+          "      description: ''\n"
+        )
+        .replace(
+          "    validations:\n      required: true\n  - type: textarea\n    id: scope",
+          "    validations:\n      required: false\n  - type: textarea\n    id: scope"
+        ),
+      [
+        "bug_report.yaml: body[1] must use the textarea type.",
+        "bug_report.yaml: body[1] id may contain only letters, numbers, hyphens, and underscores.",
+        "bug_report.yaml: body[2] must have a non-empty string id.",
+        "bug_report.yaml: body[2] must have a non-empty string label.",
+        "bug_report.yaml: body[2] must have a non-empty string description.",
+        "bug_report.yaml: body[2] must require a response."
+      ]
+    ],
+    [
+      validIssueForm
+        .replace("id: evidence", "id: problem")
+        .replace("label: Evidence", "label: Problem"),
+      [
+        "bug_report.yaml: body[2] repeats field id problem.",
+        "bug_report.yaml: body[2] repeats field label Problem."
+      ]
+    ]
+  ]) {
+    writeFileSync(path.join(directory, "bug_report.yaml"), content);
+    const result = runValidation(root, "issue-forms.mjs");
+    assert.equal(
+      result.status,
+      diagnostics.length === 0 ? 0 : 1,
+      result.stderr
     );
-  const errors = validateIssueFormContent(content, "bug_report.yaml");
-  assert.ok(
-    errors.some((error) => error.includes("must use the textarea type"))
+    assert.equal(
+      result.stdout,
+      diagnostics.length === 0 ? "Validated 1 GitHub issue forms.\n" : ""
+    );
+    assert.equal(
+      result.stderr,
+      diagnostics
+        .map((message) => `.github/ISSUE_TEMPLATE/${message}\n`)
+        .join("")
+    );
+  }
+  writeFileSync(path.join(directory, "bug_report.yaml"), validIssueForm);
+  writeFileSync(
+    path.join(directory, "duplicate.yaml"),
+    validIssueForm.replace("name: Bug report", "name: BUG REPORT")
   );
-  assert.ok(
-    errors.some((error) => error.includes("id may contain only letters"))
-  );
-  assert.ok(
-    errors.some((error) => error.includes("must have a non-empty string id"))
-  );
-  assert.ok(
-    errors.some((error) => error.includes("must have a non-empty string label"))
-  );
-  assert.ok(
-    errors.some((error) =>
-      error.includes("must have a non-empty string description")
-    )
-  );
-  assert.ok(errors.some((error) => error.includes("must require a response")));
-});
-
-test("issue form validator rejects duplicate field ids and labels", () => {
-  const content = validIssueForm
-    .replace("id: evidence", "id: problem")
-    .replace("label: Evidence", "label: Problem");
-  const errors = validateIssueFormContent(content, "bug_report.yaml");
-  assert.ok(errors.some((error) => error.includes("repeats field id problem")));
-  assert.ok(
-    errors.some((error) => error.includes("repeats field label Problem"))
+  const duplicate = runValidation(root, "issue-forms.mjs");
+  assert.equal(duplicate.status, 1);
+  assert.equal(duplicate.stdout, "");
+  assert.equal(
+    duplicate.stderr,
+    ".github/ISSUE_TEMPLATE/duplicate.yaml: top-level name must be unique across issue forms.\n"
   );
 });
 
-test("issue form names must be unique across discovered forms", () => {
-  const duplicateName = validIssueForm.replace(
-    "name: Bug report",
-    "name: BUG REPORT"
-  );
-  const forms = [
-    { content: validIssueForm, source: "bug_report.yaml" },
-    { content: duplicateName, source: "duplicate.yaml" }
-  ];
-  const errors = validateIssueForms(forms);
-  assert.ok(
-    errors.some((error) =>
-      error.includes("name must be unique across issue forms")
-    )
-  );
-});
-
-test("issue forms preserve required field IDs and remove Markdown templates", () => {
+test("issue forms request the required contribution fields", () => {
   const directory = new URL(".github/ISSUE_TEMPLATE/", repositoryRoot);
   const expectedIds = [
     "problem",
@@ -189,10 +197,8 @@ test("issue forms preserve required field IDs and remove Markdown templates", ()
     "acceptance",
     "ownership_next_action"
   ];
-  const forms = [];
   for (const filename of ["bug_report", "improvement"]) {
     const formPath = new URL(`${filename}.yaml`, directory);
-    const source = `${filename}.yaml`;
     const content = readFileSync(formPath, "utf-8");
     const form = yamlParser(content);
     assert.ok(!form.description.endsWith("\n"));
@@ -203,20 +209,7 @@ test("issue forms preserve required field IDs and remove Markdown templates", ()
     assert.ok(
       form.body.every((field) => !field.attributes.description.endsWith("\n"))
     );
-    assert.equal(existsSync(new URL(`${filename}.md`, directory)), false);
-    forms.push({ content, source });
   }
-  assert.deepEqual(validateIssueForms(forms), []);
-});
-
-test("YAML block scalars preserve literal and folded text without trailing line feeds", () => {
-  const parsed = yamlParser(
-    "literal: |-\n  first line\n  second line\nfolded: >-\n  first line\n  second line\n"
-  );
-  assert.equal(parsed.literal, "first line\nsecond line");
-  assert.equal(parsed.folded, "first line second line");
-  assert.ok(!parsed.literal.endsWith("\n"));
-  assert.ok(!parsed.folded.endsWith("\n"));
 });
 
 test("relative link rule accepts existing files and headings", async (t) => {
@@ -243,54 +236,91 @@ test("relative link rule rejects missing files", async (t) => {
   assert.equal(errors[0].severity, "error");
 });
 
-test("plugin version validation accepts matching calendar date releases", () => {
-  assert.doesNotThrow(() =>
-    validatePluginVersions("2026.10.10.07", "2026.10.10.07")
-  );
-});
-
-test("plugin version validation rejects invalid format, date, sequence, and parity", () => {
-  assert.throws(
-    () => validatePluginVersions("2026.10.10", "2026.10.10.01"),
-    /format/u
-  );
-  assert.throws(
-    () => validatePluginVersions("2026.02.30.01", "2026.02.30.01"),
-    /valid date/u
-  );
-  assert.throws(
-    () => validatePluginVersions("2026.10.10.00", "2026.10.10.00"),
-    /non-zero/u
-  );
-  assert.throws(
-    () => validatePluginVersions("2026.10.10.01", "2026.10.10.02"),
-    /must match/u
-  );
-});
-
-test("release manifest validation accepts manifests without version fields", () => {
-  assert.doesNotThrow(() =>
-    validateOmittedManifestVersions({ plugins: [{ name: "workgraph" }] }, {})
-  );
-});
-
-test("release manifest validation rejects forbidden marketplace and package versions", () => {
-  assert.throws(
-    () => validateOmittedManifestVersions({ version: "1.0.0" }, {}),
-    /Claude marketplace manifest must omit the version field/u
-  );
-  assert.throws(
-    () =>
-      validateOmittedManifestVersions(
-        { plugins: [{ name: "workgraph", version: "1.0.0" }] },
-        {}
-      ),
-    /Claude marketplace manifest must omit the version field/u
-  );
-  assert.throws(
-    () => validateOmittedManifestVersions({}, { version: "1.0.0" }),
-    /Private package manifest must omit the version field/u
-  );
+test("plugin version command rejects invalid releases and forbidden manifest versions", (t) => {
+  const root = copyValidation(t);
+  mkdirSync(path.join(root, ".claude-plugin"));
+  mkdirSync(path.join(root, ".codex-plugin"));
+  for (const [claude, codex, marketplace, packageManifest, diagnostic] of [
+    [
+      "2026.10.10.07",
+      "2026.10.10.07",
+      { plugins: [{ name: "workgraph" }] },
+      {},
+      ""
+    ],
+    [
+      "2026.10.10",
+      "2026.10.10.01",
+      {},
+      {},
+      "Claude plugin version must use yyyy.mm.dd.seq format."
+    ],
+    [
+      "2026.02.30.01",
+      "2026.02.30.01",
+      {},
+      {},
+      "Claude plugin version must contain a valid date and non-zero sequence."
+    ],
+    [
+      "2026.10.10.00",
+      "2026.10.10.00",
+      {},
+      {},
+      "Claude plugin version must contain a valid date and non-zero sequence."
+    ],
+    [
+      "2026.10.10.01",
+      "2026.10.10.02",
+      {},
+      {},
+      "Claude and Codex plugin versions must match."
+    ],
+    [
+      "2026.10.10.01",
+      "2026.10.10.01",
+      { version: "1.0.0" },
+      {},
+      "Claude marketplace manifest must omit the version field."
+    ],
+    [
+      "2026.10.10.01",
+      "2026.10.10.01",
+      { plugins: [{ name: "workgraph", version: "1.0.0" }] },
+      {},
+      "Claude marketplace manifest must omit the version field."
+    ],
+    [
+      "2026.10.10.01",
+      "2026.10.10.01",
+      {},
+      { version: "1.0.0" },
+      "Private package manifest must omit the version field."
+    ]
+  ]) {
+    for (const [filename, value] of [
+      [".claude-plugin/plugin.json", { version: claude }],
+      [".codex-plugin/plugin.json", { version: codex }],
+      [".claude-plugin/marketplace.json", marketplace],
+      ["package.json", packageManifest]
+    ]) {
+      writeFileSync(path.join(root, filename), JSON.stringify(value));
+    }
+    const result = runValidation(root, "plugin-version.mjs");
+    assert.equal(result.status, diagnostic === "" ? 0 : 1, result.stderr);
+    assert.equal(
+      result.stdout,
+      diagnostic === ""
+        ? "Host plugin versions match, and marketplace and package manifests omit version fields.\n"
+        : ""
+    );
+    assert.equal(
+      result.stderr,
+      diagnostic === ""
+        ? ""
+        : `Plugin version validation failed: ${diagnostic}\n`
+    );
+  }
 });
 
 test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {

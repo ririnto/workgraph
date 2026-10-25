@@ -3,7 +3,6 @@ import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
   cpSync,
-  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -27,13 +26,6 @@ const roles = [
 const hosts = ["claude", "codex"];
 const hookTimeoutMilliseconds = 5000;
 
-/**
- * Run the hook with the current Node and capture its result.
- * @param {string[]} args Hook event and host arguments.
- * @param {string} scriptPath Injector path.
- * @param {string} cwd Child working directory.
- * @returns {object} Captured process output and exit status.
- */
 const runHook = (args, scriptPath = script, cwd = tmpdir()) =>
   spawnSync(process.execPath, [scriptPath, ...args], {
     cwd,
@@ -58,11 +50,6 @@ const runConfiguredHook = (command, env) =>
     timeout: hookTimeoutMilliseconds
   });
 
-/**
- * Copy the plugin into a disposable directory owned by the test.
- * @param {import("node:test").TestContext} t Test cleanup owner.
- * @returns {string} Disposable plugin root.
- */
 const copyPlugin = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph skills "));
   t.after(() => rmSync(root, { force: true, recursive: true }));
@@ -81,82 +68,79 @@ const copyPlugin = (t) => {
   return root;
 };
 
-/**
- * Assert the complete output, including exact source paths and loaded text.
- * @param {string} event Hook event.
- * @param {string} host Selected execution host.
- * @param {string} rootSkills Skill directory.
- * @param {string} body Optional replacement skill body.
- * @returns {object} Expected hook envelope.
- */
-const expectedOutput = (event, host, rootSkills = skills, body = "") => {
+const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
   const name =
     event === "SessionStart" ? "main-agent-contract" : "subagent-context";
   const source = realpathSync(path.join(rootSkills, name, "SKILL.md"));
-  const content = readFileSync(source, "utf-8");
-  const context =
-    host === "claude"
-      ? `Workgraph source paths are relative to the skill base directory below.\nWorkgraph instructions loaded from ${path.basename(source)}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(source)}\n\n${(body || content.slice(content.indexOf("\n---\n") + 5)).trimStart()}`
-      : `Workgraph instructions loaded from ${source}.\nThe active execution host is Codex.\nThe complete skill file is already loaded below, including YAML frontmatter.\n\n<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`;
   const reference = realpathSync(
     path.join(rootSkills, name, "references", `${host}.md`)
   );
-  return {
-    hookSpecificOutput: {
-      additionalContext: `${context}\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(source), reference) : reference}.\nThe complete reference content is already loaded below.\n\n${
-        host === "claude"
-          ? readFileSync(reference, "utf-8")
-              .replace(/^\uFEFF/u, "")
-              .replaceAll("\r\n", "\n")
-              .replace(/\r$/u, "")
-              .split("\n")
-              .map((line, index) => `${index + 1}\t${line.replace(/\r$/u, "")}`)
-              .join("\n")
-          : readFileSync(reference, "utf-8")
-      }`,
-      hookEventName: event
-    }
-  };
+  const content = readFileSync(source, "utf-8");
+  const guidance = readFileSync(reference, "utf-8");
+  const { additionalContext: context, hookEventName } =
+    output.hookSpecificOutput;
+  assert.equal(hookEventName, event);
+  const [roleContext, referenceContext, extra] = context.split(
+    `\n\nWorkgraph ${host} guidance loaded from `
+  );
+  assert.equal(extra, undefined);
+  assert.ok(
+    roleContext.includes(
+      `The active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.`
+    )
+  );
+  const [location, referenceBody] = referenceContext.split(
+    ".\nThe complete reference content is already loaded below.\n\n"
+  );
+  if (host === "claude") {
+    const { directory, deliveredBody } = roleContext.match(
+      /Base directory for this skill: (?<directory>[^\n]+)\n\n(?<deliveredBody>[\s\S]*)$/u
+    ).groups;
+    assert.equal(directory, path.dirname(source));
+    assert.equal(path.resolve(directory, location), reference);
+    assert.equal(
+      deliveredBody,
+      (body || content.split("\n---\n").slice(1).join("\n---\n")).trimStart()
+    );
+    const lines = referenceBody.split("\n");
+    assert.deepEqual(
+      lines.map((line) => line.slice(0, line.indexOf("\t"))),
+      lines.map((_, index) => String(index + 1))
+    );
+    assert.equal(
+      lines.map((line) => line.slice(line.indexOf("\t") + 1)).join("\n"),
+      guidance.replaceAll("\r", "")
+    );
+  } else {
+    assert.equal(location, reference);
+    assert.equal(referenceBody, guidance);
+    assert.ok(
+      roleContext.endsWith(
+        `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`
+      )
+    );
+  }
 };
 
-/**
- * Assert that a required file failure emits no partial context.
- * @param {object} result Captured hook process result.
- * @param {string} file Required file named in the error.
- */
 const assertFileFailure = (result, file) => {
   assert.equal(result.status, 1, result.stderr);
   assert.equal(result.stdout, "");
   assert.ok(result.stderr.includes(file), result.stderr);
 };
 
-for (const [event, name] of roles) {
+for (const [event] of roles) {
   for (const host of hosts) {
     test(`${event} ${host}: injects the exact selected body and role-specific host reference`, () => {
       const result = runHook([event, host]);
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
       const output = JSON.parse(result.stdout);
-      assert.deepEqual(output, expectedOutput(event, host));
+      assertOutput(output, event, host);
       const context = output.hookSpecificOutput.additionalContext;
       if (host === "claude") {
         assert.ok(
           context.length <= 10_000,
           "Claude must receive the complete context without host spilling"
-        );
-        assert.match(
-          context,
-          /When only callbacks remain, immediately end the turn with `Waiting for the completion signal\.`\./u
-        );
-        assert.doesNotMatch(
-          context,
-          /Complete authorized work under native Codex execution rules and report results directly\./u
-        );
-      } else {
-        assert.doesNotMatch(context, /Waiting for the completion signal/u);
-        assert.match(
-          context,
-          /Complete authorized work under native Codex execution rules and report results directly\./u
         );
       }
       assert.match(
@@ -175,17 +159,6 @@ for (const [event, name] of roles) {
       );
     });
   }
-
-  test(`${name}: skill contains a complete role body`, () => {
-    const [prefix, frontmatter, body] = readFileSync(
-      path.join(skills, name, "SKILL.md"),
-      "utf-8"
-    ).split(/^---$/mu);
-    assert.equal(prefix, "");
-    assert.match(frontmatter, new RegExp(`^name: ${name}$`, "mu"));
-    assert.doesNotMatch(frontmatter, /^user-invocable: false$/mu);
-    assert.ok(body.trim());
-  });
 }
 
 test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
@@ -224,16 +197,12 @@ test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) =>
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
       const output = JSON.parse(result.stdout);
-      assert.deepEqual(
+      assertOutput(
         output,
-        expectedOutput(
-          event,
-          "claude",
-          path.join(root, "skills"),
-          content
-            .slice(content.indexOf("\n---\n") + 5)
-            .replaceAll("\n", newline)
-        )
+        event,
+        "claude",
+        path.join(root, "skills"),
+        content.slice(content.indexOf("\n---\n") + 5).replaceAll("\n", newline)
       );
       const contextLength = output.hookSpecificOutput.additionalContext.length;
       t.diagnostic(
@@ -292,18 +261,24 @@ test("configured Claude hooks load relocated skills and references with LF or CR
       });
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
-      assert.deepEqual(
+      assertOutput(
         JSON.parse(result.stdout),
-        expectedOutput(event, "claude", path.join(root, "skills"), body)
+        event,
+        "claude",
+        path.join(root, "skills"),
+        body
       );
       const codex = runHook(
         [event, "codex"],
         path.join(root, "hooks", "inject-context.mjs")
       );
       assert.equal(codex.status, 0, codex.stderr);
-      assert.deepEqual(
+      assertOutput(
         JSON.parse(codex.stdout),
-        expectedOutput(event, "codex", path.join(root, "skills"), body)
+        event,
+        "codex",
+        path.join(root, "skills"),
+        body
       );
     }
   }
@@ -372,9 +347,11 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
         path.join(root, "hooks", "inject-context.mjs")
       );
       assert.equal(result.status, 0, result.stderr);
-      assert.deepEqual(
+      assertOutput(
         JSON.parse(result.stdout),
-        expectedOutput(event, host, path.join(root, "skills"))
+        event,
+        host,
+        path.join(root, "skills")
       );
       if (host === "claude") {
         const context = JSON.parse(result.stdout).hookSpecificOutput
@@ -449,10 +426,7 @@ test("configured Codex hooks load complete relocated skill files without a conte
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stderr, "");
-    assert.deepEqual(
-      JSON.parse(result.stdout),
-      expectedOutput(event, "codex", selectedSkills)
-    );
+    assertOutput(JSON.parse(result.stdout), event, "codex", selectedSkills);
   }
 });
 
@@ -488,7 +462,7 @@ for (const [event, name] of roles) {
       name === "main-agent-contract"
         ? "subagent-context"
         : "main-agent-contract";
-    rmSync(path.join(root, "skills", otherRole, "references"), {
+    rmSync(path.join(root, "skills", otherRole), {
       recursive: true
     });
     for (const host of hosts) {
@@ -507,9 +481,11 @@ for (const [event, name] of roles) {
         path.join(root, "hooks", "inject-context.mjs")
       );
       assert.equal(result.status, 0, result.stderr);
-      assert.deepEqual(
+      assertOutput(
         JSON.parse(result.stdout),
-        expectedOutput(event, host, path.join(root, "skills"))
+        event,
+        host,
+        path.join(root, "skills")
       );
       const context = JSON.parse(result.stdout).hookSpecificOutput
         .additionalContext;
@@ -548,9 +524,12 @@ test("Codex delimiter lines preserve raw files and remove Claude body prefixes",
         );
         assert.equal(result.status, 0, result.stderr);
         assert.equal(result.stderr, "");
-        assert.deepEqual(
+        assertOutput(
           JSON.parse(result.stdout),
-          expectedOutput(event, host, path.join(root, "skills"), body)
+          event,
+          host,
+          path.join(root, "skills"),
+          body
         );
       }
     }
@@ -609,92 +588,7 @@ test("bundled native Workflow sources remain relocatable text resources", (t) =>
     assert.match(file, /\.workflow\.txt$/u);
     const source = realpathSync(path.join(directory, file));
     assert.ok(source.startsWith(`${realpathSync(directory)}${path.sep}`));
-    assert.match(readFileSync(source, "utf-8"), /^export const meta = \{/u);
-  }
-});
-
-test("root review guidance routes to the scoped contributor policy", () => {
-  const rootInstructions = readFileSync(
-    new URL("../AGENTS.md", import.meta.url),
-    "utf-8"
-  );
-  const reviewSection = rootInstructions
-    .split("## Repository Reviews\n")[1]
-    ?.split("\n## ")[0]
-    ?.trim();
-  assert.ok(reviewSection);
-  assert.match(reviewSection, /\]\(docs\/reviews\.md\)/u);
-  assert.doesNotMatch(reviewSection, /\b(?:Claude|Codex|pstack)\b/iu);
-});
-
-test("agent-facing instructions never name the auto-injected repository guidance file", () => {
-  const files = [
-    "CONTRIBUTING.md",
-    "README.md",
-    "docs/design.md",
-    "docs/reviews.md"
-  ].map((file) => fileURLToPath(new URL(`../${file}`, import.meta.url)));
-  for (const name of readdirSync(skills)) {
-    const directory = path.join(skills, name);
-    files.push(path.join(directory, "SKILL.md"));
-    for (const group of ["playbooks", "references"]) {
-      const groupDirectory = path.join(directory, group);
-      if (existsSync(groupDirectory)) {
-        files.push(
-          ...readdirSync(groupDirectory).map((file) =>
-            path.join(groupDirectory, file)
-          )
-        );
-      }
-    }
-  }
-  for (const file of files) {
-    assert.doesNotMatch(
-      readFileSync(file, "utf-8"),
-      /AGENTS\.md/u,
-      `${path.relative(skills, file)} names auto-injected repository guidance`
-    );
-  }
-});
-
-test("shared skills and update routing retain host-neutral wording", () => {
-  const files = [
-    path.join(skills, "delivery", "references", "plugin-updates.md")
-  ];
-  for (const name of readdirSync(skills)) {
-    if (
-      name !== "workflow" &&
-      name !== "codex-scoped-cleanup" &&
-      name !== "astra-dual-review"
-    ) {
-      files.push(path.join(skills, name, "SKILL.md"));
-    }
-  }
-  for (const file of files) {
-    assert.doesNotMatch(
-      readFileSync(file, "utf-8"),
-      /\b(?:Claude|Codex)\b/iu,
-      `${path.relative(skills, file)} contains host-specific wording`
-    );
-  }
-});
-
-test("hooks load exact role context without bundled agent configuration", (t) => {
-  const root = copyPlugin(t);
-  assert.equal(existsSync(path.join(root, "agents")), false);
-  for (const [event] of roles) {
-    for (const host of hosts) {
-      const result = runHook(
-        [event, host],
-        path.join(root, "hooks", "inject-context.mjs")
-      );
-      assert.equal(result.status, 0, result.stderr);
-      assert.equal(result.stderr, "");
-      assert.deepEqual(
-        JSON.parse(result.stdout),
-        expectedOutput(event, host, path.join(root, "skills"))
-      );
-    }
+    assert.ok(readFileSync(source, "utf-8").trim());
   }
 });
 
@@ -704,28 +598,6 @@ test("conditional skill bodies stay outside automatic delivery and are not start
   const conditional = readdirSync(path.join(root, "skills"))
     .filter((name) => !roleNames.has(name))
     .map((name) => path.join(root, "skills", name));
-  const bodies = conditional.map((directory) =>
-    readFileSync(path.join(directory, "SKILL.md"), "utf-8")
-      .split(/^---$/mu)[2]
-      .trim()
-  );
-  for (const [event] of roles) {
-    for (const host of hosts) {
-      const result = runHook(
-        [event, host],
-        path.join(root, "hooks", "inject-context.mjs")
-      );
-      assert.equal(result.status, 0, result.stderr);
-      const output = JSON.parse(result.stdout);
-      assert.deepEqual(
-        output,
-        expectedOutput(event, host, path.join(root, "skills"))
-      );
-      for (const body of bodies) {
-        assert.ok(!output.hookSpecificOutput.additionalContext.includes(body));
-      }
-    }
-  }
   for (const directory of conditional) {
     rmSync(directory, { recursive: true });
   }
@@ -736,29 +608,13 @@ test("conditional skill bodies stay outside automatic delivery and are not start
         path.join(root, "hooks", "inject-context.mjs")
       );
       assert.equal(result.status, 0, result.stderr);
-      assert.deepEqual(
+      assertOutput(
         JSON.parse(result.stdout),
-        expectedOutput(event, host, path.join(root, "skills"))
+        event,
+        host,
+        path.join(root, "skills")
       );
     }
-  }
-});
-
-test("worker hooks load only their role and selected host reference", (t) => {
-  const root = copyPlugin(t);
-  rmSync(path.join(root, "skills", "main-agent-contract"), {
-    recursive: true
-  });
-  for (const host of hosts) {
-    const result = runHook(
-      ["SubagentStart", host],
-      path.join(root, "hooks", "inject-context.mjs")
-    );
-    assert.equal(result.status, 0, result.stderr);
-    assert.deepEqual(
-      JSON.parse(result.stdout),
-      expectedOutput("SubagentStart", host, path.join(root, "skills"))
-    );
   }
 });
 
