@@ -9,7 +9,6 @@ import { stripVTControlCharacters } from "node:util";
 
 import { lint } from "markdownlint/sync";
 
-import tsdoc from "../plugins/tsdoc-plugin.ts";
 import sentencePerLine from "../rules/sentence-per-line.ts";
 import tableSeparators from "../rules/table-separators.ts";
 
@@ -622,317 +621,95 @@ test("search-replace covers box drawing in all Markdown with first UTF-16 match 
   }
 });
 
-test("sentence token traversal preserves leaf diagnostics through deep containers", () => {
-  let params;
-  lint({
-    config: { default: false, "docs/sentence-per-line": true },
-    customRules: [
-      {
-        ...sentencePerLine,
-        function: (input) => {
-          params = input;
-        }
-      }
-    ],
-    strings: { "input.md": "- First sentence. Second sentence.\n" }
-  });
-  const [container] = params.parsers.micromark.tokens;
-  const paragraph = container.children
-    .flatMap(({ children }) => children)
-    .find(({ type }) => type === "paragraph");
-  assert.ok(paragraph);
-  let nested = paragraph;
-  for (let depth = 0; depth < 10_000; depth += 1) {
-    nested = { ...container, children: [nested] };
-  }
-  const expected = [];
-  sentencePerLine.function(params, (diagnostic) => expected.push(diagnostic));
-  assert.equal(expected.length, 1);
-  const actual = [];
-  sentencePerLine.function(
-    {
-      ...params,
-      parsers: {
-        ...params.parsers,
-        micromark: { ...params.parsers.micromark, tokens: [nested] }
-      }
-    },
-    (diagnostic) => actual.push(diagnostic)
+test("sentence diagnostics reach prose inside deeply nested Markdown lists", () => {
+  assert.deepEqual(
+    sentenceErrors(
+      `${"- ".repeat(10_000)}First sentence. Second sentence.\n`
+    ).map(({ lineNumber, errorRange }) => ({ lineNumber, range: errorRange })),
+    [{ lineNumber: 1, range: [20_015, 1] }]
   );
-  assert.deepEqual(actual, expected);
 });
 
-test("TSDoc covers public and protected class members while excluding private ones", () => {
-  const constructor = {
-    key: { name: "constructor", type: "Identifier" },
-    kind: "constructor",
-    type: "MethodDefinition"
-  };
-  const protectedMethod = {
-    accessibility: "protected",
-    key: { name: "read", type: "Identifier" },
-    kind: "method",
-    type: "MethodDefinition"
-  };
-  const protectedProperty = {
-    accessibility: "protected",
-    key: { name: "status", type: "Identifier" },
-    type: "PropertyDefinition",
-    value: { type: "Literal" }
-  };
-  const publicProperty = {
-    key: { name: "enabled", type: "Identifier" },
-    type: "PropertyDefinition",
-    value: { type: "Literal" }
-  };
-  const documentedProperty = {
-    key: { name: "documented", type: "Identifier" },
-    type: "PropertyDefinition",
-    value: { type: "Literal" }
-  };
-  const privateProperty = {
-    accessibility: "private",
-    key: { name: "secret", type: "Identifier" },
-    type: "PropertyDefinition",
-    value: { type: "Literal" }
-  };
-  const privateMethod = {
-    key: { name: "hidden", type: "PrivateIdentifier" },
-    kind: "method",
-    type: "MethodDefinition"
-  };
-  const documentedComments = new Map([
-    [
-      documentedProperty,
-      [
-        {
-          end: 0,
-          start: 0,
-          type: "Block",
-          value: "*\n * Existing documentation.\n "
-        }
-      ]
-    ]
-  ]);
-  const reports = [];
-  const visitor = tsdoc.rules["require-export-tsdoc"].create({
-    filename: "source.ts",
-    report: ({ data, messageId }) => reports.push({ data, messageId }),
-    sourceCode: {
-      getCommentsBefore: (node) => documentedComments.get(node) ?? [],
-      text: ""
-    }
-  });
-  visitor.ExportNamedDeclaration({
-    declaration: {
-      body: {
-        body: [
-          constructor,
-          protectedMethod,
-          protectedProperty,
-          publicProperty,
-          documentedProperty,
-          privateProperty,
-          privateMethod
-        ]
-      },
-      id: { name: "Store" },
-      type: "ClassDeclaration"
-    },
-    type: "ExportNamedDeclaration"
-  });
-  assert.deepEqual(reports, [
-    {
-      data: { kind: "class", name: "Store" },
-      messageId: "missingTsdoc"
-    },
-    {
-      data: { kind: "method", name: "constructor" },
-      messageId: "missingTsdoc"
-    },
-    { data: { kind: "method", name: "read" }, messageId: "missingTsdoc" },
-    { data: { kind: "property", name: "status" }, messageId: "missingTsdoc" },
-    { data: { kind: "property", name: "enabled" }, messageId: "missingTsdoc" }
-  ]);
-});
-
-test("TSDoc validates exported local class expressions by binding name", () => {
-  const statements = [];
-  const program = { body: statements, type: "Program" };
-  const directExpression = {
-    body: {
-      body: [
-        {
-          key: { name: "run", type: "Identifier" },
-          kind: "method",
-          type: "MethodDefinition"
-        }
-      ]
-    },
-    type: "ClassExpression"
-  };
-  const aliasedExpression = {
-    body: {
-      body: [
-        {
-          key: { name: "status", type: "Identifier" },
-          type: "PropertyDefinition",
-          value: { type: "Literal" }
-        },
-        {
-          key: { name: "documented", type: "Identifier" },
-          type: "PropertyDefinition",
-          value: { type: "Literal" }
-        }
-      ]
-    },
-    type: "ClassExpression"
-  };
-  const [, documentedProperty] = aliasedExpression.body.body;
-  const documentedComments = new Map([
-    [
-      documentedProperty,
-      [
-        {
-          end: 0,
-          start: 0,
-          type: "Block",
-          value: "*\n * Existing documentation.\n "
-        }
-      ]
-    ]
-  ]);
-  const directExport = {
-    parent: program,
-    specifiers: [
-      {
-        exported: { name: "Direct", type: "Identifier" },
-        local: { name: "Direct", type: "Identifier" }
-      }
-    ],
-    type: "ExportNamedDeclaration"
-  };
-  const aliasedExport = {
-    parent: program,
-    specifiers: [
-      {
-        exported: { name: "Public", type: "Identifier" },
-        local: { name: "Internal", type: "Identifier" }
-      }
-    ],
-    type: "ExportNamedDeclaration"
-  };
-  statements.push(
-    {
-      declarations: [
-        {
-          id: { name: "Direct", type: "Identifier" },
-          init: directExpression
-        },
-        {
-          id: { name: "Internal", type: "Identifier" },
-          init: aliasedExpression
-        }
-      ],
-      type: "VariableDeclaration"
-    },
-    directExport,
-    aliasedExport
+test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
+  const root = path.resolve(import.meta.dirname, "..");
+  const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tsdoc-"));
+  t.after(() => rm(directory, { force: true, recursive: true }));
+  await Promise.all(
+    ["oxlint.config.ts", "oxfmt.config.ts", "plugins"].map((entry) =>
+      cp(path.join(root, entry), path.join(directory, entry), {
+        recursive: true
+      })
+    )
   );
-  const reports = [];
-  const visitor = tsdoc.rules["require-export-tsdoc"].create({
-    filename: "source.ts",
-    report: ({ data, messageId }) => reports.push({ data, messageId }),
-    sourceCode: {
-      getCommentsBefore: (node) => documentedComments.get(node) ?? [],
-      text: ""
-    }
-  });
-  visitor.ExportNamedDeclaration(directExport);
-  visitor.ExportNamedDeclaration(aliasedExport);
-  assert.deepEqual(reports, [
-    {
-      data: { kind: "export list", name: "Direct" },
-      messageId: "missingTsdoc"
-    },
-    { data: { kind: "method", name: "run" }, messageId: "missingTsdoc" },
-    {
-      data: { kind: "export list", name: "Public" },
-      messageId: "missingTsdoc"
-    },
-    { data: { kind: "property", name: "status" }, messageId: "missingTsdoc" }
-  ]);
-});
-
-test("TSDoc class reuse preserves diagnostic order and reads members only once", () => {
-  const reports = [];
-  let memberReads = 0;
-  const classNode = {
-    body: {
-      get body() {
-        memberReads += 1;
-        return [
-          {
-            key: { name: "read", type: "Identifier" },
-            kind: "method",
-            type: "MethodDefinition"
-          }
-        ];
-      }
-    },
-    id: { name: "Store" },
-    type: "ClassDeclaration"
-  };
-  const visitor = tsdoc.rules["require-export-tsdoc"].create({
-    filename: "source.ts",
-    report: ({ data, messageId }) => reports.push({ data, messageId }),
-    sourceCode: { getCommentsBefore: () => [], text: "" }
-  });
-  const exported = {
-    declaration: classNode,
-    type: "ExportNamedDeclaration"
-  };
-  visitor.ExportNamedDeclaration(exported);
-  visitor.ExportNamedDeclaration(exported);
-  assert.deepEqual(reports, [
-    {
-      data: { kind: "class", name: "Store" },
-      messageId: "missingTsdoc"
-    },
-    {
-      data: { kind: "method", name: "read" },
-      messageId: "missingTsdoc"
-    },
-    {
-      data: { kind: "class", name: "Store" },
-      messageId: "missingTsdoc"
-    }
-  ]);
-  assert.equal(memberReads, 1);
-});
-
-test("TSDoc filename fallback preserves lazy evaluation and JavaScript exclusion", () => {
-  let filenameReads = 0;
-  const context = {
-    filename: "source.js",
-    getFilename: () => {
-      filenameReads += 1;
-      return "source.ts";
-    },
-    report: () => assert.fail("JavaScript must not produce TSDoc diagnostics"),
-    sourceCode: { getCommentsBefore: () => [], text: "" }
-  };
-  assert.deepEqual(tsdoc.rules["require-export-tsdoc"].create(context), {});
-  assert.equal(filenameReads, 0);
-  const visitor = tsdoc.rules["require-export-tsdoc"].create({
-    ...context,
-    filename: undefined
-  });
-  assert.deepEqual(Object.keys(visitor), [
-    "ExportAllDeclaration",
-    "ExportDefaultDeclaration",
-    "ExportNamedDeclaration",
-    "TSExportAssignment"
-  ]);
-  assert.equal(filenameReads, 1);
+  await symlink(
+    path.join(root, "node_modules"),
+    path.join(directory, "node_modules")
+  );
+  await writeFile(
+    path.join(directory, "source.ts"),
+    `export class Store {
+  constructor() {}
+  protected read() { return 1; }
+  protected status = 1;
+  enabled = true;
+  /**
+   * Expose a documented property.
+   */
+  documented = true;
+  private secret = 1;
+  #hidden() { return 1; }
+}
+const Direct = class {
+  run() { return 1; }
+};
+const Internal = class {
+  status = 1;
+  /**
+   * Expose a documented property.
+   */
+  documented = true;
+};
+export { Direct };
+export { Internal as Public };
+export { Store as Again };
+`
+  );
+  await writeFile(
+    path.join(directory, "source.js"),
+    "export class JavaScript { read() { return 1; } }\n"
+  );
+  const result = spawnSync(
+    process.execPath,
+    [
+      path.join(root, "node_modules/ultracite/dist/index.js"),
+      "check",
+      "source.ts",
+      "source.js",
+      "--format",
+      "json"
+    ],
+    { cwd: directory, encoding: "utf-8", timeout: 30_000 }
+  );
+  assert.ifError(result.error);
+  assert.equal(result.status, 1, result.stderr);
+  const start = result.stdout.search(/\{\s*"diagnostics"\s*:/u);
+  assert.notEqual(start, -1, result.stdout);
+  assert.deepEqual(
+    JSON.parse(result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1))
+      .diagnostics.filter(({ code }) => code === "tsdoc(require-export-tsdoc)")
+      .map(({ message }) => message)
+      .toSorted(),
+    [
+      'Missing TSDoc for exported public API class "Store".',
+      'Missing TSDoc for exported public API export list "Again".',
+      'Missing TSDoc for exported public API export list "Direct".',
+      'Missing TSDoc for exported public API export list "Public".',
+      'Missing TSDoc for exported public API method "constructor".',
+      'Missing TSDoc for exported public API method "read".',
+      'Missing TSDoc for exported public API method "run".',
+      'Missing TSDoc for exported public API property "enabled".',
+      'Missing TSDoc for exported public API property "status".',
+      'Missing TSDoc for exported public API property "status".'
+    ]
+  );
 });
