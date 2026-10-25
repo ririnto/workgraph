@@ -67,8 +67,8 @@ Use the language or platform's native named-group facilities instead of adding u
 If the engine lacks named groups, report that limit.
 Do not treat ordinary array indexing as regex capture access.
 
-Before source work, read [Preserve Behavior](../principle-preserve-behavior/SKILL.md) unless its complete content is already loaded.
-Before source work, read [Production Interfaces](../principle-production-interfaces/SKILL.md) unless its complete content is already loaded.
+Before control-flow or expression changes, including condition inversion, read [Preserve Behavior](../principle-preserve-behavior/SKILL.md) unless its complete content is already loaded.
+Before helper, abstraction, or test-observation decisions, read [Production Interfaces](../principle-production-interfaces/SKILL.md) unless its complete content is already loaded.
 
 ## Spacing
 
