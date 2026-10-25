@@ -1092,6 +1092,15 @@ const failedRepair = (options) =>
         checks: [{ command: "check-failed", status: "failed" }]
       }
     : splitImplement(options);
+const multiRound = (options) => {
+  if (options.label.includes(":fix-1")) {
+    return { ...splitImplement(options), branch: "unit-u1-r1" };
+  }
+  if (options.label.includes(":fix-2")) {
+    return { ...splitImplement(options), branch: "unit-u1-r2" };
+  }
+  return splitImplement(options);
+};
 const integrateResult = {
   branch: "task-branch",
   checks: [{ command: "pnpm run check", status: "passed" }],
@@ -1110,6 +1119,20 @@ const integrateSingle = {
   evidence: "e",
   merged: true,
   resources: [{ branch: "unit-u1", key: "u1", state: "merged" }]
+};
+const integrateFirstRepair = {
+  ...integrateResult,
+  resources: [
+    { branch: "unit-u1-r1", key: "u1", state: "merged" },
+    { branch: "unit-u2", key: "u2", state: "merged" }
+  ]
+};
+const integrateSecondRepair = {
+  ...integrateResult,
+  resources: [
+    { branch: "unit-u1-r2", key: "u1", state: "merged" },
+    { branch: "unit-u2", key: "u2", state: "merged" }
+  ]
 };
 const sweepResult = { evidence: "e", exposures: [] };
 const publishCreated = {
@@ -1139,7 +1162,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,
-      { issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
@@ -1199,9 +1222,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     );
     const implementCalls = calls.filter((entry) => entry.phase === "Implement");
     assert.ok(
-      implementCalls[0].prompt.includes(
-        "Required starting reference: the current task branch"
-      )
+      implementCalls[0].prompt.includes("Required starting reference: main")
     );
     assert.ok(!implementCalls[0].prompt.includes("Base branch:"));
     assert.ok(
@@ -1223,7 +1244,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,
-      { issue: "#1", maxFixRounds: 0, task: "t" },
+      { candidateBranch: "main", issue: "#1", maxFixRounds: 0, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: () => simpleImplement,
@@ -1251,7 +1272,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,
-      { issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
@@ -1283,7 +1304,13 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.complex,
-      { issue: "#1", maxFixRounds: 1, skips: { sweep: true }, task: "t" },
+      {
+        candidateBranch: "main",
+        issue: "#1",
+        maxFixRounds: 1,
+        skips: { sweep: true },
+        task: "t"
+      },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: splitImplement,
@@ -1332,7 +1359,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.complex,
-      { issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: splitImplement,
@@ -1417,9 +1444,28 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     );
   }
   {
+    const { calls, result } = await runWorkflowSample(
+      samplePaths.simple,
+      { issue: "#1", skips: { implement: true }, task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Plan: () => singleUnits,
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    assert.equal(result.complete, false);
+    assert.equal(calls.filter((call) => call.phase === "Implement").length, 0);
+    assert.equal(
+      result.phaseEvidence.find((record) => record.title === "Implement")
+        .reason,
+      "Explicit dispatch skip, so source changes did not run"
+    );
+  }
+  {
     const { result } = await runWorkflowSample(
       samplePaths.simple,
-      { issue: "#1", task: "t" },
+      { candidateBranch: "main", issue: "#1", task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: () => null,
@@ -1522,7 +1568,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
     ].map(async ([payload, pattern]) => {
       const { result } = await runWorkflowSample(
         samplePaths.simple,
-        { issue: "#1", task: "t" },
+        { candidateBranch: "main", issue: "#1", task: "t" },
         dispatchTable({
           Explore: () => exploreResult,
           Implement: () => payload,
@@ -1575,18 +1621,40 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       { branch: "unit-u2", key: "u2", state: "merged" }
     ]
   };
+  const integrateDuplicate = {
+    ...integrateResult,
+    resources: [
+      { branch: "unit-u1", key: "u1", state: "retained" },
+      { branch: "unit-u1", key: "u1", state: "merged" },
+      { branch: "unit-u2", key: "u2", state: "merged" }
+    ]
+  };
   await Promise.all(
     [
-      [integrateUnmerged, /unmerged/u],
-      [integrateConflicted, /contradictory/u],
-      [integratePartialLedger, /every named unit branch/u],
-      [integrateWrongBranch, /every named unit branch/u],
-      [integrateNoChecks, /combined candidate/u],
-      [integrateRetained, /contradictory/u]
-    ].map(async ([payload, pattern]) => {
+      [integrateUnmerged, /unmerged/u, ["merged", "merged"]],
+      [integrateConflicted, /contradictory/u, ["merged", "merged"]],
+      [
+        integratePartialLedger,
+        /every named unit branch/u,
+        ["merged", "implemented"]
+      ],
+      [
+        integrateWrongBranch,
+        /every named unit branch/u,
+        ["implemented", "merged"]
+      ],
+      [
+        integrateDuplicate,
+        /every named unit branch/u,
+        ["implemented", "implemented"]
+      ],
+      [integrateNoChecks, /combined candidate/u, ["merged", "merged"]],
+      [integrateRetained, /contradictory/u, ["merged", "retained"]],
+      [null, /Integration agent failed/u, ["implemented", "implemented"]]
+    ].map(async ([payload, pattern, states]) => {
       const { result } = await runWorkflowSample(
         samplePaths.complex,
-        { issue: "#1", task: "t" },
+        { candidateBranch: "main", issue: "#1", task: "t" },
         dispatchTable({
           Explore: () => exploreResult,
           Implement: splitImplement,
@@ -1602,7 +1670,10 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       );
       assert.equal(integrateRecord.status, "failed");
       assert.match(integrateRecord.reason, pattern);
-      assert.equal(result.resources.length, 2);
+      assert.deepEqual(
+        result.resources.map((resource) => resource.state),
+        states
+      );
       const publishRecord = result.phaseEvidence.find(
         (record) => record.title === "Publish"
       );
@@ -1617,7 +1688,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
 test("delivery workflow samples carry named candidates and per-key repair evidence", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.complex,
-    { issue: "#1", maxFixRounds: 1, task: "t" },
+    { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
       Implement: wrongStart,
@@ -1654,7 +1725,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   );
   const repairRun = await runWorkflowSample(
     samplePaths.complex,
-    { issue: "#1", maxFixRounds: 1, task: "t" },
+    { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
       Implement: failedRepair,
@@ -1674,13 +1745,16 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     "failed"
   );
   assert.deepEqual(
-    repairRun.result.resources.find((resource) => resource.key === "u1"),
-    {
-      branch: "unit-u1-r2",
-      key: "u1",
-      startRef: "task-branch",
-      state: "attempted"
-    }
+    repairRun.result.resources.filter((resource) => resource.key === "u1"),
+    [
+      { branch: "unit-u1", key: "u1", startRef: "main", state: "merged" },
+      {
+        branch: "unit-u1-r2",
+        key: "u1",
+        startRef: "task-branch",
+        state: "attempted"
+      }
+    ]
   );
   assert.equal(
     repairRun.result.resources.find((resource) => resource.key === "u2").state,
@@ -1718,4 +1792,74 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   assert.deepEqual(candidateRun.result.resources, [
     { branch: "unit-u1", key: "u1", startRef: "main", state: "attempted" }
   ]);
+  const multiRun = await runWorkflowSample(
+    samplePaths.complex,
+    { candidateBranch: "main", issue: "#1", maxFixRounds: 2, task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: multiRound,
+      Integrate: sequence(
+        integrateResult,
+        integrateFirstRepair,
+        integrateSecondRepair
+      ),
+      Plan: () => splitUnits,
+      Publish: sequence(publishCreated, publishUpdated, publishUpdated),
+      Review: sequence(reviewFix, reviewFix, reviewPass),
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(multiRun.result.complete, true);
+  assert.deepEqual(multiRun.result.fixRounds, { max: 2, used: 2 });
+  assert.equal(
+    multiRun.calls.filter((call) => call.phase === "Implement").length,
+    4
+  );
+  assert.deepEqual(multiRun.result.resources, [
+    { branch: "unit-u1", key: "u1", startRef: "main", state: "merged" },
+    { branch: "unit-u2", key: "u2", startRef: "main", state: "merged" },
+    {
+      branch: "unit-u1-r1",
+      key: "u1",
+      startRef: "task-branch",
+      state: "merged"
+    },
+    {
+      branch: "unit-u1-r2",
+      key: "u1",
+      startRef: "task-branch",
+      state: "merged"
+    }
+  ]);
+  const missingRun = await runWorkflowSample(
+    samplePaths.complex,
+    { issue: "#1", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: splitImplement,
+      Integrate: () => integrateResult,
+      Plan: () => splitUnits,
+      Publish: () => publishCreated,
+      Review: () => reviewPass,
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(missingRun.result.complete, false);
+  assert.equal(
+    missingRun.calls.filter((call) => call.phase === "Implement").length,
+    0
+  );
+  const missingRecord = missingRun.result.phaseEvidence.find(
+    (record) => record.title === "Implement"
+  );
+  assert.equal(missingRecord.status, "failed");
+  assert.match(missingRecord.reason, /args.candidateBranch/u);
+  assert.deepEqual(missingRun.result.resources, []);
+  assert.equal(
+    missingRun.result.phaseEvidence.find((record) => record.title === "Publish")
+      .reason,
+    "Implementation did not complete, so publication is blocked"
+  );
 });

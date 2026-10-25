@@ -355,7 +355,7 @@ const explorationsFor = unit => {
   }
   return matches
 }
-const dispatchImplementation = async (targets, findings, roundLabel, expectedStart) => {
+const dispatchImplementation = async (targets, findings, roundLabel, requiredStart) => {
   const results = await parallel(targets.map(unit => () => {
     const options = {
       isolation: 'worktree',
@@ -392,7 +392,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, expectedSta
       findings === null ? '' : `Fix these review findings inside your owned paths: ${JSON.stringify(findings)}`,
       `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
       'You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.',
-      `Required starting reference: ${expectedStart.description}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
+      `Required starting reference: ${requiredStart}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
       `Create a branch named for unit ${unit.key}, commit your changes there with a descriptive subject, and do not push.`,
       'Edit only files inside your owned paths, and report every changed file as a repository-relative path.',
       'Run the narrowest relevant checks and report each command with status passed, failed, or skipped.',
@@ -417,8 +417,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, expectedSta
         changedFiles.every(file => file !== null && item.paths.some(owned => ownsPath(owned, file)))
       const handoffHeld =
         typeof result?.branch === 'string' && result.branch.trim().length > 0 &&
-        typeof result?.startRef === 'string' && result.startRef.trim().length > 0 &&
-        (expectedStart.name === null || result.startRef === expectedStart.name)
+        result.startRef === requiredStart
       const evidenceHeld =
         typeof result?.diffSummary === 'string' && result.diffSummary.trim().length > 0 &&
         typeof result?.evidence === 'string' && result.evidence.trim().length > 0
@@ -430,7 +429,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, expectedSta
         problems.push('required checks are missing or did not all pass')
       }
       if (!handoffHeld) {
-        problems.push(`unit branch or verified starting reference is missing${expectedStart.name === null ? '' : `, or the worktree did not start from ${expectedStart.name}`}`)
+        problems.push(`unit branch is missing or the worktree did not start from ${requiredStart}`)
       }
       if (!evidenceHeld) {
         problems.push('result is missing or malformed')
@@ -560,24 +559,36 @@ const dispatchIntegration = async currentUnits => {
   }
   return { branch: result.branch, checks: result.checks, conflicts: result.conflicts, reason: null, resources, status: 'completed' }
 }
-const applyLedger = (integrationState, knownResources) => {
-  if (!Array.isArray(integrationState?.resources)) {
+const retainAttempts = (attemptResources, attemptLedger) => {
+  attemptResources.forEach(resource => {
+    const existing = attemptLedger.find(entry => entry.key === resource.key && entry.branch === resource.branch)
+    if (existing === undefined) {
+      attemptLedger.push(resource)
+    } else {
+      existing.startRef = resource.startRef
+      existing.state = resource.state
+    }
+  })
+}
+const applyLedger = (integrationState, attemptLedger) => {
+  const resources = Array.isArray(integrationState?.resources) ? integrationState.resources : []
+  const namedKeys = resources
+    .map(resource => (typeof resource?.key === 'string' ? resource.key : ''))
+    .filter(key => key.length > 0)
+  const claimsHeld =
+    new Set(namedKeys).size === namedKeys.length &&
+    resources.every(resource =>
+      typeof resource?.key === 'string' &&
+      typeof resource?.branch === 'string' && resource.branch.trim().length > 0 &&
+      ['failed', 'merged', 'retained'].includes(resource?.state))
+  if (!claimsHeld) {
     return
   }
-  integrationState.resources.forEach(resource => {
-    if (typeof resource?.key !== 'string') {
-      return
+  resources.forEach(resource => {
+    const entry = attemptLedger.find(candidate => candidate.key === resource.key && candidate.branch === resource.branch)
+    if (entry !== undefined) {
+      entry.state = resource.state
     }
-    const known = knownResources.get(resource.key)
-    if (known !== undefined && resource.branch !== known.branch) {
-      return
-    }
-    knownResources.set(resource.key, {
-      branch: known?.branch ?? resource.branch,
-      key: resource.key,
-      startRef: known?.startRef ?? null,
-      state: resource.state
-    })
   })
 }
 const dispatchSweep = async () => {
@@ -768,20 +779,19 @@ const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) 
 
 phase('Implement')
 let unitResults = []
-const knownResources = new Map()
+const attemptLedger = []
 if (phaseRecords.plan?.status !== 'completed') {
   recordPhase('implement', 'skipped', 'Required Plan predecessor is incomplete')
 } else if (skipped.implement) {
   recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
+} else if (!candidateBranch) {
+  recordPhase('implement', 'failed', 'Provide the named task candidate as a nonempty args.candidateBranch string, because implementation cannot verify a worktree starting reference without it')
 } else {
   log('Implementing the planned unit')
-  const implementState = await dispatchImplementation(units, null, '', {
-    description: candidateBranch || 'the current task branch carrying any prerequisite changes',
-    name: candidateBranch || null
-  })
+  const implementState = await dispatchImplementation(units, null, '', candidateBranch)
   recordPhase('implement', implementState.status, implementState.reason)
   unitResults = implementState.unitResults
-  implementState.attemptResources.forEach(resource => knownResources.set(resource.key, resource))
+  retainAttempts(implementState.attemptResources, attemptLedger)
 }
 let integrationState = null
 phase('Integrate')
@@ -794,7 +804,7 @@ if (phaseRecords.implement.status !== 'completed') {
   integrationState = await dispatchIntegration(unitResults)
 }
 recordPhase('integrate', integrationState.status, integrationState.reason)
-applyLedger(integrationState, knownResources)
+applyLedger(integrationState, attemptLedger)
 let sweepState = null
 phase('Sweep')
 if (skipped.sweep) {
@@ -847,14 +857,11 @@ while (
   const candidateName =
     (typeof integrationState?.branch === 'string' && integrationState.branch.trim().length > 0 ? integrationState.branch : null) ??
     previousByKey.get(targets[0].key)?.branch ??
-    (candidateBranch || null)
+    candidateBranch
   phase('Implement')
-  const fixState = await dispatchImplementation(targets, reviewState.findings, `:fix-${roundsUsed}`, {
-    description: candidateName ?? 'the current task branch carrying any prerequisite changes',
-    name: candidateName
-  })
+  const fixState = await dispatchImplementation(targets, reviewState.findings, `:fix-${roundsUsed}`, candidateName)
   recordPhase('implement', fixState.status, fixState.reason)
-  fixState.attemptResources.forEach(resource => knownResources.set(resource.key, resource))
+  retainAttempts(fixState.attemptResources, attemptLedger)
   const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
   unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
   if (fixState.status !== 'completed') {
@@ -865,7 +872,7 @@ while (
     ? { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
     : await dispatchIntegration(unitResults)
   recordPhase('integrate', integrationState.status, integrationState.reason)
-  applyLedger(integrationState, knownResources)
+  applyLedger(integrationState, attemptLedger)
   phase('Sweep')
   sweepState = skipped.sweep
     ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
@@ -904,10 +911,7 @@ return {
   publish: publishState.status === 'completed'
     ? { action: publishState.action, url: publishState.url }
     : null,
-  resources: units.flatMap(unit => {
-    const known = knownResources.get(unit.key)
-    return known === undefined ? [] : [known]
-  }),
+  resources: attemptLedger,
   review: reviewState.status === 'completed'
     ? { findings: reviewState.findings.length, verdict: reviewState.verdict }
     : null,
