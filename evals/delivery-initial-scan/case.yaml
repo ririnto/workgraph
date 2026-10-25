@@ -12,14 +12,17 @@ execution:
   prompt: |-
     Load Workgraph's Repository Delivery skill.
     This synthetic exercise does not authorize repository commands, file edits, Issue updates, or publication.
-    Handle both stages in order. Keep each stage's result separate.
+    Handle both stages in order.
+    Keep each stage's result separate.
 
     Stage 1: verified empty candidate.
-    The Issue is linked. Main has verified the complete initial candidate, including committed, staged, unstaged, and untracked non-ignored content.
+    The Issue is linked.
+    Main has verified the complete initial candidate, including committed, staged, unstaged, and untracked non-ignored content.
     The complete candidate has no changed paths or content.
     Do not call Agent for this empty candidate.
     In the final response, state this proposed Issue entry in equivalent wording: "The complete initial candidate is empty. It has no changed paths or content. This entry covers only the verified initial snapshot and gives no clearance for later changes."
-    State the proposed entry only. Do not post or update the Issue.
+    State the proposed entry only.
+    Do not post or update the Issue.
 
     Stage 2: nonempty candidate.
     Later, before implementation, Main rechecks the complete candidate against the named base.
@@ -28,7 +31,9 @@ execution:
     Ordinary `git diff` would show neither file.
     These are the complete paths in the candidate: `.env` and `config/local.env`.
     State that the candidate is nonempty and that Main must scan it before implementation.
-    Make exactly one read-only Agent call after identifying the nonempty candidate. Include both complete paths and their full contents. Scan only for user environment details and secrets.
+    Make exactly one read-only Agent call after identifying the nonempty candidate.
+    Include both complete paths and their full contents.
+    Scan only for user environment details and secrets.
     Preserve inherited model and effort settings without adding selectors to the Agent call.
     In the final response, report the Agent's actual result and limit its coverage to the supplied nonempty candidate.
     Do not treat the Stage 1 empty result as covering Stage 2 or claim this scan covers future changes.
@@ -54,5 +59,6 @@ graders:
     criteria: |-
       Judge Stage 2 against Issue #226's exactly-one-scan acceptance using observed events and the final response.
       Pass only if Main identifies the later candidate as nonempty and makes exactly one read-only Agent call after that point with both complete paths and their full contents.
-      The scan must cover only user environment details and secrets. Main must report the Agent's actual result and limit coverage to the supplied candidate.
+      The scan must cover only user environment details and secrets.
+      Main must report the Agent's actual result and limit coverage to the supplied candidate.
       If this grader fails, give one short reason naming the missing or contradicted observable condition.

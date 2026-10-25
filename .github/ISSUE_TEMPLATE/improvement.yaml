@@ -5,32 +5,35 @@ body:
     id: problem
     attributes:
       label: Problem
-      description: >-
-        Describe the requirement or current limitation. Link related issues or pull requests.
+      description: "Describe the requirement or current limitation. \
+        Link related issues or pull requests."
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
       label: Evidence
-      description: >-
-        Provide concrete examples or source references supporting the change. Distinguish confirmed behavior from assumptions. Remove credentials and private environment details.
+      description:
+        "Provide concrete examples or source references supporting the change. \
+        Distinguish confirmed behavior from assumptions. \
+        Remove credentials and private environment details."
     validations:
       required: true
   - type: textarea
     id: scope
     attributes:
       label: Scope
-      description: >-
-        Describe the proposed change and its exclusions. Identify affected documents, instructions, or runtime paths.
+      description: "Describe the proposed change and its exclusions. \
+        Identify affected documents, instructions, or runtime paths."
     validations:
       required: true
   - type: textarea
     id: acceptance
     attributes:
       label: Acceptance
-      description: >-
-        Describe the observable result and checks that establish completion. Record material limits and any validation that requires a specific host.
+      description:
+        "Describe the observable result and checks that establish completion. \
+        Record material limits and any validation that requires a specific host."
     validations:
       required: true
   - type: textarea
