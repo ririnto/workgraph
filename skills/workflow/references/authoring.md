@@ -12,9 +12,10 @@ Delegate filesystem and tool execution to agents because the script only coordin
 Use existing host capabilities without requiring another execution engine or claiming that one ran.
 
 Pass Main's per-stage model and effort selections, respecting overrides and pinned agent definitions.
-Keep scan stages read-only and give each edit agent a separate host-supported isolated worktree.
+Keep scan stages read-only.
+Follow Main's [editor isolation policy](../../main-agent-contract/SKILL.md#assignments).
 Use a supported read-only `agentType` or existing host tool restrictions for scans, without inventing a `readOnly` option.
-Use native `isolation: 'worktree'` for edits when supported by the current tool contract.
+Set `isolation: 'worktree'` through the native tool contract for edits.
 Return each edit's diff, checks, and worktree ownership to Main before integration and cleanup.
 When explicit approval is required, end the proposal run before any edit and start edits only after approval.
 
