@@ -32,7 +32,8 @@ Use `t.Parallel()` for independent cases whose setup and shared resources permit
 Use `go.work` to coordinate repository modules when the declared Go version supports workspaces.
 Keep adopted Go tools and their versions in a repository-owned `go.mod` or dedicated modfile.
 Workspace coordination does not replace module ownership of tool dependencies.
-Manage and run tools using their owning module or explicit `-modfile=<file>.mod`.
+Manage and run tools using their owning module.
+Use an explicit `-modfile=<file>.mod` only outside workspace mode.
 
 For Go 1.24 or later, use `go get -tool <tool-package>@<version>` to record tool dependencies in the module file.
 Run them with `go tool <tool-package>`.
