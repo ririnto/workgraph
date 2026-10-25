@@ -1621,6 +1621,15 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       { branch: "unit-u2", key: "u2", state: "merged" }
     ]
   };
+  const integratePartialFailure = {
+    ...integrateResult,
+    conflicts: ["docs/guide.md"],
+    merged: false,
+    resources: [
+      { branch: "unit-u1", key: "u1", state: "merged" },
+      { branch: "unit-u2", key: "u2", state: "failed" }
+    ]
+  };
   const integrateDuplicate = {
     ...integrateResult,
     resources: [
@@ -1631,17 +1640,18 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
   };
   await Promise.all(
     [
-      [integrateUnmerged, /unmerged/u, ["merged", "merged"]],
-      [integrateConflicted, /contradictory/u, ["merged", "merged"]],
+      [integrateUnmerged, /contradicts/u, ["implemented", "implemented"]],
+      [integrateConflicted, /contradicts/u, ["implemented", "implemented"]],
+      [integratePartialFailure, /unmerged/u, ["merged", "failed"]],
       [
         integratePartialLedger,
         /every named unit branch/u,
-        ["merged", "implemented"]
+        ["implemented", "implemented"]
       ],
       [
         integrateWrongBranch,
         /every named unit branch/u,
-        ["implemented", "merged"]
+        ["implemented", "implemented"]
       ],
       [
         integrateDuplicate,
@@ -1649,7 +1659,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
         ["implemented", "implemented"]
       ],
       [integrateNoChecks, /combined candidate/u, ["merged", "merged"]],
-      [integrateRetained, /contradictory/u, ["merged", "retained"]],
+      [integrateRetained, /contradicts/u, ["implemented", "implemented"]],
       [null, /Integration agent failed/u, ["implemented", "implemented"]]
     ].map(async ([payload, pattern, states]) => {
       const { result } = await runWorkflowSample(
@@ -1830,6 +1840,45 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
       key: "u1",
       startRef: "task-branch",
       state: "merged"
+    }
+  ]);
+  const supersededRun = await runWorkflowSample(
+    samplePaths.complex,
+    { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: multiRound,
+      Integrate: sequence(integrateResult, {
+        ...integrateResult,
+        conflicts: ["docs/guide.md"],
+        merged: false,
+        resources: [
+          { branch: "unit-u1", key: "u1", state: "failed" },
+          { branch: "unit-u2", key: "u2", state: "merged" }
+        ]
+      }),
+      Plan: () => splitUnits,
+      Publish: sequence(publishCreated, publishUpdated),
+      Review: sequence(reviewFix, reviewPass),
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(supersededRun.result.complete, false);
+  assert.match(
+    supersededRun.result.phaseEvidence.find(
+      (record) => record.title === "Integrate"
+    ).reason,
+    /every named unit branch/u
+  );
+  assert.deepEqual(supersededRun.result.resources, [
+    { branch: "unit-u1", key: "u1", startRef: "main", state: "merged" },
+    { branch: "unit-u2", key: "u2", startRef: "main", state: "merged" },
+    {
+      branch: "unit-u1-r1",
+      key: "u1",
+      startRef: "task-branch",
+      state: "implemented"
     }
   ]);
   const missingRun = await runWorkflowSample(

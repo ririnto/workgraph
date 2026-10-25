@@ -534,11 +534,16 @@ const dispatchIntegration = async currentUnits => {
     Array.isArray(result?.conflicts) && result.conflicts.every(conflict => typeof conflict === 'string') &&
     checkEntries(result?.checks) &&
     ledgerHeld
+  const consistent =
+    shape &&
+    (result.merged
+      ? result.conflicts.length === 0 && resources.every(resource => resource.state === 'merged')
+      : resources.some(resource => resource.state !== 'merged'))
   const retained = {
     branch: typeof result?.branch === 'string' ? result.branch : '',
     checks: Array.isArray(result?.checks) ? result.checks : [],
     conflicts: Array.isArray(result?.conflicts) ? result.conflicts : [],
-    resources
+    resources: consistent ? resources : []
   }
   if (attempt.error !== undefined) {
     return { ...retained, reason: `Integration agent failed: ${attempt.error}`, status: 'failed' }
@@ -546,14 +551,11 @@ const dispatchIntegration = async currentUnits => {
   if (!shape) {
     return { ...retained, reason: 'Integration result is missing, malformed, or does not exactly account for every named unit branch', status: 'failed' }
   }
+  if (!consistent) {
+    return { ...retained, branch: result.branch, reason: 'Integration reported a merge outcome that contradicts its conflicts or unit resource states, so no resource state applies', status: 'failed' }
+  }
   if (!result.merged) {
     return { ...retained, branch: result.branch, reason: `Integration left the branch unmerged: ${result.conflicts.join('; ')}`, status: 'failed' }
-  }
-  if (result.conflicts.length > 0) {
-    return { ...retained, branch: result.branch, reason: 'Integration reported unresolved conflicts alongside a completed merge, so the evidence is contradictory', status: 'failed' }
-  }
-  if (resources.some(resource => resource.state !== 'merged')) {
-    return { ...retained, branch: result.branch, reason: 'Integration reported a completed merge while named unit resources remain unmerged, so the evidence is contradictory', status: 'failed' }
   }
   if (!checksPassed(result.checks)) {
     return { ...retained, branch: result.branch, reason: 'Required checks on the combined candidate are missing or did not all pass', status: 'failed' }
@@ -572,20 +574,7 @@ const retainAttempts = (attemptResources, attemptLedger) => {
   })
 }
 const applyLedger = (integrationState, attemptLedger) => {
-  const resources = Array.isArray(integrationState?.resources) ? integrationState.resources : []
-  const namedKeys = resources
-    .map(resource => (typeof resource?.key === 'string' ? resource.key : ''))
-    .filter(key => key.length > 0)
-  const claimsHeld =
-    new Set(namedKeys).size === namedKeys.length &&
-    resources.every(resource =>
-      typeof resource?.key === 'string' &&
-      typeof resource?.branch === 'string' && resource.branch.trim().length > 0 &&
-      ['failed', 'merged', 'retained'].includes(resource?.state))
-  if (!claimsHeld) {
-    return
-  }
-  resources.forEach(resource => {
+  integrationState.resources?.forEach(resource => {
     const entry = attemptLedger.find(candidate => candidate.key === resource.key && candidate.branch === resource.branch)
     if (entry !== undefined) {
       entry.state = resource.state

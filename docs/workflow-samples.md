@@ -30,7 +30,12 @@ Workflow({
 
 ```js
 Workflow({
-  args: { task: 'Fix the parser bug and verify the original trigger.', baseBranch: 'main', issue: '#12' },
+  args: {
+    task: 'Fix the parser bug and verify the original trigger.',
+    baseBranch: 'main',
+    candidateBranch: 'task/fix-parser',
+    issue: '#12'
+  },
   resumeFromRunId: '<run ID returned by the first run>',
   scriptPath: '<scriptPath returned by the first run>'
 })
@@ -76,7 +81,9 @@ Unit ownership uses canonical repository-relative paths, so aliases, absolute pa
 Checks report explicit passed, failed, or skipped statuses, and a gate passes only when every required check passed.
 Every unit commits to a branch named for the unit, so each attempt retains its known branch identity even when its checks fail.
 Integration merges exactly the named unit branches into the authorized task branch, requires each resource to match its named branch exactly, and runs the checks on the combined candidate.
-Resource states apply only from a consistent ledger, so a rejected, malformed, or duplicate claim never overrides the known identity.
+Resource states apply only when every claim names a current unit branch and agrees with the merge outcome and conflicts.
+A rejected, contradictory, superseded-branch, malformed, or duplicate claim changes no known state.
+A consistent partial failure keeps its reported states, and a completed merge with failed combined checks keeps its merged states.
 A single unit lands through the same integration step, so missing integration is never treated as not required.
 Publication always precedes review, and review requires the request posted by the completed publication phase.
 Publication and review receive the per-unit checks and the combined-candidate checks.
