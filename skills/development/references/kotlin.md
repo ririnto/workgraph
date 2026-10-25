@@ -7,7 +7,8 @@ Account for enclosing `internal` and `private` scopes when determining visibilit
 Put `/**` and `*/` on separate lines, with meaningful sentences on `*` lines.
 Give class, object, companion object, and private top-level properties explicit types.
 Use `val` for bindings that do not require reassignment.
-When a generic-producing call initializes a variable, prefer putting the explicit type on the variable declaration so the initializer can infer it.
+When a generic-producing call initializes a variable, prefer an explicit type on the variable declaration.
+This lets the initializer infer it.
 For example, prefer `val captured: CapturingSlot<String> = slot()` to `val captured = slot<String>()`.
 Preserve the exact type, nullability, variance, overload selection, and inference.
 Keep generic arguments when reified or uninferable parameters require them.
@@ -103,7 +104,8 @@ Preserve setup timing, evaluation order, resource lifetime, mock verification or
 
 ## Automation
 
-For authorized Kotlin lint automation, prefer ktlint built-in rules and use its supported custom-rule API when built-ins cannot express a safe requirement.
+For authorized Kotlin lint automation, prefer ktlint built-in rules.
+For that automation, use ktlint's supported custom-rule API when built-ins cannot express a safe requirement.
 Verify compatibility with the project's ktlint version before implementing custom rules or fixes.
 Check Kotlin, Gradle, JVM, ktlint engine, and plugin compatibility together before selecting versions.
 Stay within Kotlin's officially supported Gradle range even when a newer stable Gradle release exists.
