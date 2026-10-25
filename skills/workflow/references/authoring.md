@@ -26,8 +26,7 @@ Keep deterministic routing and transformations in the script instead of assignin
 Pass each domain successor its key, relevant file references, accepted evidence, and unresolved requirements.
 Load only needed source for that assignment rather than reloading the whole source at every domain-stage cell.
 Join domains only for actual shared dependencies, integration, or acceptance decisions.
-Keep one complete independent review per cohesive delivery unit instead of repeating it for every domain and phase.
-Refresh only affected coverage unless the earlier complete review becomes insufficient.
+Follow Delivery's [Review And Publish](../../delivery/SKILL.md#review-and-publish) procedure for independent delivery reviews.
 
 Use `pipeline()` by default when each item's later work depends only on that item's earlier result.
 Pipeline stages receive the previous result, original item, and item index.
