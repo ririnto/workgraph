@@ -64,20 +64,23 @@ Record requests and report resolved settings only when host-exposed.
 ### Assignments
 
 Dispatch inputs, ownership, authority, outputs, acceptance, cleanup, and recursive constraints.
-Specify Git writers' allowed commands, refs, ownership limits, and pre-action checks.
-Forbid destructive Git commands, require fast-forward-only syncs, and explain blocked skips.
+Give Git writers allowed commands, refs, ownership limits, and pre-action checks.
+Forbid destructive Git, require fast-forward-only syncs, and explain blocked skips.
 Assign one writer per file, worktree, ref, and shared record.
 Assign one owner and execution path per outcome.
 Give each native Task one host manager while its Main owns source and delivery.
-Run authorized ready outcomes concurrently, isolating logical overlap in separate native worktrees.
+Run authorized ready outcomes concurrently.
+Create separate editor worktrees with agent-native tools outside `/tmp` and system-temporary paths.
+Report unavailable native isolation without volatile fallback.
+Allow temporary evidence directories.
 Require only relevant predecessor results and conflicting ownership returns.
 Assess unexpected changes without stopping or tracing origin, then adopt or drop them.
 
-After agent or tool calls, continue only required result handling, ready work, or required human interaction.
+After calls, handle only required results, ready work, or required human interaction.
 After deciding to yield, add no thinking blocks, narration, or tool calls.
-Keep exactly one live background wait per target.
+Keep one live background wait per target.
 Silence means wait, not another shell, command, or wait.
-Inspect the existing background task when status is necessary.
+Inspect the existing background task for status.
 Resume waiting work only on actionable completion signals.
 Never speculate, poll or request progress, redispatch, or claim completion while waiting.
 
@@ -87,7 +90,7 @@ Unrelated edits, commit identity, parents, and branch names alone do not invalid
 Rerun affected checks for relevant changes, failures, or unresolved concerns.
 Inspect failures, attempt status, and partial effects before retries, reassignment, or stopping.
 Try all reasonable authorized repairs, retries, and alternative supported commands or tools.
-Report each attempt, outcome, evidence, and remaining limits honestly.
+Report each attempt, outcome, evidence, and limits honestly.
 Bound retries by new evidence, progress, and an exit condition.
 After two no-progress rounds, reassess authorized avenues without waiving acceptance.
 Reset after progress, independently of host retries and inference sampling.
@@ -109,7 +112,7 @@ Return source, Git, reader, process, and descendant ownership.
 
 ## Orchestration
 
-Use a task graph when dependencies aid coordination.
+Use graphs when dependencies aid coordination.
 Record node operations, prerequisites, inputs, outputs, owners, authority, and completion evidence.
 Connect result or condition dependencies and pass required evidence.
 Treat null, missing, or unsupported evidence as incomplete.
@@ -121,7 +124,7 @@ Report unavailable selected or delegation tools.
 Preserve explicit tool choices.
 Proceed directly only when safe and the user's tool choice permits it.
 Delegate substantial ready outcomes unless the user selects direct work or permits fallback.
-Handle trivial work directly unless delegation is requested.
+Handle trivial work unless delegation is requested.
 
 ## Repository
 

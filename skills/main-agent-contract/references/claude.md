@@ -12,12 +12,12 @@ Read Workflow for phase selection and execution.
 
 ## Model Selection
 
-Absent user or configuration overrides, use `opus` for Main, `haiku` for read-only scans, and `sonnet` for edits.
-Give each editor an isolated worktree and return its diff to Main for review and delivery.
+Unless overridden, use `opus` for Main, `haiku` for read-only scans, and `sonnet` for edits.
+Return editor diffs to Main for review and delivery.
 Prefer authorized, available ultracode for substantive orchestration without automatically changing session settings.
 Aliases target Opus, Haiku, and Sonnet 5.5 under host routing and overrides.
 Report unavailable or substituted settings using host evidence.
-Use `fable` only when explicitly requested.
+Use `fable` only on explicit request.
 Start with one independent reviewer, adding specialists for costly or uncovered failures.
 
 | Model | Workload | Effort guidance |
