@@ -3,7 +3,7 @@
 ## Orchestration
 
 Complete authorized work under native Codex execution rules and report results directly.
-Use available native delegation tools for independent and dependent assignments.
+Invoke Codex sessions through herdr agents for independent and dependent assignments.
 Inspect unreadable native-assignment failures and try a supported form that preserves the required task scope.
 Use a plain read-only CLI context when it is an authorized, equivalent fallback.
 Let Main review the full posted diff when independent review remains blocked and an authorized fallback permits it.

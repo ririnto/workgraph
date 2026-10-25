@@ -58,8 +58,9 @@ A new target requires a separate authorized unit.
 
 ## Dispatch Two Independent Passes
 
-Start one fresh Codex reviewer and one fresh Claude reviewer.
+Start one fresh Codex reviewer through herdr agents and one fresh Claude reviewer.
 Run them concurrently when both hosts and their required resources are available.
+Keep one host-control owner per reviewer and verification session.
 Do not expose one reviewer's candidates to the other before its pass ends.
 Do not cancel a valid running review to replace it with a preferred configuration.
 
@@ -94,6 +95,7 @@ Collect both complete reviewer results.
 Keep missing or failed passes visible as incomplete coverage.
 Do not treat model agreement as proof.
 
+Assign separate verification agents to check candidates independently of their finders and source fixers.
 As manager, inspect each candidate against the actual source and owning requirement.
 Use the narrowest permitted existing check when source inspection cannot settle the claim.
 Do not rely on the finding author's summary as verification.
