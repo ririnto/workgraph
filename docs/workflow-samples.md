@@ -12,12 +12,13 @@ The samples exercise the native Workflow interface and add no scheduler, executi
 ## Launch
 
 Run a sample from a checkout the session can read, passing the goal and dispatch choices through `args`.
-The Workflow tool accepts the stored file through `scriptPath` or its complete text through `script`.
+Pass the complete source text through `script` on the first invocation, as the Workflow skill requires.
+Use the `scriptPath` and run ID the run returns, with `resumeFromRunId`, for a same-session continuation.
 The first invocation executes the source directly and registers no named workflow command.
 
 ```js
 Workflow({
-  scriptPath: 'skills/workflow/scripts/delivery-simple.workflow.txt',
+  script: '<complete text of skills/workflow/scripts/delivery-simple.workflow.txt>',
   args: {
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
@@ -26,15 +27,24 @@ Workflow({
 })
 ```
 
+```js
+Workflow({
+  args: { task: 'Fix the parser bug and verify the original trigger.', baseBranch: 'main', issue: '#12' },
+  resumeFromRunId: '<run ID returned by the first run>',
+  scriptPath: '<scriptPath returned by the first run>'
+})
+```
+
 For a repeatable command, save a run from `/workflows` or copy a sample into `.claude/workflows/` in the project, and the host then runs it by name.
 The sample sources stay plain script bodies, so they need no wrapper, transform, dependency, or lint exception.
+The dispatching session owns the linked issue, the task branch, and the initial complete-candidate scan before it authorizes implementation, as its Delivery procedure requires.
 
 ## Dispatch Inputs
 
 | Input | Contract |
 | --- | --- |
 | `task` | Required nonempty string holding the delivery goal. |
-| `issue` | Optional issue reference string included in the publication prompt. |
+| `issue` | Required issue reference string included in the publication and review prompts. |
 | `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving acceptance. |
 | `models` | Optional object of per-phase model selector strings overriding the defaults. |
@@ -48,14 +58,18 @@ The sample sources stay plain script bodies, so they need no wrapper, transform,
 | Scope | `opus` | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
 | Explore | `haiku` | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
 | Plan | `opus` | The scopes and exploration findings. | Work units with disjoint owned paths and instructions. |
-| Implement | `sonnet` | One unit per agent, with matching exploration only. | Changed files, diff summary, checks, and evidence. |
+| Implement | `sonnet` | One unit per agent, with matching exploration only. | Changed files, diff summary, passing checks, and evidence. |
 | Integrate | `sonnet` | All unit results, only when the plan split units. | Merge outcome with conflicts and evidence. |
 | Sweep | `haiku` | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
-| Publish | `sonnet` | A clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
+| Publish | `sonnet` | Completed implementation, completed integration when split, a clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
 | Review | `sonnet` | The change summary and integration outcome. | Verdict with concrete findings and evidence. |
 
 Implementation runs each unit in its own isolated native worktree exactly when the plan defines more than one unit.
 A single-unit plan edits the task branch directly, so integration is skipped as not required.
+Implementation creates a task branch before committing when the checkout sits on the base branch.
+Publication always precedes review, and review examines the posted request when one exists.
+A fix round updates the same posted request and reviews the posted candidate again.
+The scope, exploration, and sweep stages run with the built-in read-only Explore agent type, while review keeps the default agent and a read-only instruction.
 
 ## Skip, Failure, And Recovery
 

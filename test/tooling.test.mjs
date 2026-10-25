@@ -936,3 +936,333 @@ test("TSDoc filename fallback preserves lazy evaluation and JavaScript exclusion
   ]);
   assert.equal(filenameReads, 1);
 });
+
+const compileWorkflowSource = (file) => {
+  const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+  const source = readFileSync(file, "utf-8").replace(/^export /mu, "");
+  return new AsyncFunction(
+    "args",
+    "agent",
+    "parallel",
+    "pipeline",
+    "phase",
+    "log",
+    "workflow",
+    "budget",
+    source
+  );
+};
+const dispatchTable = (table) => (options) => {
+  const entry = table[options.phase];
+  if (entry === undefined) {
+    throw new Error(`unexpected phase ${options.phase}`);
+  }
+  return entry();
+};
+const sequence = (...payloads) => {
+  let served = 0;
+  return () => {
+    const payload = payloads[Math.min(served, payloads.length - 1)];
+    served += 1;
+    return payload;
+  };
+};
+const runWorkflowSample = async (file, args, payloadFor) => {
+  const calls = [];
+  const environment = {
+    agent: (prompt, options) => {
+      calls.push({
+        isolation: options.isolation,
+        model: options.model,
+        phase: options.phase,
+        prompt
+      });
+      try {
+        const payload = payloadFor(options);
+        return payload === null
+          ? Promise.reject(new Error("agent failure"))
+          : Promise.resolve(payload);
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    },
+    budget: { remaining: () => Infinity, spent: () => 0, total: null },
+    log: () => null,
+    parallel: (thunks) => Promise.all(thunks.map((thunk) => thunk())),
+    phase: () => null,
+    pipeline: () => {
+      throw new Error("pipeline must not run in these samples");
+    },
+    workflow: () => {
+      throw new Error("workflow must not run in these samples");
+    }
+  };
+  const result = await compileWorkflowSource(file)(
+    args,
+    environment.agent,
+    environment.parallel,
+    environment.pipeline,
+    environment.phase,
+    environment.log,
+    environment.workflow,
+    environment.budget
+  );
+  return { calls, result };
+};
+
+test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
+  const root = path.resolve(import.meta.dirname, "..");
+  const samplePaths = {
+    complex: path.join(
+      root,
+      "skills/workflow/scripts/delivery-complex.workflow.txt"
+    ),
+    simple: path.join(
+      root,
+      "skills/workflow/scripts/delivery-simple.workflow.txt"
+    )
+  };
+  for (const file of Object.values(samplePaths)) {
+    const text = readFileSync(file, "utf-8");
+    assert.ok(
+      text.indexOf("title: 'Publish'") < text.indexOf("title: 'Review'")
+    );
+  }
+  const scopeResult = {
+    evidence: "e",
+    scopes: [{ description: "d", key: "s1", paths: ["docs"] }]
+  };
+  const exploreResult = { evidence: "e", risks: ["r"], summary: "s" };
+  const singleUnits = {
+    evidence: "e",
+    units: [{ instructions: "i", key: "u1", paths: ["docs/guide.md"] }]
+  };
+  const nestedUnits = {
+    evidence: "e",
+    units: [
+      { instructions: "i", key: "u1", paths: ["docs"] },
+      { instructions: "i", key: "u2", paths: ["docs/guide.md"] }
+    ]
+  };
+  const splitUnits = {
+    evidence: "e",
+    units: [
+      { instructions: "i", key: "u1", paths: ["docs/guide.md"] },
+      { instructions: "i", key: "u2", paths: ["src/main.js"] }
+    ]
+  };
+  const implementResult = {
+    changedFiles: ["docs/guide.md"],
+    checks: [
+      { command: "pnpm run check:markdownlint-cli2", outcome: "passed" }
+    ],
+    checksPassed: true,
+    diffSummary: "d",
+    evidence: "e"
+  };
+  const integrateResult = { conflicts: [], evidence: "e", merged: true };
+  const sweepResult = { evidence: "e", exposures: [] };
+  const publishCreated = {
+    action: "created",
+    evidence: "e",
+    url: "https://example.invalid/pr/1"
+  };
+  const publishUpdated = {
+    action: "updated",
+    evidence: "e",
+    url: "https://example.invalid/pr/1"
+  };
+  const reviewFix = {
+    evidence: "e",
+    findings: [{ detail: "d", file: "docs/guide.md", scenario: "s" }],
+    verdict: "fix-required"
+  };
+  const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
+  {
+    const { calls, result } = await runWorkflowSample(
+      samplePaths.simple,
+      { issue: "#1", maxFixRounds: 1, task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Implement: () => implementResult,
+        Plan: () => singleUnits,
+        Publish: sequence(publishCreated, publishUpdated),
+        Review: sequence(reviewFix, reviewPass),
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    const phases = calls.map((call) => call.phase);
+    assert.equal(result.complete, true);
+    assert.deepEqual(
+      result.phaseEvidence.map((record) => record.status),
+      [
+        "completed",
+        "completed",
+        "completed",
+        "completed",
+        "skipped",
+        "completed",
+        "completed",
+        "completed"
+      ]
+    );
+    assert.deepEqual(result.fixRounds, { max: 1, used: 1 });
+    assert.equal(phases.filter((phase) => phase === "Implement").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Publish").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Review").length, 2);
+    assert.ok(phases.indexOf("Publish") < phases.indexOf("Review"));
+    assert.ok(phases.lastIndexOf("Publish") < phases.lastIndexOf("Review"));
+    for (const call of calls.filter((entry) => entry.phase === "Review")) {
+      assert.ok(call.prompt.includes("https://example.invalid/pr/1"));
+    }
+    const models = Object.fromEntries(
+      calls.map((call) => [call.phase, call.model])
+    );
+    assert.equal(models.Scope, "opus");
+    assert.equal(models.Explore, "haiku");
+    assert.equal(models.Plan, "opus");
+    assert.equal(models.Implement, "sonnet");
+    assert.equal(models.Sweep, "haiku");
+    assert.equal(models.Publish, "sonnet");
+    assert.equal(models.Review, "sonnet");
+    assert.ok(
+      calls
+        .filter((entry) => entry.phase === "Implement")
+        .every((call) => call.isolation === undefined)
+    );
+  }
+  {
+    const { calls, result } = await runWorkflowSample(
+      samplePaths.complex,
+      { issue: "#1", maxFixRounds: 1, skips: { sweep: true }, task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Implement: () => implementResult,
+        Integrate: () => integrateResult,
+        Plan: () => splitUnits,
+        Review: sequence(reviewFix, reviewPass),
+        Scope: () => scopeResult
+      })
+    );
+    const phases = calls.map((call) => call.phase);
+    assert.equal(result.complete, false);
+    assert.equal(result.split, true);
+    assert.equal(phases.filter((phase) => phase === "Sweep").length, 0);
+    assert.equal(phases.filter((phase) => phase === "Publish").length, 0);
+    assert.equal(phases.filter((phase) => phase === "Integrate").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Implement").length, 3);
+    assert.equal(phases.filter((phase) => phase === "Review").length, 2);
+    assert.ok(
+      calls
+        .filter((entry) => entry.phase === "Implement")
+        .every((call) => call.isolation === "worktree")
+    );
+    const sweepRecord = result.phaseEvidence.find(
+      (record) => record.title === "Sweep"
+    );
+    assert.equal(sweepRecord.status, "skipped");
+    const publishRecord = result.phaseEvidence.find(
+      (record) => record.title === "Publish"
+    );
+    assert.equal(
+      publishRecord.reason,
+      "Required Sweep predecessor is incomplete"
+    );
+  }
+  {
+    const { calls, result } = await runWorkflowSample(
+      samplePaths.simple,
+      {
+        issue: "#1",
+        maxFixRounds: 0,
+        models: { scope: "haiku" },
+        skips: { implement: true, integrate: true, publish: true },
+        task: "t"
+      },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Plan: () => singleUnits,
+        Review: () => reviewFix,
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    const phases = calls.map((call) => call.phase);
+    assert.equal(result.complete, false);
+    assert.equal(phases.filter((phase) => phase === "Implement").length, 0);
+    assert.equal(phases.filter((phase) => phase === "Publish").length, 0);
+    assert.equal(phases.filter((phase) => phase === "Integrate").length, 0);
+    const models = Object.fromEntries(
+      calls.map((call) => [call.phase, call.model])
+    );
+    assert.equal(models.Scope, "haiku");
+    assert.equal(models.Plan, "opus");
+    const reviewRecord = result.phaseEvidence.find(
+      (record) => record.title === "Review"
+    );
+    assert.equal(
+      reviewRecord.reason,
+      "Verdict fix-required after 0 of 0 fix rounds"
+    );
+  }
+  {
+    const { result } = await runWorkflowSample(
+      samplePaths.simple,
+      { issue: "#1", task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Implement: () => null,
+        Plan: () => singleUnits,
+        Review: () => reviewPass,
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    assert.equal(result.complete, false);
+    const implementRecord = result.phaseEvidence.find(
+      (record) => record.title === "Implement"
+    );
+    assert.equal(implementRecord.status, "failed");
+    const publishRecord = result.phaseEvidence.find(
+      (record) => record.title === "Publish"
+    );
+    assert.equal(publishRecord.status, "skipped");
+    assert.equal(
+      publishRecord.reason,
+      "Implementation did not complete, so publication is blocked"
+    );
+  }
+  {
+    const { calls, result } = await runWorkflowSample(
+      samplePaths.complex,
+      { issue: "#1", task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Plan: () => nestedUnits,
+        Review: () => reviewPass,
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    assert.equal(result.complete, false);
+    const planRecord = result.phaseEvidence.find(
+      (record) => record.title === "Plan"
+    );
+    assert.equal(planRecord.status, "failed");
+    const implementRecord = result.phaseEvidence.find(
+      (record) => record.title === "Implement"
+    );
+    assert.equal(implementRecord.status, "skipped");
+    assert.equal(calls.filter((call) => call.phase === "Implement").length, 0);
+  }
+  await assert.rejects(
+    () =>
+      runWorkflowSample(
+        samplePaths.simple,
+        { task: "t" },
+        dispatchTable({ Scope: () => scopeResult })
+      ),
+    /args.issue/u
+  );
+});

@@ -44,6 +44,9 @@ if (typeof input.task !== 'string' || !input.task.trim()) {
 }
 const task = input.task
 const issue = typeof input.issue === 'string' ? input.issue.trim() : ''
+if (!issue) {
+  throw new Error('Provide the linked issue reference as a nonempty args.issue string')
+}
 const baseBranch = typeof input.baseBranch === 'string' ? input.baseBranch.trim() : ''
 const settingsMap = (value, name) => {
   if (value === undefined || value === null) {
@@ -117,6 +120,7 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
   readOnlyPart,
   promptParts.scope
 ), {
+  agentType: 'Explore',
   label: 'scope',
   model: models.scope,
   phase: 'Scope',
@@ -185,6 +189,7 @@ if (phaseRecords.scope?.status !== 'completed') {
       readOnlyPart,
       promptParts.explore
     ), {
+      agentType: 'Explore',
       label: `explore:${scope.key}`,
       model: models.explore,
       phase: 'Explore',
@@ -281,7 +286,10 @@ if (phaseRecords.explore?.status !== 'completed') {
     unitNames.every(name => name.length > 0) &&
     new Set(unitNames).size === unitNames.length &&
     ownedPaths.every(path => typeof path === 'string' && path.trim().length > 0) &&
-    new Set(ownedPaths).size === ownedPaths.length &&
+    ownedPaths.every((path, index) =>
+      ownedPaths.every((other, otherIndex) =>
+        otherIndex === index ||
+        (other !== path && !other.startsWith(`${path}/`) && !path.startsWith(`${other}/`)))) &&
     unitList.every(unit =>
       typeof unit?.instructions === 'string' &&
       unit.instructions.trim().length > 0 &&
@@ -290,7 +298,7 @@ if (phaseRecords.explore?.status !== 'completed') {
   if (planAttempt.error !== undefined) {
     recordPhase('plan', 'failed', `Plan agent failed: ${planAttempt.error}`)
   } else if (!planShape) {
-    recordPhase('plan', 'failed', `Plan result is missing, malformed, duplicated, shared between units, or outside 1 through ${unitCap} units`)
+    recordPhase('plan', 'failed', `Plan result is missing, malformed, duplicated, overlapping between units, or outside 1 through ${unitCap} units`)
   } else {
     units = unitList
     recordPhase('plan', 'completed')
@@ -331,10 +339,11 @@ const dispatchImplementation = async (targets, findings, roundLabel) => {
             },
             type: 'array'
           },
+          checksPassed: { type: 'boolean' },
           diffSummary: { type: 'string' },
           evidence: { type: 'string' }
         },
-        required: ['changedFiles', 'checks', 'diffSummary', 'evidence'],
+        required: ['changedFiles', 'checks', 'checksPassed', 'diffSummary', 'evidence'],
         type: 'object'
       }
     }
@@ -344,6 +353,8 @@ const dispatchImplementation = async (targets, findings, roundLabel) => {
       `Unit instructions: ${unit.instructions}`,
       findings === null ? '' : `Fix these review findings inside your owned paths: ${JSON.stringify(findings)}`,
       `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
+      basePart,
+      'If the current branch is the base branch, create and switch to a task branch named for the delivery before committing.',
       split
         ? 'You run in an isolated worktree, so commit your changes there with a descriptive subject and do not push.'
         : 'Commit your changes on the current branch with a descriptive subject and do not push.',
@@ -367,7 +378,8 @@ const dispatchImplementation = async (targets, findings, roundLabel) => {
         Array.isArray(result?.checks) &&
         result.checks.every(check =>
           typeof check?.command === 'string' && check.command.trim().length > 0 &&
-          typeof check?.outcome === 'string') &&
+          typeof check?.outcome === 'string' && check.outcome.trim().length > 0) &&
+        result?.checksPassed === true &&
         typeof result?.diffSummary === 'string' && result.diffSummary.trim().length > 0 &&
         typeof result?.evidence === 'string' && result.evidence.trim().length > 0
       if (shape) {
@@ -439,6 +451,7 @@ const dispatchSweep = async () => {
     readOnlyPart,
     promptParts.sweep
   ), {
+    agentType: 'Explore',
     label: 'sweep',
     model: models.sweep,
     phase: 'Sweep',
@@ -517,16 +530,20 @@ const dispatchPublish = async currentUnits => {
   }
   return { action: result.action, reason: null, status: 'completed', url: result.url }
 }
-const dispatchReview = async (currentUnits, integrationState) => {
+const dispatchReview = async (currentUnits, integrationState, publishState) => {
   const attempt = await runAgent(compose(
     'Independently review the complete current change for the delivery goal.',
     taskPart,
     basePart,
+    issuePart,
     `Change summary: ${JSON.stringify({
       integration: integrationState === null ? 'not required' : integrationState.status,
       units: currentUnits.map(unit => ({ changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key }))
     })}`,
-    'Inspect the branch diff and the affected consumers beyond the changed lines.',
+    publishState !== null && publishState.status === 'completed'
+      ? `Review the posted candidate at ${publishState.url}, including its request description.`
+      : 'No request was posted for this dispatch, so review the branch candidate directly and record that limitation.',
+    'Inspect the change and the affected consumers beyond the changed lines.',
     'Report concrete findings with file locations and failure scenarios, separating new defects from pre-existing issues.',
     'Return verdict fix-required only for findings that block acceptance, correctness, safety, or required checks.',
     'Return an empty findings list with verdict pass when no actionable defect remains.',
@@ -577,6 +594,12 @@ const dispatchReview = async (currentUnits, integrationState) => {
 const runPublish = async (sweepState, currentUnits) => {
   if (skipped.publish) {
     return { reason: 'Explicit dispatch skip, so publication did not run', status: 'skipped' }
+  }
+  if (phaseRecords.implement.status !== 'completed') {
+    return { reason: 'Implementation did not complete, so publication is blocked', status: 'skipped' }
+  }
+  if (split && phaseRecords.integrate.status !== 'completed') {
+    return { reason: 'Required Integration predecessor is incomplete, so publication is blocked', status: 'skipped' }
   }
   if (phaseRecords.sweep.status !== 'completed') {
     return { reason: 'Required Sweep predecessor is incomplete', status: 'skipped' }
@@ -640,7 +663,7 @@ if (skipped.review) {
   reviewState = { reason: 'Explicit dispatch skip, so independent review did not run', status: 'skipped' }
 } else {
   log('Reviewing the complete change')
-  reviewState = await dispatchReview(unitResults, integrationState)
+  reviewState = await dispatchReview(unitResults, integrationState, publishState)
 }
 recordPhase('review', reviewState.status, reviewState.reason)
 let roundsUsed = 0
@@ -670,17 +693,21 @@ while (
   unitResults = fixState.unitResults
   if (split) {
     phase('Integrate')
-    integrationState = await dispatchIntegration(unitResults)
+    integrationState = skipped.integrate
+      ? { conditional: false, reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
+      : await dispatchIntegration(unitResults)
     recordPhase('integrate', integrationState.status, integrationState.reason)
   }
   phase('Sweep')
-  sweepState = await dispatchSweep()
+  sweepState = skipped.sweep
+    ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
+    : await dispatchSweep()
   recordPhase('sweep', sweepState.status, sweepState.reason)
   phase('Publish')
   publishState = await runPublish(sweepState, unitResults)
   recordPhase('publish', publishState.status, publishState.reason)
   phase('Review')
-  reviewState = await dispatchReview(unitResults, integrationState)
+  reviewState = await dispatchReview(unitResults, integrationState, publishState)
   recordPhase('review', reviewState.status, reviewState.reason)
 }
 if (reviewState.status === 'completed' && reviewState.verdict === 'fix-required') {
