@@ -41,25 +41,11 @@ Write maintained instructions and documentation in concise English.
 Follow the active role's request-origin communication policy for conversations and handbacks.
 Instruction Authoring owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
 
-In all Markdown documents, use complete sentences in prose and list items, with one sentence per source line.
-Keep conditions and exceptions with their actions.
-Keep each paragraph focused on one idea.
-Separate paragraphs with a blank line.
-Do not join separate sentences with semicolons or substitute punctuation.
+When drafting, editing, or reviewing prose, read Writing unless its complete content is already loaded.
 
-Preserve required syntax in headings, code, metadata, and exact quotations.
-Table labels and fragments need no sentence punctuation.
-Use complete sentences and terminal punctuation for table explanations.
-For multiple items, a table may use successive rows with blank first cells and `- description` cells.
-Use that structure only when the items need separate rows.
-Do not reflow Markdown to a fixed column width.
-
-Apply Markdown lint and these prose rules to `.md` files.
+Apply Markdown lint to `.md` files.
 Ultracite's code rules do not apply to Markdown.
 Exclude generated and vendored material from mechanical prose edits.
-
-Use direct verbs and concrete terms.
-Remove filler and repetition without changing technical meaning or explicit requirements.
 
 ## Implementation
 
@@ -108,7 +94,6 @@ This behavioral check uses real agents and requires a host with Workflow enabled
 Keep evaluation reports local and outside the repository with `--output-dir`.
 Inspect tool results because an attempted invocation alone does not prove successful execution.
 
-Review sentence completeness, line boundaries, and conditions.
 Report model adherence as unverified unless a behavioral evaluation supplies evidence.
 
 Reuse passing checks for unchanged inputs, configuration, and toolchain.
