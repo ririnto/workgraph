@@ -5,7 +5,7 @@ description: Use when implementing, refactoring, debugging, or reviewing source 
 
 # Development
 
-Apply the target repository's rules and lint configuration before these defaults.
+Apply the target repository's rules, lint configuration, and existing tools before these defaults.
 Read only matching playbooks and language references unless their complete content is already loaded.
 For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
 Use `.yaml` for YAML files unless the consuming platform requires another exact filename.
@@ -34,7 +34,6 @@ Verify each coherent unit before building dependent work on it.
 Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
 Main and Delivery retain review, integration, and cleanup authority.
 
-Apply the target project's rules and existing tools.
 Guidance alone does not authorize tooling changes or changes across consumer projects.
 
 | Language | Source | Reference |
@@ -84,7 +83,6 @@ Preserve required formatter output and meaningful line breaks when these spacing
 
 Document effective public, protected, and exported declarations using the language's declaration documentation syntax.
 Check implicit visibility, enclosing scopes, re-exports, and default exports when identifying these declarations.
-Use multiline declaration documentation where that syntax supports it.
 Format documentation comments and docstrings as multiline, even for one sentence, wherever language syntax supports them.
 Preserve their text, indentation, declaration attachment, and language-native semantics when formatting or moving them.
 Documentation for other declarations is optional unless tooling or a safety contract requires it.
@@ -150,7 +148,6 @@ Do not add suppressions, disable rules, or weaken checks to make a rollout pass.
 If a rule cannot detect violations safely, do not add it.
 If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
 Do not promise automatic fixes that replace `void` with `await`, restructure control flow, or hoist state across lifecycle boundaries.
-Adding instructions alone does not authorize lint implementations or changes across consumer repositories.
 
 ## Verification Routing
 
