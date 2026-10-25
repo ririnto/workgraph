@@ -25,8 +25,6 @@ A clear approved Git task includes implementation, checks, Issue/MR/PR creation,
 Complete those operations without renewed stage approval or repeated permission questions.
 Preserve explicit user gates, new-scope boundaries, and authorization limits for irreversible actions.
 Git delivery does not authorize deployment, credential handling, live assets, forks, or upstream destinations.
-Keep authentication, hooks, output guards, host permissions, and server protections unchanged.
-Never change permission settings or weaken guards to finish delivery.
 
 Use the user's specified base branch, otherwise retain the recorded base or use the current branch.
 Without a base, confirm the active development branch.
