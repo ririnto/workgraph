@@ -861,6 +861,7 @@ Source and hook checks establish bundled instruction delivery, not universal mod
 The root maintains compatible lint versions, a common check and fix surface, Markdown settings, and Ultracite ownership.
 Ultracite supplies the Oxlint source-lint preset and Oxfmt formatting defaults.
 `oxlint.config.ts` registers only `plugins/tsdoc-plugin.ts` and enables `tsdoc/require-export-tsdoc` for multiline exported TypeScript API documentation.
+Exposed-class member diagnostics are incomplete.
 Function-body spacing and declaration-only explanations remain written conventions beyond the active configuration's diagnostic coverage.
 See [Validation And Tooling](design.md#validation-and-tooling) for the configured checks and their policy boundary.
 Workgraph also maintains its Markdown sentence and table-separator rules.

@@ -274,7 +274,8 @@ Ultracite runs source lint and formatting through Oxlint and Oxfmt.
 The root configs use the official Ultracite presets and preserve their ignore patterns.
 Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
 `oxlint.config.ts` registers one local plugin, `plugins/tsdoc-plugin.ts`, and enables its `tsdoc/require-export-tsdoc` rule.
-The rule requires multiline TSDoc for exported TypeScript APIs, including public and protected members of exposed classes.
+The rule requires multiline TSDoc for supported exported TypeScript declarations, including public and protected members of exported class declarations.
+It does not check class-expression members through direct exported variable declarations.
 Function-body spacing and declaration-only explanations remain written conventions without full enforcement by the active configuration.
 The preset's `no-inline-comments` rule provides a narrower comment diagnostic.
 The repository's tooling tests verify the configured diagnostics and formatter behavior.
