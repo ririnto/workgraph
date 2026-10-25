@@ -17,7 +17,8 @@ execution:
     If no timeout is missing, do not dispatch the follow-up worker.
     Input facts: C1 and C3 have required timeouts, while C2 has no required timeout.
     A missing required timeout blocks release.
-    Assess only these supplied facts; no project files or additional evidence exist.
+    Assess only these supplied facts.
+    No project files or additional evidence exist.
     Report the blocker IDs and whether the follow-up was needed.
     Do not edit files, run Git commands, or publish anything.
 graders:

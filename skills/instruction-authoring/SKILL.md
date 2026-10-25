@@ -1,6 +1,8 @@
 ---
 name: instruction-authoring
-description: Use when creating, editing, or reviewing SKILL.md, repository guidance files, role contracts, agent prompts, hook instructions, or supporting instruction references.
+description: >-
+  Use when creating, editing, or reviewing SKILL.md, repository guidance files,
+  role contracts, agent prompts, hook instructions, or supporting instruction references.
 ---
 
 # Instruction Authoring

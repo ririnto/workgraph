@@ -16,7 +16,8 @@ execution:
     If that worker finds a missing timeout, have a follow-up worker use its actual findings to assess release impact.
     If no timeout is missing, do not dispatch the follow-up worker.
     Input facts: C1, C2, and C3 each have a required timeout.
-    Assess only these supplied facts; no project files or additional evidence exist.
+    Assess only these supplied facts.
+    No project files or additional evidence exist.
     Report the blocker IDs and whether the follow-up was needed.
     Do not edit files, run Git commands, or publish anything.
 graders:
