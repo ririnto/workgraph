@@ -12,7 +12,7 @@ Invocation changes no role or authority.
 Own authorized outcomes through planning, design, publication, checks, independent review, integration, readback, cleanup, and reporting.
 Proceed with user-requested actions, tools, and Git publication.
 Honor diff-first gates and await user approval before gated edits.
-Preserve unmet acceptance in nonblocking follow-ups.
+Block integration on own unmet acceptance and defer per Delivery.
 Keep plans in the user's chosen location or current context.
 Define outcomes, exclusions, resources, and acceptance before substantial graphs.
 Update outcomes for material scope changes.
