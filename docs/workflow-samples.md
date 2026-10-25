@@ -35,7 +35,8 @@ Workflow({
 })
 ```
 
-For a repeatable command, save a run from `/workflows` or copy a sample into `.claude/workflows/` in the project, and the host then runs it by name.
+For a repeatable command, save a run from `/workflows`, or copy a sample source to `.claude/workflows/delivery-simple.js` or `.claude/workflows/delivery-complex.js` in the project.
+Named discovery reads `.js` files, so a copied `.workflow.txt` resource needs its `.js` destination name.
 The sample sources stay plain script bodies, so they need no wrapper, transform, dependency, or lint exception.
 The dispatching session owns the linked issue, the task branch, and the initial complete-candidate scan before it authorizes implementation, as its Delivery procedure requires.
 
@@ -58,17 +59,22 @@ The dispatching session owns the linked issue, the task branch, and the initial 
 | Scope | `opus` | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
 | Explore | `haiku` | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
 | Plan | `opus` | The scopes and exploration findings. | Work units with disjoint owned paths and instructions. |
-| Implement | `sonnet` | One unit per agent, with matching exploration only. | Changed files, diff summary, passing checks, and evidence. |
-| Integrate | `sonnet` | All unit results, only when the plan split units. | Merge outcome with conflicts and evidence. |
+| Implement | `sonnet` | One unit per agent, with matching exploration only. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
+| Integrate | `sonnet` | All unit results, only when the plan split units. | Named unit branches merged, their resource states, and combined-candidate checks. |
 | Sweep | `haiku` | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
 | Publish | `sonnet` | Completed implementation, completed integration when split, a clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
 | Review | `sonnet` | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
 
 Implementation runs each unit in its own isolated native worktree exactly when the plan defines more than one unit.
+Each isolated worker verifies its worktree starts from the named task candidate before editing and synchronizes first when it does not.
 A single-unit plan edits the task branch directly, so integration is skipped as not required.
 Implementation creates a task branch before committing when the checkout sits on the base branch.
+Unit ownership uses canonical repository-relative paths, so aliases, absolute paths, and escaping paths are rejected before dispatch, and every changed file must stay inside its unit.
+Checks report explicit passed, failed, or skipped statuses, and a gate passes only when every required check passed.
+Integration merges only the named unit branches, returns their merged, retained, or failed resource states, and runs the checks on the combined candidate.
 Publication always precedes review, and review requires the request posted by the completed publication phase.
-A fix round updates the same posted request and reviews the posted candidate again.
+Publication and review receive the per-unit checks and the combined-candidate checks.
+A fix round updates the same posted request, replaces only the repaired units' results by key, and reviews the posted candidate again.
 The scope, exploration, and sweep stages run with the built-in read-only Explore agent type, while review keeps the default agent and a read-only instruction.
 
 ## Skip, Failure, And Recovery
@@ -77,7 +83,8 @@ Each phase records `completed`, `skipped`, or `failed` with a reason, and the ru
 A skipped phase never counts as passing, so a dispatch that skips implementation or publication returns `complete: false` with the skips recorded.
 Integration is the one conditionally required phase, and a single-unit plan skips it without blocking completion.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.
-A `fix-required` review returns to implementation for the affected units, bounded by `maxFixRounds`, and then repeats integration, sweep, publication, and review so earlier evidence is replaced rather than reused.
+A `fix-required` review returns to implementation for the affected units, bounded by `maxFixRounds`, and then repeats integration, sweep, publication, and review.
+A fix round replaces the repaired units' results by key, so unaffected unit evidence stays while combined-candidate evidence is regenerated.
 The affected-unit mapping falls back to every unit when no finding names an owned path, and the fallback is logged.
 
 ## Models
@@ -90,6 +97,9 @@ An override must be a nonempty selector string the host supports for agent calls
 
 Resume a run in the same session with the stored `scriptPath` and `resumeFromRunId`, and unchanged agent calls return their saved results.
 A changed prompt, model, or predecessor result re-runs its call and every later call, which is what invalidates stale sweep, publication, and review evidence after a fix round.
+Before resuming, check the live checkout, the named task and base branch refs, the toolchain configuration, and the posted request against what the recorded run used, because native cache keys carry none of that state.
+A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.
+Never reuse a sweep or a posted review for a changed accepted candidate, because the recorded evidence describes the earlier candidate.
 A cached result avoids repeated work but does not prove acceptance, so a resumed run still needs its phase evidence checked.
 Sibling agents with matching settings can share the host prompt-cache prefix, which affects cost and speed but not the recorded phase evidence.
 Inspect the run journal when a result is missing or unexpected, as the [authoring reference](../skills/workflow/references/authoring.md) describes.

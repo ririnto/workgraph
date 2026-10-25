@@ -108,6 +108,38 @@ const taskPart = `Delivery goal: ${task}`
 const basePart = baseBranch ? `Base branch: ${baseBranch}` : 'Base branch: the repository default branch'
 const issuePart = issue ? `Linked issue reference: ${issue}` : ''
 const readOnlyPart = 'This stage is read-only, so change nothing and publish nothing.'
+const canonicalPath = path => {
+  if (typeof path !== 'string' || path.trim().length === 0 || path.includes('\0')) {
+    return null
+  }
+  const normalized = path.trim().replace(/\\/g, '/')
+  if (normalized.startsWith('/') || /^[a-zA-Z]:/.test(normalized)) {
+    return null
+  }
+  const segments = []
+  for (const segment of normalized.split('/')) {
+    if (segment === '' || segment === '.') {
+      continue
+    }
+    if (segment === '..') {
+      if (segments.pop() === undefined) {
+        return null
+      }
+      continue
+    }
+    segments.push(segment)
+  }
+  return segments.length > 0 ? segments.join('/') : null
+}
+const ownsPath = (owned, path) => path === owned || path.startsWith(`${owned}/`)
+const checkEntries = checks =>
+  Array.isArray(checks) &&
+  checks.every(check =>
+    typeof check?.command === 'string' &&
+    check.command.trim().length > 0 &&
+    ['failed', 'passed', 'skipped'].includes(check?.status))
+const checksPassed = checks =>
+  checkEntries(checks) && checks.length > 0 && checks.every(check => check.status === 'passed')
 
 phase('Scope')
 log('Separating the delivery goal into scopes')
@@ -158,8 +190,11 @@ const scopeShape =
     scope.description.trim().length > 0 &&
     Array.isArray(scope.paths) &&
     scope.paths.length > 0 &&
-    scope.paths.every(path => typeof path === 'string' && path.trim().length > 0))
-const scopes = scopeShape ? scopeList : []
+    scope.paths.every(path => typeof path === 'string' && path.trim().length > 0) &&
+    scope.paths.every(path => canonicalPath(path) !== null))
+const scopes = scopeShape
+  ? scopeList.map(scope => ({ ...scope, paths: scope.paths.map(canonicalPath) }))
+  : []
 if (skipped.scope) {
   recordPhase('scope', 'skipped', 'Explicit dispatch skip, so scope separation did not run')
 } else if (scopeAttempt.error !== undefined) {
@@ -277,7 +312,8 @@ if (phaseRecords.explore?.status !== 'completed') {
   })
   const unitList = Array.isArray(planAttempt.result?.units) ? planAttempt.result.units : []
   const unitNames = unitList.map(unit => (typeof unit?.key === 'string' ? unit.key.trim() : ''))
-  const ownedPaths = unitList.flatMap(unit => (Array.isArray(unit?.paths) ? unit.paths : []))
+  const ownedPaths = unitList.flatMap(unit =>
+    Array.isArray(unit?.paths) && unit.paths.length > 0 ? unit.paths.map(canonicalPath) : [null])
   const planShape =
     typeof planAttempt.result?.evidence === 'string' &&
     planAttempt.result.evidence.trim().length > 0 &&
@@ -285,7 +321,8 @@ if (phaseRecords.explore?.status !== 'completed') {
     unitList.length <= unitCap &&
     unitNames.every(name => name.length > 0) &&
     new Set(unitNames).size === unitNames.length &&
-    ownedPaths.every(path => typeof path === 'string' && path.trim().length > 0) &&
+    ownedPaths.every(path => path !== null) &&
+    new Set(ownedPaths).size === ownedPaths.length &&
     ownedPaths.every((path, index) =>
       ownedPaths.every((other, otherIndex) =>
         otherIndex === index ||
@@ -298,9 +335,9 @@ if (phaseRecords.explore?.status !== 'completed') {
   if (planAttempt.error !== undefined) {
     recordPhase('plan', 'failed', `Plan agent failed: ${planAttempt.error}`)
   } else if (!planShape) {
-    recordPhase('plan', 'failed', `Plan result is missing, malformed, duplicated, overlapping between units, or outside 1 through ${unitCap} units`)
+    recordPhase('plan', 'failed', `Plan result is missing, malformed, duplicated, unsafe or overlapping in unit ownership, or outside 1 through ${unitCap} units`)
   } else {
-    units = unitList
+    units = unitList.map(unit => ({ instructions: unit.instructions, key: unit.key, paths: unit.paths.map(canonicalPath) }))
     recordPhase('plan', 'completed')
   }
 }
@@ -318,7 +355,7 @@ const explorationsFor = unit => {
   }
   return matches
 }
-const dispatchImplementation = async (targets, findings, roundLabel) => {
+const dispatchImplementation = async (targets, findings, roundLabel, expectedStart) => {
   const results = await parallel(targets.map(unit => () => {
     const options = {
       ...(split ? { isolation: 'worktree' } : {}),
@@ -327,23 +364,24 @@ const dispatchImplementation = async (targets, findings, roundLabel) => {
       phase: 'Implement',
       schema: {
         properties: {
+          branch: { type: 'string' },
           changedFiles: { items: { type: 'string' }, type: 'array' },
           checks: {
             items: {
               properties: {
                 command: { type: 'string' },
-                outcome: { type: 'string' }
+                status: { enum: ['failed', 'passed', 'skipped'], type: 'string' }
               },
-              required: ['command', 'outcome'],
+              required: ['command', 'status'],
               type: 'object'
             },
             type: 'array'
           },
-          checksPassed: { type: 'boolean' },
           diffSummary: { type: 'string' },
-          evidence: { type: 'string' }
+          evidence: { type: 'string' },
+          startRef: { type: 'string' }
         },
-        required: ['changedFiles', 'checks', 'checksPassed', 'diffSummary', 'evidence'],
+        required: ['branch', 'changedFiles', 'checks', 'diffSummary', 'evidence', 'startRef'],
         type: 'object'
       }
     }
@@ -354,15 +392,21 @@ const dispatchImplementation = async (targets, findings, roundLabel) => {
       findings === null ? '' : `Fix these review findings inside your owned paths: ${JSON.stringify(findings)}`,
       `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
       basePart,
-      'If the current branch is the base branch, create and switch to a task branch named for the delivery before committing.',
       split
-        ? 'You run in an isolated worktree, so commit your changes there with a descriptive subject and do not push.'
-        : 'Commit your changes on the current branch with a descriptive subject and do not push.',
-      'Edit only files inside your owned paths.',
-      'Run the narrowest relevant checks and report each command and its outcome.',
+        ? 'You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.'
+        : 'Verify the current checkout branch before editing.',
+      expectedStart.name === null && !split
+        ? 'Report the branch name you verified as the starting reference.'
+        : `Required starting reference: ${expectedStart.description}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
+      split
+        ? `Create a branch named for unit ${unit.key}, commit your changes there with a descriptive subject, and do not push.`
+        : 'If the current branch is the base branch, create and switch to a task branch named for the delivery before committing, then commit with a descriptive subject and do not push.',
+      'Edit only files inside your owned paths, and report every changed file as a repository-relative path.',
+      'Run the narrowest relevant checks and report each command with status passed, failed, or skipped.',
+      'Report the branch you committed to, the verified starting reference, the changed files, and the checks.',
       'Do not rewrite existing commits, do not push, and do not publish.',
       promptParts.implement
-    ), options).then(attempt => ({ attempt, key: unit.key }))
+    ), options).then(attempt => ({ attempt, key: unit.key, paths: unit.paths }))
   }))
   const failures = []
   const unitResults = []
@@ -373,24 +417,42 @@ const dispatchImplementation = async (targets, findings, roundLabel) => {
       failures.push(`${item.key}: ${item.attempt.error}`)
     } else {
       const result = item.attempt.result
-      const shape =
-        Array.isArray(result?.changedFiles) && result.changedFiles.every(file => typeof file === 'string') &&
-        Array.isArray(result?.checks) &&
-        result.checks.every(check =>
-          typeof check?.command === 'string' && check.command.trim().length > 0 &&
-          typeof check?.outcome === 'string' && check.outcome.trim().length > 0) &&
-        result?.checksPassed === true &&
+      const changedFiles = Array.isArray(result?.changedFiles) ? result.changedFiles.map(canonicalPath) : []
+      const ownershipHeld =
+        changedFiles.length > 0 &&
+        changedFiles.every(file => file !== null && item.paths.some(owned => ownsPath(owned, file)))
+      const handoffHeld =
+        typeof result?.branch === 'string' && result.branch.trim().length > 0 &&
+        typeof result?.startRef === 'string' && result.startRef.trim().length > 0 &&
+        (expectedStart.name === null || result.startRef === expectedStart.name)
+      const evidenceHeld =
         typeof result?.diffSummary === 'string' && result.diffSummary.trim().length > 0 &&
         typeof result?.evidence === 'string' && result.evidence.trim().length > 0
-      if (shape) {
+      const problems = []
+      if (!ownershipHeld) {
+        problems.push('changed files fall outside the owned paths or are not safe repository-relative paths')
+      }
+      if (!checksPassed(result?.checks)) {
+        problems.push('required checks are missing or did not all pass')
+      }
+      if (!handoffHeld) {
+        problems.push(`unit branch or verified starting reference is missing${expectedStart.name === null ? '' : `, or the worktree did not start from ${expectedStart.name}`}`)
+      }
+      if (!evidenceHeld) {
+        problems.push('result is missing or malformed')
+      }
+      if (problems.length === 0) {
         unitResults.push({
-          changedFiles: result.changedFiles,
+          branch: result.branch,
+          changedFiles,
           checks: result.checks,
           diffSummary: result.diffSummary,
-          key: item.key
+          evidence: result.evidence,
+          key: item.key,
+          startRef: result.startRef
         })
       } else {
-        failures.push(`${item.key}: result is missing or malformed`)
+        failures.push(`${item.key}: ${problems.join(', ')}`)
       }
     }
   }
@@ -400,12 +462,15 @@ const dispatchImplementation = async (targets, findings, roundLabel) => {
 }
 const dispatchIntegration = async currentUnits => {
   const attempt = await runAgent(compose(
-    'Integrate the split implementation units into the current task branch.',
-    `Unit results: ${JSON.stringify(currentUnits.map(unit => ({ changedFiles: unit.changedFiles, key: unit.key })))}`,
-    'Locate the unit worktrees with git worktree list and merge each unit branch into the current branch.',
+    'Integrate the named unit branches into the current task branch.',
+    `Unit resources: ${JSON.stringify(currentUnits.map(unit => ({ branch: unit.branch, key: unit.key })))}`,
+    'Merge exactly these named unit branches into the current task branch, and use no discovered or unrelated worktree.',
     'Keep every unit inside its owned paths and resolve cross-unit conflicts without changing unrelated work.',
     'Report unresolved conflicts instead of forcing a merge.',
-    'Commit the merged result on the current branch and do not push.',
+    'If the current branch is the base branch, create and switch to a task branch named for the delivery before committing.',
+    'Run the relevant checks on the combined candidate and report each command with status passed, failed, or skipped.',
+    'Report the final task branch name and the state of every named unit resource.',
+    'Commit the merged result on the task branch, do not push, and do not publish.',
     promptParts.integrate
   ), {
     label: 'integrate',
@@ -413,32 +478,83 @@ const dispatchIntegration = async currentUnits => {
     phase: 'Integrate',
     schema: {
       properties: {
+        branch: { type: 'string' },
+        checks: {
+          items: {
+            properties: {
+              command: { type: 'string' },
+              status: { enum: ['failed', 'passed', 'skipped'], type: 'string' }
+            },
+            required: ['command', 'status'],
+            type: 'object'
+          },
+          type: 'array'
+        },
         conflicts: { items: { type: 'string' }, type: 'array' },
         evidence: { type: 'string' },
-        merged: { type: 'boolean' }
+        merged: { type: 'boolean' },
+        resources: {
+          items: {
+            properties: {
+              branch: { type: 'string' },
+              key: { type: 'string' },
+              state: { enum: ['failed', 'merged', 'retained'], type: 'string' }
+            },
+            required: ['branch', 'key', 'state'],
+            type: 'object'
+          },
+          type: 'array'
+        }
       },
-      required: ['conflicts', 'evidence', 'merged'],
+      required: ['branch', 'checks', 'conflicts', 'evidence', 'merged', 'resources'],
       type: 'object'
     }
   })
   const result = attempt.result
+  const resources = Array.isArray(result?.resources) ? result.resources : []
+  const currentKeys = currentUnits.map(unit => unit.key)
+  const namedKeys = resources
+    .map(resource => (typeof resource?.key === 'string' ? resource.key : ''))
+    .filter(key => key.length > 0)
+  const ledgerHeld =
+    resources.every(resource =>
+      typeof resource?.branch === 'string' && resource.branch.trim().length > 0 &&
+      ['failed', 'merged', 'retained'].includes(resource?.state) &&
+      currentKeys.includes(resource?.key)) &&
+    new Set(namedKeys).size === namedKeys.length &&
+    currentKeys.every(key => namedKeys.includes(key))
   const shape =
+    typeof result?.branch === 'string' && result.branch.trim().length > 0 &&
     typeof result?.evidence === 'string' && result.evidence.trim().length > 0 &&
     typeof result?.merged === 'boolean' &&
-    Array.isArray(result?.conflicts) && result.conflicts.every(conflict => typeof conflict === 'string')
+    Array.isArray(result?.conflicts) && result.conflicts.every(conflict => typeof conflict === 'string') &&
+    checkEntries(result?.checks) &&
+    ledgerHeld
+  const retained = {
+    branch: typeof result?.branch === 'string' ? result.branch : '',
+    checks: Array.isArray(result?.checks) ? result.checks : [],
+    conflicts: Array.isArray(result?.conflicts) ? result.conflicts : [],
+    resources
+  }
   if (attempt.error !== undefined) {
-    return { reason: `Integration agent failed: ${attempt.error}`, status: 'failed' }
+    return { ...retained, reason: `Integration agent failed: ${attempt.error}`, status: 'failed' }
   }
   if (!shape) {
-    return { reason: 'Integration result is missing or malformed', status: 'failed' }
+    return { ...retained, reason: 'Integration result is missing, malformed, or does not account for every named unit resource', status: 'failed' }
   }
-  return result.merged
-    ? { conflicts: result.conflicts, reason: null, status: 'completed' }
-    : {
-        conflicts: result.conflicts,
-        reason: `Integration left the branch unmerged: ${result.conflicts.join('; ')}`,
-        status: 'failed'
-      }
+  if (!result.merged) {
+    return { ...retained, branch: result.branch, reason: `Integration left the branch unmerged: ${result.conflicts.join('; ')}`, status: 'failed' }
+  }
+  if (result.conflicts.length > 0) {
+    return { ...retained, branch: result.branch, reason: 'Integration reported unresolved conflicts alongside a completed merge, so the evidence is contradictory', status: 'failed' }
+  }
+  if (resources.some(resource => resource.state !== 'merged')) {
+    return { ...retained, branch: result.branch, reason: 'Integration reported a completed merge while named unit resources remain unmerged, so the evidence is contradictory', status: 'failed' }
+  }
+  if (!checksPassed(result.checks)) {
+    return { ...retained, branch: result.branch, reason: 'Required checks on the combined candidate are missing or did not all pass', status: 'failed' }
+  }
+  return { branch: result.branch, checks: result.checks, conflicts: result.conflicts, reason: null, resources, status: 'completed' }
 }
 const dispatchSweep = async () => {
   const attempt = await runAgent(compose(
@@ -491,17 +607,20 @@ const dispatchSweep = async () => {
   }
   return { exposures: result.exposures, reason: null, status: 'completed' }
 }
-const dispatchPublish = async (currentUnits, priorUrl) => {
+const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   const attempt = await runAgent(compose(
     'Publish the current task branch for review.',
     taskPart,
     basePart,
     issuePart,
     priorUrl === null ? '' : `Update the existing open request at ${priorUrl} with the fixed change instead of creating another request.`,
-    `Change summary: ${JSON.stringify(currentUnits.map(unit => ({ changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key })))}`,
+    `Change summary: ${JSON.stringify({
+      combinedChecks: integrationState !== null && integrationState.status === 'completed' ? integrationState.checks : 'not required',
+      units: currentUnits.map(unit => ({ branch: unit.branch, changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key }))
+    })}`,
     'Create a pull request with gh for a GitHub remote, or a merge request with glab for a GitLab remote.',
     'Reuse the existing open request for this branch instead of creating a duplicate.',
-    'Describe the change, the checks that ran, and the remaining limits, and keep private environment details out of the request.',
+    'Describe the change, the per-unit and combined checks that ran, and the remaining limits, and keep private environment details out of the request.',
     'Do not merge, close, approve, or change repository settings.',
     promptParts.publish
   ), {
@@ -541,8 +660,14 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     basePart,
     issuePart,
     `Change summary: ${JSON.stringify({
-      integration: integrationState === null ? 'not required' : integrationState.status,
-      units: currentUnits.map(unit => ({ changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key }))
+      integration: integrationState === null
+        ? 'not required'
+        : {
+            branch: integrationState.branch,
+            checks: Array.isArray(integrationState.checks) ? integrationState.checks : [],
+            status: integrationState.status
+          },
+      units: currentUnits.map(unit => ({ branch: unit.branch, changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key }))
     })}`,
     `Review the posted candidate at ${publishState.url}, including its request description.`,
     'Inspect the change and the affected consumers beyond the changed lines.',
@@ -593,7 +718,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
   }
   return { findings: result.findings, reason: null, status: 'completed', verdict: result.verdict }
 }
-const runPublish = async (sweepState, currentUnits, priorUrl) => {
+const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) => {
   if (skipped.publish) {
     return { reason: 'Explicit dispatch skip, so publication did not run', status: 'skipped' }
   }
@@ -614,7 +739,7 @@ const runPublish = async (sweepState, currentUnits, priorUrl) => {
     }
   }
   log('Publishing the task branch')
-  return dispatchPublish(currentUnits, priorUrl)
+  return dispatchPublish(currentUnits, integrationState, priorUrl)
 }
 
 phase('Implement')
@@ -625,7 +750,9 @@ if (phaseRecords.plan?.status !== 'completed') {
   recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
 } else {
   log('Implementing the planned units')
-  const implementState = await dispatchImplementation(units, null, '')
+  const implementState = await dispatchImplementation(units, null, '', split
+    ? { description: baseBranch || 'the repository default branch', name: baseBranch || null }
+    : { description: 'the current checkout branch', name: null })
   recordPhase('implement', implementState.status, implementState.reason)
   unitResults = implementState.unitResults
 }
@@ -658,7 +785,7 @@ recordPhase('sweep', sweepState.status, sweepState.reason)
 let publishState = null
 let postedUrl = null
 phase('Publish')
-publishState = await runPublish(sweepState, unitResults, null)
+publishState = await runPublish(sweepState, unitResults, integrationState, null)
 recordPhase('publish', publishState.status, publishState.reason)
 if (publishState.status === 'completed') {
   postedUrl = publishState.url
@@ -685,20 +812,30 @@ while (
 ) {
   roundsUsed += 1
   log(`Review requires fixes, so returning to implementation in fix round ${roundsUsed} of ${maxFixRounds}`)
+  const previousByKey = new Map(unitResults.map(unit => [unit.key, unit]))
   const affected = units.filter(unit =>
-    reviewState.findings.some(finding =>
-      unit.paths.some(path => finding.file === path || finding.file.startsWith(`${path}/`))))
+    reviewState.findings.some(finding => {
+      const file = canonicalPath(finding.file)
+      return file !== null && unit.paths.some(owned => ownsPath(owned, file))
+    }))
   const targets = affected.length > 0 ? affected : units
   if (affected.length === 0) {
     log('No finding maps to an owned unit path, so the fix round covers every unit')
   }
+  const candidateName = split
+    ? (typeof integrationState?.branch === 'string' && integrationState.branch.trim().length > 0 ? integrationState.branch : null)
+    : previousByKey.get(targets[0].key)?.branch ?? null
   phase('Implement')
-  const fixState = await dispatchImplementation(targets, reviewState.findings, `:fix-${roundsUsed}`)
+  const fixState = await dispatchImplementation(targets, reviewState.findings, `:fix-${roundsUsed}`, {
+    description: candidateName ?? 'the current task branch',
+    name: candidateName
+  })
   recordPhase('implement', fixState.status, fixState.reason)
   if (fixState.status !== 'completed') {
     break
   }
-  unitResults = fixState.unitResults
+  const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
+  unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
   if (split) {
     phase('Integrate')
     integrationState = skipped.integrate
@@ -712,7 +849,7 @@ while (
     : await dispatchSweep()
   recordPhase('sweep', sweepState.status, sweepState.reason)
   phase('Publish')
-  publishState = await runPublish(sweepState, unitResults, postedUrl)
+  publishState = await runPublish(sweepState, unitResults, integrationState, postedUrl)
   recordPhase('publish', publishState.status, publishState.reason)
   if (publishState.status === 'completed') {
     postedUrl = publishState.url
@@ -746,10 +883,15 @@ return {
   publish: publishState.status === 'completed'
     ? { action: publishState.action, url: publishState.url }
     : null,
+  resources: integrationState !== null && Array.isArray(integrationState.resources) ? integrationState.resources : [],
   review: reviewState.status === 'completed'
     ? { findings: reviewState.findings.length, verdict: reviewState.verdict }
     : null,
   split,
-  units: units.map(unit => ({ key: unit.key, paths: unit.paths })),
+  units: units.map(unit => ({
+    branch: unitResults.find(result => result.key === unit.key)?.branch ?? null,
+    key: unit.key,
+    paths: unit.paths
+  })),
   variant
 }
