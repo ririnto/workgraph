@@ -147,8 +147,15 @@ Evaluation relocates `HOME` into its sandbox, which can break home-dependent Nod
 Prepend the resolved Node binary directory to `PATH` for the evaluator and its isolated runs.
 
 ```sh
-PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --runs 1 --ablation none --allow-tools Agent Workflow Bash --keep-temp --no-publish --output-dir ../workgraph-eval-results
+PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --runs 2 --ablation none --allow-tools Agent Workflow Bash --keep-temp --no-publish --output-dir ../workgraph-eval-results
 ```
+
+Run each case at least twice for instruction-behavior evidence.
+Report each case's individual run outcomes, including failures and incomplete runs, rather than only an aggregate score.
+Use `--runs 1` only for a labeled packaging or invocation smoke check.
+A smoke check does not satisfy instruction-behavior acceptance.
+Keep source-check results separate from measured behavioral evidence.
+Use the [verification map](docs/verification-map.md) for case-specific commands and evidence limits.
 
 Keep reports outside the repository and retain traces until their actual completion results have been inspected.
 Remove task-owned reports and retained evaluation sandboxes when checks, investigation, recovery, and retention no longer need them.
