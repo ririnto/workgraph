@@ -5,8 +5,8 @@ export const meta = {
     { detail: 'separate the goal into disjoint scopes', title: 'Scope' },
     { detail: 'one read-only explorer per scope', title: 'Explore' },
     { detail: 'define exactly one implementation unit', title: 'Plan' },
-    { detail: 'implement the unit on the task branch', title: 'Implement' },
-    { detail: 'runs only when the plan splits units', title: 'Integrate' },
+    { detail: 'implement the unit in an isolated worktree', title: 'Implement' },
+    { detail: 'merge the named unit branch into the task branch', title: 'Integrate' },
     { detail: 'diff-only environment-exposure sweep', title: 'Sweep' },
     { detail: 'create or update the PR or MR', title: 'Publish' },
     { detail: 'independent review of the complete change', title: 'Review' }
@@ -48,6 +48,7 @@ if (!issue) {
   throw new Error('Provide the linked issue reference as a nonempty args.issue string')
 }
 const baseBranch = typeof input.baseBranch === 'string' ? input.baseBranch.trim() : ''
+const candidateBranch = typeof input.candidateBranch === 'string' ? input.candidateBranch.trim() : ''
 const settingsMap = (value, name) => {
   if (value === undefined || value === null) {
     return {}
@@ -357,7 +358,7 @@ const explorationsFor = unit => {
 const dispatchImplementation = async (targets, findings, roundLabel, expectedStart) => {
   const results = await parallel(targets.map(unit => () => {
     const options = {
-      ...(split ? { isolation: 'worktree' } : {}),
+      isolation: 'worktree',
       label: `implement:${unit.key}${roundLabel}`,
       model: models.implement,
       phase: 'Implement',
@@ -390,16 +391,9 @@ const dispatchImplementation = async (targets, findings, roundLabel, expectedSta
       `Unit instructions: ${unit.instructions}`,
       findings === null ? '' : `Fix these review findings inside your owned paths: ${JSON.stringify(findings)}`,
       `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
-      basePart,
-      split
-        ? 'You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.'
-        : 'Verify the current checkout branch before editing.',
-      expectedStart.name === null && !split
-        ? 'Report the branch name you verified as the starting reference.'
-        : `Required starting reference: ${expectedStart.description}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
-      split
-        ? `Create a branch named for unit ${unit.key}, commit your changes there with a descriptive subject, and do not push.`
-        : 'If the current branch is the base branch, create and switch to a task branch named for the delivery before committing, then commit with a descriptive subject and do not push.',
+      'You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.',
+      `Required starting reference: ${expectedStart.description}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
+      `Create a branch named for unit ${unit.key}, commit your changes there with a descriptive subject, and do not push.`,
       'Edit only files inside your owned paths, and report every changed file as a repository-relative path.',
       'Run the narrowest relevant checks and report each command with status passed, failed, or skipped.',
       'Report the branch you committed to, the verified starting reference, the changed files, and the checks.',
@@ -409,6 +403,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, expectedSta
   }))
   const failures = []
   const unitResults = []
+  const attemptResources = []
   for (const item of results) {
     if (item === null) {
       failures.push('an implementation agent returned no result')
@@ -440,6 +435,14 @@ const dispatchImplementation = async (targets, findings, roundLabel, expectedSta
       if (!evidenceHeld) {
         problems.push('result is missing or malformed')
       }
+      if (typeof result?.branch === 'string' && result.branch.trim().length > 0) {
+        attemptResources.push({
+          branch: result.branch.trim(),
+          key: item.key,
+          startRef: typeof result?.startRef === 'string' && result.startRef.trim().length > 0 ? result.startRef.trim() : null,
+          state: problems.length === 0 ? 'implemented' : 'attempted'
+        })
+      }
       if (problems.length === 0) {
         unitResults.push({
           branch: result.branch,
@@ -456,8 +459,8 @@ const dispatchImplementation = async (targets, findings, roundLabel, expectedSta
     }
   }
   return failures.length > 0
-    ? { reason: failures.join('; '), status: 'failed', unitResults }
-    : { reason: null, status: 'completed', unitResults }
+    ? { attemptResources, reason: failures.join('; '), status: 'failed', unitResults }
+    : { attemptResources, reason: null, status: 'completed', unitResults }
 }
 const dispatchIntegration = async currentUnits => {
   const attempt = await runAgent(compose(
@@ -512,6 +515,7 @@ const dispatchIntegration = async currentUnits => {
   const result = attempt.result
   const resources = Array.isArray(result?.resources) ? result.resources : []
   const currentKeys = currentUnits.map(unit => unit.key)
+  const branchByKey = new Map(currentUnits.map(unit => [unit.key, unit.branch]))
   const namedKeys = resources
     .map(resource => (typeof resource?.key === 'string' ? resource.key : ''))
     .filter(key => key.length > 0)
@@ -519,7 +523,8 @@ const dispatchIntegration = async currentUnits => {
     resources.every(resource =>
       typeof resource?.branch === 'string' && resource.branch.trim().length > 0 &&
       ['failed', 'merged', 'retained'].includes(resource?.state) &&
-      currentKeys.includes(resource?.key)) &&
+      currentKeys.includes(resource?.key) &&
+      resource.branch === branchByKey.get(resource.key)) &&
     new Set(namedKeys).size === namedKeys.length &&
     currentKeys.every(key => namedKeys.includes(key))
   const shape =
@@ -539,7 +544,7 @@ const dispatchIntegration = async currentUnits => {
     return { ...retained, reason: `Integration agent failed: ${attempt.error}`, status: 'failed' }
   }
   if (!shape) {
-    return { ...retained, reason: 'Integration result is missing, malformed, or does not account for every named unit resource', status: 'failed' }
+    return { ...retained, reason: 'Integration result is missing, malformed, or does not exactly account for every named unit branch', status: 'failed' }
   }
   if (!result.merged) {
     return { ...retained, branch: result.branch, reason: `Integration left the branch unmerged: ${result.conflicts.join('; ')}`, status: 'failed' }
@@ -554,6 +559,26 @@ const dispatchIntegration = async currentUnits => {
     return { ...retained, branch: result.branch, reason: 'Required checks on the combined candidate are missing or did not all pass', status: 'failed' }
   }
   return { branch: result.branch, checks: result.checks, conflicts: result.conflicts, reason: null, resources, status: 'completed' }
+}
+const applyLedger = (integrationState, knownResources) => {
+  if (!Array.isArray(integrationState?.resources)) {
+    return
+  }
+  integrationState.resources.forEach(resource => {
+    if (typeof resource?.key !== 'string') {
+      return
+    }
+    const known = knownResources.get(resource.key)
+    if (known !== undefined && resource.branch !== known.branch) {
+      return
+    }
+    knownResources.set(resource.key, {
+      branch: known?.branch ?? resource.branch,
+      key: resource.key,
+      startRef: known?.startRef ?? null,
+      state: resource.state
+    })
+  })
 }
 const dispatchSweep = async () => {
   const attempt = await runAgent(compose(
@@ -724,7 +749,7 @@ const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) 
   if (phaseRecords.implement.status !== 'completed') {
     return { reason: 'Implementation did not complete, so publication is blocked', status: 'skipped' }
   }
-  if (split && phaseRecords.integrate.status !== 'completed') {
+  if (phaseRecords.integrate.status !== 'completed') {
     return { reason: 'Required Integration predecessor is incomplete, so publication is blocked', status: 'skipped' }
   }
   if (phaseRecords.sweep.status !== 'completed') {
@@ -743,35 +768,33 @@ const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) 
 
 phase('Implement')
 let unitResults = []
+const knownResources = new Map()
 if (phaseRecords.plan?.status !== 'completed') {
   recordPhase('implement', 'skipped', 'Required Plan predecessor is incomplete')
 } else if (skipped.implement) {
   recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
 } else {
   log('Implementing the planned unit')
-  const implementState = await dispatchImplementation(units, null, '', split
-    ? { description: baseBranch || 'the repository default branch', name: baseBranch || null }
-    : { description: 'the current checkout branch', name: null })
+  const implementState = await dispatchImplementation(units, null, '', {
+    description: candidateBranch || 'the current task branch carrying any prerequisite changes',
+    name: candidateBranch || null
+  })
   recordPhase('implement', implementState.status, implementState.reason)
   unitResults = implementState.unitResults
+  implementState.attemptResources.forEach(resource => knownResources.set(resource.key, resource))
 }
 let integrationState = null
 phase('Integrate')
-if (!split) {
-  integrationState = {
-    conditional: true,
-    reason: 'The plan defined one unit, so no worktree integration is required',
-    status: 'skipped'
-  }
-} else if (phaseRecords.implement.status !== 'completed') {
-  integrationState = { conditional: false, reason: 'Implementation did not complete', status: 'skipped' }
+if (phaseRecords.implement.status !== 'completed') {
+  integrationState = { reason: 'Implementation did not complete', status: 'skipped' }
 } else if (skipped.integrate) {
-  integrationState = { conditional: false, reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
+  integrationState = { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
 } else {
-  log('Integrating unit worktrees into the task branch')
+  log('Integrating the named unit branches into the task branch')
   integrationState = await dispatchIntegration(unitResults)
 }
 recordPhase('integrate', integrationState.status, integrationState.reason)
+applyLedger(integrationState, knownResources)
 let sweepState = null
 phase('Sweep')
 if (skipped.sweep) {
@@ -821,27 +844,28 @@ while (
   if (affected.length === 0) {
     log('No finding maps to an owned unit path, so the fix round covers every unit')
   }
-  const candidateName = split
-    ? (typeof integrationState?.branch === 'string' && integrationState.branch.trim().length > 0 ? integrationState.branch : null)
-    : previousByKey.get(targets[0].key)?.branch ?? null
+  const candidateName =
+    (typeof integrationState?.branch === 'string' && integrationState.branch.trim().length > 0 ? integrationState.branch : null) ??
+    previousByKey.get(targets[0].key)?.branch ??
+    (candidateBranch || null)
   phase('Implement')
   const fixState = await dispatchImplementation(targets, reviewState.findings, `:fix-${roundsUsed}`, {
-    description: candidateName ?? 'the current task branch',
+    description: candidateName ?? 'the current task branch carrying any prerequisite changes',
     name: candidateName
   })
   recordPhase('implement', fixState.status, fixState.reason)
+  fixState.attemptResources.forEach(resource => knownResources.set(resource.key, resource))
+  const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
+  unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
   if (fixState.status !== 'completed') {
     break
   }
-  const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
-  unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
-  if (split) {
-    phase('Integrate')
-    integrationState = skipped.integrate
-      ? { conditional: false, reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
-      : await dispatchIntegration(unitResults)
-    recordPhase('integrate', integrationState.status, integrationState.reason)
-  }
+  phase('Integrate')
+  integrationState = skipped.integrate
+    ? { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
+    : await dispatchIntegration(unitResults)
+  recordPhase('integrate', integrationState.status, integrationState.reason)
+  applyLedger(integrationState, knownResources)
   phase('Sweep')
   sweepState = skipped.sweep
     ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
@@ -870,9 +894,7 @@ if (
   throw new Error('Phase evidence is incomplete')
 }
 const complete =
-  phaseEvidence.every(record =>
-    record.status === 'completed' ||
-    (record.title === 'Integrate' && record.status === 'skipped' && !split)) &&
+  phaseEvidence.every(record => record.status === 'completed') &&
   (phaseRecords.review.status !== 'completed' || reviewState.verdict === 'pass')
 return {
   complete,
@@ -882,7 +904,10 @@ return {
   publish: publishState.status === 'completed'
     ? { action: publishState.action, url: publishState.url }
     : null,
-  resources: integrationState !== null && Array.isArray(integrationState.resources) ? integrationState.resources : [],
+  resources: units.flatMap(unit => {
+    const known = knownResources.get(unit.key)
+    return known === undefined ? [] : [known]
+  }),
   review: reviewState.status === 'completed'
     ? { findings: reviewState.findings.length, verdict: reviewState.verdict }
     : null,

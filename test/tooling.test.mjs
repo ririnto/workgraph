@@ -1053,7 +1053,7 @@ const splitUnits = {
   ]
 };
 const simpleImplement = {
-  branch: "task-branch",
+  branch: "unit-u1",
   changedFiles: ["docs/guide.md"],
   checks: [{ command: "pnpm run check:markdownlint-cli2", status: "passed" }],
   diffSummary: "d",
@@ -1084,6 +1084,14 @@ const wrongStart = (options) => {
     ? { ...result, startRef: "wrong-ref" }
     : result;
 };
+const failedRepair = (options) =>
+  options.label.includes(":fix-")
+    ? {
+        ...splitImplement(options),
+        branch: "unit-u1-r2",
+        checks: [{ command: "check-failed", status: "failed" }]
+      }
+    : splitImplement(options);
 const integrateResult = {
   branch: "task-branch",
   checks: [{ command: "pnpm run check", status: "passed" }],
@@ -1094,6 +1102,14 @@ const integrateResult = {
     { branch: "unit-u1", key: "u1", state: "merged" },
     { branch: "unit-u2", key: "u2", state: "merged" }
   ]
+};
+const integrateSingle = {
+  branch: "task-branch",
+  checks: [{ command: "pnpm run check:hooks", status: "passed" }],
+  conflicts: [],
+  evidence: "e",
+  merged: true,
+  resources: [{ branch: "unit-u1", key: "u1", state: "merged" }]
 };
 const sweepResult = { evidence: "e", exposures: [] };
 const publishCreated = {
@@ -1127,6 +1143,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
+        Integrate: sequence(integrateSingle, integrateSingle),
         Plan: () => singleUnits,
         Publish: sequence(publishCreated, publishUpdated),
         Review: sequence(reviewFix, reviewPass),
@@ -1143,7 +1160,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         "completed",
         "completed",
         "completed",
-        "skipped",
+        "completed",
         "completed",
         "completed",
         "completed"
@@ -1178,10 +1195,15 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     assert.ok(
       calls
         .filter((entry) => entry.phase === "Implement")
-        .every((call) => call.isolation === undefined)
+        .every((call) => call.isolation === "worktree")
     );
     const implementCalls = calls.filter((entry) => entry.phase === "Implement");
-    assert.ok(implementCalls[0].prompt.includes("Report the branch name"));
+    assert.ok(
+      implementCalls[0].prompt.includes(
+        "Required starting reference: the current task branch"
+      )
+    );
+    assert.ok(!implementCalls[0].prompt.includes("Base branch:"));
     assert.ok(
       implementCalls[1].prompt.includes(
         "Required starting reference: task-branch"
@@ -1189,11 +1211,14 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     );
     for (const call of calls.filter((entry) => entry.phase === "Publish")) {
       assert.ok(call.prompt.includes("pnpm run check:markdownlint-cli2"));
+      assert.ok(call.prompt.includes("pnpm run check:hooks"));
     }
     assert.deepEqual(result.units, [
-      { branch: "task-branch", key: "u1", paths: ["docs/guide.md"] }
+      { branch: "unit-u1", key: "u1", paths: ["docs/guide.md"] }
     ]);
-    assert.deepEqual(result.resources, []);
+    assert.deepEqual(result.resources, [
+      { branch: "unit-u1", key: "u1", startRef: "task-branch", state: "merged" }
+    ]);
   }
   {
     const { calls, result } = await runWorkflowSample(
@@ -1202,6 +1227,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       dispatchTable({
         Explore: () => exploreResult,
         Implement: () => simpleImplement,
+        Integrate: () => integrateSingle,
         Plan: () => singleUnits,
         Publish: () => publishCreated,
         Review: () => reviewFix,
@@ -1229,6 +1255,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
+        Integrate: () => integrateSingle,
         Plan: () => singleUnits,
         Publish: sequence(publishCreated, {
           action: "created",
@@ -1541,14 +1568,22 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       { branch: "unit-u2", key: "u2", state: "retained" }
     ]
   };
+  const integrateWrongBranch = {
+    ...integrateResult,
+    resources: [
+      { branch: "other-branch", key: "u1", state: "merged" },
+      { branch: "unit-u2", key: "u2", state: "merged" }
+    ]
+  };
   await Promise.all(
     [
-      [integrateUnmerged, /unmerged/u, 2],
-      [integrateConflicted, /contradictory/u, 2],
-      [integratePartialLedger, /every named unit resource/u, 1],
-      [integrateNoChecks, /combined candidate/u, 2],
-      [integrateRetained, /contradictory/u, 2]
-    ].map(async ([payload, pattern, resources]) => {
+      [integrateUnmerged, /unmerged/u],
+      [integrateConflicted, /contradictory/u],
+      [integratePartialLedger, /every named unit branch/u],
+      [integrateWrongBranch, /every named unit branch/u],
+      [integrateNoChecks, /combined candidate/u],
+      [integrateRetained, /contradictory/u]
+    ].map(async ([payload, pattern]) => {
       const { result } = await runWorkflowSample(
         samplePaths.complex,
         { issue: "#1", task: "t" },
@@ -1567,7 +1602,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       );
       assert.equal(integrateRecord.status, "failed");
       assert.match(integrateRecord.reason, pattern);
-      assert.equal(result.resources.length, resources);
+      assert.equal(result.resources.length, 2);
       const publishRecord = result.phaseEvidence.find(
         (record) => record.title === "Publish"
       );
@@ -1613,4 +1648,74 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     fixCall.prompt.includes("Required starting reference: task-branch")
   );
   assert.ok(fixCall.prompt.includes("Synchronize to it"));
+  assert.deepEqual(
+    result.resources.find((resource) => resource.key === "u1"),
+    { branch: "unit-u1", key: "u1", startRef: "wrong-ref", state: "attempted" }
+  );
+  const repairRun = await runWorkflowSample(
+    samplePaths.complex,
+    { issue: "#1", maxFixRounds: 1, task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: failedRepair,
+      Integrate: () => integrateResult,
+      Plan: () => splitUnits,
+      Publish: sequence(publishCreated, publishUpdated),
+      Review: sequence(reviewFix, reviewPass),
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(repairRun.result.complete, false);
+  assert.equal(
+    repairRun.result.phaseEvidence.find(
+      (record) => record.title === "Implement"
+    ).status,
+    "failed"
+  );
+  assert.deepEqual(
+    repairRun.result.resources.find((resource) => resource.key === "u1"),
+    {
+      branch: "unit-u1-r2",
+      key: "u1",
+      startRef: "task-branch",
+      state: "attempted"
+    }
+  );
+  assert.equal(
+    repairRun.result.resources.find((resource) => resource.key === "u2").state,
+    "merged"
+  );
+  assert.equal(
+    repairRun.calls.filter((call) => call.phase === "Publish").length,
+    1
+  );
+  const candidateRun = await runWorkflowSample(
+    samplePaths.simple,
+    { candidateBranch: "wg-candidate", issue: "#1", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: () => simpleImplement,
+      Integrate: () => integrateSingle,
+      Plan: () => singleUnits,
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  const initialCall = candidateRun.calls.find(
+    (entry) => entry.phase === "Implement"
+  );
+  assert.ok(
+    initialCall.prompt.includes("Required starting reference: wg-candidate")
+  );
+  assert.ok(!initialCall.prompt.includes("Base branch:"));
+  assert.equal(candidateRun.result.complete, false);
+  const candidateRecord = candidateRun.result.phaseEvidence.find(
+    (record) => record.title === "Implement"
+  );
+  assert.equal(candidateRecord.status, "failed");
+  assert.match(candidateRecord.reason, /start from wg-candidate/u);
+  assert.deepEqual(candidateRun.result.resources, [
+    { branch: "unit-u1", key: "u1", startRef: "main", state: "attempted" }
+  ]);
 });
