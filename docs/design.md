@@ -270,11 +270,14 @@ Do not infer model adherence from a passing hook test or a shorter prompt.
 
 ## Validation And Tooling
 
-Ultracite owns source lint and formatting, including Workgraph's maintained source-style plugins.
-The root configs use the official Ultracite 8 presets and preserve their ignore patterns.
+Ultracite runs source lint and formatting through Oxlint and Oxfmt.
+The root configs use the official Ultracite presets and preserve their ignore patterns.
 Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
-The local style and TSDoc plugins retain mandatory function-body spacing, declaration-comment, and exported TypeScript documentation checks.
-The repository owns these additions and verifies their behavior through its tooling tests.
+`oxlint.config.ts` registers one local plugin, `plugins/tsdoc-plugin.ts`, and enables its `tsdoc/require-export-tsdoc` rule.
+The rule requires multiline TSDoc for exported TypeScript APIs, including public and protected members of exposed classes.
+Function-body spacing and declaration-only explanations remain written conventions without full enforcement by the active configuration.
+The preset's `no-inline-comments` rule provides a narrower comment diagnostic.
+The repository's tooling tests verify the configured diagnostics and formatter behavior.
 JavaScript parameter and return annotations and type imports follow the official preset defaults.
 Markdownlint checks relative links and heading fragments, sentence boundaries, and table separators through the adopted rules.
 
