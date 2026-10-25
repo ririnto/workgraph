@@ -6,6 +6,7 @@ description: Use in Codex when archiving or deleting native threads, or retiring
 # Codex Scoped Cleanup
 
 Apply this procedure only in Codex and within the current cleanup authority.
+Route every cleanup operation through the authorized resource owner using supported herdr agent operations.
 
 ## Authority And Native Lifecycle
 
@@ -15,10 +16,12 @@ Require explicit human authority for permanent deletion of the exact affected sc
 Preserve any action-time confirmation required by the selected tool, even when broader cleanup is already authorized.
 Do not infer Project, Session, or Chat deletion support from a Thread method.
 
-Before native inventory or lifecycle changes, read [App-Server Lifecycle](references/app-server.md) unless already loaded completely.
-Use supported lifecycle methods rather than editing authoritative SQLite, rollout files, or raw host state.
-Do not restart shared daemons or terminate unrelated workers to evade ownership guards.
-Keep temporary private identities, paths, payloads, and protocol logs out of published instructions and shared reports.
+Before cleanup inventory or lifecycle changes, read [Owner-mediated resource lifecycle](references/app-server.md) unless already loaded completely.
+Use supported owner-controlled operations rather than editing authoritative SQLite, rollout files, or raw host state.
+Do not restart shared services or terminate unrelated workers to evade ownership guards.
+When an owner or supported operation is unavailable, preserve affected resources and report the exact limitation.
+Do not use direct app-server access.
+Keep temporary private identities, paths, payloads, and logs out of published instructions and shared reports.
 
 ## Git Preservation
 
@@ -49,7 +52,7 @@ Preserve primary, shared, and pinned checkouts during generic task cleanup.
 
 ## Worktrees And Caches
 
-Prefer native worktree lifecycle tools or Git's worktree commands over deleting checkout directories directly.
+Have the authorized owner use supported worktree lifecycle tools or Git's worktree commands rather than direct directory deletion.
 Refresh ownership and working-tree state before removal.
 Do not force removal to bypass unique dirty or untracked content.
 Check exact process arguments, working directories, open handles, and active containers for the selected scope.
@@ -64,8 +67,8 @@ Preserve hard-linked file contents and permissions shared with other checkouts.
 
 Before changing Worktree Artifact connections, read [Native Attachment Cleanup](references/native-attachments.md) unless already loaded completely.
 Treat physical checkout deletion and Thread attachment removal as separate operations.
-Use native archiving for physical retirement that requires retained recovery state.
-Use attachment removal for verified stale connections.
+Have the authorized owner use supported archiving for physical retirement that requires retained recovery state.
+Have the owner use supported attachment removal for verified stale connections.
 Remove dangling active connections after verifying their paths are absent and their payloads contain no recovery state.
 Remove archived connections only after verifying preserved required content and no continued-use requirement.
 An archived checkout's absence alone does not establish that its connection is obsolete.
@@ -73,11 +76,11 @@ Do not use the owning Thread's activity as a substitute for worktree-specific ev
 
 ## Acceptance
 
-Read back native lifecycle state separately from attachment state and filesystem state.
-Verify removed connections through a fresh native listing and confirm protected connections remain.
+Obtain the owner's fresh lifecycle, attachment, and filesystem readbacks as separate evidence.
+Verify removed connections through the owner's supported listing and confirm protected connections remain.
 Check that selected paths and temporary quarantine directories are absent after physical cleanup.
-Remove temporary schemas, payload copies, scripts, logs, and task-owned server processes after verification.
+Have the owner remove temporary payload copies, scripts, logs, and task-owned processes after verification.
 Report attachment counts separately from physical disk-space changes.
 Use measured volume availability rather than summing directory allocation as reclaimed space.
-Report source checks, read-only protocol checks, actual mutations, and model adherence as distinct evidence.
+Report source checks, owner-mediated readbacks, actual mutations, and model adherence as distinct evidence.
 Do not require production deletion to validate cleanup instructions.

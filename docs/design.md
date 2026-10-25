@@ -94,8 +94,10 @@ Worker model selection stays in the dispatch, without a model-policy reference.
 Each role has separate host references because Main and Worker load at different execution stages.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](research.md#model-effort-and-cost).
 
-Both Codex role references link the conditional Codex Scoped Cleanup skill for resource retirement.
-Its app-server procedure loads before native inventory or lifecycle changes, and attachment details load when Worktree Artifact connections require changes.
+Both Codex role references select [Codex Scoped Cleanup](../skills/codex-scoped-cleanup/SKILL.md) before resource retirement.
+The skill routes cleanup through the authorized resource owner and supported herdr agent operations.
+Its owner-mediated lifecycle reference loads before cleanup inventory or lifecycle changes.
+Attachment details load when Worktree Artifact connections require changes.
 Claude references contain no cleanup-skill routing, and neither hook injects the conditional cleanup procedure.
 The bundled skill replaces the standalone user-level copy without repeating the common role cleanup contract.
 
