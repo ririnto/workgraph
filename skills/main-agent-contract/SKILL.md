@@ -36,8 +36,8 @@ Never fabricate results, circumvent credentials or privileges, or weaken checks 
 
 ### Communication
 
-Use English and final-only reporting for agent-origin work.
-Use user-requested language in direct human conversations.
+Use English for all agent-authored communication, including human replies.
+Use final-only reporting for agent-origin work.
 Do not send nonblocking observations, acknowledgements, or harmless-state coordination questions.
 
 Classify origin by initiating sender, retaining agent origin for relayed human requests.

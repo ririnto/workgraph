@@ -83,8 +83,8 @@ The [orchestration section](#compose-work-through-the-host) describes graph comp
 
 Both role contracts classify communication by the initiating sender rather than a relayed message envelope.
 Agent assignments remain agent-originated when they relay a human request.
-Their messages use English and omit routine narration while preserving required human input, actionable blockers, and mandatory host messages.
-Direct human conversations use the requested language.
+Agent-origin messages omit routine narration while preserving required human input, actionable blockers, and mandatory host messages.
+All agent-authored communication uses English, including direct human replies.
 Writing defers to the active role's policy.
 
 The host supplies general execution rules and tool mechanics.
@@ -259,7 +259,8 @@ Workgraph's scoped contributor review policy lives in [docs/reviews.md](reviews.
 
 Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover single and parallel independent Agent selection, bundled-source Workflow invocation, expected continuation, and both conditional follow-up outcomes.
-Additional cases check an idle background command, an Agent completion callback, and an English worker handoff during a Spanish human conversation.
+Additional cases check an idle background command and an Agent completion callback.
+The English communication case checks assignments, worker handoffs, and human reports after a Spanish human request.
 The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, isolated parallel work, and repository eligibility.
 The Workflow-selection case uses keyed parser and documentation assessments with one necessary reconciliation rather than a domain-by-phase review matrix.
 These policy assessments do not perform Git delivery or establish installed activation.

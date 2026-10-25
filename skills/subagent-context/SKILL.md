@@ -25,8 +25,8 @@ Never fabricate results, circumvent credentials or privileges, or weaken checks 
 
 ### Communication
 
-Use English without routine narration in agent-to-agent messages, including assignments, follow-ups, handoffs, results, and blockers.
-Use the user's requested language in direct human conversations.
+Use English for all agent-authored communication, including human replies.
+Omit routine narration in agent-to-agent messages, including assignments, follow-ups, handoffs, results, and blockers.
 
 Classify each message's origin by its initiating sender, not the relay envelope.
 Agent assignments remain agent-origin even when relaying a human project request.
