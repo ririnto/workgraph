@@ -490,12 +490,13 @@ const dispatchSweep = async () => {
   }
   return { exposures: result.exposures, reason: null, status: 'completed' }
 }
-const dispatchPublish = async currentUnits => {
+const dispatchPublish = async (currentUnits, priorUrl) => {
   const attempt = await runAgent(compose(
     'Publish the current task branch for review.',
     taskPart,
     basePart,
     issuePart,
+    priorUrl === null ? '' : `Update the existing open request at ${priorUrl} with the fixed change instead of creating another request.`,
     `Change summary: ${JSON.stringify(currentUnits.map(unit => ({ changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key })))}`,
     'Create a pull request with gh for a GitHub remote, or a merge request with glab for a GitLab remote.',
     'Reuse the existing open request for this branch instead of creating a duplicate.',
@@ -527,6 +528,9 @@ const dispatchPublish = async currentUnits => {
   if (!shape) {
     return { reason: 'Publish result is missing or malformed', status: 'failed' }
   }
+  if (priorUrl !== null && (result.url !== priorUrl || result.action !== 'updated')) {
+    return { reason: 'Publication did not update the previously posted request, so publication is blocked', status: 'failed' }
+  }
   return { action: result.action, reason: null, status: 'completed', url: result.url }
 }
 const dispatchReview = async (currentUnits, integrationState, publishState) => {
@@ -539,9 +543,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
       integration: integrationState === null ? 'not required' : integrationState.status,
       units: currentUnits.map(unit => ({ changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key }))
     })}`,
-    publishState !== null && publishState.status === 'completed'
-      ? `Review the posted candidate at ${publishState.url}, including its request description.`
-      : 'No request was posted for this dispatch, so review the branch candidate directly and record that limitation.',
+    `Review the posted candidate at ${publishState.url}, including its request description.`,
     'Inspect the change and the affected consumers beyond the changed lines.',
     'Report concrete findings with file locations and failure scenarios, separating new defects from pre-existing issues.',
     'Return verdict fix-required only for findings that block acceptance, correctness, safety, or required checks.',
@@ -590,7 +592,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
   }
   return { findings: result.findings, reason: null, status: 'completed', verdict: result.verdict }
 }
-const runPublish = async (sweepState, currentUnits) => {
+const runPublish = async (sweepState, currentUnits, priorUrl) => {
   if (skipped.publish) {
     return { reason: 'Explicit dispatch skip, so publication did not run', status: 'skipped' }
   }
@@ -611,7 +613,7 @@ const runPublish = async (sweepState, currentUnits) => {
     }
   }
   log('Publishing the task branch')
-  return dispatchPublish(currentUnits)
+  return dispatchPublish(currentUnits, priorUrl)
 }
 
 phase('Implement')
@@ -653,15 +655,21 @@ if (skipped.sweep) {
 }
 recordPhase('sweep', sweepState.status, sweepState.reason)
 let publishState = null
+let postedUrl = null
 phase('Publish')
-publishState = await runPublish(sweepState, unitResults)
+publishState = await runPublish(sweepState, unitResults, null)
 recordPhase('publish', publishState.status, publishState.reason)
+if (publishState.status === 'completed') {
+  postedUrl = publishState.url
+}
 let reviewState = null
 phase('Review')
 if (skipped.review) {
   reviewState = { reason: 'Explicit dispatch skip, so independent review did not run', status: 'skipped' }
+} else if (publishState.status !== 'completed') {
+  reviewState = { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
 } else {
-  log('Reviewing the complete change')
+  log('Reviewing the posted candidate')
   reviewState = await dispatchReview(unitResults, integrationState, publishState)
 }
 recordPhase('review', reviewState.status, reviewState.reason)
@@ -703,10 +711,15 @@ while (
     : await dispatchSweep()
   recordPhase('sweep', sweepState.status, sweepState.reason)
   phase('Publish')
-  publishState = await runPublish(sweepState, unitResults)
+  publishState = await runPublish(sweepState, unitResults, postedUrl)
   recordPhase('publish', publishState.status, publishState.reason)
+  if (publishState.status === 'completed') {
+    postedUrl = publishState.url
+  }
   phase('Review')
-  reviewState = await dispatchReview(unitResults, integrationState, publishState)
+  reviewState = publishState.status === 'completed'
+    ? await dispatchReview(unitResults, integrationState, publishState)
+    : { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
   recordPhase('review', reviewState.status, reviewState.reason)
 }
 if (reviewState.status === 'completed' && reviewState.verdict === 'fix-required') {

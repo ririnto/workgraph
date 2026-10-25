@@ -1116,6 +1116,13 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     for (const call of calls.filter((entry) => entry.phase === "Review")) {
       assert.ok(call.prompt.includes("https://example.invalid/pr/1"));
     }
+    const publishCalls = calls.filter((entry) => entry.phase === "Publish");
+    assert.ok(publishCalls[0].prompt.includes("Create a pull request"));
+    assert.ok(
+      publishCalls[1].prompt.includes(
+        "Update the existing open request at https://example.invalid/pr/1"
+      )
+    );
     const models = Object.fromEntries(
       calls.map((call) => [call.phase, call.model])
     );
@@ -1134,6 +1141,64 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   }
   {
     const { calls, result } = await runWorkflowSample(
+      samplePaths.simple,
+      { issue: "#1", maxFixRounds: 0, task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Implement: () => implementResult,
+        Plan: () => singleUnits,
+        Publish: () => publishCreated,
+        Review: () => reviewFix,
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    const phases = calls.map((call) => call.phase);
+    assert.equal(result.complete, false);
+    assert.equal(phases.filter((phase) => phase === "Publish").length, 1);
+    assert.equal(phases.filter((phase) => phase === "Review").length, 1);
+    const reviewRecord = result.phaseEvidence.find(
+      (record) => record.title === "Review"
+    );
+    assert.equal(reviewRecord.status, "completed");
+    assert.equal(
+      reviewRecord.reason,
+      "Verdict fix-required after 0 of 0 fix rounds"
+    );
+  }
+  {
+    const { calls, result } = await runWorkflowSample(
+      samplePaths.simple,
+      { issue: "#1", maxFixRounds: 1, task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Implement: () => implementResult,
+        Plan: () => singleUnits,
+        Publish: sequence(publishCreated, {
+          action: "created",
+          evidence: "e",
+          url: "https://example.invalid/pr/2"
+        }),
+        Review: sequence(reviewFix, reviewPass),
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    const phases = calls.map((call) => call.phase);
+    assert.equal(result.complete, false);
+    assert.equal(phases.filter((phase) => phase === "Publish").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Review").length, 1);
+    const publishRecord = result.phaseEvidence.find(
+      (record) => record.title === "Publish"
+    );
+    assert.equal(publishRecord.status, "failed");
+    assert.equal(
+      publishRecord.reason,
+      "Publication did not update the previously posted request, so publication is blocked"
+    );
+  }
+  {
+    const { calls, result } = await runWorkflowSample(
       samplePaths.complex,
       { issue: "#1", maxFixRounds: 1, skips: { sweep: true }, task: "t" },
       dispatchTable({
@@ -1141,7 +1206,6 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         Implement: () => implementResult,
         Integrate: () => integrateResult,
         Plan: () => splitUnits,
-        Review: sequence(reviewFix, reviewPass),
         Scope: () => scopeResult
       })
     );
@@ -1150,9 +1214,9 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     assert.equal(result.split, true);
     assert.equal(phases.filter((phase) => phase === "Sweep").length, 0);
     assert.equal(phases.filter((phase) => phase === "Publish").length, 0);
-    assert.equal(phases.filter((phase) => phase === "Integrate").length, 2);
-    assert.equal(phases.filter((phase) => phase === "Implement").length, 3);
-    assert.equal(phases.filter((phase) => phase === "Review").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Review").length, 0);
+    assert.equal(phases.filter((phase) => phase === "Integrate").length, 1);
+    assert.equal(phases.filter((phase) => phase === "Implement").length, 2);
     assert.ok(
       calls
         .filter((entry) => entry.phase === "Implement")
@@ -1169,6 +1233,40 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       publishRecord.reason,
       "Required Sweep predecessor is incomplete"
     );
+    const reviewRecord = result.phaseEvidence.find(
+      (record) => record.title === "Review"
+    );
+    assert.equal(reviewRecord.status, "skipped");
+    assert.equal(
+      reviewRecord.reason,
+      "Required Publish predecessor is incomplete, so there is no posted request to review"
+    );
+  }
+  {
+    const { calls, result } = await runWorkflowSample(
+      samplePaths.complex,
+      { issue: "#1", maxFixRounds: 1, task: "t" },
+      dispatchTable({
+        Explore: () => exploreResult,
+        Implement: () => implementResult,
+        Integrate: () => integrateResult,
+        Plan: () => splitUnits,
+        Publish: sequence(publishCreated, publishUpdated),
+        Review: sequence(reviewFix, reviewPass),
+        Scope: () => scopeResult,
+        Sweep: () => sweepResult
+      })
+    );
+    const phases = calls.map((call) => call.phase);
+    assert.equal(result.complete, true);
+    assert.equal(result.split, true);
+    assert.equal(phases.filter((phase) => phase === "Implement").length, 3);
+    assert.equal(phases.filter((phase) => phase === "Integrate").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Sweep").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Publish").length, 2);
+    assert.equal(phases.filter((phase) => phase === "Review").length, 2);
+    assert.ok(phases.indexOf("Publish") < phases.indexOf("Review"));
+    assert.ok(phases.lastIndexOf("Publish") < phases.lastIndexOf("Review"));
   }
   {
     const { calls, result } = await runWorkflowSample(
@@ -1183,7 +1281,6 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       dispatchTable({
         Explore: () => exploreResult,
         Plan: () => singleUnits,
-        Review: () => reviewFix,
         Scope: () => scopeResult,
         Sweep: () => sweepResult
       })
@@ -1193,6 +1290,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     assert.equal(phases.filter((phase) => phase === "Implement").length, 0);
     assert.equal(phases.filter((phase) => phase === "Publish").length, 0);
     assert.equal(phases.filter((phase) => phase === "Integrate").length, 0);
+    assert.equal(phases.filter((phase) => phase === "Review").length, 0);
     const models = Object.fromEntries(
       calls.map((call) => [call.phase, call.model])
     );
@@ -1201,9 +1299,10 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
+    assert.equal(reviewRecord.status, "skipped");
     assert.equal(
       reviewRecord.reason,
-      "Verdict fix-required after 0 of 0 fix rounds"
+      "Required Publish predecessor is incomplete, so there is no posted request to review"
     );
   }
   {

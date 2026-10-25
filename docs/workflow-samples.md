@@ -62,12 +62,12 @@ The dispatching session owns the linked issue, the task branch, and the initial 
 | Integrate | `sonnet` | All unit results, only when the plan split units. | Merge outcome with conflicts and evidence. |
 | Sweep | `haiku` | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
 | Publish | `sonnet` | Completed implementation, completed integration when split, a clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
-| Review | `sonnet` | The change summary and integration outcome. | Verdict with concrete findings and evidence. |
+| Review | `sonnet` | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
 
 Implementation runs each unit in its own isolated native worktree exactly when the plan defines more than one unit.
 A single-unit plan edits the task branch directly, so integration is skipped as not required.
 Implementation creates a task branch before committing when the checkout sits on the base branch.
-Publication always precedes review, and review examines the posted request when one exists.
+Publication always precedes review, and review requires the request posted by the completed publication phase.
 A fix round updates the same posted request and reviews the posted candidate again.
 The scope, exploration, and sweep stages run with the built-in read-only Explore agent type, while review keeps the default agent and a read-only instruction.
 
