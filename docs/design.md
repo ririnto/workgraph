@@ -58,7 +58,7 @@ Delivery routes plugin updates through project-declared host references instead 
 Main Agent mode remains the stable public entry at `skills/main-agent-contract/SKILL.md` under `/workgraph:main-agent-contract`.
 Its activation description identifies the mode without adding another public entry.
 Main and Worker select conditional skills by plain skill name when their stated task scope applies.
-Development selects only the matching playbook and language references, with each selection carrying its own read trigger.
+Development's conditional loading keeps unrelated lifecycle and language guidance out of task context.
 The principle skills are conditional and remain user-invocable and model-invocable without lint enforcement.
 Writing owns prose, while Instruction Authoring owns the agent-facing prompt task contract and source or example separation.
 Workflow stays focused on its lower-level native operation without repeating the Main contract or Delivery checklist.
