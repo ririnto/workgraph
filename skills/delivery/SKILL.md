@@ -50,7 +50,7 @@ Skip delegation only when Main verifies that the complete candidate contains no 
 Record the empty result in the task's Issue, without claims about later changes.
 If the complete candidate contains content, delegate exactly one brief scan for user environment details and secrets.
 Provide the complete candidate to the Explorer.
-If any part of the candidate cannot be inspected or compared with its named base, do not use the empty-diff fast path.
+If any candidate part cannot be inspected or compared with its named base, do not use the empty-diff fast path.
 Obtain the complete candidate before deciding whether to skip the scan.
 Preserve completed valid work without fabricating an earlier scan or review.
 

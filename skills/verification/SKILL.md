@@ -8,7 +8,8 @@ description: Use when running an application, reproducing reported behavior, or 
 ## Select Evidence
 
 Confirm the target, trigger, input, and observable expected outcome before checking behavior.
-Use existing run, test, and diagnostic commands before creating temporary helpers, and make a repeatedly needed helper a maintained project entry point instead of regenerating it per session.
+Use existing run, test, and diagnostic commands before creating temporary helpers.
+Make a repeatedly needed helper a maintained project entry point instead of regenerating it per session.
 Preserve the project's execution and import boundaries when selecting how to run checks.
 Give each shared-state write an owner, and serialize checks that could conflict.
 Choose behavior-specific tests that exercise the changed path and expected result.

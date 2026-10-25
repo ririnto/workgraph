@@ -55,7 +55,8 @@ For external contributions, restrict style cleanup to lines already included in 
 
 Preserve the project's declared runtime, toolchain, public contracts, and required failure behavior.
 Replace superseded implementations and their consumers together, removing obsolete paths in the same change.
-Agents copy nearby code as precedent, so avoid copying neighboring workarounds and fix recurring causes in code or data architecture first.
+Avoid copying neighboring workarounds because agents copy nearby code as precedent.
+Fix recurring causes in code or data architecture first.
 Use official SDK or framework properties directly when they satisfy the required behavior.
 Prefer immutable bindings and minimize mutable state.
 
@@ -107,7 +108,8 @@ Record the affected item and reason in the task report.
 | Early-exit inversion | Rewriting branches can change evaluation order, cleanup, cost, or admission and security checks. |
 | Dependency style and LTS selection | Manifest restructuring or upgrades can change resolution, runtime requirements, and supported APIs. |
 | Rule rollout | New diagnostics and fixes can misclassify source or change behavior before target-specific validation. |
-| Structured validation identifiers | Replacing exported string diagnostics or bare errors changes observable validator contracts, so keep migration as policy until those consumers can be migrated safely. |
+| Structured validation identifiers | Replacing exported string diagnostics or bare errors changes observable validator contracts. |
+| | - Keep migration as policy until those consumers can be migrated safely. |
 
 ## Dependency Versions
 
