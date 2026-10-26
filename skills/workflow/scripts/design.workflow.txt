@@ -230,7 +230,8 @@ const skipPhase = (title, reason) => {
   phase(title)
   return { reason, result: null, status: 'skipped' }
 }
-const inputData = JSON.stringify({ task, context: input.context ?? '', constraints, requirements, sources })
+const serializePromptData = value => JSON.stringify(value).replaceAll('<', '\\u003c').replaceAll('>', '\\u003e')
+const inputData = serializePromptData({ task, context: input.context ?? '', constraints, requirements, sources })
 const requirementIndexing = `Use one-based requirementIndex values ${requirements.map((_, index) => index + 1).join(', ')}. These are requirement identifiers, not zero-based array positions.`
 const readOnly = 'Read only the supplied sources and relevant repository context.'
 const authority = 'Do not write files, run commands, publish, or dispatch agents.'
@@ -268,7 +269,7 @@ if (phaseRecords.design.status !== 'completed') {
     'compose',
     'Compose',
     'workgraph:design-composer',
-    `Compose one implementation-ready design from the accepted architecture and evidence results.\n\n<request>${inputData}</request>\n\n<architecture>${JSON.stringify(architecture.result)}</architecture>\n\n<evidence>${JSON.stringify(evidence.result)}</evidence>\n\n${requirementIndexing}\nResolve interface conflicts using evidence from both results.\nCover every requirement using its one-based identifier.\nReturn a concise design with key decisions, implementation steps, requirement coverage, test plan, and open questions.\nKeep the design under 800 words and lists to the smallest useful set.\nDo not invent missing predecessor work.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Compose one implementation-ready design from the accepted architecture and evidence results.\n\n<request>${inputData}</request>\n\n<architecture>${serializePromptData(architecture.result)}</architecture>\n\n<evidence>${serializePromptData(evidence.result)}</evidence>\n\n${requirementIndexing}\nResolve interface conflicts using evidence from both results.\nCover every requirement using its one-based identifier.\nReturn a concise design with key decisions, implementation steps, requirement coverage, test plan, and open questions.\nKeep the design under 800 words and lists to the smallest useful set.\nDo not invent missing predecessor work.\n${readOnly} ${authority} ${dataBoundary}`,
     schemas.compose,
     validate.compose)
 }
@@ -283,7 +284,7 @@ if (composed.status !== 'completed') {
     'challenge',
     'Challenge',
     'workgraph:design-challenger',
-    `Challenge the composed design with concrete failure scenarios.\n\n<request>${inputData}</request>\n\n<design>${JSON.stringify(composed.result)}</design>\n\n${requirementIndexing}\nExamine each requirement, interface, failure mode, test claim, and open question.\nReturn concise, actionable, evidence-backed findings with severity and a proposed correction.\nAn empty findings list is valid only when coverage describes what you examined.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Challenge the composed design with concrete failure scenarios.\n\n<request>${inputData}</request>\n\n<design>${serializePromptData(composed.result)}</design>\n\n${requirementIndexing}\nExamine each requirement, interface, failure mode, test claim, and open question.\nReturn concise, actionable, evidence-backed findings with severity and a proposed correction.\nAn empty findings list is valid only when coverage describes what you examined.\n${readOnly} ${authority} ${dataBoundary}`,
     schemas.challenge,
     validate.challenge)
 }
@@ -298,7 +299,7 @@ if (challenged.status !== 'completed' || composed.status !== 'completed') {
     'verify',
     'Verify',
     'workgraph:design-verifier',
-    `Independently verify every challenge finding against the composed design and original requirements.\n\n<request>${inputData}</request>\n\n<design>${JSON.stringify(composed.result)}</design>\n\n<challenge>${JSON.stringify(challenged.result)}</challenge>\n\n${requirementIndexing}\nReturn exactly one concise disposition per finding and evidence-backed status for every requirement.\nUse inconclusive when the available evidence cannot settle a claim.\nDo not repeat predecessor text or repair the design.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Independently verify every challenge finding against the composed design and original requirements.\n\n<request>${inputData}</request>\n\n<design>${serializePromptData(composed.result)}</design>\n\n<challenge>${serializePromptData(challenged.result)}</challenge>\n\n${requirementIndexing}\nReturn exactly one concise disposition per finding and evidence-backed status for every requirement.\nUse inconclusive when the available evidence cannot settle a claim.\nDo not repeat predecessor text or repair the design.\n${readOnly} ${authority} ${dataBoundary}`,
     schemas.verify,
     validate.verify,
     challenged.result)
