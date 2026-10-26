@@ -1,0 +1,49 @@
+schema_version: "1.1"
+name: workflow-design-blocker
+description: Verify that contradictory requirements cannot produce an accepted design.
+execution:
+  runs: 2
+  max_turns: 30
+  timeout_seconds: 2400
+  allowed_tools:
+    - Workflow
+    - Read
+    - Skill(workgraph:workflow)
+  prompt: |-
+    Use the read-only agent design path in Workgraph Workflow for this request.
+    Read the complete workflow skill and its bundled scripts/design.workflow.txt source.
+    Pass that exact source inline to native Workflow and do not rewrite or recreate it.
+    Design a status endpoint that returns the exact current count of active users.
+    Requirement one is to return the exact current active-user count.
+    Requirement two is that no component may read, receive, compute, persist, or access any data from which that count can be derived.
+    Do not use hard-coded, estimated, or stale counts.
+    Pass the requirements as structured arguments.
+    Pass runtime selectors gpt-6-astra for architecture, evidence, and challenge.
+    Pass runtime selectors claude-opus-5-5 for composition and verification.
+    Do not edit files, run shell commands, use Git, publish, or dispatch host Agents.
+    Run exactly one native Workflow invocation for this request.
+    Do not retry or duplicate it after failure, incomplete results, or timeout.
+    Report only the returned phase results and acceptance status.
+graders:
+  - name: design-workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+    max: 1
+  - name: contradictory-design-rejected
+    type: llm
+    focus: trace
+    criteria: |-
+      Judge the observed tool trace, Workflow results, and final report together.
+      Require the session to read and pass the exact maintained design.workflow.txt source through native Workflow.
+      Require the original two contradictory requirements and runtime model selectors to reach the workflow as structured arguments.
+      Require every requirement coverage entry to use the one-based identifiers 1 and 2.
+      Require exactly one Workflow invocation without retry after incomplete phase evidence.
+      Require actual bounded design specialists rather than coordinator-authored findings.
+      Do not require dependent stages to run after an invalid or failed predecessor.
+      Require complete false or accepted false for every outcome.
+      When all phases complete, require independent verification of a blocking contradiction tied to the original requirements.
+      When a phase fails, require explicit failed and skipped evidence without claiming independent verification that did not occur.
+      Reject any claimed accepted design, fabricated phase results, or unsupported model identity.
+      Require no file edits, shell commands, Git commands, publication, or extra host Agent dispatch.
+      Judge observed behavior rather than fixed wording.

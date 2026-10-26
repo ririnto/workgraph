@@ -1,13 +1,14 @@
 # Workflow Samples
 
-Workgraph bundles two launchable native Workflow samples that run an authorized engineering delivery graph end to end.
-Each sample is a self-contained script with a default model per phase, and every phase prompt accepts an injected part through `args` at dispatch time.
-The samples exercise the native Workflow interface and add no scheduler, execution engine, or repository dependency.
+Workgraph bundles two native Workflow delivery samples and one read-only agent-authored design workflow.
+The delivery samples provide per-phase model defaults, while design selectors come from runtime inputs or host configuration.
+All three use the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 
 | Variant | Source | Shape |
 | --- | --- | --- |
 | Simple task | [delivery-simple.workflow.txt](../skills/workflow/scripts/delivery-simple.workflow.txt) | At most two scopes, exactly one work unit, and integration landing the unit branch. |
 | Complex task | [delivery-complex.workflow.txt](../skills/workflow/scripts/delivery-complex.workflow.txt) | Up to four scopes, a plan-decided unit split with per-unit worktrees, and integration of the named unit branches. |
+| Agent design | [design.workflow.txt](../skills/workflow/scripts/design.workflow.txt) | Parallel architecture and evidence work, followed by composition, challenge, and independent verification. |
 
 ## Launch
 
@@ -45,6 +46,50 @@ For a repeatable command, save a run from `/workflows`, or copy a sample source 
 Named discovery reads `.js` files, so a copied `.workflow.txt` resource needs its `.js` destination name.
 The sample sources stay plain script bodies, so they need no wrapper, transform, dependency, or lint exception.
 The dispatching session owns the linked issue, the task branch, and the initial complete-candidate scan before it authorizes implementation, as its Delivery procedure requires.
+
+## Agent Design
+
+Run `/workgraph:workflow` with a design goal to launch the bundled source through native Workflow.
+The `workgraph:design-lead` plugin agent is an optional main-session coordinator that uses the same skill and source.
+The skill passes the exact `.workflow.txt` body as inline `script`, so the plugin does not register a second workflow implementation.
+Run the skill again for a fresh design, or continue the same session with the returned `scriptPath` and run ID.
+
+| Phase | Specialist | Runtime model input | Completion evidence |
+| --- | --- | --- | --- |
+| Design | `workgraph:design-architect` and `workgraph:design-evidence` run in parallel. | `args.models.architecture` and `args.models.evidence`. | Both schema-valid architecture and evidence results cover every requirement. |
+| Compose | `workgraph:design-composer` consumes both Design results. | `args.models.compose`. | One design, decisions, implementation steps, requirement mapping, and test plan. |
+| Challenge | `workgraph:design-challenger` tests the composed design with counterexamples. | `args.models.challenge`. | Evidence-backed findings and substantive coverage, including when findings are empty. |
+| Verify | `workgraph:design-verifier` independently assesses findings and requirements. | `args.models.verify`. | One disposition per finding and evidence-backed status for every requirement. |
+| Acceptance | The workflow computes status from validated phase results. | No model call. | `complete` records phase completion, while `accepted` requires no unresolved blocker or requirement gap. |
+
+The task input requires a nonempty `args.task` string.
+Optional `requirements`, `constraints`, and `context` fields carry the design brief.
+Optional `sources` must contain unique canonical repository-relative paths.
+The `models` object accepts one host-supported selector per specialist role, with no workflow defaults.
+When a selector is omitted, the agent call leaves its model unset for host configuration.
+For the requested two-model assignment, pass `gpt-6-astra` to architecture, evidence, and challenge, and pass `claude-opus-5-5` to compose and verify.
+Those values are invocation inputs rather than aliases or committed workflow defaults.
+
+```js
+Workflow({
+  script: '<complete text of skills/workflow/scripts/design.workflow.txt>',
+  args: {
+    task: 'Design a reliable event-replay boundary.',
+    requirements: ['Retries must not duplicate effects.'],
+    models: {
+      architecture: '<runtime selector>',
+      evidence: '<runtime selector>',
+      compose: '<runtime selector>',
+      challenge: '<runtime selector>',
+      verify: '<runtime selector>'
+    }
+  }
+})
+```
+
+A failed or malformed specialist result blocks dependent phases and preserves successful sibling results.
+Verified blocking or major findings, inconclusive findings, and unmet requirements make `accepted` false.
+The workflow returns the candidate design, phase evidence, findings, blockers, and requested model inputs without performing implementation.
 
 ## Dispatch Inputs
 
@@ -104,9 +149,11 @@ The affected-unit mapping falls back to every unit when no finding names an owne
 
 ## Models
 
-Every phase has a default functional model selector, and `args.models` overrides any phase for one dispatch.
-The defaults are host-resolved aliases, so the samples carry no specific model identity or routing.
-An override must be a nonempty selector string the host supports for agent calls.
+The two delivery samples have a default functional model selector, and `args.models` overrides a phase for one dispatch.
+Their defaults are host-resolved aliases, so those sources carry no specific model identity or routing.
+The design workflow has no model defaults and accepts optional selectors by specialist role through `args.models`.
+An omitted design selector stays unset so the host can apply its current configuration.
+Every override must be a nonempty selector string the host supports for agent calls.
 
 ## Cache Reuse
 

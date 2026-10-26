@@ -42,6 +42,7 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 
 ```text
 /workgraph:main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger within the authorized scope.
+/workgraph:workflow Design a bounded in-memory LRU cache with deterministic eviction.
 ```
 
 | Invocation | Purpose |
@@ -49,7 +50,8 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:main-agent-contract` | Load Main Agent mode in the main session. |
 | `/workgraph:subagent-context` | Load the Worker role for an existing bounded dispatch. |
 | `/workgraph:delivery` | Load Main's repository delivery procedure. |
-| `/workgraph:workflow` | Request native Claude Code Workflow. |
+| `/workgraph:workflow` | Request native Claude Code Workflow, including the bundled agent-authored design graph. |
+| `claude --agent workgraph:design-lead` | Start the main-session design coordinator, which delegates to the Workflow skill. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
 | `/workgraph:principle-preserve-behavior` | Load guidance for behavior-preserving transformations. |
 | `/workgraph:principle-production-interfaces` | Load guidance for production interfaces, abstractions, and test design. |

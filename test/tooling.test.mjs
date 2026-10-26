@@ -743,6 +743,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
   const environment = {
     agent: (prompt, options) => {
       calls.push({
+        agentType: options.agentType,
         isolation: options.isolation,
         model: options.model,
         phase: options.phase,
@@ -792,6 +793,10 @@ const samplePaths = {
     "skills/workflow/scripts/delivery-simple.workflow.txt"
   )
 };
+const designPath = path.join(
+  sampleRoot,
+  "skills/workflow/scripts/design.workflow.txt"
+);
 const scopeResult = {
   evidence: "e",
   scopes: [{ description: "d", key: "s1", paths: ["docs"] }]
@@ -1681,5 +1686,276 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     missingRun.result.phaseEvidence.find((record) => record.title === "Publish")
       .reason,
     "Implementation did not complete, so publication is blocked"
+  );
+});
+
+test("agent design workflow validates specialist results and runtime model routing", async () => {
+  const requirements = [
+    "Retries do not duplicate effects.",
+    "Failures remain observable."
+  ];
+  const architecture = {
+    assumptions: [],
+    components: [{ id: "replay", responsibility: "Applies an event once." }],
+    dataFlow: [{ contract: "ordered event", from: "queue", to: "replay" }],
+    decisions: [
+      {
+        alternatives: ["at-least-once"],
+        choice: "idempotent replay",
+        question: "How are retries handled?",
+        rationale: "The event key bounds duplicate effects."
+      }
+    ],
+    evidence: [
+      {
+        claim: "The contract exposes event keys.",
+        source: "supplied requirement"
+      }
+    ],
+    failureModes: [
+      {
+        behavior: "Retain the event and report the error.",
+        trigger: "Replay fails."
+      }
+    ],
+    interfaces: [{ contract: "Accepts a keyed event.", name: "Replay.apply" }],
+    summary: "Use a keyed, idempotent replay boundary."
+  };
+  const evidence = {
+    evaluationCases: ["Replay the same event twice."],
+    evidenceLimits: [],
+    regressionCases: ["A retry does not duplicate side effects."],
+    requirementCoverage: requirements.map((_, index) => ({
+      evidence: `Design element ${index + 1} addresses its requirement.`,
+      requirementIndex: index + 1
+    }))
+  };
+  const composition = {
+    decisions: ["Use event keys for idempotency."],
+    design: "A replay boundary accepts keyed events and records outcomes.",
+    implementationSteps: [
+      "Define the event contract.",
+      "Add idempotent replay."
+    ],
+    openQuestions: [],
+    requirementCoverage: requirements.map((_, index) => ({
+      evidence: `The design addresses requirement ${index + 1}.`,
+      requirementIndex: index + 1
+    })),
+    testPlan: ["Replay a duplicate event and inspect side effects."]
+  };
+  const challenge = {
+    coverage: requirements.map((_, index) => ({
+      evidence: `Examined requirement ${index + 1}.`,
+      requirementIndex: index + 1
+    })),
+    findings: [],
+    remainingRisks: []
+  };
+  const verification = {
+    dispositions: [],
+    requirementCoverage: requirements.map((_, index) => ({
+      evidence: `Verified requirement ${index + 1}.`,
+      requirementIndex: index + 1,
+      status: "satisfied"
+    }))
+  };
+  const outputs = new Map([
+    ["workgraph:design-architect", architecture],
+    ["workgraph:design-evidence", evidence],
+    ["workgraph:design-composer", composition],
+    ["workgraph:design-challenger", challenge],
+    ["workgraph:design-verifier", verification]
+  ]);
+  const payloadFor = (options) => outputs.get(options.agentType);
+  const args = {
+    models: {
+      architecture: "gpt-6-astra",
+      challenge: "gpt-6-astra",
+      compose: "claude-opus-5-5",
+      evidence: "gpt-6-astra",
+      verify: "claude-opus-5-5"
+    },
+    requirements,
+    task: "Design a retry-safe event replay boundary."
+  };
+  const successfulRun = await runWorkflowSample(designPath, args, payloadFor);
+  assert.equal(successfulRun.result.complete, true);
+  assert.equal(successfulRun.result.accepted, true);
+  assert.deepEqual(
+    successfulRun.result.phaseEvidence.map(({ status }) => status),
+    ["completed", "completed", "completed", "completed", "completed"]
+  );
+  assert.deepEqual(
+    successfulRun.calls.map(({ agentType }) => agentType),
+    [...outputs.keys()]
+  );
+  assert.deepEqual(
+    Object.fromEntries(
+      successfulRun.calls.map(({ agentType, model }) => [agentType, model])
+    ),
+    {
+      "workgraph:design-architect": "gpt-6-astra",
+      "workgraph:design-challenger": "gpt-6-astra",
+      "workgraph:design-composer": "claude-opus-5-5",
+      "workgraph:design-evidence": "gpt-6-astra",
+      "workgraph:design-verifier": "claude-opus-5-5"
+    }
+  );
+  const compositionCall = successfulRun.calls.find(
+    ({ agentType }) => agentType === "workgraph:design-composer"
+  );
+  assert.ok(compositionCall.prompt.includes(JSON.stringify(architecture)));
+  assert.ok(compositionCall.prompt.includes(JSON.stringify(evidence)));
+  assert.doesNotMatch(
+    readFileSync(designPath, "utf-8"),
+    /claude-opus-5-5|gpt-6-astra/u
+  );
+
+  const hostConfiguredRun = await runWorkflowSample(
+    designPath,
+    { requirements, task: args.task },
+    payloadFor
+  );
+  assert.ok(hostConfiguredRun.calls.every(({ model }) => model === undefined));
+
+  outputs.set("workgraph:design-verifier", {
+    requirementCoverage: verification.requirementCoverage
+  });
+  const missingDispositionsRun = await runWorkflowSample(
+    designPath,
+    args,
+    payloadFor
+  );
+  assert.equal(missingDispositionsRun.result.complete, false);
+  assert.equal(
+    missingDispositionsRun.result.phaseEvidence.find(
+      ({ title }) => title === "Verify"
+    ).status,
+    "failed"
+  );
+  outputs.set("workgraph:design-verifier", verification);
+
+  outputs.set("workgraph:design-challenger", {
+    ...challenge,
+    findings: [
+      {
+        correction: "Persist the idempotency key before applying effects.",
+        evidence: "The current ordering permits a retry window.",
+        id: "F1",
+        scenario:
+          "A process stops after applying effects but before storing the key.",
+        severity: "blocking",
+        target: "Replay.apply"
+      }
+    ]
+  });
+  outputs.set("workgraph:design-verifier", {
+    ...verification,
+    dispositions: [
+      {
+        evidence: "The operation can repeat after a crash.",
+        findingId: "F1",
+        outcome: "confirmed"
+      }
+    ]
+  });
+  const blockedRun = await runWorkflowSample(designPath, args, payloadFor);
+  assert.equal(blockedRun.result.complete, true);
+  assert.equal(blockedRun.result.accepted, false);
+  assert.deepEqual(
+    blockedRun.result.blockers.map(({ findingId }) => findingId),
+    ["F1"]
+  );
+
+  outputs.set("workgraph:design-verifier", {
+    ...verification,
+    dispositions: [
+      { evidence: "First assessment.", findingId: "F1", outcome: "confirmed" },
+      { evidence: "Duplicate assessment.", findingId: "F1", outcome: "refuted" }
+    ]
+  });
+  const malformedRun = await runWorkflowSample(designPath, args, payloadFor);
+  assert.equal(malformedRun.result.complete, false);
+  assert.equal(malformedRun.result.accepted, false);
+  assert.equal(
+    malformedRun.result.phaseEvidence.find(({ title }) => title === "Verify")
+      .status,
+    "failed"
+  );
+
+  const invalidDispositions = ["invalid", [null]];
+  const invalidVerificationRuns = await Promise.all(
+    invalidDispositions.map((dispositions) =>
+      runWorkflowSample(designPath, args, (options) =>
+        options.agentType === "workgraph:design-verifier"
+          ? { ...verification, dispositions }
+          : payloadFor(options)
+      )
+    )
+  );
+  for (const [
+    index,
+    invalidVerificationRun
+  ] of invalidVerificationRuns.entries()) {
+    assert.equal(invalidVerificationRun.result.complete, false);
+    assert.equal(invalidVerificationRun.result.accepted, false);
+    assert.deepEqual(invalidVerificationRun.result.findings.confirmed, []);
+    assert.deepEqual(
+      invalidVerificationRun.result.partitions.verify.dispositions,
+      invalidDispositions[index]
+    );
+  }
+
+  outputs.set("workgraph:design-challenger", { ...challenge, findings: {} });
+  const invalidChallengeRun = await runWorkflowSample(
+    designPath,
+    args,
+    payloadFor
+  );
+  assert.equal(invalidChallengeRun.result.complete, false);
+  assert.equal(invalidChallengeRun.result.accepted, false);
+  assert.deepEqual(
+    invalidChallengeRun.result.phaseEvidence.map(({ status }) => status),
+    ["completed", "completed", "failed", "skipped", "completed"]
+  );
+  assert.deepEqual(
+    invalidChallengeRun.result.partitions.challenge.findings,
+    {}
+  );
+  outputs.set("workgraph:design-challenger", challenge);
+
+  outputs.set("workgraph:design-evidence", null);
+  const partialRun = await runWorkflowSample(designPath, args, payloadFor);
+  assert.equal(partialRun.result.complete, false);
+  assert.equal(partialRun.result.accepted, false);
+  assert.deepEqual(
+    partialRun.result.phaseEvidence.map(({ status }) => status),
+    ["failed", "skipped", "skipped", "skipped", "completed"]
+  );
+  assert.deepEqual(partialRun.result.partitions.architecture, architecture);
+  assert.equal(partialRun.calls.length, 2);
+
+  await assert.rejects(
+    runWorkflowSample(designPath, {}, () =>
+      assert.fail("Invalid input dispatched an agent")
+    ),
+    /args.task/u
+  );
+  await assert.rejects(
+    runWorkflowSample(
+      designPath,
+      { sources: ["../outside"], task: args.task },
+      () => assert.fail("Unsafe source path dispatched an agent")
+    ),
+    /canonical repository-relative paths/u
+  );
+  await assert.rejects(
+    runWorkflowSample(
+      designPath,
+      { models: { unknown: "selector" }, task: args.task },
+      () => assert.fail("Unknown model key dispatched an agent")
+    ),
+    /Unknown model phase/u
   );
 });
