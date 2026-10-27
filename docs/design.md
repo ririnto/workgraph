@@ -197,7 +197,8 @@ The host may relay the user's `/workgraph:workflow` invocation to a dispatched a
 That relay carries no Workflow launch authority.
 The dispatched agent should complete the assigned task within its authority instead of launching another Workflow or returning it unworked.
 
-Claude Main selects direct Agent for terminal one-phase work and Workflow for expected continuation.
+Claude Main selects direct Agent when one assignment completes the work without dependent agent stages or joins.
+It selects Workflow for dependent agent stages, required joins, or expected continuation.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
 Its [bundled native source](../skills/workflow/scripts/sum-check.workflow.txt) supplies reusable inline input.

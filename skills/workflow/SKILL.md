@@ -16,10 +16,11 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 ## Prepare The Run
 
 Honor explicit supported tool choices within the host's authority before applying default routing.
-Use direct Agent when the accepted work ends in one phase.
+Use direct Agent when one assignment completes the accepted work without a dependent agent stage or join.
 Use Workflow when actual later phases are expected, even if the first invocation contains only one phase.
 Exclude speculative future tasks and display-only phases.
-Use Workflow for one outcome's dependent stages or required joins, not to replace independent native Task controllers.
+Use Workflow for dependent agent stages or required joins within one outcome, not for steps within one Agent assignment.
+Do not use Workflow to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
