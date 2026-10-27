@@ -24,7 +24,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/delivery/references/{claude,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
 | `skills/workflow/references/authoring.md` | Workflow authors | Authors follow script construction, mapping, recovery, and bundled-source caller contracts. |
-| `skills/workflow/scripts/` | Claude Main using Workflow | Native text resources supply reusable source for the controlling skill without another runner. |
+| `workflows/` | Claude Main using Workflow | Native JavaScript workflow definitions use plugin discovery without another runner. |
 | `skills/workflow/references/delivery.md` | Workflow delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
@@ -201,9 +201,9 @@ The dispatched agent should complete the assigned task within its authority inst
 Claude Main prefers Agent for one-phase work and permits a one-phase Workflow when actual follow-up phases are expected.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
-Its [bundled native source](../skills/workflow/scripts/sum-check.workflow.txt) supplies reusable inline input.
+Its [bundled native source](../workflows/sum-check.js) supplies a discoverable native workflow.
 The [caller contract](../skills/workflow/references/authoring.md#use-the-bundled-source) separates native source from Node modules and run-specific script copies.
-The resource has no named registration or replacement executor.
+The plugin registers workflows by convention and supplies no replacement executor.
 Its delivery reference maps authorized engineering operations to node inputs and outputs without owning a second delivery checklist.
 Worker and Codex contexts do not load Workflow procedures.
 Codex uses available native delegation tools, and its Main host reference owns tool routing.

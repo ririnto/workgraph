@@ -784,19 +784,10 @@ const runWorkflowSample = async (file, args, payloadFor) => {
 
 const sampleRoot = path.resolve(import.meta.dirname, "..");
 const samplePaths = {
-  complex: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-complex.workflow.txt"
-  ),
-  simple: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-simple.workflow.txt"
-  )
+  complex: path.join(sampleRoot, "workflows/delivery-complex.js"),
+  simple: path.join(sampleRoot, "workflows/delivery-simple.js")
 };
-const designPath = path.join(
-  sampleRoot,
-  "skills/workflow/scripts/design.workflow.txt"
-);
+const designPath = path.join(sampleRoot, "workflows/design.js");
 const scopeResult = {
   evidence: "e",
   scopes: [{ description: "d", key: "s1", paths: ["docs"] }]
@@ -988,6 +979,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     assert.equal(models.Explore, "haiku");
     assert.equal(models.Plan, "opus");
     assert.equal(models.Implement, "sonnet");
+    assert.equal(models.Integrate, "sonnet");
     assert.equal(models.Sweep, "haiku");
     assert.equal(models.Publish, "sonnet");
     assert.equal(models.Review, "sonnet");

@@ -6,6 +6,10 @@ import ultracite from "ultracite/oxfmt";
  */
 export default defineConfig({
   ...ultracite,
-  ignorePatterns: [...(ultracite.ignorePatterns ?? []), "**/*.md"],
+  ignorePatterns: [
+    ...(ultracite.ignorePatterns ?? []),
+    "**/*.md",
+    "workflows/*.js"
+  ],
   trailingComma: "none"
 });
