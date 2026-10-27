@@ -125,7 +125,11 @@ A repair round carries the integrated task branch as its required starting refer
 Unit ownership uses canonical repository-relative paths, so aliases, absolute paths, and escaping paths are rejected before dispatch, and every changed file must stay inside its unit.
 Checks report explicit passed, failed, or skipped statuses, and a gate passes only when every required check passed.
 Every unit commits to a branch named for the unit, so each attempt retains its known branch identity even when its checks fail.
-Integration merges exactly the named unit branches into the authorized task branch, requires each resource to match its named branch exactly, and runs the checks on the combined candidate.
+Integration receives the named candidate and each planned unit path.
+It checks the destination, resolved base, protections, and actual branch diffs before writing.
+It merges only the named unit branches and reports changed paths and actual diff evidence.
+The result must name the candidate, keep changed paths within ownership, account for every named branch, and pass combined checks.
+These reports are evidence claims, not independent proof of Git state.
 Resource states apply only when every claim names a current unit branch and agrees with the merge outcome and conflicts.
 A rejected, contradictory, superseded-branch, malformed, or duplicate claim changes no known state.
 A consistent partial failure keeps its reported states, and a completed merge with failed combined checks keeps its merged states.
@@ -137,15 +141,20 @@ The scope, exploration, and sweep stages run with the built-in read-only Explore
 
 ## Skip, Failure, And Recovery
 
-Each phase records `completed`, `skipped`, or `failed` with a reason, and the run returns `complete` only when every required phase completed and review passed.
+Each phase records `completed`, `skipped`, or `failed` with a reason, and the run returns `complete` only when every required phase completed and review passed or all findings were refuted.
 A skipped phase never counts as passing, so a dispatch that skips implementation or publication returns `complete: false` with the skips recorded.
 Integration is required after any completed implementation, so a skipped or failed integration blocks publication.
 The run result retains the branch identity and state of every attempt, and a superseded branch stays listed because the samples retire nothing.
 A retained resource never counts as passing evidence.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.
-A `fix-required` review returns to implementation for the affected units, bounded by `maxFixRounds`, and then repeats integration, sweep, publication, and review.
+A separate read-only agent verifies every `fix-required` finding before repair.
+It reports a confirmed, refuted, or unverified disposition with evidence for each finding.
+Missing, malformed, failed, or unverified dispositions block repairs and acceptance.
+Confirmed findings alone go to their owning units, bounded by `maxFixRounds`.
+Each repair repeats integration, sweep, publication, review, and finding verification.
+A fully refuted review can pass, and the result retains the review and disposition evidence.
 A fix round replaces the repaired units' results by key, so unaffected unit evidence stays while combined-candidate evidence is regenerated.
-The affected-unit mapping falls back to every unit when no finding names an owned path, and the fallback is logged.
+A confirmed finding outside one unambiguous owned unit blocks the round for replanning.
 
 ## Models
 
@@ -157,8 +166,9 @@ Every override must be a nonempty selector string the host supports for agent ca
 
 ## Cache Reuse
 
-Resume a run in the same session with the stored `scriptPath` and `resumeFromRunId`, and unchanged agent calls return their saved results.
-A changed prompt, model, or predecessor result re-runs its call and every later call, which is what invalidates stale sweep, publication, and review evidence after a fix round.
+Resume a run in the same session with the stored `scriptPath` and `resumeFromRunId`, and native continuation may reuse unchanged agent calls.
+Check the native run journal for actual cache hits and their relevance before reusing evidence.
+A changed candidate, destination, owned path, finding set, or verification contract invalidates affected evidence and dependent decisions.
 Before resuming, check the live checkout, the named task and base branch refs, the toolchain configuration, and the posted request against what the recorded run used, because native cache keys carry none of that state.
 A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.
 Never reuse a sweep or a posted review for a changed accepted candidate, because the recorded evidence describes the earlier candidate.

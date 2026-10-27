@@ -390,7 +390,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
       `Implement delivery work unit ${unit.key}.`,
       `Owned paths: ${unit.paths.join(', ')}`,
       `Unit instructions: ${unit.instructions}`,
-      findings === null ? '' : `Fix these review findings inside your owned paths: ${JSON.stringify(findings)}`,
+      findings === null ? '' : `Fix these review findings inside your owned paths: ${JSON.stringify(findings.filter(finding => unit.paths.some(path => ownsPath(path, finding.file))))}`,
       `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
       'You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.',
       `Required starting reference: ${requiredStart}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
@@ -464,12 +464,12 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
 }
 const dispatchIntegration = async currentUnits => {
   const attempt = await runAgent(compose(
-    'Integrate the named unit branches into the current task branch.',
-    `Unit resources: ${JSON.stringify(currentUnits.map(unit => ({ branch: unit.branch, key: unit.key })))}`,
-    'Merge exactly these named unit branches into the current task branch, and use no discovered or unrelated worktree.',
-    'Keep every unit inside its owned paths and resolve cross-unit conflicts without changing unrelated work.',
-    'Report unresolved conflicts instead of forcing a merge.',
-    'If the current branch is the base branch, create and switch to a task branch named for the delivery before committing.',
+    `Integrate into the authorized destination: ${candidateBranch}.`,
+    basePart,
+    `Unit resources: ${JSON.stringify(currentUnits.map(unit => ({ ...unit, paths: units.find(plan => plan.key === unit.key).paths })))}`,
+    'Before writing, verify the actual checkout, destination, resolved base, branch protections, and named unit branches. Refuse a protected destination or one equal to the base.',
+    'Inspect actual branch diffs against each start reference, including both sides of renames, deletions, and symlinks. Refuse unrelated changes and conflicts outside the responsible unit paths.',
+    'Merge only the named branches into the exact destination. Report all changed paths and actual diff evidence, including conflict resolutions. Report unresolved conflicts instead of forcing a merge.',
     'Run the relevant checks on the combined candidate and report each command with status passed, failed, or skipped.',
     'Report the final task branch name and the state of every named unit resource.',
     'Commit the merged result on the task branch, do not push, and do not publish.',
@@ -481,6 +481,7 @@ const dispatchIntegration = async currentUnits => {
     schema: {
       properties: {
         branch: { type: 'string' },
+        changedFiles: { items: { type: 'string' }, type: 'array' },
         checks: {
           items: {
             properties: {
@@ -508,7 +509,7 @@ const dispatchIntegration = async currentUnits => {
           type: 'array'
         }
       },
-      required: ['branch', 'checks', 'conflicts', 'evidence', 'merged', 'resources'],
+      required: ['branch', 'changedFiles', 'checks', 'conflicts', 'evidence', 'merged', 'resources'],
       type: 'object'
     }
   })
@@ -528,7 +529,11 @@ const dispatchIntegration = async currentUnits => {
     new Set(namedKeys).size === namedKeys.length &&
     currentKeys.every(key => namedKeys.includes(key))
   const shape =
-    typeof result?.branch === 'string' && result.branch.trim().length > 0 &&
+    result?.branch === candidateBranch &&
+    Array.isArray(result?.changedFiles) && result.changedFiles.every(file => {
+      const path = canonicalPath(file)
+      return path !== null && path === file && units.some(unit => unit.paths.some(owned => ownsPath(owned, path)))
+    }) &&
     typeof result?.evidence === 'string' && result.evidence.trim().length > 0 &&
     typeof result?.merged === 'boolean' &&
     Array.isArray(result?.conflicts) && result.conflicts.every(conflict => typeof conflict === 'string') &&
@@ -543,6 +548,7 @@ const dispatchIntegration = async currentUnits => {
     branch: typeof result?.branch === 'string' ? result.branch : '',
     checks: Array.isArray(result?.checks) ? result.checks : [],
     conflicts: Array.isArray(result?.conflicts) ? result.conflicts : [],
+    evidence: result?.evidence ?? null,
     resources: consistent ? resources : []
   }
   if (attempt.error !== undefined) {
@@ -560,7 +566,7 @@ const dispatchIntegration = async currentUnits => {
   if (!checksPassed(result.checks)) {
     return { ...retained, branch: result.branch, reason: 'Required checks on the combined candidate are missing or did not all pass', status: 'failed' }
   }
-  return { branch: result.branch, checks: result.checks, conflicts: result.conflicts, reason: null, resources, status: 'completed' }
+  return { branch: result.branch, changedFiles: result.changedFiles, checks: result.checks, conflicts: result.conflicts, evidence: result.evidence, reason: null, resources, status: 'completed' }
 }
 const retainAttempts = (attemptResources, attemptLedger) => {
   attemptResources.forEach(resource => {
@@ -731,7 +737,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     typeof result?.evidence === 'string' && result.evidence.trim().length > 0 &&
     Array.isArray(result?.findings) &&
     result.findings.every(finding =>
-      typeof finding?.file === 'string' && finding.file.trim().length > 0 &&
+      canonicalPath(finding?.file) === finding.file &&
       typeof finding?.detail === 'string' && finding.detail.trim().length > 0 &&
       typeof finding?.scenario === 'string' && finding.scenario.trim().length > 0) &&
     ((result?.verdict === 'pass' && result.findings.length === 0) ||
@@ -742,7 +748,35 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
   if (!shape) {
     return { reason: 'Review result is missing or malformed', status: 'failed' }
   }
-  return { findings: result.findings, reason: null, status: 'completed', verdict: result.verdict }
+  return { evidence: result.evidence, findings: result.findings, reason: null, status: 'completed', verdict: result.verdict }
+}
+const verifyFindings = async (review, integration, publication, round) => {
+  if (review.status !== 'completed' || review.verdict === 'pass') {
+    return review
+  }
+  const findings = review.findings.map((finding, index) => ({ ...finding, id: `review-${round + 1}-finding-${index + 1}` }))
+  const attempt = await runAgent(compose(
+    'Independently verify each review finding against source and requirements. Do not fix or modify anything.',
+    taskPart,
+    basePart,
+    `Candidate branch: ${integration.branch}; posted request: ${publication.url}`,
+    `Review evidence and findings: ${JSON.stringify({ evidence: review.evidence, findings })}`,
+    'Return exactly one disposition per finding with its id, status confirmed, refuted, or unverified, and nonempty evidence.',
+    readOnlyPart
+  ), { label: `verify-findings:${round + 1}`, phase: 'Verify', schema: {
+    properties: { dispositions: { items: { properties: { id: { type: 'string' }, status: { enum: ['confirmed', 'refuted', 'unverified'], type: 'string' }, evidence: { type: 'string' } }, required: ['id', 'status', 'evidence'], type: 'object' }, type: 'array' } },
+    required: ['dispositions'], type: 'object'
+  } })
+  const dispositions = attempt.result?.dispositions
+  const valid = Array.isArray(dispositions) && dispositions.length === findings.length &&
+    dispositions.every(item => findings.some(finding => finding.id === item?.id) &&
+      ['confirmed', 'refuted', 'unverified'].includes(item?.status) && typeof item?.evidence === 'string' && item.evidence.trim()) &&
+    new Set(dispositions.map(item => item.id)).size === findings.length
+  if (attempt.error !== undefined || !valid || dispositions.some(item => item.status === 'unverified')) {
+    return { ...review, findings, verification: { dispositions: dispositions ?? null, error: attempt.error ?? null }, reason: 'Finding verification failed or remains unresolved', status: 'failed' }
+  }
+  const confirmed = findings.filter(finding => dispositions.some(item => item.id === finding.id && item.status === 'confirmed'))
+  return { ...review, findings, confirmed, verification: { dispositions }, accepted: confirmed.length === 0 }
 }
 const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) => {
   if (skipped.publish) {
@@ -777,6 +811,8 @@ if (phaseRecords.plan?.status !== 'completed') {
   recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
 } else if (!candidateBranch) {
   recordPhase('implement', 'failed', 'Provide the named task candidate as a nonempty args.candidateBranch string, because implementation cannot verify a worktree starting reference without it')
+} else if (baseBranch && candidateBranch === baseBranch) {
+  recordPhase('implement', 'failed', 'The task candidate cannot equal the base branch')
 } else {
   log('Implementing the planned units')
   const implementState = await dispatchImplementation(units, null, '', candidateBranch)
@@ -798,7 +834,9 @@ recordPhase('integrate', integrationState.status, integrationState.reason)
 applyLedger(integrationState, attemptLedger)
 let sweepState = null
 phase('Sweep')
-if (skipped.sweep) {
+if (phaseRecords.integrate.status !== 'completed') {
+  sweepState = { reason: 'Integration did not complete', status: 'skipped' }
+} else if (skipped.sweep) {
   sweepState = { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
 } else {
   log('Sweeping the change for environment exposures')
@@ -823,34 +861,29 @@ if (skipped.review) {
   log('Reviewing the posted candidate')
   reviewState = await dispatchReview(unitResults, integrationState, publishState)
 }
+reviewState = await verifyFindings(reviewState, integrationState, publishState, 0)
 recordPhase('review', reviewState.status, reviewState.reason)
+const reviewHistory = [reviewState]
 let roundsUsed = 0
 while (
   reviewState.status === 'completed' &&
   reviewState.verdict === 'fix-required' &&
-  reviewState.findings.length > 0 &&
+  reviewState.confirmed?.length > 0 &&
   roundsUsed < maxFixRounds &&
   !skipped.implement &&
   phaseRecords.plan.status === 'completed'
 ) {
-  roundsUsed += 1
-  log(`Review requires fixes, so returning to implementation in fix round ${roundsUsed} of ${maxFixRounds}`)
-  const previousByKey = new Map(unitResults.map(unit => [unit.key, unit]))
-  const affected = units.filter(unit =>
-    reviewState.findings.some(finding => {
-      const file = canonicalPath(finding.file)
-      return file !== null && unit.paths.some(owned => ownsPath(owned, file))
-    }))
-  const targets = affected.length > 0 ? affected : units
-  if (affected.length === 0) {
-    log('No finding maps to an owned unit path, so the fix round covers every unit')
+  const unmatched = reviewState.confirmed.filter(finding => units.filter(unit => unit.paths.some(path => ownsPath(path, finding.file))).length !== 1)
+  if (unmatched.length > 0) {
+    reviewState = { ...reviewState, reason: 'Confirmed findings do not map to exactly one owned unit', status: 'failed' }
+    recordPhase('review', reviewState.status, reviewState.reason)
+    break
   }
-  const candidateName =
-    (typeof integrationState?.branch === 'string' && integrationState.branch.trim().length > 0 ? integrationState.branch : null) ??
-    previousByKey.get(targets[0].key)?.branch ??
-    candidateBranch
+  const targets = units.filter(unit => reviewState.confirmed.some(finding => unit.paths.some(path => ownsPath(path, finding.file))))
+  roundsUsed += 1
+  const candidateName = integrationState.branch
   phase('Implement')
-  const fixState = await dispatchImplementation(targets, reviewState.findings, `:fix-${roundsUsed}`, candidateName)
+  const fixState = await dispatchImplementation(targets, reviewState.confirmed, `:fix-${roundsUsed}`, candidateName)
   recordPhase('implement', fixState.status, fixState.reason)
   retainAttempts(fixState.attemptResources, attemptLedger)
   const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
@@ -865,7 +898,9 @@ while (
   recordPhase('integrate', integrationState.status, integrationState.reason)
   applyLedger(integrationState, attemptLedger)
   phase('Sweep')
-  sweepState = skipped.sweep
+  sweepState = integrationState.status !== 'completed'
+    ? { reason: 'Integration did not complete', status: 'skipped' }
+    : skipped.sweep
     ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
     : await dispatchSweep()
   recordPhase('sweep', sweepState.status, sweepState.reason)
@@ -879,9 +914,11 @@ while (
   reviewState = publishState.status === 'completed'
     ? await dispatchReview(unitResults, integrationState, publishState)
     : { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
+  reviewState = await verifyFindings(reviewState, integrationState, publishState, roundsUsed)
+  reviewHistory.push(reviewState)
   recordPhase('review', reviewState.status, reviewState.reason)
 }
-if (reviewState.status === 'completed' && reviewState.verdict === 'fix-required') {
+if (reviewState.status === 'completed' && reviewState.verdict === 'fix-required' && !reviewState.accepted) {
   recordPhase('review', 'completed', `Verdict fix-required after ${roundsUsed} of ${maxFixRounds} fix rounds`)
 }
 const phaseEvidence = phaseKeys.map(key => phaseRecords[key])
@@ -893,7 +930,7 @@ if (
 }
 const complete =
   phaseEvidence.every(record => record.status === 'completed') &&
-  (phaseRecords.review.status !== 'completed' || reviewState.verdict === 'pass')
+  (phaseRecords.review.status !== 'completed' || (reviewState.verdict === 'pass' || reviewState.accepted === true))
 return {
   complete,
   exposures: sweepState.exposures ?? [],
@@ -903,9 +940,9 @@ return {
     ? { action: publishState.action, url: publishState.url }
     : null,
   resources: attemptLedger,
-  review: reviewState.status === 'completed'
-    ? { findings: reviewState.findings.length, verdict: reviewState.verdict }
-    : null,
+  integration: integrationState,
+  review: reviewState,
+  reviewHistory,
   split,
   units: units.map(unit => ({
     branch: unitResults.find(result => result.key === unit.key)?.branch ?? null,
