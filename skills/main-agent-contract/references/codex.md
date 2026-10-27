@@ -22,6 +22,7 @@ Route cleanup through the authorized resource owner and supported herdr agent op
 For native Codex spawning, use the model ID the tool lists for the selected alias at call time.
 Keep the alias as the recorded label.
 Use `luna` (alias) for clear tasks, including development, review, document analysis, and multistep agentic work.
+Use `terra` (alias) for substantive coding or refactoring that exceeds a clear bounded task.
 Use `sol` (alias) when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
 Call `astra` (alias) only at the user's explicit request.
 Start with one independent reviewer, adding depth or specialists for costly or uncovered failure modes.
@@ -31,6 +32,7 @@ Start with one independent reviewer, adding depth or specialists for costly or u
 | `luna` (alias) | Simple exploration and extraction | Use `low`. |
 | | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
 | | Other clear analysis and agentic work | Use `medium`, or `high` for harder tasks. |
+| `terra` (alias) | Substantive coding and refactoring | Use `xhigh`. |
 | `sol` (alias) | Simple queries, conversions, and extraction | Use `low`. |
 | | Ordinary development, review, and document analysis | Use `medium`. |
 | | Complex debugging, algorithms, and architecture | Use `high`. |
