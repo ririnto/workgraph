@@ -1,25 +1,25 @@
 # Workflow Samples
 
 Workgraph bundles two native Workflow delivery samples and one read-only agent-authored design workflow.
-The delivery samples provide per-phase model defaults, while design selectors come from runtime inputs or host configuration.
+The workflows use optional model selectors from runtime inputs or host configuration.
 All three use the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 
 | Variant | Source | Shape |
 | --- | --- | --- |
-| Simple task | [delivery-simple.workflow.txt](../skills/workflow/scripts/delivery-simple.workflow.txt) | At most two scopes, exactly one work unit, and integration landing the unit branch. |
-| Complex task | [delivery-complex.workflow.txt](../skills/workflow/scripts/delivery-complex.workflow.txt) | Up to four scopes, a plan-decided unit split with per-unit worktrees, and integration of the named unit branches. |
-| Agent design | [design.workflow.txt](../skills/workflow/scripts/design.workflow.txt) | Parallel architecture and evidence work, followed by composition, challenge, and independent verification. |
+| Simple task | [delivery-simple.js](../workflows/delivery-simple.js) | At most two scopes, exactly one work unit, and integration landing the unit branch. |
+| Complex task | [delivery-complex.js](../workflows/delivery-complex.js) | Up to four scopes, a plan-decided unit split with per-unit worktrees, and integration of the named unit branches. |
+| Agent design | [design.js](../workflows/design.js) | Parallel architecture and evidence work, followed by composition, challenge, and independent verification. |
 
 ## Launch
 
 Run a sample from a checkout the session can read, passing the goal and dispatch choices through `args`.
-Pass the complete source text through `script` on the first invocation, as the Workflow skill requires.
+Pass the registered workflow name on the first invocation.
 Use the `scriptPath` and run ID the run returns, with `resumeFromRunId`, for a same-session continuation.
-The first invocation executes the source directly and registers no named workflow command.
+The plugin exposes each workflow by its metadata name.
 
 ```js
 Workflow({
-  script: '<complete text of skills/workflow/scripts/delivery-simple.workflow.txt>',
+  name: 'workgraph:delivery-simple',
   args: {
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
@@ -42,16 +42,14 @@ Workflow({
 })
 ```
 
-For a repeatable command, save a run from `/workflows`, or copy a sample source to `.claude/workflows/delivery-simple.js` or `.claude/workflows/delivery-complex.js` in the project.
-Named discovery reads `.js` files, so a copied `.workflow.txt` resource needs its `.js` destination name.
-The sample sources stay plain script bodies, so they need no wrapper, transform, dependency, or lint exception.
+The plugin discovers the bundled `.js` definitions in `workflows/`.
 The dispatching session owns the linked issue, the task branch, and the initial complete-candidate scan before it authorizes implementation, as its Delivery procedure requires.
 
 ## Agent Design
 
 Run `/workgraph:workflow` with a design goal to launch the bundled source through native Workflow.
 The `workgraph:design-lead` plugin agent is an optional main-session coordinator that uses the same skill and source.
-The skill passes the exact `.workflow.txt` body as inline `script`, so the plugin does not register a second workflow implementation.
+The skill invokes the registered `workgraph:design` workflow.
 Run the skill again for a fresh design, or continue the same session with the returned `scriptPath` and run ID.
 
 | Phase | Specialist | Runtime model input | Completion evidence |
@@ -72,7 +70,7 @@ Those values are invocation inputs rather than aliases or committed workflow def
 
 ```js
 Workflow({
-  script: '<complete text of skills/workflow/scripts/design.workflow.txt>',
+  name: 'workgraph:design',
   args: {
     task: 'Design a reliable event-replay boundary.',
     requirements: ['Retries must not duplicate effects.'],
@@ -100,22 +98,22 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving acceptance. |
-| `models` | Optional object of per-phase model selector strings overriding the defaults. |
+| `models` | Optional object of per-phase model selector strings. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds. |
 
 ## Phases
 
-| Phase | Default model | Required predecessor data | Completion evidence |
-| --- | --- | --- | --- |
-| Scope | `opus` | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
-| Explore | `haiku` | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
-| Plan | `opus` | The scopes and exploration findings. | Work units with disjoint owned paths and instructions. |
-| Implement | `sonnet` | One unit per agent, with matching exploration only. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
-| Integrate | `sonnet` | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
-| Sweep | `haiku` | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
-| Publish | `sonnet` | Completed implementation, completed integration, a clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
-| Review | `sonnet` | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
+| Phase | Required predecessor data | Completion evidence |
+| --- | --- | --- |
+| Scope | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
+| Explore | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
+| Plan | The scopes and exploration findings. | Work units with disjoint owned paths and instructions. |
+| Implement | One unit per agent, with matching exploration only. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
+| Integrate | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
+| Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
+| Publish | Completed implementation, completed integration, a clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
+| Review | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
 
 Implementation runs every unit in its own isolated native worktree, including a single-unit plan.
 Each isolated worker verifies its worktree starts from the named task candidate before editing and synchronizes first when it does not.
@@ -149,8 +147,8 @@ The affected-unit mapping falls back to every unit when no finding names an owne
 
 ## Models
 
-The two delivery samples have a default functional model selector, and `args.models` overrides a phase for one dispatch.
-Their defaults are host-resolved aliases, so those sources carry no specific model identity or routing.
+The delivery samples accept optional phase selectors in `args.models`.
+Omitted selectors leave model selection to the host.
 The design workflow has no model defaults and accepts optional selectors by specialist role through `args.models`.
 An omitted design selector stays unset so the host can apply its current configuration.
 Every override must be a nonempty selector string the host supports for agent calls.

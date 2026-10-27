@@ -1,22 +1,22 @@
 export const meta = {
-  description: 'Split-capable delivery graph: separate scopes, explore in parallel, plan the unit split, implement in worktrees, integrate, sweep the diff, publish, and review',
-  name: 'delivery-complex',
+  description: 'Single-unit delivery graph: separate scopes, explore in parallel, plan one unit, implement, sweep the diff, publish, and review',
+  name: 'delivery-simple',
   phases: [
     { detail: 'separate the goal into disjoint scopes', title: 'Scope' },
     { detail: 'one read-only explorer per scope', title: 'Explore' },
-    { detail: 'decide the unit split and define disjoint units', title: 'Plan' },
-    { detail: 'one isolated implementation agent per unit', title: 'Implement' },
-    { detail: 'merge the named unit branches into the task branch', title: 'Integrate' },
+    { detail: 'define exactly one implementation unit', title: 'Plan' },
+    { detail: 'implement the unit in an isolated worktree', title: 'Implement' },
+    { detail: 'merge the named unit branch into the task branch', title: 'Integrate' },
     { detail: 'diff-only environment-exposure sweep', title: 'Sweep' },
     { detail: 'create or update the PR or MR', title: 'Publish' },
     { detail: 'independent review of the complete change', title: 'Review' }
   ]
 }
 
-const variant = 'complex'
-const maxScopes = 4
-const unitCap = 4
-const defaultFixRounds = 2
+const variant = 'simple'
+const maxScopes = 2
+const unitCap = 1
+const defaultFixRounds = 1
 const phaseKeys = ['scope', 'explore', 'plan', 'implement', 'integrate', 'sweep', 'publish', 'review']
 const phaseTitles = {
   explore: 'Explore',
@@ -27,16 +27,6 @@ const phaseTitles = {
   review: 'Review',
   scope: 'Scope',
   sweep: 'Sweep'
-}
-const defaultModels = {
-  explore: 'haiku',
-  implement: 'sonnet',
-  integrate: 'sonnet',
-  plan: 'opus',
-  publish: 'sonnet',
-  review: 'sonnet',
-  scope: 'opus',
-  sweep: 'haiku'
 }
 const input = args === null || typeof args !== 'object' || Array.isArray(args) ? {} : args
 if (typeof input.task !== 'string' || !input.task.trim()) {
@@ -85,7 +75,7 @@ for (const key of phaseKeys) {
     throw new Error(`Provide promptParts.${key} as a nonempty instruction string`)
   }
   skipped[key] = skip === true
-  models[key] = model ?? defaultModels[key]
+  models[key] = model
   promptParts[key] = part ?? ''
 }
 let maxFixRounds = defaultFixRounds
@@ -155,7 +145,7 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
 ), {
   agentType: 'Explore',
   label: 'scope',
-  model: models.scope,
+  ...(models.scope === undefined ? {} : { model: models.scope }),
   phase: 'Scope',
   schema: {
     properties: {
@@ -227,7 +217,7 @@ if (phaseRecords.scope?.status !== 'completed') {
     ), {
       agentType: 'Explore',
       label: `explore:${scope.key}`,
-      model: models.explore,
+      ...(models.explore === undefined ? {} : { model: models.explore }),
       phase: 'Explore',
       schema: {
         properties: {
@@ -278,18 +268,17 @@ if (phaseRecords.explore?.status !== 'completed') {
   const planAttempt = await runAgent(compose(
     'Plan the implementation for the delivery goal.',
     taskPart,
-    `Decide whether the goal needs one work unit or several disjoint work units, and define at most ${unitCap} units.`,
-    'Use separate units only when parallel ownership or context size requires them, and prefer the fewest units that cover the goal.',
+    'This simple variant delivers through exactly one work unit, so define a single unit that covers the whole goal.',
     `Scopes and exploration findings: ${JSON.stringify({
       explorations,
       scopes: scopes.map(scope => ({ description: scope.description, key: scope.key, paths: scope.paths }))
     })}`,
-    'Give each unit a short key, the owned paths, and concrete instructions that name the files to change and the checks to run.',
-    'List each owned path once, and share no owned path between units.',
+    'Give the unit a short key, the owned paths, and concrete instructions that name the files to change and the checks to run.',
+    'List each owned path once.',
     promptParts.plan
   ), {
     label: 'plan',
-    model: models.plan,
+    ...(models.plan === undefined ? {} : { model: models.plan }),
     phase: 'Plan',
     schema: {
       properties: {
@@ -361,7 +350,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     const options = {
       isolation: 'worktree',
       label: `implement:${unit.key}${roundLabel}`,
-      model: models.implement,
+      ...(models.implement === undefined ? {} : { model: models.implement }),
       phase: 'Implement',
       schema: {
         properties: {
@@ -476,7 +465,7 @@ const dispatchIntegration = async currentUnits => {
     promptParts.integrate
   ), {
     label: 'integrate',
-    model: models.integrate,
+    ...(models.integrate === undefined ? {} : { model: models.integrate }),
     phase: 'Integrate',
     schema: {
       properties: {
@@ -594,7 +583,7 @@ const dispatchSweep = async () => {
   ), {
     agentType: 'Explore',
     label: 'sweep',
-    model: models.sweep,
+    ...(models.sweep === undefined ? {} : { model: models.sweep }),
     phase: 'Sweep',
     schema: {
       properties: {
@@ -650,7 +639,7 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
     promptParts.publish
   ), {
     label: 'publish',
-    model: models.publish,
+    ...(models.publish === undefined ? {} : { model: models.publish }),
     phase: 'Publish',
     schema: {
       properties: {
@@ -703,7 +692,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     promptParts.review
   ), {
     label: 'review',
-    model: models.review,
+    ...(models.review === undefined ? {} : { model: models.review }),
     phase: 'Review',
     schema: {
       properties: {
@@ -777,7 +766,7 @@ if (phaseRecords.plan?.status !== 'completed') {
 } else if (!candidateBranch) {
   recordPhase('implement', 'failed', 'Provide the named task candidate as a nonempty args.candidateBranch string, because implementation cannot verify a worktree starting reference without it')
 } else {
-  log('Implementing the planned units')
+  log('Implementing the planned unit')
   const implementState = await dispatchImplementation(units, null, '', candidateBranch)
   recordPhase('implement', implementState.status, implementState.reason)
   unitResults = implementState.unitResults

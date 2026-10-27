@@ -7,7 +7,7 @@ import core from "ultracite/oxlint/core";
 export default defineConfig({
   env: core.env,
   extends: [core],
-  ignorePatterns: core.ignorePatterns,
+  ignorePatterns: [...(core.ignorePatterns ?? []), "workflows/*.js"],
   jsPlugins: ["./plugins/tsdoc-plugin.ts"],
   rules: {
     "tsdoc/require-export-tsdoc": "deny"

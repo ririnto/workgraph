@@ -784,19 +784,10 @@ const runWorkflowSample = async (file, args, payloadFor) => {
 
 const sampleRoot = path.resolve(import.meta.dirname, "..");
 const samplePaths = {
-  complex: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-complex.workflow.txt"
-  ),
-  simple: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-simple.workflow.txt"
-  )
+  complex: path.join(sampleRoot, "workflows/delivery-complex.js"),
+  simple: path.join(sampleRoot, "workflows/delivery-simple.js")
 };
-const designPath = path.join(
-  sampleRoot,
-  "skills/workflow/scripts/design.workflow.txt"
-);
+const designPath = path.join(sampleRoot, "workflows/design.js");
 const scopeResult = {
   evidence: "e",
   scopes: [{ description: "d", key: "s1", paths: ["docs"] }]
@@ -981,16 +972,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         "Update the existing open request at https://example.invalid/pr/1"
       )
     );
-    const models = Object.fromEntries(
-      calls.map((call) => [call.phase, call.model])
-    );
-    assert.equal(models.Scope, "opus");
-    assert.equal(models.Explore, "haiku");
-    assert.equal(models.Plan, "opus");
-    assert.equal(models.Implement, "sonnet");
-    assert.equal(models.Sweep, "haiku");
-    assert.equal(models.Publish, "sonnet");
-    assert.equal(models.Review, "sonnet");
+    assert.ok(calls.every((call) => call.model === undefined));
     assert.ok(
       calls
         .filter((entry) => entry.phase === "Implement")
@@ -1209,7 +1191,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       calls.map((call) => [call.phase, call.model])
     );
     assert.equal(models.Scope, "haiku");
-    assert.equal(models.Plan, "opus");
+    assert.equal(models.Plan, undefined);
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );

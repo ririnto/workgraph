@@ -65,6 +65,13 @@ const copyPlugin = (t) => {
     { recursive: true }
   );
   cpSync(skills, path.join(root, "skills"), { recursive: true });
+  cpSync(
+    new URL("../workflows/", import.meta.url),
+    path.join(root, "workflows"),
+    {
+      recursive: true
+    }
+  );
   return root;
 };
 
@@ -579,13 +586,18 @@ test("bundled skills retain invocation metadata and supporting reference files",
   }
 });
 
-test("bundled native Workflow sources remain relocatable text resources", (t) => {
+test("bundled native Workflow sources remain relocatable", (t) => {
   const root = copyPlugin(t);
-  const directory = path.join(root, "skills", "workflow", "scripts");
+  const directory = path.join(root, "workflows");
   const files = readdirSync(directory);
-  assert.ok(files.length > 0);
+  assert.deepEqual(files.toSorted(), [
+    "delivery-complex.js",
+    "delivery-simple.js",
+    "design.js",
+    "sum-check.js"
+  ]);
   for (const file of files) {
-    assert.match(file, /\.workflow\.txt$/u);
+    assert.match(file, /\.js$/u);
     const source = realpathSync(path.join(directory, file));
     assert.ok(source.startsWith(`${realpathSync(directory)}${path.sep}`));
     assert.ok(readFileSync(source, "utf-8").trim());
