@@ -204,7 +204,7 @@ The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-refe
 Its [bundled native source](../skills/workflow/scripts/sum-check.workflow.txt) supplies reusable inline input.
 The [caller contract](../skills/workflow/references/authoring.md#use-the-bundled-source) separates native source from Node modules and run-specific script copies.
 The resource has no named registration or replacement executor.
-Its delivery reference maps authorized engineering operations to node inputs and outputs without owning a second delivery checklist.
+Its delivery reference maps authorized engineering operations to node inputs and outputs while Main owns graph readiness.
 Worker and Codex contexts do not load Workflow procedures.
 Codex uses available native delegation tools, and its Main host reference owns tool routing.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.

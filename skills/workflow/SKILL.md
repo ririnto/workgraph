@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use in Claude Code main sessions for dependent stages, expected follow-up phases, or explicit Workflow requests.
+  Use in Claude Code main sessions for dependent stages, required joins, expected follow-up phases, or explicit Workflow requests.
 argument-hint: "[goal]"
 ---
 
@@ -25,7 +25,7 @@ Workflow's internal `agent()` calls are stages, not additional host Agent dispat
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 For ownership of each outcome, follow the [Main Agent Contract](../main-agent-contract/SKILL.md#assignments).
-For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
+For authorized engineering-delivery graphs, read Delivery and `references/delivery.md` unless their complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
 Follow the Main Agent Contract's model policy for agent settings.
@@ -53,11 +53,6 @@ If the native Workflow tool is unavailable, report that it did not run.
 
 ## Verify Results
 
-Treat failed, missing, null, or unsupported results as incomplete rather than successful.
 Check returned evidence against acceptance criteria, including required predecessor data and phase outcomes.
-A changed setting, lifecycle observation, or missing optional setup alone does not invalidate a run.
-Assess current stage suitability without tracing changed-state authorship, origin, or history.
-Perform maintained setup only when the next authorized operation needs it.
-Preserve real required-gate, security, authority, and conflicting-write constraints.
 Inspect the journal when required result or completion evidence is missing or inconsistent.
 Report missing results, failed stages, skipped required work, or unverified checks.

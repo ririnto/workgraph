@@ -22,12 +22,8 @@ Use only nodes allowed by the goal's scope and authority.
 
 ## Readiness And Transitions
 
-Before starting a node, confirm its accepted inputs, owner, authority, tools, paths, and branch.
-Confirm required predecessor results and conflicting-resource ownership returns without waiting for unrelated global returns.
-Connect nodes only when a predecessor result or condition gates its successor.
+Follow Main Agent Contract for graph readiness, dependencies, ownership, and result acceptance.
 Select needed nodes for each domain rather than copying the whole delivery graph across every domain and phase.
-Start ready independent nodes in parallel and serialize conflicting writes.
-Join branches only when a later node requires their combined results.
 Keep reports dependent on finding verification and edits dependent on any explicit user approval.
 
 Main owns node status and decides whether to retry, reassign, or stop after a failure.
