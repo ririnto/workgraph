@@ -795,19 +795,10 @@ const runWorkflowSample = async (file, args, payloadFor) => {
 
 const sampleRoot = path.resolve(import.meta.dirname, "..");
 const samplePaths = {
-  complex: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-complex.workflow.txt"
-  ),
-  simple: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-simple.workflow.txt"
-  )
+  complex: path.join(sampleRoot, "workflows/delivery-complex.js"),
+  simple: path.join(sampleRoot, "workflows/delivery-simple.js")
 };
-const designPath = path.join(
-  sampleRoot,
-  "skills/workflow/scripts/design.workflow.txt"
-);
+const designPath = path.join(sampleRoot, "workflows/design.js");
 const scopeResult = {
   evidence: "e",
   scopes: [{ description: "d", key: "s1", paths: ["docs"] }]
@@ -968,6 +959,42 @@ test("delivery samples reject a passing review with unresolved findings", async 
   );
 });
 
+test("delivery samples explain a fix-required review without findings", async () => {
+  await Promise.all(
+    Object.values(samplePaths).map(async (file) => {
+      const { result } = await runWorkflowSample(
+        file,
+        {
+          candidateBranch: "task-branch",
+          issue: "#1",
+          maxFixRounds: 0,
+          task: "t"
+        },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: () => simpleImplement,
+          Integrate: () => integrateSingle,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => ({
+            evidence: "e",
+            findings: [],
+            verdict: "fix-required"
+          }),
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      const review = result.phaseEvidence.find(
+        (record) => record.title === "Review"
+      );
+      assert.equal(result.complete, false);
+      assert.equal(review.status, "failed");
+      assert.match(review.reason, /fix-required.*findings/iu);
+    })
+  );
+});
+
 test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   for (const file of Object.values(samplePaths)) {
     const text = readFileSync(file, "utf-8");
@@ -1033,6 +1060,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     assert.equal(models.Explore, "haiku");
     assert.equal(models.Plan, "opus");
     assert.equal(models.Implement, "sonnet");
+    assert.equal(models.Integrate, "sonnet");
     assert.equal(models.Sweep, "haiku");
     assert.equal(models.Publish, "sonnet");
     assert.equal(models.Review, "sonnet");

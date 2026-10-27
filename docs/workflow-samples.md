@@ -6,20 +6,20 @@ All three use the native Workflow interface without adding a scheduler, executio
 
 | Variant | Source | Shape |
 | --- | --- | --- |
-| Simple task | [delivery-simple.workflow.txt](../skills/workflow/scripts/delivery-simple.workflow.txt) | At most two scopes, exactly one work unit, and integration landing the unit branch. |
-| Complex task | [delivery-complex.workflow.txt](../skills/workflow/scripts/delivery-complex.workflow.txt) | Up to four scopes, a plan-decided unit split with per-unit worktrees, and integration of the named unit branches. |
-| Agent design | [design.workflow.txt](../skills/workflow/scripts/design.workflow.txt) | Parallel architecture and evidence work, followed by composition, challenge, and independent verification. |
+| Simple task | [delivery-simple.js](../workflows/delivery-simple.js) | At most two scopes, exactly one work unit, and integration landing the unit branch. |
+| Complex task | [delivery-complex.js](../workflows/delivery-complex.js) | Up to four scopes, a plan-decided unit split with per-unit worktrees, and integration of the named unit branches. |
+| Agent design | [design.js](../workflows/design.js) | Parallel architecture and evidence work, followed by composition, challenge, and independent verification. |
 
 ## Launch
 
 Run a sample from a checkout the session can read, passing the goal and dispatch choices through `args`.
-Pass the complete source text through `script` on the first invocation, as the Workflow skill requires.
+Pass the registered workflow name on the first invocation.
 Use the `scriptPath` and run ID the run returns, with `resumeFromRunId`, for a same-session continuation.
-The first invocation executes the source directly and registers no named workflow command.
+The plugin exposes each workflow by its metadata name.
 
 ```js
 Workflow({
-  script: '<complete text of skills/workflow/scripts/delivery-simple.workflow.txt>',
+  name: 'workgraph:delivery-simple',
   args: {
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
@@ -42,16 +42,14 @@ Workflow({
 })
 ```
 
-For a repeatable command, save a run from `/workflows`, or copy a sample source to `.claude/workflows/delivery-simple.js` or `.claude/workflows/delivery-complex.js` in the project.
-Named discovery reads `.js` files, so a copied `.workflow.txt` resource needs its `.js` destination name.
-The sample sources stay plain script bodies, so they need no wrapper, transform, dependency, or lint exception.
+The plugin discovers the bundled `.js` definitions in `workflows/`.
 The dispatching session owns the linked issue, the task branch, and the initial complete-candidate scan before it authorizes implementation, as its Delivery procedure requires.
 
 ## Agent Design
 
 Run `/workgraph:workflow` with a design goal to launch the bundled source through native Workflow.
 The `workgraph:design-lead` plugin agent is an optional main-session coordinator that uses the same skill and source.
-The skill passes the exact `.workflow.txt` body as inline `script`, so the plugin does not register a second workflow implementation.
+The skill invokes the registered `workgraph:design` workflow.
 Run the skill again for a fresh design, or continue the same session with the returned `scriptPath` and run ID.
 
 | Phase | Specialist | Runtime model input | Completion evidence |
@@ -72,7 +70,7 @@ Those values are invocation inputs rather than aliases or committed workflow def
 
 ```js
 Workflow({
-  script: '<complete text of skills/workflow/scripts/design.workflow.txt>',
+  name: 'workgraph:design',
   args: {
     task: 'Design a reliable event-replay boundary.',
     requirements: ['Retries must not duplicate effects.'],
@@ -159,7 +157,7 @@ A confirmed finding outside one unambiguous owned unit blocks the round for repl
 
 ## Models
 
-The two delivery samples have a default functional model selector, and `args.models` overrides a phase for one dispatch.
+The two delivery samples provide per-phase defaults, and `args.models` overrides a phase for one dispatch.
 Their defaults are host-resolved aliases, so those sources carry no specific model identity or routing.
 The design workflow has no model defaults and accepts optional selectors by specialist role through `args.models`.
 An omitted design selector stays unset so the host can apply its current configuration.

@@ -746,7 +746,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     return { reason: `Review agent failed: ${attempt.error}`, status: 'failed' }
   }
   if (!shape) {
-    return { evidence: result?.evidence ?? null, findings: result?.findings ?? null, reason: 'Review result is missing or malformed', status: 'failed', verdict: result?.verdict ?? null }
+    return { evidence: result?.evidence ?? null, findings: result?.findings ?? null, reason: result?.verdict === 'fix-required' && Array.isArray(result?.findings) && result.findings.length === 0 ? 'Review verdict fix-required has no findings' : 'Review result is missing or malformed', status: 'failed', verdict: result?.verdict ?? null }
   }
   return { evidence: result.evidence, findings: result.findings, reason: null, status: 'completed', verdict: result.verdict }
 }

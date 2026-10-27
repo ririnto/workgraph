@@ -34,14 +34,14 @@ Resume authorized edit work only after that approval, without adding gates to wo
 
 ## Run Workflow
 
-For numeric sum-and-check goals, read [the bundled native source](scripts/sum-check.workflow.txt) relative to this skill's base directory.
+For numeric sum-and-check goals, read [the bundled native source](../../workflows/sum-check.js) relative to this skill's base directory.
 Follow its [argument and result contract](references/authoring.md#use-the-bundled-source) rather than recreating that graph.
-For read-only agent-authored design requests, read [the bundled design source](scripts/design.workflow.txt) and follow its validated phase and result contract.
+For read-only agent-authored design requests, read [the bundled design source](../../workflows/design.js) and follow its validated phase and result contract.
 Pass the design task, requirements, constraints, optional repository-relative source paths, and runtime model selectors through structured `args`.
 Omit any model selector not supplied by the request or supported host configuration, and never add a fixed workflow default.
 Do not replace the specialist outputs with coordinator-authored design content.
-For other accepted graphs, author their native source under the authoring reference.
-Call native Workflow with the exact native source as inline `script` on the first invocation.
+Call native Workflow with the registered plugin workflow name for bundled graphs.
+For other accepted graphs, author native source under the authoring reference and pass it as inline `script`.
 Use its returned `scriptPath` and same-session `resumeFromRunId` for an authorized continuation.
 Pass structured JSON through `args` when the script needs runtime inputs.
 
