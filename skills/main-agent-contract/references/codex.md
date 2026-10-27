@@ -32,7 +32,7 @@ Start with one independent reviewer, adding depth or specialists for costly or u
 | `luna` (alias) | Simple exploration and extraction | Use `low`. |
 | | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
 | | Other clear analysis and agentic work | Use `medium`, or `high` for harder tasks. |
-| `terra` (alias) | Substantive coding and refactoring | Use `xhigh`. |
+| `terra` (alias) | Substantive coding and refactoring | Use `medium`, or `high` for harder tasks. |
 | `sol` (alias) | Simple queries, conversions, and extraction | Use `low`. |
 | | Ordinary development, review, and document analysis | Use `medium`. |
 | | Complex debugging, algorithms, and architecture | Use `high`. |
