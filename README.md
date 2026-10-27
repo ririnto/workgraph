@@ -63,9 +63,10 @@ Its [delivery reference](skills/workflow/references/delivery.md) maps Delivery o
 Codex uses native delegation rather than Claude Code Workflow.
 Workgraph bundles [native sum-and-check source](skills/workflow/scripts/sum-check.workflow.txt) selected by the Workflow skill for that read-only outcome.
 Its [caller contract](skills/workflow/references/authoring.md#use-the-bundled-source) distinguishes inline execution, named discovery, skill selection, and installed activation.
-Workgraph also bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
-Each sample launches through the native Workflow interface with injectable prompt parts, per-phase model defaults, and explicit skip, failure, and bounded-recovery records.
-Workgraph supplies no replacement execution engine.
+Workgraph bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
+Those samples use injectable prompt parts, per-phase model defaults, and explicit skip, failure, and bounded-recovery records.
+It also includes an [agent-authored design workflow](skills/workflow/scripts/design.workflow.txt) with runtime model inputs and independent verification.
+All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
 
 ## Skill Invocation
 

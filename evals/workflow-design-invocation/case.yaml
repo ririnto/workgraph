@@ -1,0 +1,49 @@
+schema_version: "1.1"
+name: workflow-design-invocation
+description: Verify the bundled design Workflow dispatches bounded specialists and validates their real results.
+execution:
+  runs: 2
+  max_turns: 30
+  timeout_seconds: 2400
+  allowed_tools:
+    - Workflow
+    - Read
+    - Skill(workgraph:workflow)
+  prompt: |-
+    Use the read-only agent design path in Workgraph Workflow for this design request.
+    Read the complete workflow skill and its bundled scripts/design.workflow.txt source.
+    Pass that exact source inline to native Workflow and do not rewrite or recreate it.
+    Design a bounded in-memory LRU cache for a single-process request router.
+    The capacity must never be exceeded, cache hits must refresh recency, and eviction order must be deterministic.
+    The cache must not persist data or perform network operations.
+    Pass those three requirements as structured arguments.
+    Pass runtime selectors gpt-6-astra for architecture, evidence, and challenge.
+    Pass runtime selectors claude-opus-5-5 for composition and verification.
+    Do not edit files, run shell commands, use Git, publish, or dispatch host Agents.
+    Run exactly one native Workflow invocation for this request.
+    Do not retry or duplicate it after failure, incomplete results, or timeout.
+    Report only the returned results and do not invent a candidate when the workflow is incomplete.
+graders:
+  - name: design-workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+    max: 1
+  - name: specialist-design-completed
+    type: llm
+    focus: trace
+    criteria: |-
+      Judge the observed tool trace, Workflow results, and final report together.
+      Require the session to use Skill(workgraph:workflow) and read the complete maintained design.workflow.txt source.
+      Require its first native Workflow call to pass that exact source inline with the task, all three requirements, and runtime model selectors.
+      Require actual calls to workgraph:design-architect, workgraph:design-evidence, workgraph:design-composer, workgraph:design-challenger, and workgraph:design-verifier.
+      Require the architecture and evidence specialists to run in the Design phase and the later specialists to consume actual predecessor results.
+      Require runtime model settings to reach the requested specialists without any selector default in the workflow source.
+      Require every requirement coverage entry to use the one-based identifiers 1, 2, and 3.
+      Require the candidate design to originate in the composer result rather than coordinator prose.
+      Require completed phase evidence, one verifier disposition per actual finding, and evidence-backed assessment of all three requirements.
+      Require exactly one Workflow invocation and no retry after incomplete phase evidence.
+      Require complete true and accepted true only when the actual results justify acceptance.
+      Require no file edits, shell commands, Git commands, publication, or extra host Agent dispatch.
+      Fail a proposed-only response, fabricated predecessor data, missing specialist result, malformed phase output, unsupported model claim, or premature acceptance.
+      Judge observed behavior rather than fixed wording.
