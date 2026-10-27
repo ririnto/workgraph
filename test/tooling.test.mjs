@@ -2270,3 +2270,70 @@ test("complex delivery routes only independently confirmed findings to their own
   assert.doesNotMatch(repairs[0].prompt, /second trigger/u);
   assert.equal(result.reviewHistory[0].verification.dispositions.length, 2);
 });
+
+test("delivery samples reject malformed findings and preserve review evidence", async () => {
+  await Promise.all(
+    Object.values(samplePaths).flatMap((file) =>
+      [null, { detail: "d", file: null, scenario: "s" }].map(
+        async (finding) => {
+          const { calls, result } = await runWorkflowSample(
+            file,
+            { candidateBranch: "task-branch", issue: "#1", task: "t" },
+            dispatchTable({
+              Explore: () => exploreResult,
+              Implement: () => simpleImplement,
+              Integrate: () => integrateSingle,
+              Plan: () => singleUnits,
+              Publish: () => publishCreated,
+              Review: () => ({
+                evidence: "review evidence",
+                findings: [finding],
+                verdict: "fix-required"
+              }),
+              Scope: () => scopeResult,
+              Sweep: () => sweepResult
+            })
+          );
+          assert.equal(result.complete, false);
+          assert.equal(result.review.status, "failed");
+          assert.equal(result.review.evidence, "review evidence");
+          assert.deepEqual(result.review.findings, [finding]);
+          assert.equal(
+            calls.some(({ phase }) => phase === "Verify"),
+            false
+          );
+        }
+      )
+    )
+  );
+});
+
+test("delivery finding verification uses the configured review model", async () => {
+  await Promise.all(
+    Object.values(samplePaths).map(async (file) => {
+      const { calls } = await runWorkflowSample(
+        file,
+        {
+          candidateBranch: "task-branch",
+          issue: "#1",
+          models: { review: "review-selector" },
+          task: "t"
+        },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: () => simpleImplement,
+          Integrate: () => integrateSingle,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => reviewFix,
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.equal(
+        calls.find(({ phase }) => phase === "Verify").model,
+        "review-selector"
+      );
+    })
+  );
+});

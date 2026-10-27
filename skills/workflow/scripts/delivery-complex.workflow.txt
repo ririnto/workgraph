@@ -737,7 +737,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     typeof result?.evidence === 'string' && result.evidence.trim().length > 0 &&
     Array.isArray(result?.findings) &&
     result.findings.every(finding =>
-      canonicalPath(finding?.file) === finding.file &&
+      typeof finding?.file === 'string' && canonicalPath(finding.file) === finding.file &&
       typeof finding?.detail === 'string' && finding.detail.trim().length > 0 &&
       typeof finding?.scenario === 'string' && finding.scenario.trim().length > 0) &&
     ((result?.verdict === 'pass' && result.findings.length === 0) ||
@@ -746,7 +746,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     return { reason: `Review agent failed: ${attempt.error}`, status: 'failed' }
   }
   if (!shape) {
-    return { reason: 'Review result is missing or malformed', status: 'failed' }
+    return { evidence: result?.evidence ?? null, findings: result?.findings ?? null, reason: 'Review result is missing or malformed', status: 'failed', verdict: result?.verdict ?? null }
   }
   return { evidence: result.evidence, findings: result.findings, reason: null, status: 'completed', verdict: result.verdict }
 }
@@ -763,7 +763,7 @@ const verifyFindings = async (review, integration, publication, round) => {
     `Review evidence and findings: ${JSON.stringify({ evidence: review.evidence, findings })}`,
     'Return exactly one disposition per finding with its id, status confirmed, refuted, or unverified, and nonempty evidence.',
     readOnlyPart
-  ), { label: `verify-findings:${round + 1}`, phase: 'Verify', schema: {
+  ), { label: `verify-findings:${round + 1}`, model: models.review, phase: 'Verify', schema: {
     properties: { dispositions: { items: { properties: { id: { type: 'string' }, status: { enum: ['confirmed', 'refuted', 'unverified'], type: 'string' }, evidence: { type: 'string' } }, required: ['id', 'status', 'evidence'], type: 'object' }, type: 'array' } },
     required: ['dispositions'], type: 'object'
   } })

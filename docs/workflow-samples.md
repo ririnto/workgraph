@@ -148,6 +148,7 @@ The run result retains the branch identity and state of every attempt, and a sup
 A retained resource never counts as passing evidence.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.
 A separate read-only agent verifies every `fix-required` finding before repair.
+The verifier uses the Review phase model selector, including any `args.models.review` override.
 It reports a confirmed, refuted, or unverified disposition with evidence for each finding.
 Missing, malformed, failed, or unverified dispositions block repairs and acceptance.
 Confirmed findings alone go to their owning units, bounded by `maxFixRounds`.
