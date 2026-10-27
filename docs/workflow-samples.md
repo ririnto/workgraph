@@ -108,8 +108,8 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | --- | --- | --- |
 | Scope | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
 | Explore | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
-| Plan | The scopes and exploration findings. | Work units with disjoint owned paths and instructions. |
-| Implement | One unit per agent, with matching exploration only. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
+| Plan | The scopes and any exploration findings. | Work units with disjoint owned paths and instructions. |
+| Implement | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
 | Integrate | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
 | Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
 | Publish | Completed implementation, completed integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
