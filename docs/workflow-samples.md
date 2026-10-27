@@ -45,7 +45,7 @@ Workflow({
 For a repeatable command, save a run from `/workflows`, or copy a sample source to `.claude/workflows/delivery-simple.js` or `.claude/workflows/delivery-complex.js` in the project.
 Named discovery reads `.js` files, so a copied `.workflow.txt` resource needs its `.js` destination name.
 The sample sources stay plain script bodies, so they need no wrapper, transform, dependency, or lint exception.
-The dispatching session owns the linked issue, the task branch, and the initial complete-candidate scan before it authorizes implementation, as its Delivery procedure requires.
+The dispatching session owns the task branch, initial candidate inspection, and any required issue.
 
 ## Agent Design
 
@@ -94,7 +94,7 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | Input | Contract |
 | --- | --- |
 | `task` | Required nonempty string holding the delivery goal. |
-| `issue` | Required issue reference string included in the publication and review prompts. |
+| `issue` | Optional nonempty issue reference included in the publication and review prompts. |
 | `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving acceptance. |
@@ -112,7 +112,7 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | Implement | One unit per agent, with matching exploration only. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
 | Integrate | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
 | Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
-| Publish | Completed implementation, completed integration, a clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
+| Publish | Completed implementation, completed integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
 | Review | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
 
 Implementation runs every unit in its own isolated native worktree, including a single-unit plan.

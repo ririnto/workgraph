@@ -939,7 +939,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,
-      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
@@ -1040,7 +1040,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,
-      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
@@ -1127,7 +1127,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.complex,
-      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: splitImplement,
@@ -1284,7 +1284,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     () =>
       runWorkflowSample(
         samplePaths.simple,
-        { task: "t" },
+        { issue: "", task: "t" },
         dispatchTable({ Scope: () => scopeResult })
       ),
     /args.issue/u

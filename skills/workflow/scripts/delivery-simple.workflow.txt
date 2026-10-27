@@ -33,10 +33,10 @@ if (typeof input.task !== 'string' || !input.task.trim()) {
   throw new Error('Provide the delivery goal as a nonempty args.task string')
 }
 const task = input.task
-const issue = typeof input.issue === 'string' ? input.issue.trim() : ''
-if (!issue) {
-  throw new Error('Provide the linked issue reference as a nonempty args.issue string')
+if (input.issue !== undefined && (typeof input.issue !== 'string' || !input.issue.trim())) {
+  throw new Error('Provide args.issue as a nonempty issue reference when supplied')
 }
+const issue = input.issue?.trim() ?? ''
 const baseBranch = typeof input.baseBranch === 'string' ? input.baseBranch.trim() : ''
 const candidateBranch = typeof input.candidateBranch === 'string' ? input.candidateBranch.trim() : ''
 const settingsMap = (value, name) => {
