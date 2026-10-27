@@ -109,6 +109,7 @@ Run formatting fixes only within the authorized change.
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit bodies and issue and pull request templates.
 
 Keep matching versions in both host plugin manifests using `yyyy.mm.dd.seq`.
+Include the matching plugin version bump in every plugin-source pull request.
 Follow the release procedure in `README.md`.
 Omit version fields from the marketplace and private package manifest.
 Publish only to a user-authorized destination after inspecting the diff and required evidence.
