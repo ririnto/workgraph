@@ -145,13 +145,13 @@ A cache hit avoids repeated work but does not prove acceptance.
 
 ## Use The Bundled Source
 
-Read [the sum-and-check source](../scripts/sum-check.workflow.txt) when the accepted goal requires adding supplied integers and independently checking them.
-Pass its complete text unchanged through native Workflow's inline `script` input.
+Read [the sum-and-check source](../../../workflows/sum-check.js) when the accepted goal requires adding supplied integers and independently checking them.
+Call native Workflow by its registered name `workgraph:sum-check`.
 Resolve the resource from this reference or the loaded skill directory, not the repository working directory.
 
-The `.workflow.txt` file contains a native async script body, not an importable Node module.
+The `.js` file contains a native async script body, not an importable Node module.
 Native top-level `return` conflicts with module grammar and the unchanged source lint rules.
-The text resource needs no wrapper, transform, dependency, or lint exception.
+The repository excludes these native workflow bodies from Oxc because top-level return is valid in Workflow.
 Packaging checks cover its relocation, while native execution checks its syntax and behavior.
 
 Supply the following structured arguments under Main's active host policy.
@@ -175,8 +175,8 @@ A missing, malformed, or incorrect Sum fails that partition and skips the depend
 A missing, malformed, failed, or rejecting Check leaves the accepted Sum intact and returns `complete: false`.
 Keep these incomplete outcomes instead of treating native completion as acceptance.
 
-The first invocation executes inline source, not a registered workflow name.
-The source is not registered for named discovery, and skill selection does not prove installed activation.
+The first invocation uses the registered workflow name.
+Skill selection does not prove installed activation or successful discovery.
 Do not replace the selected source run with an additional host Agent or Workflow dispatch.
 
 For an authorized continuation, edit only the returned per-run `scriptPath`, not the bundled resource.
