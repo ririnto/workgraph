@@ -972,7 +972,17 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         "Update the existing open request at https://example.invalid/pr/1"
       )
     );
-    assert.ok(calls.every((call) => call.model === undefined));
+    const models = Object.fromEntries(
+      calls.map((call) => [call.phase, call.model])
+    );
+    assert.equal(models.Scope, "opus");
+    assert.equal(models.Explore, "haiku");
+    assert.equal(models.Plan, "opus");
+    assert.equal(models.Implement, "sonnet");
+    assert.equal(models.Integrate, "sonnet");
+    assert.equal(models.Sweep, "haiku");
+    assert.equal(models.Publish, "sonnet");
+    assert.equal(models.Review, "sonnet");
     assert.ok(
       calls
         .filter((entry) => entry.phase === "Implement")
@@ -1191,7 +1201,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       calls.map((call) => [call.phase, call.model])
     );
     assert.equal(models.Scope, "haiku");
-    assert.equal(models.Plan, undefined);
+    assert.equal(models.Plan, "opus");
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
