@@ -109,7 +109,7 @@ graders:
       Main determines the complete initial candidate, including committed, staged, unstaged, and untracked content, and gives it to the scanner when nonempty.
       Main records a verified empty initial candidate without dispatching a scan and limits the result to that snapshot.
       A nonempty initial candidate receives exactly one delegated read-only exposure scan and its completed result before implementation.
-      A read-only delegate scans the complete diff for exposures before each push.
+      A read-only delegate scans the complete diff for exposures before each push, allowing reuse only while that diff remains unchanged.
       Explicitly required independent reviewers run in parallel when ready, and dependent verification receives the relevant predecessor evidence.
       Finding verification excludes both finder and fixer and receives the complete predecessor result and candidate evidence.
       Prior completed sequential reviews are preserved without being relabeled as parallel or rerun only to change timing.
