@@ -590,12 +590,15 @@ test("bundled native Workflow sources remain relocatable", (t) => {
   const root = copyPlugin(t);
   const directory = path.join(root, "workflows");
   const files = readdirSync(directory);
-  assert.deepEqual(files.toSorted(), [
-    "delivery-complex.js",
-    "delivery-simple.js",
-    "design.js",
-    "sum-check.js"
-  ]);
+  assert.deepEqual(
+    new Set(files),
+    new Set([
+      "delivery-complex.js",
+      "delivery-simple.js",
+      "design.js",
+      "sum-check.js"
+    ])
+  );
   for (const file of files) {
     assert.match(file, /\.js$/u);
     const source = realpathSync(path.join(directory, file));
