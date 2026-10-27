@@ -18,6 +18,8 @@ execution:
     State how to select tracking, review, and verification while respecting publication authority and branch protections.
     Contrast initial candidate inspection with the exposure scan before each push.
     If two independent reviewers are explicitly required, explain their coordination and evidence handoff.
+    One reviewer identifies a candidate finding and another worker fixes it.
+    Explain who verifies the finding and what they receive before it is reported as confirmed.
 
     A user approved a bounded parser fix and its normal Git Workflow delivery in an owned repository.
     The repository is authenticated, unarchived, nonfork, and has actual source development within the preceding three calendar months.
@@ -105,6 +107,7 @@ graders:
       Tracking and review follow the task, repository requirements, and risk instead of requiring an Issue or independent review universally.
       The complete initial candidate is inspected and the changed diff is scanned for exposures before each push.
       Explicitly required independent reviewers run in parallel when ready, and dependent verification receives the relevant predecessor evidence.
+      Finding verification excludes both finder and fixer and receives the complete predecessor result and candidate evidence.
       Prior completed sequential reviews are preserved without being relabeled as parallel or rerun only to change timing.
       The assessment permits A's already-authorized normal Git delivery without another stage approval.
       A can merge while B, the umbrella issue, and the older failed unit remain open.

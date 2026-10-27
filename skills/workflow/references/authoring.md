@@ -80,10 +80,10 @@ Validate every required result before starting its dependent stage.
 A malformed JSON Schema can fail before the agent runs.
 A required name missing from a schema's `properties` may not fail as expected.
 Treat schema validation as a format check, not proof of acceptance.
-Validate finding identifiers and evidence before passing candidates to a verifier when required.
+Validate finding identifiers and evidence before passing candidates to a verifier independent of the finder and fixer.
 Require a verification result for every candidate before synthesis or confirmed reporting.
 Retain confirmed, refuted, and unverified outcomes separately, including missing or inconclusive verifier results.
-Do not replace required independent verification with schema validation, majority votes, or the finder's self-check.
+Do not replace independent verification with schema validation, majority votes, or the finder's self-check.
 
 A pipeline stage that throws drops that item's result to `null` and skips its later stages.
 A parallel thunk that throws resolves to `null`, while Workflow can still finish.

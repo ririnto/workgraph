@@ -80,6 +80,7 @@ Require inspection of affected real consumers beyond the changed lines, includin
 Require concrete failure scenarios and source locations, separating introduced defects from pre-existing issues.
 Request an explicit no-findings result and coverage limits when no actionable defects remain.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.
+Give an independent verifier each candidate and the complete predecessor result before reporting findings.
 Record each finding as fixed, rejected with evidence, or deferred under the rules below.
 Do not change code solely for unsupported style requests, cleanup suggestions, or repeated resolved findings.
 Keep required human approvals distinct from agent review.

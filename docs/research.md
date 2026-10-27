@@ -741,7 +741,7 @@ It describes host permissions and separate runs for operator sign-off between st
 | --- | --- |
 | Opus 5.5 Main with ultracode. | Claude guidance defaults to Opus planning while honoring user and configuration overrides. |
 | Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Claude defaults select those roles and Workflow passes selected settings into stages with separate edit worktrees. |
-| Independent verification before every reported finding. | Main uses a separate verifier when required, and Workflow preserves per-candidate verification outcomes. |
+| Independent verification before every reported finding. | Main excludes the finder and fixer from verification, and Workflow preserves per-candidate outcomes. |
 | Two rounds without fix progress. | Fix loops compare results and reassess stalled work without waiving acceptance. |
 | Deterministic decision routing. | Native script control flow handles deterministic choices without requiring another execution engine. |
 | Diff-first approval before edits. | Explicit consumer gates end proposal work before edits and require approval for the gated scope. |

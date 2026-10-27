@@ -85,7 +85,7 @@ Try all reasonable authorized repairs, retries, and supported alternatives.
 Report each attempt, outcome, evidence, and limits honestly.
 Bound retries by new evidence, progress, and an exit condition.
 Reassess stalled work without waiving acceptance.
-Verify findings before reporting and use an independent verifier when required.
+Independently verify findings before reporting, excluding the finder and fixer.
 Label unsupported findings and unavailable or inconclusive verification unverified.
 
 ### Cleanup
