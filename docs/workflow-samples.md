@@ -97,7 +97,7 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | `issue` | Optional nonempty issue reference included in the publication and review prompts. |
 | `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference. |
-| `skips` | Optional object of boolean phase flags that skip dispatch without waiving acceptance. |
+| `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
 | `models` | Optional object of per-phase model selector strings. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds. |
@@ -135,8 +135,10 @@ The scope, exploration, and sweep stages run with the built-in read-only Explore
 
 ## Skip, Failure, And Recovery
 
-Each phase records `completed`, `skipped`, or `failed` with a reason, and the run returns `complete` only when every required phase completed and review passed.
-A skipped phase never counts as passing, so a dispatch that skips implementation or publication returns `complete: false` with the skips recorded.
+Each phase records `completed`, `skipped`, or `failed` with a reason.
+The run returns `complete` only when every required phase completed and review passed.
+Exploration may be explicitly skipped when the accepted task does not need it.
+A skipped required phase does not pass, so skipping implementation or publication returns `complete: false`.
 Integration is required after any completed implementation, so a skipped or failed integration blocks publication.
 The run result retains the branch identity and state of every attempt, and a superseded branch stays listed because the samples retire nothing.
 A retained resource never counts as passing evidence.

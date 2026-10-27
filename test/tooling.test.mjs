@@ -929,6 +929,46 @@ const reviewFix = {
 };
 const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
 
+test("delivery workflow samples allow explicitly omitted exploration", async () => {
+  await Promise.all(
+    Object.values(samplePaths).map(async (file) => {
+      const { calls, result } = await runWorkflowSample(
+        file,
+        { candidateBranch: "main", skips: { explore: true }, task: "t" },
+        dispatchTable({
+          Implement: () => simpleImplement,
+          Integrate: () => integrateSingle,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => reviewPass,
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.equal(
+        calls.some((call) => call.phase === "Explore"),
+        false
+      );
+      assert.equal(result.complete, true);
+      assert.equal(
+        result.phaseEvidence.find((record) => record.title === "Explore")
+          .status,
+        "skipped"
+      );
+      const failed = await runWorkflowSample(
+        file,
+        { candidateBranch: "main", skips: { explore: true }, task: "t" },
+        dispatchTable({ Scope: () => null })
+      );
+      assert.equal(failed.result.complete, false);
+      assert.equal(
+        failed.calls.some((call) => call.phase === "Plan"),
+        false
+      );
+    })
+  );
+});
+
 test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   for (const file of Object.values(samplePaths)) {
     const text = readFileSync(file, "utf-8");
