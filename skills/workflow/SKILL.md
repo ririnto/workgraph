@@ -53,6 +53,9 @@ If the native Workflow tool is unavailable, report that it did not run.
 
 ## Verify Results
 
+Treat failed results as incomplete.
 Check returned evidence against acceptance criteria, including required predecessor data and phase outcomes.
+A changed setting, lifecycle observation, or missing optional setup alone does not invalidate a run.
+Perform maintained setup only when the next authorized operation needs it.
 Inspect the journal when required result or completion evidence is missing or inconsistent.
 Report missing results, failed stages, skipped required work, or unverified checks.
