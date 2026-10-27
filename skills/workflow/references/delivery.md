@@ -8,9 +8,9 @@ Use only nodes allowed by the goal's scope and authority.
 
 | Node | Owner and authority | Required inputs | Result and completion evidence |
 | --- | --- | --- | --- |
-| Implementation | Main or one named Worker writes only assigned files within granted authority. | Required tracking, task branch, initial candidate, bounded scope, accepted behavior, prerequisite results, and owned paths. | Changes, relevant checks, and material limitations reflected in any required tracking. |
+| Implementation | Main or one named Worker writes only assigned files within granted authority. | Required tracking, task branch, initial candidate and required scan result, bounded scope, accepted behavior, prerequisite results, and owned paths. | Changes, relevant checks, and material limitations reflected in any required tracking. |
 | Verification | Main or one named Worker runs authorized read-only checks. | Changed behavior, expected results, and applicable existing checks. | Exact commands, outcomes, coverage, and evidence limits. |
-| Environment scan | Main or an assigned reader scans the candidate when Delivery requires a scan. | The complete candidate and scan purpose defined by Delivery. | The scan outcome and coverage limits requested by Delivery. |
+| Environment scan | An assigned read-only reader scans the candidate when Delivery requires a scan. | The complete candidate and scan purpose defined by Delivery. | The scan outcome and coverage limits requested by Delivery. |
 | Publication in Main | Main publishes only to the user-authorized destination. | Accepted changes, required checks, environment scan, working branch, and base branch. | Published branch and PR/MR URL. |
 | Review | Reviewers selected under Delivery and the active host reference inspect the complete candidate and affected consumers. | Current candidate, intent, acceptance criteria, project review instructions, and validation evidence. | Findings with failure scenarios and source evidence, or an explicit no-findings result with coverage limits and truthful review timing. |
 | Finding verification | A verifier independent of the finder and fixer checks candidates before reporting. | Complete predecessor result, candidate identifiers, evidence, affected source, and acceptance criteria. | Confirmed, refuted, or unverified outcomes for each candidate, with evidence and limits. |

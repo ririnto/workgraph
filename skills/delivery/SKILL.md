@@ -43,8 +43,12 @@ Before implementation, determine the complete initial or incoming candidate agai
 Include committed changes against the base, staged changes, unstaged changes, and every untracked non-ignored file with its full content.
 For incoming PR/MR work, include the complete incoming diff and all relevant local changes.
 Do not use ordinary `git diff` alone to verify emptiness because it omits staged-only and untracked files.
-Inspect a nonempty initial candidate for private environment details and secrets before publication.
-Record the result where the task or repository requires it.
+If Main verifies the complete candidate is empty, record that result without dispatching a scan.
+Limit the record to that snapshot without clearing later changes.
+If the candidate is nonempty, delegate exactly one read-only scan for private environment details and secrets before implementation.
+Give the scanner the complete candidate and record the result where tracking exists or the task requires it.
+For a nonempty candidate, wait for the scan result before implementation.
+If the complete candidate cannot be determined, do not treat it as empty.
 
 ## Check Before Publication
 
