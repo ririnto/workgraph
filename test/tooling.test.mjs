@@ -744,6 +744,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
     agent: (prompt, options) => {
       calls.push({
         agentType: options.agentType,
+        hasModel: Object.hasOwn(options, "model"),
         isolation: options.isolation,
         model: options.model,
         phase: options.phase,
@@ -981,16 +982,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         "Update the existing open request at https://example.invalid/pr/1"
       )
     );
-    const models = Object.fromEntries(
-      calls.map((call) => [call.phase, call.model])
-    );
-    assert.equal(models.Scope, "opus");
-    assert.equal(models.Explore, "haiku");
-    assert.equal(models.Plan, "opus");
-    assert.equal(models.Implement, "sonnet");
-    assert.equal(models.Sweep, "haiku");
-    assert.equal(models.Publish, "sonnet");
-    assert.equal(models.Review, "sonnet");
+    assert.ok(calls.every((call) => !call.hasModel));
     assert.ok(
       calls
         .filter((entry) => entry.phase === "Implement")
@@ -1188,7 +1180,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       {
         issue: "#1",
         maxFixRounds: 0,
-        models: { scope: "haiku" },
+        models: { scope: "configured-selector" },
         skips: { implement: true, integrate: true, publish: true },
         task: "t"
       },
@@ -1208,8 +1200,8 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const models = Object.fromEntries(
       calls.map((call) => [call.phase, call.model])
     );
-    assert.equal(models.Scope, "haiku");
-    assert.equal(models.Plan, "opus");
+    assert.equal(models.Scope, "configured-selector");
+    assert.equal(models.Plan, undefined);
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );

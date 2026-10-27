@@ -37,7 +37,7 @@ graders:
     criteria: |-
       Require Main's contract and selected Claude reference to be loaded before delegation.
       Require one completed Agent assessment that receives both batches and applies the timeout rule.
-      The assessment ends in one phase without an expected follow-up, so Main uses direct Agent rather than Workflow.
+      The explicit assignment uses direct Agent and ends in one phase without an expected follow-up.
       Main must use that worker's actual result to identify the blockers.
       An irrelevant Agent call, missing worker result, or report before completion fails this check.
       The final report identifies A1 and B2 as the only blockers.

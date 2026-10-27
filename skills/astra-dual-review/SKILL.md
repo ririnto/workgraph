@@ -58,7 +58,7 @@ A new target requires a separate authorized unit.
 
 ## Dispatch Two Independent Passes
 
-Start one fresh Codex reviewer through herdr agents and one fresh Claude reviewer.
+Start one fresh Codex reviewer and one fresh Claude reviewer through their supported host controls.
 Run them concurrently when both hosts and their required resources are available.
 Keep one host-control owner per reviewer and verification session.
 Do not expose one reviewer's candidates to the other before its pass ends.

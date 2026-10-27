@@ -2,21 +2,18 @@
 
 ## Establish the owner path
 
-Confirm that the caller runs inside herdr before issuing control commands.
-Without `HERDR_ENV=1`, stop cleanup, preserve selected resources, and report that the owner path is unavailable.
-Inspect `herdr --help` and `herdr agent` for the installed command contract.
-Resolve the authorized resource owner to an existing live agent name or pane ID from supported herdr inventory.
+Resolve the authorized resource owner through the available host's supported inventory and controls.
+If an authorized owner path is unavailable, preserve selected resources and report the limitation.
 Do not infer ownership from a focused pane, resource membership, or an idle agent.
 
-Use supported `herdr agent prompt` operations to give that owner the cleanup request and exact permitted scope.
+Give the owner the cleanup request and exact permitted scope through supported controls.
 Include selected resources, protected resources, preservation requirements, affected descendants, and required readbacks.
-Collect the owner's result through supported `herdr agent get` and `herdr agent read` operations.
-Use supported `herdr agent wait` operations when waiting for an existing request.
+Collect the owner's result and wait for existing requests through supported controls.
 Prompt submission and settled agent state do not prove cleanup completion.
 After a failed or timed-out request, inspect the owner's result and affected state before resubmitting.
 
 Require the owner to verify the installed operation's support, permissions, affected resources, and preservation effects before mutation.
-Herdr agent operations carry requests and results without establishing native archive, deletion, or attachment support.
+Request and result controls do not establish native archive, deletion, or attachment support.
 Reference source from another version does not establish installed behavior.
 Do not create a permanent polling service or scheduler for cleanup.
 

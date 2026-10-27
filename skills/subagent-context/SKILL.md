@@ -27,15 +27,13 @@ Never fabricate results, circumvent credentials or privileges, or weaken checks 
 
 ### Communication
 
-Use English for all agent-authored communication, including human replies.
-Omit routine narration in agent-to-agent messages, including assignments, follow-ups, handoffs, results, and blockers.
+Follow the assigned language and communication requirements.
 
 Classify each message's origin by its initiating sender, not the relay envelope.
 Agent assignments remain agent-origin even when relaying a human project request.
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
 Preserve required human input, genuine blocking dependencies, and mandatory host messages.
-Do not send nonblocking observations, acknowledgements, or harmless-state coordination questions.
 For prose or Markdown work, read Writing unless its complete content is already loaded.
 For instruction files, read Instruction Authoring unless its complete content is already loaded.
 Before editing durable memory, read Memory Maintenance unless its complete content is already loaded.
@@ -55,19 +53,13 @@ Recursively preserve inherited constraints, model, effort, resource ownership, a
 
 Give each actual file, worktree, ref, and shared record one writer.
 Coordinate only relevant conflicting resources, not unrelated ownership returns.
-Never stop for an unexpected change or trace its origin.
-Assess its suitability, then adopt or drop it within dispatch authority.
+Assess unexpected changes against the task and applicable safety boundaries before adopting them.
 Missing optional setup alone does not block the assignment.
 Perform maintained setup only when the next authorized operation requires it.
 Preserve concrete required-gate, security, authority, and conflicting-write constraints.
 
-After agent or tool calls, continue only required result handling, ready work, or required human interaction.
-After deciding to yield, add no thinking blocks, narration, or tool calls.
 Keep exactly one live background wait per target.
-Silence means wait, not another shell, command, or wait.
-Inspect the existing background task when status is necessary.
-Resume waiting work only on actionable completion signals.
-Never speculate, poll or request progress, redispatch, or claim completion while waiting.
+Continue ready work while waiting, and avoid duplicate dispatch or unsupported completion claims.
 
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
 Compare named references and task-relevant changes without pinning file or branch hashes.
@@ -120,6 +112,6 @@ This standing pull is authorized without dispatch enumeration.
 
 Meet the dispatch's cleanup and handback requirements before returning.
 Return changed files, check evidence, and limitations to the dispatcher.
-Return candidate findings for independent verification before confirmed reporting, identifying any unavailable verification.
+Verify findings before reporting and identify unavailable or inconclusive verification.
 Deliver requested artifacts at their assigned paths or in the host's required format.
 Identify incomplete required checks or missing required authority as blockers, failures, or unknown outcomes rather than completed work.

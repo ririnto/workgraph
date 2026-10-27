@@ -9,10 +9,9 @@ Use this skill in the main session.
 
 ## Confirm Repository Eligibility
 
-Before source changes or publication, verify authenticated metadata for an unarchived nonfork repository.
-Require evidence of meaningful development within the preceding three calendar months.
-Inspect actual source changes rather than relying on `pushedAt`, orchestration records, or template-only activity.
-If eligibility is unverified or unmet, stop repository writes and report the missing evidence.
+Before repository writes, verify the target, access, and authorization required for the operation.
+Respect repository protections and explicit restrictions on destinations or forks.
+If required access or authority is unverified, stop affected writes and report the missing evidence.
 
 ## Plan Delivery Units
 
@@ -21,8 +20,7 @@ Keep coupled work together when splitting prevents independent verification or m
 Avoid tiny phases and stacked PRs that require repeated rebases.
 Publish, review, and integrate each ready unit within granted authority.
 Setup waits until an authorized operation needs it.
-A clear approved Git task includes implementation, checks, Issue/MR/PR creation, comments, normal merge, readback, and owned cleanup.
-Complete those operations without renewed stage approval or repeated permission questions.
+Complete authorized Git operations and required checks without repeated permission questions.
 Preserve explicit user gates, new-scope boundaries, and authorization limits for irreversible actions.
 Git delivery does not authorize deployment, credential handling, live assets, forks, or upstream destinations.
 
@@ -35,30 +33,24 @@ Use named branch references and current PR changes, not fixed commit hashes.
 
 ## Make Development Progress Visible
 
-Follow this sequence for new units: Issue creation -> branch creation -> initial diff handling -> implementation -> parallel reviews -> normal merge.
-Create or reuse a relevant Issue and record its link before branch creation or implementation.
-For in-flight work without an Issue, establish one with its truthful stage before the next source action.
+Follow the task's and repository's tracking and delivery requirements.
+Create or reuse an issue when the task or repository requires one.
 Do not restart completed work.
-Keep its current stage, completed evidence, material blockers, branch and PR/MR links, and next action current as work changes.
+When tracking work, keep its stage, evidence, blockers, links, and next action current.
 Report actual completed stages rather than guessed percentages.
 
 Before implementation, determine the complete initial or incoming candidate against its named base.
 Include committed changes against the base, staged changes, unstaged changes, and every untracked non-ignored file with its full content.
 For incoming PR/MR work, include the complete incoming diff and all relevant local changes.
 Do not use ordinary `git diff` alone to verify emptiness because it omits staged-only and untracked files.
-Skip delegation only when Main verifies that the complete candidate contains no changed paths or content.
-Record the empty result in the task's Issue, without claims about later changes.
-If the complete candidate contains content, delegate exactly one brief scan for user environment details and secrets.
-Provide the complete candidate to the Explorer.
-If any candidate part cannot be inspected or compared with its named base, do not use the empty-diff fast path.
-Obtain the complete candidate before deciding whether to skip the scan.
-Preserve completed valid work without fabricating an earlier scan or review.
+Inspect a nonempty initial candidate for private environment details and secrets before publication.
+Record the result where the task or repository requires it.
 
 ## Check Before Publication
 
 Inspect changed files and required evidence before publishing to the authorized base.
 
-Before each branch push, delegate a brief diff scan for user environment details and secrets only to an exploration agent.
+Before each branch push, scan the complete diff for user environment details and secrets.
 Commit author and committer names and email addresses are contributor information, not environment details or secrets.
 Do not report, flag, rewrite, or block on contributor names or email addresses in commit metadata.
 Reuse a scan only while its diff remains unchanged.
@@ -75,11 +67,10 @@ Create local evidence only when a current check, failure investigation, or recov
 ## Review And Publish
 
 Use project roles or the user's statement to determine whether the user maintains the project.
-Cover each complete delivery unit with independent review, without multiplying review by domain and phase.
+Review each complete delivery unit at the depth required by the task and its risks.
 Select reviewer staffing and effort from the active Main host reference and explicit user requirements.
 Run selected independent reviewers in parallel when there is more than one.
-For maintainers, create the PR/MR before reviewing its complete current changes.
-For contributors, review the complete working branch before creating the PR/MR.
+Follow required repository review timing and any requested independent review.
 Keep completed valid reviews without mislabeling sequential work as parallel or restarting it solely to change timing.
 
 Reuse an existing PR/MR for the unit.
@@ -89,7 +80,6 @@ Require inspection of affected real consumers beyond the changed lines, includin
 Require concrete failure scenarios and source locations, separating introduced defects from pre-existing issues.
 Request an explicit no-findings result and coverage limits when no actionable defects remain.
 Verify review candidates against requirements, source, or checks, then classify confirmed findings.
-Give an independent verifier each candidate and the complete predecessor result before reporting findings.
 Record each finding as fixed, rejected with evidence, or deferred under the rules below.
 Do not change code solely for unsupported style requests, cleanup suggestions, or repeated resolved findings.
 Keep required human approvals distinct from agent review.
@@ -125,7 +115,7 @@ Integrate after current-unit checks pass, confirmed blockers are resolved, and r
 Require only relevant resource returns, not unrelated global ownership returns.
 Finish delivery by reading back the named authorized base branch after normal merge.
 After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
-For a project that manages a plugin, read `references/plugin-updates.md` after the plugin's merge and base update.
+For an authorized plugin update, read `references/plugin-updates.md` after the plugin's merge and base update.
 Complete already-authorized task-owned cleanup without renewed stage approval.
 
 Before native retirement with retained work, use a supported non-destructive keep operation and verify worktree detachment.
