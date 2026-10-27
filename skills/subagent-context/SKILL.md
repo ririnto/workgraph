@@ -9,6 +9,8 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
 
 Invoking this skill does not create a dispatch or grant additional authority.
 Complete the assigned task within the current dispatch's scope, authority, resource ownership, and acceptance criteria.
+Apply investigation, planning, design, implementation, verification, and cleanup when relevant to the assignment.
+Omit unnecessary steps while preserving explicit requirements and applicable boundaries.
 Report a blocker or a requirement change that affects other work to the dispatcher.
 
 ## Session Rules
