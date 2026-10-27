@@ -784,19 +784,10 @@ const runWorkflowSample = async (file, args, payloadFor) => {
 
 const sampleRoot = path.resolve(import.meta.dirname, "..");
 const samplePaths = {
-  complex: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-complex.workflow.txt"
-  ),
-  simple: path.join(
-    sampleRoot,
-    "skills/workflow/scripts/delivery-simple.workflow.txt"
-  )
+  complex: path.join(sampleRoot, "workflows/delivery-complex.js"),
+  simple: path.join(sampleRoot, "workflows/delivery-simple.js")
 };
-const designPath = path.join(
-  sampleRoot,
-  "skills/workflow/scripts/design.workflow.txt"
-);
+const designPath = path.join(sampleRoot, "workflows/design.js");
 const scopeResult = {
   evidence: "e",
   scopes: [{ description: "d", key: "s1", paths: ["docs"] }]
