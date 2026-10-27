@@ -928,6 +928,28 @@ const reviewFix = {
 };
 const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
 
+test("delivery samples reject a passing review with unresolved findings", async () => {
+  await Promise.all(
+    Object.values(samplePaths).map(async (file) => {
+      const { result } = await runWorkflowSample(
+        file,
+        { candidateBranch: "main", issue: "#1", maxFixRounds: 0, task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: () => simpleImplement,
+          Integrate: () => integrateSingle,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => ({ ...reviewFix, verdict: "pass" }),
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.equal(result.complete, false);
+    })
+  );
+});
+
 test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   for (const file of Object.values(samplePaths)) {
     const text = readFileSync(file, "utf-8");

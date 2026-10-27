@@ -733,7 +733,8 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
       typeof finding?.file === 'string' && finding.file.trim().length > 0 &&
       typeof finding?.detail === 'string' && finding.detail.trim().length > 0 &&
       typeof finding?.scenario === 'string' && finding.scenario.trim().length > 0) &&
-    (result?.verdict === 'pass' || result?.verdict === 'fix-required')
+    ((result?.verdict === 'pass' && result.findings.length === 0) ||
+      (result?.verdict === 'fix-required' && result.findings.length > 0))
   if (attempt.error !== undefined) {
     return { reason: `Review agent failed: ${attempt.error}`, status: 'failed' }
   }
