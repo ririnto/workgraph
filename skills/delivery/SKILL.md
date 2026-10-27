@@ -54,7 +54,7 @@ If the complete candidate cannot be determined, do not treat it as empty.
 
 Inspect changed files and required evidence before publishing to the authorized base.
 
-Before each branch push, scan the complete diff for user environment details and secrets.
+Before each branch push, delegate a read-only scan of the complete diff for user environment details and secrets.
 Commit author and committer names and email addresses are contributor information, not environment details or secrets.
 Do not report, flag, rewrite, or block on contributor names or email addresses in commit metadata.
 Reuse a scan only while its diff remains unchanged.
