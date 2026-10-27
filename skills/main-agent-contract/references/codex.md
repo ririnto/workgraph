@@ -19,21 +19,22 @@ Route cleanup through the authorized resource owner and supported herdr agent op
 
 ## Model Selection
 
-Select each model family's supported ID from the active host's catalog.
-Use `luna` for clear tasks, including development, review, document analysis, and multistep agentic work.
-Use `sol` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
-Call `astra` only at the user's explicit request.
+For native Codex spawning, use the model ID the tool lists for the selected alias at call time.
+Keep the alias as the recorded label.
+Use `luna` (alias) for clear tasks, including development, review, document analysis, and multistep agentic work.
+Use `sol` (alias) when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
+Call `astra` (alias) only at the user's explicit request.
 Start with one independent reviewer, adding depth or specialists for costly or uncovered failure modes.
 
 | Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `luna` | Simple exploration and extraction | Use `low`. |
+| `luna` (alias) | Simple exploration and extraction | Use `low`. |
 | | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
 | | Other clear analysis and agentic work | Use `medium`, or `high` for harder tasks. |
-| `sol` | Simple queries, conversions, and extraction | Use `low`. |
+| `sol` (alias) | Simple queries, conversions, and extraction | Use `low`. |
 | | Ordinary development, review, and document analysis | Use `medium`. |
 | | Complex debugging, algorithms, and architecture | Use `high`. |
-| `astra` | Bounded work | Use `low`. |
+| `astra` (alias) | Bounded work | Use `low`. |
 | | Difficult terminal repairs or agentic work | Use `medium`, or `xhigh` for harder tasks. |
 | | The hardest reasoning | Use `max`. |
 
