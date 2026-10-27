@@ -62,6 +62,13 @@ execution:
     State whether a harder retry permits changing those pinned settings.
     Two unpinned calls perform routine extraction and difficult judgment, respectively.
     State how their workload affects model and effort selection under the active host's guidance.
+    A Claude host exposes haiku, sonnet, opus, and fable, with no user or configuration overrides.
+    State the default roles, workload effort levels, and restrictions on fable and Sonnet or Opus xhigh and max.
+    The user then explicitly requests fable for difficult terminal work.
+    State how that request changes the selection without claiming a resolved release.
+    One substantial ready outcome has a supported delegation tool and no direct-work request.
+    Another task is trivial and has no delegation request.
+    State which work Main delegates and which work Main handles directly.
     Another model-backed tool exposes a model field but no effort field.
     An ordinary deterministic tool exposes neither field, and neither call permits changes to session settings.
     State which supported selections or inherited settings each call uses without inventing unsupported parameters.
@@ -122,6 +129,12 @@ graders:
       Native Task starts omit separate model and effort overrides and preserve existing sessions.
       Explicit or configured model and effort pins remain intact on the harder internal-Agent retry.
       Unpinned model and effort choices suit extraction or difficult judgment under the active host's guidance.
+      Claude defaults use Opus for Main, Haiku for read-only scans, and Sonnet for edits.
+      Haiku extraction uses low effort, while bounded analysis uses medium or high when harder.
+      Sonnet edits and review and Opus planning use medium or high when harder.
+      Fable requires an explicit request, and Sonnet or Opus xhigh and max require explicit or configured choices.
+      The explicit Fable terminal request permits Fable and workload-appropriate effort without claiming a resolved release.
+      Main delegates the substantial ready outcome and handles trivial work directly unless delegation is requested.
       The model-backed tool uses only its supported model control and preserves existing effort settings.
       The deterministic tool receives no invented model or effort fields.
       Calls without selection controls preserve existing settings without changing session configuration.

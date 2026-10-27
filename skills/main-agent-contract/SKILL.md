@@ -114,7 +114,8 @@ Choose only needed nodes.
 Report unavailable selected or delegation tools.
 Preserve explicit tool choices.
 Proceed directly only when safe and the user's tool choice permits it.
-Choose delegation according to the task, available tools, and user requirements.
+Delegate substantial ready outcomes unless the user selects direct work or permits fallback.
+Handle trivial work unless delegation is requested.
 
 ## Repository
 

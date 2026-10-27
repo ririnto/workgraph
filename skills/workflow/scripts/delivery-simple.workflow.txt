@@ -28,6 +28,16 @@ const phaseTitles = {
   scope: 'Scope',
   sweep: 'Sweep'
 }
+const defaultModels = {
+  explore: 'haiku',
+  implement: 'sonnet',
+  integrate: 'sonnet',
+  plan: 'opus',
+  publish: 'sonnet',
+  review: 'sonnet',
+  scope: 'opus',
+  sweep: 'haiku'
+}
 const input = args === null || typeof args !== 'object' || Array.isArray(args) ? {} : args
 if (typeof input.task !== 'string' || !input.task.trim()) {
   throw new Error('Provide the delivery goal as a nonempty args.task string')
@@ -75,7 +85,7 @@ for (const key of phaseKeys) {
     throw new Error(`Provide promptParts.${key} as a nonempty instruction string`)
   }
   skipped[key] = skip === true
-  models[key] = model
+  models[key] = model ?? defaultModels[key]
   promptParts[key] = part ?? ''
 }
 let maxFixRounds = defaultFixRounds
@@ -145,7 +155,7 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
 ), {
   agentType: 'Explore',
   label: 'scope',
-  ...(models.scope === undefined ? {} : { model: models.scope }),
+  model: models.scope,
   phase: 'Scope',
   schema: {
     properties: {
@@ -217,7 +227,7 @@ if (phaseRecords.scope?.status !== 'completed') {
     ), {
       agentType: 'Explore',
       label: `explore:${scope.key}`,
-      ...(models.explore === undefined ? {} : { model: models.explore }),
+      model: models.explore,
       phase: 'Explore',
       schema: {
         properties: {
@@ -278,7 +288,7 @@ if (phaseRecords.explore?.status !== 'completed' && !(skipped.explore && phaseRe
     promptParts.plan
   ), {
     label: 'plan',
-    ...(models.plan === undefined ? {} : { model: models.plan }),
+    model: models.plan,
     phase: 'Plan',
     schema: {
       properties: {
@@ -350,7 +360,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     const options = {
       isolation: 'worktree',
       label: `implement:${unit.key}${roundLabel}`,
-      ...(models.implement === undefined ? {} : { model: models.implement }),
+      model: models.implement,
       phase: 'Implement',
       schema: {
         properties: {
@@ -465,7 +475,7 @@ const dispatchIntegration = async currentUnits => {
     promptParts.integrate
   ), {
     label: 'integrate',
-    ...(models.integrate === undefined ? {} : { model: models.integrate }),
+    model: models.integrate,
     phase: 'Integrate',
     schema: {
       properties: {
@@ -583,7 +593,7 @@ const dispatchSweep = async () => {
   ), {
     agentType: 'Explore',
     label: 'sweep',
-    ...(models.sweep === undefined ? {} : { model: models.sweep }),
+    model: models.sweep,
     phase: 'Sweep',
     schema: {
       properties: {
@@ -639,7 +649,7 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
     promptParts.publish
   ), {
     label: 'publish',
-    ...(models.publish === undefined ? {} : { model: models.publish }),
+    model: models.publish,
     phase: 'Publish',
     schema: {
       properties: {
@@ -692,7 +702,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     promptParts.review
   ), {
     label: 'review',
-    ...(models.review === undefined ? {} : { model: models.review }),
+    model: models.review,
     phase: 'Review',
     schema: {
       properties: {

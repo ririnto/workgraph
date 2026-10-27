@@ -88,7 +88,7 @@ Writing defers to the active role's policy.
 
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
-Host references supply host-specific execution guidance without imposing model defaults.
+Host references supply task defaults and escalation conditions without requiring model comparisons or benchmark evaluations during consumer sessions.
 Worker model selection stays in the dispatch, without a model-policy reference.
 Each role has separate host references because Main and Worker load at different execution stages.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](research.md#model-effort-and-cost).

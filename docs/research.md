@@ -323,7 +323,7 @@ Luna's bundled prompt also restricts tests unless the user requests testing or v
 Sol and Astra instead direct appropriate checks.
 Workgraph does not reproduce those changing host rules.
 
-The skills retain role ownership and follow the user's communication and model-selection requirements.
+The skills retain role ownership and host-specific model-family defaults, honoring user communication and model-selection requirements.
 Runtime references use family names rather than pinned release identifiers.
 Research records retain the measured releases so benchmark results keep their original meaning.
 They retain dependency routing, one writer per resource, delegated Git grants, publication privacy, and the shared-history restriction.
@@ -739,8 +739,8 @@ It describes host permissions and separate runs for operator sign-off between st
 
 | Supplied requirement | Workgraph adoption |
 | --- | --- |
-| Opus 5.5 Main with ultracode. | Workgraph follows user and host model settings without prescribing this configuration. |
-| Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Workgraph accepts supported model settings without prescribing this split. |
+| Opus 5.5 Main with ultracode. | Claude guidance defaults to Opus planning while honoring user and configuration overrides. |
+| Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Claude defaults select those roles and Workflow passes selected settings into stages with separate edit worktrees. |
 | Independent verification before every reported finding. | Main uses a separate verifier when required, and Workflow preserves per-candidate verification outcomes. |
 | Two rounds without fix progress. | Fix loops compare results and reassess stalled work without waiving acceptance. |
 | Deterministic decision routing. | Native script control flow handles deterministic choices without requiring another execution engine. |
@@ -755,9 +755,9 @@ A separate source-adoption authorization permits its specified source delivery w
 No quoted example grants permission to change live models, ultracode, credentials, permissions, or plugin activation.
 Main ownership, complete-candidate review, and normal Delivery integration boundaries remain required.
 
-The post's model split is not a universal Workflow default or measured performance ranking.
+The model split is Workgraph guidance inspired by the post, not an official universal Workflow default or measured performance ranking.
 Provider routing and model overrides can resolve aliases differently, so requested names do not prove resolved releases.
-Codex uses its supported host controls and cannot execute Claude's native Workflow.
+Codex keeps its own host model policy and cannot execute Claude's native Workflow.
 The post's throughput and cost claims are unverified here, and script-held results do not eliminate planning or worker costs.
 Schema validity does not establish factual correctness or replace an independent verifier.
 Native schema retries, stall restarts, inference sampling, and task retries remain separate from the no-progress fix-round count.
