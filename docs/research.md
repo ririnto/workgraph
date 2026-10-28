@@ -84,7 +84,7 @@ These recommendations guide instruction design without changing model or API con
 The fetched [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) lists `low`, `medium`, `high`, `xhigh`, and `max` effort settings, with `medium` as the default.
 It does not support `none` or `minimal` effort.
 We confirm supported settings from the model page.
-Main's [Codex](../skills/main-agent-contract/references/codex.md#model-selection) and [Claude Code](../skills/main-agent-contract/references/claude.md#model-selection) references own operational selection defaults and escalation conditions.
+Main's [Codex](../skills/main-agent-contract/references/codex.md#model-selection) and [Claude Code](../skills/main-agent-contract/references/claude-code.md#model-selection) references own operational selection defaults and escalation conditions.
 Consumer sessions do not need model comparisons or benchmark evaluations.
 Maintainers use model-specific benchmark and workload evidence when revising these defaults.
 Instruction text does not configure the host or establish model adherence.

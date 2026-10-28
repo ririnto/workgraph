@@ -1,9 +1,11 @@
 ---
 name: astra-dual-review
-description: "Use for an explicit cross-host review and adjudication request, ending with verified issue handoffs before implementation."
+description: "Use in a main session for an explicit cross-host review and adjudication request, ending with verified issue handoffs before implementation."
 ---
 
 # Astra Dual Review
+
+Use this skill in a main session.
 
 ## Outcome And Role
 
@@ -36,7 +38,7 @@ Continue independent permitted work while an affected action remains blocked.
 
 Use [Development](../development/SKILL.md) for source-review criteria unless fully loaded.
 Use [Verification](../verification/SKILL.md) for additional behavioral checks unless fully loaded.
-In Claude Code, use the [Claude host reference](../main-agent-contract/references/claude.md) unless fully loaded.
+In Claude Code, use the [Claude host reference](../main-agent-contract/references/claude-code.md) unless fully loaded.
 In Codex, use the [Codex host reference](../main-agent-contract/references/codex.md) unless fully loaded.
 Resolve required bundled skill paths at invocation and include them in each reviewer brief.
 Keep all required instruction links inside this plugin.
@@ -64,7 +66,7 @@ Keep one host-control owner per reviewer and verification session.
 Do not expose one reviewer's candidates to the other before its pass ends.
 Do not cancel a valid running review to replace it with a preferred configuration.
 
-Preserve configured native models unless the administrator assigns an explicit override for this work.
+Preserve configured native models unless an explicit assignment override covers this work.
 Use an assigned override only through the supported host mechanism.
 Record requested and host-exposed resolved settings without inventing reviewer identity.
 Do not substitute one host for the other and claim cross-host coverage.
@@ -95,15 +97,9 @@ Collect both complete reviewer results.
 Keep missing or failed passes visible as incomplete coverage.
 Do not treat model agreement as proof.
 
-Assign separate verification agents to check candidates independently of their finders and source fixers.
-As manager, inspect each candidate against the actual source and owning requirement.
+Verify each candidate under the Main Agent Contract's independent-verification rules, excluding its finders and source fixers.
 Use the narrowest permitted existing check when source inspection cannot settle the claim.
-Do not rely on the finding author's summary as verification.
-Do not fix the code to prove the finding.
-
-Keep the manager separate from the candidate finder and source fixer.
-If the manager cannot supply independent verification, mark the candidate unverified.
-Do not register it as a confirmed defect.
+Mark a candidate without independent verification unverified, and do not register it as a confirmed defect.
 
 Merge duplicate candidates while retaining their evidence and origins in the private handback.
 Assign each candidate one disposition:

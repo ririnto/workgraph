@@ -54,6 +54,16 @@ const readInstruction = (file, stripFrontmatter) => {
   }
 };
 
+/**
+ * Map each supported host to its bundled reference filename.
+ * Avoid name stems that a host resolves as its automatic memory file.
+ * @type {Record<string, string>}
+ */
+const hostReferenceFiles = {
+  claude: "claude-code.md",
+  codex: "codex.md"
+};
+
 if (process.argv.length !== 4) {
   fail("expected exactly one hook event and one host", 2);
 }
@@ -67,7 +77,10 @@ if (host !== "claude" && host !== "codex") {
 const role =
   event === "SessionStart" ? "main-agent-contract" : "subagent-context";
 const skill = readInstruction(`${role}/SKILL.md`, true);
-const reference = readInstruction(`${role}/references/${host}.md`, false);
+const reference = readInstruction(
+  `${role}/references/${hostReferenceFiles[host]}`,
+  false
+);
 const skillContext =
   host === "claude"
     ? `Workgraph source paths are relative to the skill base directory below.\nWorkgraph instructions loaded from ${path.basename(skill.source)}.\nThe active execution host is Claude Code.\nThe complete skill body is already loaded below, without YAML frontmatter.\n\nBase directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body.trimStart()}`

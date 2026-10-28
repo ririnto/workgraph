@@ -24,6 +24,7 @@ const roles = [
   ["SubagentStart", "subagent-context"]
 ];
 const hosts = ["claude", "codex"];
+const hostReferenceFiles = { claude: "claude-code.md", codex: "codex.md" };
 const hookTimeoutMilliseconds = 5000;
 
 const runHook = (args, scriptPath = script, cwd = tmpdir()) =>
@@ -80,7 +81,7 @@ const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
     event === "SessionStart" ? "main-agent-contract" : "subagent-context";
   const source = realpathSync(path.join(rootSkills, name, "SKILL.md"));
   const reference = realpathSync(
-    path.join(rootSkills, name, "references", `${host}.md`)
+    path.join(rootSkills, name, "references", hostReferenceFiles[host])
   );
   const content = readFileSync(source, "utf-8");
   const guidance = readFileSync(reference, "utf-8");
@@ -191,9 +192,9 @@ test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) =>
         content.replaceAll("\n", newline)
       );
       writeFileSync(
-        path.join(root, "skills", name, "references", "claude.md"),
+        path.join(root, "skills", name, "references", "claude-code.md"),
         readFileSync(
-          path.join(skills, name, "references", "claude.md"),
+          path.join(skills, name, "references", "claude-code.md"),
           "utf-8"
         ).replaceAll("\n", newline)
       );
@@ -256,7 +257,13 @@ test("configured Claude hooks load relocated skills and references with LF or CR
       );
       for (const host of hosts) {
         writeFileSync(
-          path.join(root, "skills", name, "references", `${host}.md`),
+          path.join(
+            root,
+            "skills",
+            name,
+            "references",
+            hostReferenceFiles[host]
+          ),
           `\n# Only ${host}\n\nUse ${host} guidance.\n`.replaceAll(
             "\n",
             newline
@@ -301,7 +308,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
     writeFileSync(path.join(root, "skills", name, "SKILL.md"), raw);
     for (const host of hosts) {
       writeFileSync(
-        path.join(root, "skills", name, "references", `${host}.md`),
+        path.join(root, "skills", name, "references", hostReferenceFiles[host]),
         guidance
       );
       const source = realpathSync(path.join(root, "skills", name, "SKILL.md"));
@@ -315,7 +322,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
           ? `Base directory for this skill: ${path.dirname(source)}\n\n${body}`
           : `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${raw}\n</skill>`;
       const referenceSource = realpathSync(
-        path.join(root, "skills", name, "references", `${host}.md`)
+        path.join(root, "skills", name, "references", hostReferenceFiles[host])
       );
       const reference = `\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(source), referenceSource) : referenceSource}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`;
       assert.deepEqual(JSON.parse(result.stdout), {
@@ -332,11 +339,11 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
   const root = copyPlugin(t);
   for (const file of [
     "main-agent-contract/SKILL.md",
-    "main-agent-contract/references/claude.md",
+    "main-agent-contract/references/claude-code.md",
     "main-agent-contract/references/codex.md",
     "subagent-context/SKILL.md",
     "subagent-context/references/codex.md",
-    "subagent-context/references/claude.md"
+    "subagent-context/references/claude-code.md"
   ]) {
     const target = path.join(root, "skills", file);
     const source = file.includes("/references/")
@@ -388,7 +395,7 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
                 ? "main-agent-contract"
                 : "subagent-context",
               "references",
-              "claude.md"
+              "claude-code.md"
             )
           )
         ]);
@@ -474,12 +481,13 @@ for (const [event, name] of roles) {
     });
     for (const host of hosts) {
       const unselected = host === "claude" ? "codex" : "claude";
+      const unselectedFile = hostReferenceFiles[unselected];
       const target = path.join(
         root,
         "skills",
         name,
         "references",
-        `${unselected}.md`
+        unselectedFile
       );
       const content = readFileSync(target, "utf-8");
       rmSync(target);
@@ -499,7 +507,7 @@ for (const [event, name] of roles) {
       assert.doesNotMatch(
         context,
         new RegExp(
-          `${otherRole}/references|${name}/references/${unselected}\\.md`,
+          `${otherRole}/references|${name}/references/${unselectedFile.replaceAll(".", "\\.")}`,
           "u"
         )
       );
@@ -575,7 +583,7 @@ test("bundled skills retain invocation metadata and supporting reference files",
     if (name === "delivery") {
       for (const host of hosts) {
         const reference = realpathSync(
-          path.join(directory, "references", `${host}.md`)
+          path.join(directory, "references", hostReferenceFiles[host])
         );
         assert.ok(
           reference.startsWith(`${realpathSync(directory)}${path.sep}`)
@@ -592,11 +600,7 @@ test("bundled native Workflow sources remain relocatable", (t) => {
   const files = readdirSync(directory);
   assert.deepEqual(
     new Set(files),
-    new Set([
-      "delivery-complex.js",
-      "delivery-simple.js",
-      "design.js"
-    ])
+    new Set(["delivery-complex.js", "delivery-simple.js", "design.js"])
   );
   for (const file of files) {
     assert.match(file, /\.js$/u);
@@ -693,7 +697,7 @@ for (const [event, name] of roles) {
   for (const host of hosts) {
     test(`${name} ${host}: missing, empty, or unreadable host reference produces no partial output`, (t) => {
       const root = copyPlugin(t);
-      const file = `${name}/references/${host}.md`;
+      const file = `${name}/references/${hostReferenceFiles[host]}`;
       const target = path.join(root, "skills", file);
       const copiedScript = path.join(root, "hooks", "inject-context.mjs");
       rmSync(target);

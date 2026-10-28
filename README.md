@@ -77,7 +77,7 @@ Conditional skills load only when their stated task scope matches and their comp
 | --- | --- | --- |
 | Mode and Main role | [Main Agent Contract](skills/main-agent-contract/SKILL.md) | Main follows this contract for complete authorized outcomes. |
 | Worker role | [Subagent Context](skills/subagent-context/SKILL.md) | Dispatched agents follow bounded assignments and return evidence. |
-| Host reference | Each role's `references/claude.md` or `references/codex.md` | The hook selects the active role and host together. |
+| Host reference | Each role's `references/claude-code.md` or `references/codex.md` | The hook selects the active role and host together. |
 | Development router | [Development](skills/development/SKILL.md) | Source work selects the matching lifecycle playbook and language references. |
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Behavior principle | [Preserve Behavior](skills/principle-preserve-behavior/SKILL.md) | Behavior-preserving transformations load semantic, evaluation-order, and side-effect guidance. |
