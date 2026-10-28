@@ -26,16 +26,18 @@ For native Codex invocations, use the host-confirmed full model ID, never a bare
 
 | Tier alias | Difficulty | Effort guidance |
 | --- | --- | --- |
-| `luna` (light) | Trivial to harder bounded work. | Use low for simple work, medium or high for harder work, or the supported maximum when permitted. |
-| `terra` (middle) | Harder tasks. | Use medium or high effort. |
-| `sol` (strong) | The hardest reasoning and judgment. | Use medium or high effort. |
-| `astra` | Explicit request only. | Follow the request and host support. |
+| `luna` | Simple exploration and extraction | Use `low`. |
+| | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
+| | Other clear analysis and agentic work | Use `medium`, or `high` for harder tasks. |
+| `terra` | Substantive coding and refactoring | Use `medium`, or `high` for harder tasks. |
+| `sol` | Simple queries, conversions, and extraction | Use `low`. |
+| | Ordinary development, review, and document analysis | Use `medium`. |
+| | Complex debugging, algorithms, and architecture | Use `high`. |
+| `astra` | Explicit request only | Follow the request. |
 
 Where the host provides equivalent tier aliases, map each alias to its corresponding tier.
-Light-tier models may use up to their host-supported maximum effort.
-Follow host-reported model and effort limitations.
-Verify that a response was produced at `xhigh` and higher supported effort levels.
-Reserve efforts above high for explicit or configured choices under host rules.
+Verify that a response was produced at `xhigh` and `max` effort.
+Reserve efforts above `high` for explicit or configured choices under host rules.
 [Model Effort Evidence](../../../docs/model-effort-evidence.md) covers specific workloads, not universal optima.
 Some coding evidence favors higher `luna` efforts without establishing a universal optimum.
 The evidence does not establish the `terra` alias's model identity or effort performance.
