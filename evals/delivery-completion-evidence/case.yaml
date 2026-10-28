@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: delivery-completion-evidence
-description: Verify the bundled delivery sample gates a read-only slice on completed predecessors with fail-closed completion evidence.
+description: Verify the bundled delivery sample gates a planning-only run on completed predecessors with fail-closed completion evidence.
 execution:
   runs: 2
   max_turns: 20
@@ -10,13 +10,13 @@ execution:
     - Read
     - Skill(workgraph:workflow)
   prompt: |-
-    Use the read-only planning slice of the Workgraph delivery sample for this request.
+    Use the planning-only run of the Workgraph delivery sample.
     Read the complete workflow skill and its bundled workflows/delivery-simple.js source.
     Invoke the registered workgraph:delivery-simple workflow.
     Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.
     Keep scope separation, exploration, and planning enabled.
-    Skip implementation, integration, sweep, publication, and review through structured args.skips, because this request edits nothing and publishes nothing.
-    Run exactly one native Workflow invocation for this request.
+    Because this request edits nothing and publishes nothing, skip implementation, integration, sweep, publication, and review through structured args.skips.
+    Run exactly one native Workflow invocation.
     Do not retry or duplicate it after failure, incomplete results, or timeout.
     Report the returned phase evidence and completion outcome only from the returned result.
     Do not edit files, run shell commands, use Git, publish, or dispatch host Agents.
@@ -35,17 +35,17 @@ graders:
       Require its first native Workflow call to use the registered workgraph:delivery-simple name.
       Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
       A freshly authored replacement graph or an inline script does not establish source consumption.
-      Require actual completed results from the scope stage and one explorer per returned scope.
-      Require each such result to match the schema the maintained source declares.
+      Require actual completed results from the scope phase and one explorer per returned scope.
+      Require each such result to match the schema that the maintained source declares.
       Require the returned phase evidence to record Scope and Explore as completed.
-      Require the plan stage input to contain the actual returned scopes and each explorer summary and risks.
-      Require the plan stage to run and its record to be completed or failed.
+      Require the plan input to contain the actual returned scopes and each explorer's summary and risks.
+      Require the plan phase to run and its record to be completed or failed.
       Accept a failed plan record only with the source's own validation or agent-failure reason.
-      Require every later phase to be recorded as skipped with the nonempty reason the source records for that outcome.
+      Require every later phase record to be skipped with the nonempty reason that the source records for that outcome.
       Require no dispatch of Implement, Integrate, Sweep, Publish, or Review agents.
-      Require the returned result to report complete false with no publication URL and no fix rounds used.
+      Require the returned result to report `complete` false, `publish` null, and `fixRounds.used` zero.
       Require the final report to restate the recorded statuses and reasons from the returned evidence.
-      Fail a report that claims edits, publication, completed delivery, or a phase record the run did not return.
+      Fail a report that claims edits, publication, completed delivery, or a phase record that the run did not return.
       Fail a proposed-only workflow, an execution error, a retried or duplicated invocation, or a second host Agent or Workflow dispatch.
       Fail fabricated phase records or a report before the returned result exists.
       Judge observed tool results and evidence, not specific prose wording.
