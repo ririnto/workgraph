@@ -959,6 +959,15 @@ test("delivery samples name the integrated candidate in sweep and publication on
         })
       );
       assert.equal(result.complete, true);
+      const integrateCalls = calls.filter((call) => call.phase === "Integrate");
+      assert.equal(integrateCalls.length, 2);
+      for (const call of integrateCalls) {
+        assert.ok(
+          call.prompt.includes(
+            "as `git diff <destination>...<unit branch>` reports them"
+          )
+        );
+      }
       for (const phase of ["Sweep", "Publish"]) {
         const phaseCalls = calls.filter((call) => call.phase === phase);
         assert.equal(phaseCalls.length, 2);
@@ -1847,6 +1856,33 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   );
   assert.equal(multiRun.result.complete, true);
   assert.deepEqual(multiRun.result.fixRounds, { max: 2, used: 2 });
+  const integrateCalls = multiRun.calls.filter(
+    (call) => call.phase === "Integrate"
+  );
+  assert.equal(integrateCalls.length, 3);
+  for (const [round, call] of integrateCalls.entries()) {
+    assert.ok(
+      call.prompt.includes(
+        "its own changes since its merge base with the destination, as `git diff <destination>...<unit branch>` reports them"
+      )
+    );
+    assert.ok(
+      call.prompt.includes(
+        "Do not judge a unit by a direct comparison with the current destination"
+      )
+    );
+    assert.ok(
+      call.prompt.includes(
+        "A unit branch the destination already contains has no new changes, so report it merged without merging it again."
+      )
+    );
+    assert.ok(call.prompt.includes('"branch":"unit-u2"'));
+    assert.ok(
+      call.prompt.includes(
+        `"branch":"${["unit-u1", "unit-u1-r1", "unit-u1-r2"][round]}"`
+      )
+    );
+  }
   assert.equal(
     multiRun.calls.filter((call) => call.phase === "Implement").length,
     4
