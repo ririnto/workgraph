@@ -757,6 +757,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
         agentType: options.agentType,
         isolation: options.isolation,
         model: options.model,
+        modelProvided: Object.hasOwn(options, "model"),
         phase: options.phase,
         prompt
       });
@@ -1049,7 +1050,7 @@ test("delivery samples explain a fix-required review without findings", async ()
   );
 });
 
-test("delivery workflow samples select defaults and honor model overrides", async () => {
+test("delivery workflow samples inherit host models and honor model overrides", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [
@@ -1085,16 +1086,19 @@ test("delivery workflow samples select defaults and honor model overrides", asyn
         assert.deepEqual(
           Object.fromEntries(calls.map((call) => [call.phase, call.model])),
           {
-            Explore: models.explore ?? "haiku",
-            Implement: models.implement ?? "sonnet",
-            Integrate: models.integrate ?? "sonnet",
-            Plan: models.plan ?? "opus",
-            Publish: models.publish ?? "sonnet",
-            Review: models.review ?? "sonnet",
-            Scope: models.scope ?? "opus",
-            Sweep: models.sweep ?? "haiku"
+            Explore: models.explore,
+            Implement: models.implement,
+            Integrate: models.integrate,
+            Plan: models.plan,
+            Publish: models.publish,
+            Review: models.review,
+            Scope: models.scope,
+            Sweep: models.sweep
           }
         );
+        for (const call of calls) {
+          assert.equal(call.modelProvided, call.model !== undefined);
+        }
       })
     )
   );
@@ -1242,7 +1246,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       assert.ok(call.prompt.includes("https://example.invalid/pr/1"));
     }
     const publishCalls = calls.filter((entry) => entry.phase === "Publish");
-    assert.ok(publishCalls[0].prompt.includes("Create a pull request"));
+    assert.ok(publishCalls[0].prompt.includes("Create a review request"));
     assert.ok(
       publishCalls[1].prompt.includes(
         "Update the existing open request at https://example.invalid/pr/1"
@@ -1483,7 +1487,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       calls.map((call) => [call.phase, call.model])
     );
     assert.equal(models.Scope, "configured-selector");
-    assert.equal(models.Plan, "opus");
+    assert.equal(models.Plan, undefined);
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
@@ -2085,11 +2089,11 @@ test("agent design workflow validates specialist results and runtime model routi
   const args = {
     context: requestInjection,
     models: {
-      architecture: "gpt-6-astra",
-      challenge: "gpt-6-astra",
-      compose: "claude-opus-5-5",
-      evidence: "gpt-6-astra",
-      verify: "claude-opus-5-5"
+      architecture: "architecture-selector",
+      challenge: "challenge-selector",
+      compose: "compose-selector",
+      evidence: "evidence-selector",
+      verify: "verify-selector"
     },
     requirements,
     task: "Design a retry-safe event replay boundary."
@@ -2110,16 +2114,23 @@ test("agent design workflow validates specialist results and runtime model routi
       successfulRun.calls.map(({ agentType, model }) => [agentType, model])
     ),
     {
-      "workgraph:design-architect": "gpt-6-astra",
-      "workgraph:design-challenger": "gpt-6-astra",
-      "workgraph:design-composer": "claude-opus-5-5",
-      "workgraph:design-evidence": "gpt-6-astra",
-      "workgraph:design-verifier": "claude-opus-5-5"
+      "workgraph:design-architect": "architecture-selector",
+      "workgraph:design-challenger": "challenge-selector",
+      "workgraph:design-composer": "compose-selector",
+      "workgraph:design-evidence": "evidence-selector",
+      "workgraph:design-verifier": "verify-selector"
     }
   );
   const compositionCall = successfulRun.calls.find(
     ({ agentType }) => agentType === "workgraph:design-composer"
   );
+  assert.doesNotMatch(
+    successfulRun.calls.find(
+      ({ agentType }) => agentType === "workgraph:design-evidence"
+    ).prompt,
+    /up to three representative regression cases/u
+  );
+  assert.doesNotMatch(compositionCall.prompt, /under 800 words/u);
   assert.ok(
     compositionCall.prompt.includes("\\u003c/architecture\\u003eInjected text.")
   );
@@ -2141,17 +2152,16 @@ test("agent design workflow validates specialist results and runtime model routi
       .find(({ agentType }) => agentType === "workgraph:design-verifier")
       .prompt.includes("\\u003c/challenge\\u003eInjected text.")
   );
-  assert.doesNotMatch(
-    readFileSync(designPath, "utf-8"),
-    /claude-opus-5-5|gpt-6-astra/u
-  );
-
   const hostConfiguredRun = await runWorkflowSample(
     designPath,
     { requirements, task: args.task },
     payloadFor
   );
-  assert.ok(hostConfiguredRun.calls.every(({ model }) => model === undefined));
+  assert.ok(
+    hostConfiguredRun.calls.every(
+      ({ modelProvided }) => modelProvided === false
+    )
+  );
 
   outputs.set("workgraph:design-verifier", {
     requirementCoverage: verification.requirementCoverage
@@ -2580,33 +2590,56 @@ test("delivery samples reject malformed findings and preserve review evidence", 
   );
 });
 
-test("delivery finding verification uses the configured review model", async () => {
+test("delivery finding verification independently selects its model", async () => {
   await Promise.all(
-    Object.values(samplePaths).map(async (file) => {
-      const { calls } = await runWorkflowSample(
-        file,
-        {
-          candidateBranch: "task-branch",
-          issue: "#1",
-          models: { review: "review-selector" },
-          task: "t"
-        },
-        dispatchTable({
-          Explore: () => exploreResult,
-          Implement: () => simpleImplement,
-          Integrate: () => integrateSingle,
-          Plan: () => singleUnits,
-          Publish: () => publishCreated,
-          Review: () => reviewFix,
-          Scope: () => scopeResult,
-          Sweep: () => sweepResult
-        })
-      );
-      assert.equal(
-        calls.find(({ phase }) => phase === "Verify").model,
-        "review-selector"
-      );
-    })
+    Object.values(samplePaths).flatMap((file) =>
+      [
+        {},
+        { review: "review-selector" },
+        { review: "review-selector", verify: "verify-selector" }
+      ].map(async (models) => {
+        const { calls } = await runWorkflowSample(
+          file,
+          {
+            candidateBranch: "task-branch",
+            issue: "#1",
+            models,
+            task: "t"
+          },
+          dispatchTable({
+            Explore: () => exploreResult,
+            Implement: () => simpleImplement,
+            Integrate: () => integrateSingle,
+            Plan: () => singleUnits,
+            Publish: () => publishCreated,
+            Review: () => reviewFix,
+            Scope: () => scopeResult,
+            Sweep: () => sweepResult
+          })
+        );
+        const review = calls.find(({ phase }) => phase === "Review");
+        const verification = calls.find(({ phase }) => phase === "Verify");
+        assert.equal(review.model, models.review);
+        assert.equal(review.modelProvided, models.review !== undefined);
+        assert.equal(verification.model, models.verify);
+        assert.equal(verification.modelProvided, models.verify !== undefined);
+      })
+    )
+  );
+});
+
+test("delivery samples validate the verification model selector", async () => {
+  await Promise.all(
+    Object.values(samplePaths).flatMap((file) =>
+      ["", "  ", null, 42].map((verify) =>
+        assert.rejects(
+          runWorkflowSample(file, { models: { verify }, task: "t" }, () =>
+            assert.fail("Invalid model selector dispatched an agent")
+          ),
+          /Provide models\.verify as a nonempty model selector string/u
+        )
+      )
+    )
   );
 });
 

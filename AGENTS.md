@@ -88,11 +88,11 @@ Select the narrowest applicable read-only gate.
 
 After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
 For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.
-Confirm the selected role and host reference appear without repository guidance or the other host's model policy.
+Confirm the selected role and host reference appear without repository guidance or the other host's guidance.
 
 Follow the [evaluation reporting requirements](README.md#development) for repeated behavioral runs, individual outcomes, and limited smoke checks.
 
-For Workflow invocation changes, run `claude plugin eval ./ --case workflow-invocation --runs 2 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
+For Workflow invocation changes, run `claude plugin eval ./ --case workflow-design-invocation --runs 2 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
 This behavioral check uses real agents and requires a host with Workflow enabled.
 Keep evaluation reports local and outside the repository with `--output-dir`.
 Inspect tool results because an attempted invocation alone does not prove successful execution.

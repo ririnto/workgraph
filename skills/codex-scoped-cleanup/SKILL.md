@@ -25,7 +25,7 @@ Keep temporary private identities, paths, payloads, and logs out of published in
 ## Git Preservation
 
 Default to removing completed, unused resources when retained Git history preserves every required source change.
-Verify reachability from a retained branch, tag, or snapshot ref without pinning file or branch hashes.
+Verify reachability from a retained branch, tag, or snapshot ref.
 A merged PR establishes preservation of its merged source changes.
 Do not rely solely on dangling objects, expiring reflogs, or an unspecified remote copy.
 Compare staged, unstaged, untracked, and required ignored content before removing a physical checkout.

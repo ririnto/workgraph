@@ -10,7 +10,7 @@ The two Gemini models carry provider documentation rather than benchmark compari
 These results describe the authors' tasks, harnesses, and settings.
 Use their methods and limits when choosing comparable local experiments.
 Read [the research notes](research.md#model-effort-and-cost) for supported controls, official defaults, host settings, and pricing.
-Operational selection policy lives in Main's [Codex](../skills/main-agent-contract/references/codex.md#model-selection) and [Claude Code](../skills/main-agent-contract/references/claude.md#model-selection) references.
+The [Main contract](../skills/main-agent-contract/SKILL.md#models) honors user settings and selects supported controls by workload.
 Local behavior checks do not establish universal model-effort rankings.
 
 ### Shared Measurement Limits

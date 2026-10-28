@@ -38,7 +38,8 @@ Record an umbrella's own acceptance separately from its children's delivery stat
 
 Skip ownership-blocked items, name the conflicting resource and next owner, and continue independent ready work.
 Use only the concurrency granted by the assignment and existing coordination.
-Give each issue owner a fresh isolated worktree and branch for one issue or a small coherent batch.
+Give each issue owner an isolated workspace and branch for one issue or a small coherent batch.
+Use an isolation method supported by the assignment and host.
 Keep branches separate.
 Name the source, Git, integration, evidence, and cleanup owners in each assignment.
 Include the required bundled procedures by their resolved installed absolute paths.
@@ -53,14 +54,14 @@ The integration owner accepts each complete posted PR's independent review and r
 Merge one PR at a time through the normal protected integration path.
 Let the issue owner update its branch unless ownership has explicitly transferred.
 
-After a collision, compare the affected changes with current named main.
+After a collision, compare the affected changes with the current authorized base branch.
 Have the responsible owner resolve conflicts without force-pushing or rewriting shared history.
 Refresh affected checks, acceptance evidence, and review coverage before the next dependent merge.
 
 ## Confirm Acceptance Before Closure
 
-For each issue, the integration owner confirms both the merged PR and its acceptance on named main.
-Inspect the relevant named-main source or run the narrowest required behavioral check against the original acceptance.
+For each issue, the integration owner confirms both the merged PR and its acceptance on the authorized base branch.
+Inspect the relevant base-branch source or run the narrowest required behavioral check against the original acceptance.
 A ref readback alone establishes no fix behavior or acceptance.
 Record the inspected source or behavioral result, its target, and any unmet criteria.
 Keep the issue open when acceptance is unmet or unverified, even when its PR merged.
@@ -79,6 +80,6 @@ Keep unmerged PRs open at a deadline and report their next action without weaken
 
 ## Hand Back
 
-Return merged issues and PRs, original-acceptance checks, named-main readbacks, and confirmed closure states.
+Return merged issues and PRs, original-acceptance checks, base-branch readbacks, and confirmed closure states.
 Report umbrella acceptance separately, along with blocked items, their owners, and the remaining queue count.
 Report any incomplete delivery.

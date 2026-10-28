@@ -14,14 +14,13 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `docs/harness/claude-code.md` | Claude Code users | Users follow this adapter for installation, loading formats, manual invocation, updates, and host evidence limits. |
 | `docs/harness/codex.md` | Codex users | Users follow this adapter for supported activation, loading formats, manual invocation, updates, and host evidence limits. |
 | `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow role authority, planning, dispatch, reporting, and conditional skill routing. |
-| `skills/main-agent-contract/references/{claude,codex}.md` | Main agents | Each reference supplies execution timing, orchestration, and model guidance for one host. |
+| `skills/main-agent-contract/references/{claude-code,codex}.md` | Main agents | Each reference supplies execution timing, orchestration, and model selection guidance for one host. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow bounded assignments, evidence, and handbacks in one self-contained body. |
-| `skills/subagent-context/references/{claude,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
+| `skills/subagent-context/references/{claude-code,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
 | `skills/fix-queue-delivery/SKILL.md` | Assigned repository queue owners | Queue Main, issue owners, and the integration owner coordinate bounded fixes and confirm original acceptance before closure. |
-| `skills/astra-dual-review/SKILL.md` | Assigned dual-host review managers | Managers collect independent native passes, verify candidates, read back issue writes, and hand fixes to separate units. |
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
-| `skills/delivery/references/{claude,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
+| `skills/delivery/references/{claude-code,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
 | `skills/workflow/references/authoring.md` | Workflow authors | Authors follow script construction, mapping, recovery, and bundled-source caller contracts. |
 | `workflows/` | Claude Main using Workflow | Native JavaScript workflow definitions use plugin discovery without another runner. |
@@ -88,7 +87,8 @@ Writing defers to the active role's policy.
 
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
-Host references supply task defaults and escalation conditions without requiring model comparisons or benchmark evaluations during consumer sessions.
+The Main contract honors user and configuration settings within host restrictions.
+Main host references provide tier and effort guidance based on task difficulty.
 Worker model selection stays in the dispatch, without a model-policy reference.
 Each role has separate host references because Main and Worker load at different execution stages.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](research.md#model-effort-and-cost).
@@ -201,8 +201,8 @@ Claude Main selects direct Agent when one assignment completes the work without 
 It selects Workflow for dependent agent stages, required joins, or expected continuation.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
-Its [bundled native source](../workflows/sum-check.js) supplies a discoverable native workflow.
-The [caller contract](../skills/workflow/references/authoring.md#use-the-bundled-source) separates native source from Node modules and run-specific script copies.
+Its [bundled design source](../workflows/design.js) supplies a discoverable native workflow.
+The [authoring reference](../skills/workflow/references/authoring.md) covers native source and run-specific script copies.
 The plugin registers workflows by convention and supplies no replacement executor.
 Its delivery reference maps authorized engineering operations to node inputs and outputs while Main owns graph readiness.
 Worker and Codex contexts do not load Workflow procedures.
@@ -251,7 +251,8 @@ It checks Claude's inline limit with complete instructions, long plugin paths, a
 Each test removes its disposable plugin copies.
 
 The tests also check skill names, descriptions, and invocation metadata.
-A source guard rejects repository-guidance filenames in bundled instructions and contributor entry points, without judging model behavior.
+Source checks scan `SKILL.md` bodies for instruction reference links that resolve outside the bundled skills tree.
+They do not scan host reference files or judge model behavior.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
 Plugin validation checks configuration rather than model behavior.
 Use the validation commands and prose review requirements from the auto-injected repository guidance.

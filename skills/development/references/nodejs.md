@@ -10,14 +10,3 @@ Prefer appropriate `await` and error handling over using `void` solely to discar
 This is guidance only, not a lint requirement or automatic rewrite.
 Preserve callback contracts, async signatures, execution order, and intentional background work.
 For intentional background work, preserve its existing error-handling policy without forcing callers to wait.
-
-## Automation
-
-For authorized Node.js lint automation with Ultracite, prefer supported built-in Oxlint rules and Oxfmt formatting.
-Ultracite is the only caller of Oxlint and Oxfmt.
-Preserve Ultracite defaults and existing ignore patterns when creating or explicitly changing configuration.
-In `oxfmt.config.ts`, spread `ultracite/oxfmt`, append `"**/*.md"` to its existing `ignorePatterns`, and set `trailingComma: "none"`.
-In `oxlint.config.ts`, import `core` from `ultracite/oxlint/core` and use `defineConfig({ extends: [core], ignorePatterns: core.ignorePatterns })`.
-Preserve mandatory project extensions rather than replacing them with this minimal preset.
-Check installed versions before adding custom rules or assuming a formatter can enforce a requirement.
-Do not add dependencies with known vulnerabilities.

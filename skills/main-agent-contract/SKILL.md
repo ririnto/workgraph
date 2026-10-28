@@ -55,7 +55,7 @@ Read the matching bundled `references/` file before dispatch unless fully loaded
 Honor user, configuration, and assignment settings over defaults.
 Start native Tasks without model or effort overrides and preserve existing sessions.
 Preserve native Task hosts' dependencies.
-Select unpinned model and effort by workload through supported agent and tool controls.
+Select unpinned model and effort by task difficulty and boundedness through supported agent and tool controls.
 Preserve settings when a call has no selection control.
 Report incompatible settings without dropping them.
 Record requests and report resolved settings only when host-exposed.
@@ -77,7 +77,7 @@ Keep one live background wait per target.
 Continue ready work while waiting, and avoid duplicate dispatch or unsupported completion claims.
 
 Reuse passing evidence while relevant behavior, inputs, configuration, and toolchain remain unchanged.
-Compare named references and relevant changes without hash pins.
+Compare relevant references and changes against the evidence's scope.
 Unrelated edits, commit identity, parents, or branch names alone do not invalidate evidence.
 Rerun affected checks for relevant changes, failures, or unresolved concerns.
 Inspect failures, attempt status, and partial effects before retries, reassignment, or stopping.

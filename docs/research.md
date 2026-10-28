@@ -84,9 +84,9 @@ These recommendations guide instruction design without changing model or API con
 The fetched [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) lists `low`, `medium`, `high`, `xhigh`, and `max` effort settings, with `medium` as the default.
 It does not support `none` or `minimal` effort.
 We confirm supported settings from the model page.
-Main's [Codex](../skills/main-agent-contract/references/codex.md#model-selection) and [Claude Code](../skills/main-agent-contract/references/claude.md#model-selection) references own operational selection defaults and escalation conditions.
+The [Main contract](../skills/main-agent-contract/SKILL.md#models) honors user settings and selects supported controls by workload.
 Consumer sessions do not need model comparisons or benchmark evaluations.
-Maintainers use model-specific benchmark and workload evidence when revising these defaults.
+Maintainers can use model-specific benchmark and workload evidence for scoped evaluations.
 Instruction text does not configure the host or establish model adherence.
 
 OpenAI's [model-selection guide](https://developers.openai.com/api/docs/guides/model-selection.md) gives different effort starting points for Luna, Sol, and Astra.
@@ -119,7 +119,7 @@ These recommendations support Workgraph's completion and native-callback instruc
 
 The guide recommends removing unnecessary thinking instructions and measuring the effects of older prompt workarounds.
 Workgraph keeps actionable scope, authority, and evidence requirements rather than prescribing reasoning steps.
-Role procedures remain inline, while Main orchestration and model guidance load only for the active environment.
+Role procedures remain inline, while host-specific orchestration loads only for the active environment.
 We have not measured these prompt choices in Workgraph on the selected models.
 
 We fetched the official [Claude Fable 5.1](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1.md) and [Claude Sonnet 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5-5.md) prompting guides.
@@ -131,7 +131,7 @@ Anthropic recommends evaluating effort on the target workload because effort nam
 Fable 5.1 starts at its default `high`, while Opus 5.5 starts at its default `medium`.
 Sonnet 5.5 defaults to `high` in the API but recommends `medium` for well-defined agentic tasks and `high` for harder work.
 Anthropic recommends lowering host effort settings to reduce thinking.
-Check each model's settings before reuse, and preserve the Claude routing guidance.
+Check each model's settings before reuse and honor the active assignment.
 
 Effort settings, token limits, response-block parsing, progress-update display, and bounded automatic continuations belong to the host or API integration.
 Time signals require host-supplied measurements, and pasted-content tags require application support.
@@ -244,11 +244,7 @@ The exact Haiku 5.5 ID is `claude-haiku-5-5`, without a date suffix.
 The Haiku guidance assumes Haiku 5.5.
 Claude Code does not accept `max` in persistent `effortLevel` or `modelSettings` values.
 Use `max` per session, through an effort frontmatter override, or through `CLAUDE_CODE_EFFORT_LEVEL`.
-The locally installed Codex catalog lists Terra as a Codex model with low through ultra reasoning levels.
-The local administrator policy maps its Sonnet roles to the Terra alias for Codex.
-These local records do not establish external verification, provider identity, performance, or runtime adherence.
-Codex's Astra, Sol, Terra, and Luna display names do not establish support for bare aliases in dispatch tools.
-Use the host's supported exact IDs and preserve pinned versions.
+Use model identifiers supported by the active host and preserve explicitly required versions.
 Record requested settings and report resolved settings only when the host supplies them, otherwise mark them unknown.
 Follow the current tool contract for fork inheritance and override support.
 
@@ -323,7 +319,7 @@ Luna's bundled prompt also restricts tests unless the user requests testing or v
 Sol and Astra instead direct appropriate checks.
 Workgraph does not reproduce those changing host rules.
 
-The skills retain role ownership and host-specific model-family defaults, honoring user communication and model-selection requirements.
+The skills retain role ownership while honoring user communication and model-selection requirements.
 Runtime references use family names rather than pinned release identifiers.
 Research records retain the measured releases so benchmark results keep their original meaning.
 They retain dependency routing, one writer per resource, delegated Git grants, publication privacy, and the shared-history restriction.
@@ -493,7 +489,7 @@ This practitioner report does not establish Workgraph effectiveness or authorize
 | Runnable verification precedes review. | Development and Verification already require observable checks, commands, outcomes, and evidence limits. |
 | Review evaluates intent and system impact. | Delivery now supplies the complete candidate, project review instructions, acceptance, and affected real consumers. |
 | Findings need verification and disposition. | Delivery now distinguishes introduced defects, pre-existing issues, evidence-based rejection, fixes, and tracked deferrals. |
-| Review effort follows risk. | Main host references now select reviewer staffing and depth by uncovered failure modes and failure consequences. |
+| Review effort follows risk. | Delivery selects reviewer staffing and depth by task risk and explicit requirements. |
 | Review must converge. | Delivery and its Workflow consumer now retain prior dispositions and reassess affected interactions without repeating resolved findings. |
 | Human authority and ownership remain explicit. | Main already owns authorized delivery, while Delivery preserves required human approvals and now records recovery considerations. |
 | Repeated failures should improve the responsible layer. | Development already prioritizes root causes, existing checks, and narrowly justified instruction changes. |
@@ -739,8 +735,8 @@ It describes host permissions and separate runs for operator sign-off between st
 
 | Supplied requirement | Workgraph adoption |
 | --- | --- |
-| Opus 5.5 Main with ultracode. | Claude guidance defaults to Opus planning while honoring user and configuration overrides. |
-| Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Claude defaults select those roles and Workflow passes selected settings into stages with separate edit worktrees. |
+| Opus 5.5 Main with ultracode. | Workgraph selects tiers by task difficulty and honors compatible user and configuration choices. |
+| Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Workflow passes selected settings into stages with separate edit worktrees. |
 | Independent verification before every reported finding. | Main excludes the finder and fixer from verification, and Workflow preserves per-candidate outcomes. |
 | Two rounds without fix progress. | Fix loops compare results and reassess stalled work without waiving acceptance. |
 | Deterministic decision routing. | Native script control flow handles deterministic choices without requiring another execution engine. |
@@ -755,9 +751,9 @@ A separate source-adoption authorization permits its specified source delivery w
 No quoted example grants permission to change live models, ultracode, credentials, permissions, or plugin activation.
 Main ownership, complete-candidate review, and normal Delivery integration boundaries remain required.
 
-The model split is Workgraph guidance inspired by the post, not an official universal Workflow default or measured performance ranking.
+The post's model split is not an official universal Workflow default or a measured performance ranking.
 Provider routing and model overrides can resolve aliases differently, so requested names do not prove resolved releases.
-Codex keeps its own host model policy and cannot execute Claude's native Workflow.
+Codex uses its configured model settings and cannot execute Claude's native Workflow.
 The post's throughput and cost claims are unverified here, and script-held results do not eliminate planning or worker costs.
 Schema validity does not establish factual correctness or replace an independent verifier.
 Native schema retries, stall restarts, inference sampling, and task retries remain separate from the no-progress fix-round count.
@@ -769,34 +765,6 @@ The official [Workflow documentation](https://code.claude.com/docs/en/workflows)
 Workgraph retains dependency selection, role ownership, evidence freshness, and delivery gates.
 The native tool defines its API, permissions, model controls, and notification delivery.
 The bundled Workflow reference adds graph mapping, result acceptance, journal checks, and conservative same-run recovery.
-
-#### Reusable Native Source
-
-The Workflow skill now selects skill-internal exact-body text for its supported sum-and-check outcome.
-The caller contract distinguishes inline execution from named registration, skill selection, and installed activation.
-A native body needs top-level `return`, which Node module parsing and the unchanged Ultracite `prefer-module` rule reject in `.js`.
-A text resource preserves the native body without adding a transform, runner, registry, dependency, or lint exception.
-
-On Claude Code 2.1.305, the maintained source ran inline with numbers `[17, 23, 31]` and requested internal settings `haiku` and `medium`.
-A byte comparison confirmed that the persisted first-run source matched the bundled resource.
-Both workers completed, the dependent check consumed the actual predecessor, and the result reported a checked sum of 71.
-The host did not expose a resolved model identity through that result.
-
-Independent finding verification identified a matching-wrong-answer case that peer agreement alone could accept.
-The source now validates the predecessor against an exact BigInt total and rejects out-of-range totals before dispatch.
-Native execution confirmed BigInt reduction for `[9007199254740991, 2, -2]` without intermediate Number rounding.
-The repaired source completed that full two-worker boundary case and rejected an injected matching-wrong-answer result for `[1, 1]`.
-
-Same-session postprocessing probes discarded one returned value in the per-run copy without changing either agent call.
-Discarding Check returned `complete: false` while retaining the completed Sum.
-Discarding Sum failed that partition and skipped dependent Check dispatch.
-Restoring the copy returned the original successful result.
-Each replay reported zero additional subagent tokens and tool calls, establishing completed-call reuse for these unchanged inputs.
-These injected missing-result probes do not establish provider-failure or skip behavior.
-
-The maintained `workflow-invocation` evaluator was refused before execution because the worktree guard treated its CLI subcommand as shell `eval`.
-That refusal remains distinct from a failed behavioral evaluation and was not bypassed.
-The source-loaded case, automatic skill selection, named discovery, installed activation, and general model adherence remain unverified.
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
 Workgraph uses sentence-level source lines for all documents, including table explanations.

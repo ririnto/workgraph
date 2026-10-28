@@ -15,8 +15,8 @@ Keep public-function type hints without forcing full annotations on private glue
 Use `match` for dispatch on one value when the declared Python version supports it.
 Use Python suite syntax and convert deep recursion to iteration when depth scales with input.
 
-Write public module, class, and function docstrings as multiline prose, including one-sentence docstrings.
+Document public contracts using the project's docstring conventions.
 Check implicit public names and declared exports such as `__all__`.
 Describe public attributes and constants in their owning module or class docstring when direct docstrings are unavailable.
-Put opening and closing triple quotes on separate lines.
+Preserve observable docstring text when changing its formatting.
 Describe contracts and semantic constraints without repeating type hints.

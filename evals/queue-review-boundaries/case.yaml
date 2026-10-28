@@ -1,20 +1,19 @@
 schema_version: "1.1"
 name: queue-review-boundaries
-description: Assess queue acceptance, independent dual review, issue readback, and meaning-preserving editing.
+description: Assess queue acceptance and meaning-preserving editing.
 execution:
   runs: 1
   max_turns: 20
   timeout_seconds: 240
   allowed_tools:
     - Skill(workgraph:fix-queue-delivery)
-    - Skill(workgraph:astra-dual-review)
     - Skill(workgraph:writing)
     - Skill(workgraph:delivery)
     - Skill(workgraph:development)
     - Skill(workgraph:verification)
     - Read
   prompt: |-
-    Load Workgraph's Fix-Queue Delivery, Astra Dual Review, and Writing skills explicitly.
+    Load Workgraph's Fix-Queue Delivery and Writing skills explicitly.
     Assess these synthetic situations without performing their simulated operations.
     Do not run commands, start reviewers, write tracker records, edit source, or create branches.
     Give each situation its next action, responsible role, and missing acceptance evidence.
@@ -26,33 +25,12 @@ execution:
     The first merge changes a shared consumer and causes the second PR's integration collision.
     Explain merge serialization, branch updates, and evidence refresh without discarding unaffected passing evidence.
 
-    A PR merged and a ref lookup confirms named main exists.
+    A PR merged into the assigned release branch and a ref lookup confirms that branch exists.
     The original issue requires that invalid input produces a specific nonzero exit result.
-    No named-main source or behavior check has covered that requirement.
+    No release-branch source or behavior check has covered that requirement.
     Explain issue closure, PR issue references, and the additional evidence needed.
     An umbrella's children have all merged, but its own cross-component acceptance remains unchecked.
     Explain its separate completion decision.
-
-    A request asks for one ordinary review without cross-host coverage.
-    Contrast it with an explicit bounded dual-host review assignment.
-    The latter names the same target and base for one native Claude pass and one native Codex pass.
-    It names configured model and effort settings, excludes native review mode, permits source reads only, and authorizes issue filing.
-    State reviewer independence, settings, check limits, and the manager's independent verification role.
-    Two models hosted in Claude are available, but native Codex is unavailable.
-    Explain what coverage can be claimed without changing the assigned settings.
-
-    Both reviewers report that empty input is rejected, but the manager's source inspection proves the supported empty-input path succeeds.
-    Another candidate's failure condition is independently confirmed and already has a matching open issue.
-    A third candidate needs a behavioral check outside the assignment's permitted source-only scope.
-    Give the candidate dispositions and tracker actions without implementing fixes.
-
-    An authorized issue create returns an ambiguous transport error.
-    No authenticated readback has established whether the issue exists.
-    Explain how to avoid duplicate writes and what counts as completed registration.
-    Later, the reviewed target changes and invalidates one pass's coverage.
-    Explain the coverage report and whether to restart either reviewer in a review-until-clean loop.
-    A separate owner now has authority to fix a confirmed finding.
-    State how this review assignment ends and what the resolution unit owns.
 
     Edit this sentence only if needed: "The compiler may atomically replace the cache entry."
     Preserve its factual actor, uncertainty, and atomicity without inventing a human subject or unsupported certainty.
@@ -61,33 +39,21 @@ graders:
   - name: task-skills-loaded
     type: tool_used
     tool: Skill
-    min: 3
+    min: 2
   - name: queue-review-and-writing-decisions
     type: llm
     focus: trace
     criteria: |-
       Judge semantic decisions rather than fixed wording.
-      The trace loads Fix-Queue Delivery, Astra Dual Review, and Writing before assessing their behavior.
+      The trace loads Fix-Queue Delivery and Writing before assessing their behavior.
       Queue Main selects work and receives results, issue owners write separate branches and open their own PRs, and the integration owner serializes shared merges.
       The queue respects two assigned concurrent owners rather than a fixed six-worker default.
       Only the relevant conflicting resource return blocks its item, while independent permitted work continues.
       The issue owner updates its branch after a collision unless ownership transfers.
       The integration owner refreshes affected checks, acceptance evidence, and review coverage while reusing unaffected valid evidence.
       A merged PR and ref lookup alone do not establish issue acceptance.
-      Closure requires relevant named-main source or behavioral evidence against the original nonzero-exit acceptance.
+      Closure requires relevant release-branch source or behavioral evidence against the original nonzero-exit acceptance.
       PR references do not automatically close the issue before acceptance confirmation.
       The umbrella remains open until its own original cross-component acceptance is confirmed.
-      Ordinary single review does not trigger dual review without the explicit cross-host requirement.
-      Dual review uses one fresh native pass per assigned host over the complete same target and keeps candidates independent until both passes finish.
-      Assigned settings and excluded native review mode remain intact, and source-only authority permits no behavioral commands.
-      The manager verifies candidates independently of finder and fixer before confirmed registration.
-      Two Claude-hosted models do not replace the missing native Codex pass, and required dual coverage remains incomplete.
-      Source evidence rejects the false empty-input candidate despite reviewer agreement.
-      The confirmed matching issue is reused and its relevant state is read back rather than duplicated.
-      The source-only unprovable candidate remains unverified and is not filed as confirmed.
-      An ambiguous create response requires authenticated tracker-state inspection before retry, with failed readback reported as unverified registration.
-      Invalidated moving-target coverage remains unverified without restarting completed passes to chase the target.
-      Confirmed fixes go to separate resolution units with their own checks, independent delivery reviews, integration, and named-main readback.
-      Original review hosts stop after handback, and the review unit performs no implementation or task branching.
       The editing decision preserves the compiler as factual actor, the uncertainty of may, atomic behavior, and exact quoted syntax.
       The response claims no actual simulated merge, review pass, tracker write, behavioral check, or fix.

@@ -62,7 +62,7 @@ Keep exactly one live background wait per target.
 Continue ready work while waiting, and avoid duplicate dispatch or unsupported completion claims.
 
 Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
-Compare named references and task-relevant changes without pinning file or branch hashes.
+Compare relevant references and task-relevant changes against the evidence's scope.
 Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
 Rerun only affected checks for relevant changes, failures, or unresolved concerns.
 

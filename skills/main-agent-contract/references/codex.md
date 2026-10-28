@@ -18,16 +18,13 @@ Route cleanup through the authorized resource owner and supported host operation
 
 ## Model Selection
 
-Use model and effort controls exposed by the host, honoring explicit user and configuration choices.
-Use supported model identifiers for the families below, without assuming bare aliases are accepted.
-Report unavailable or substituted settings using host evidence.
-Use `luna` for clear tasks, including development, review, document analysis, and multistep agentic work.
-Use `terra` for substantive coding or refactoring that exceeds a clear bounded task.
-Use `sol` when conflicting evidence, difficult tradeoffs, or acceptance failures justify stronger judgment.
-Call `astra` only at the user's explicit request.
-Start with one independent reviewer, adding depth or specialists for costly or uncovered failure modes.
+Select model tier and effort from the concrete task's difficulty and boundedness, not its role or work kind.
+For ordinary tasks, choose the lowest sufficient tier.
+Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
+Resolve each tier at call time using the host's model list and supported controls.
+For native Codex invocations, use the host-confirmed full model ID, never a bare alias or Claude-family name.
 
-| Model | Workload | Effort guidance |
+| Tier alias | Difficulty | Effort guidance |
 | --- | --- | --- |
 | `luna` | Simple exploration and extraction | Use `low`. |
 | | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
@@ -36,8 +33,16 @@ Start with one independent reviewer, adding depth or specialists for costly or u
 | `sol` | Simple queries, conversions, and extraction | Use `low`. |
 | | Ordinary development, review, and document analysis | Use `medium`. |
 | | Complex debugging, algorithms, and architecture | Use `high`. |
-| `astra` | Bounded work | Use `low`. |
-| | Difficult terminal repairs or agentic work | Use `medium`, or `xhigh` for harder tasks. |
-| | The hardest reasoning | Use `max`. |
+| `astra` | Explicit request only | Follow the request. |
 
-Leave Sol `xhigh` and `max` to explicit or configured choices.
+Where the host provides equivalent tier aliases, map each alias to its corresponding tier.
+Verify that a response was produced at `xhigh` and `max` effort.
+Reserve Terra and Sol `xhigh` and `max` for explicit or configured choices under host rules.
+[Model Effort Evidence](../../../docs/model-effort-evidence.md) covers specific workloads, not universal optima.
+Some coding evidence favors higher `luna` efforts without establishing a universal optimum.
+The evidence does not establish the `terra` alias's model identity or effort performance.
+Do not pin a specific model version.
+If a requested or configured setting requires a version pin, report the incompatibility without substituting it.
+When these models or effort levels are unavailable, report the limitation and use a supported alternative only when permitted.
+Use supported agent and tool controls, honoring explicit user and configuration choices.
+Report unavailable or substituted settings using host evidence.

@@ -29,7 +29,7 @@ Without a base, confirm the active development branch.
 Record working and authorized base branches before branch creation, commits, or publication.
 If they match, create a separate branch from the base before committing or pushing task changes.
 Push only the working branch for PR delivery, and never push task changes directly to the base before PR review.
-Use named branch references and current PR changes, not fixed commit hashes.
+Use the named branch references and current PR changes for delivery.
 
 ## Make Development Progress Visible
 
@@ -43,12 +43,9 @@ Before implementation, determine the complete initial or incoming candidate agai
 Include committed changes against the base, staged changes, unstaged changes, and every untracked non-ignored file with its full content.
 For incoming PR/MR work, include the complete incoming diff and all relevant local changes.
 Do not use ordinary `git diff` alone to verify emptiness because it omits staged-only and untracked files.
-If Main verifies the complete candidate is empty, record that result without dispatching a scan.
-Limit the record to that snapshot without clearing later changes.
-If the candidate is nonempty, delegate exactly one read-only scan for private environment details and secrets before implementation.
-Give the scanner the complete candidate and record the result where tracking exists or the task requires it.
-For a nonempty candidate, wait for the scan result before implementation.
+Limit any empty-candidate finding to that snapshot without clearing later changes.
 If the complete candidate cannot be determined, do not treat it as empty.
+Before exposing candidate content outside its trusted boundary, assess and address private information and secret risks.
 
 ## Check Before Publication
 
@@ -72,7 +69,7 @@ Create local evidence only when a current check, failure investigation, or recov
 
 Use project roles or the user's statement to determine whether the user maintains the project.
 Review each complete delivery unit at the depth required by the task and its risks.
-Select reviewer staffing and effort from the active Main host reference and explicit user requirements.
+Select reviewer staffing and effort from the task's risks, available controls, and explicit requirements.
 Run selected independent reviewers in parallel when there is more than one.
 Follow required repository review timing and any requested independent review.
 Keep completed valid reviews without mislabeling sequential work as parallel or restarting it solely to change timing.

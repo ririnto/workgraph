@@ -25,9 +25,10 @@ Workgraph changes no model or effort settings through installation.
 
 ## Automatic Loading
 
-SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Claude reference](../../skills/main-agent-contract/references/claude.md).
-SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Claude reference](../../skills/subagent-context/references/claude.md).
-Those references own execution timing and, for Main only, orchestration and model policy.
+SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Claude reference](../../skills/main-agent-contract/references/claude-code.md).
+SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Claude reference](../../skills/subagent-context/references/claude-code.md).
+Both references own execution timing.
+The Main reference also provides host-specific orchestration and model selection guidance.
 This user adapter does not replace them.
 
 The hook's skill fragment uses the native base-directory line and the skill body without YAML frontmatter.
