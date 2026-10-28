@@ -37,7 +37,7 @@ For native Codex invocations, use the host-confirmed full model ID, never a bare
 
 Where the host provides equivalent tier aliases, map each alias to its corresponding tier.
 Verify that a response was produced at `xhigh` and `max` effort.
-Reserve efforts above `high` for explicit or configured choices under host rules.
+Reserve Terra and Sol `xhigh` and `max` for explicit or configured choices under host rules.
 [Model Effort Evidence](../../../docs/model-effort-evidence.md) covers specific workloads, not universal optima.
 Some coding evidence favors higher `luna` efforts without establishing a universal optimum.
 The evidence does not establish the `terra` alias's model identity or effort performance.
