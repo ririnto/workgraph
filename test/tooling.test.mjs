@@ -919,6 +919,97 @@ const reviewFix = {
 };
 const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
 
+test("delivery workflow samples select defaults and honor model overrides", async () => {
+  await Promise.all(
+    Object.values(samplePaths).flatMap((file) =>
+      [
+        {},
+        { scope: "configured-selector" },
+        Object.fromEntries(
+          [
+            "scope",
+            "explore",
+            "plan",
+            "implement",
+            "integrate",
+            "sweep",
+            "publish",
+            "review"
+          ].map((phase) => [phase, `custom-${phase}`])
+        )
+      ].map(async (models) => {
+        const { calls } = await runWorkflowSample(
+          file,
+          { candidateBranch: "main", models, task: "t" },
+          dispatchTable({
+            Explore: () => exploreResult,
+            Implement: () => simpleImplement,
+            Integrate: () => integrateSingle,
+            Plan: () => singleUnits,
+            Publish: () => publishCreated,
+            Review: () => reviewPass,
+            Scope: () => scopeResult,
+            Sweep: () => sweepResult
+          })
+        );
+        assert.deepEqual(
+          Object.fromEntries(calls.map((call) => [call.phase, call.model])),
+          {
+            Explore: models.explore ?? "haiku",
+            Implement: models.implement ?? "sonnet",
+            Integrate: models.integrate ?? "sonnet",
+            Plan: models.plan ?? "opus",
+            Publish: models.publish ?? "sonnet",
+            Review: models.review ?? "sonnet",
+            Scope: models.scope ?? "opus",
+            Sweep: models.sweep ?? "haiku"
+          }
+        );
+      })
+    )
+  );
+});
+
+test("delivery workflow samples allow explicitly omitted exploration", async () => {
+  await Promise.all(
+    Object.values(samplePaths).map(async (file) => {
+      const { calls, result } = await runWorkflowSample(
+        file,
+        { candidateBranch: "main", skips: { explore: true }, task: "t" },
+        dispatchTable({
+          Implement: () => simpleImplement,
+          Integrate: () => integrateSingle,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => reviewPass,
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.equal(
+        calls.some((call) => call.phase === "Explore"),
+        false
+      );
+      assert.equal(result.complete, true);
+      assert.equal(
+        result.phaseEvidence.find((record) => record.title === "Explore")
+          .status,
+        "skipped"
+      );
+      const failed = await runWorkflowSample(
+        file,
+        { candidateBranch: "main", skips: { explore: true }, task: "t" },
+        dispatchTable({ Scope: () => null })
+      );
+      assert.equal(failed.result.complete, false);
+      assert.equal(
+        failed.calls.some((call) => call.phase === "Plan"),
+        false
+      );
+    })
+  );
+});
+
 test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   for (const file of Object.values(samplePaths)) {
     const text = readFileSync(file, "utf-8");
@@ -929,7 +1020,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,
-      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
@@ -972,17 +1063,6 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         "Update the existing open request at https://example.invalid/pr/1"
       )
     );
-    const models = Object.fromEntries(
-      calls.map((call) => [call.phase, call.model])
-    );
-    assert.equal(models.Scope, "opus");
-    assert.equal(models.Explore, "haiku");
-    assert.equal(models.Plan, "opus");
-    assert.equal(models.Implement, "sonnet");
-    assert.equal(models.Integrate, "sonnet");
-    assert.equal(models.Sweep, "haiku");
-    assert.equal(models.Publish, "sonnet");
-    assert.equal(models.Review, "sonnet");
     assert.ok(
       calls
         .filter((entry) => entry.phase === "Implement")
@@ -1040,7 +1120,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,
-      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: sequence(simpleImplement, simpleRepair),
@@ -1127,7 +1207,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.complex,
-      { candidateBranch: "main", issue: "#1", maxFixRounds: 1, task: "t" },
+      { candidateBranch: "main", maxFixRounds: 1, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
         Implement: splitImplement,
@@ -1180,7 +1260,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       {
         issue: "#1",
         maxFixRounds: 0,
-        models: { scope: "haiku" },
+        models: { scope: "configured-selector" },
         skips: { implement: true, integrate: true, publish: true },
         task: "t"
       },
@@ -1200,7 +1280,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const models = Object.fromEntries(
       calls.map((call) => [call.phase, call.model])
     );
-    assert.equal(models.Scope, "haiku");
+    assert.equal(models.Scope, "configured-selector");
     assert.equal(models.Plan, "opus");
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
@@ -1284,7 +1364,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     () =>
       runWorkflowSample(
         samplePaths.simple,
-        { task: "t" },
+        { issue: "", task: "t" },
         dispatchTable({ Scope: () => scopeResult })
       ),
     /args.issue/u

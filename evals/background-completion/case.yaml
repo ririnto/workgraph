@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: background-completion
-description: Verify callback-only turn closure and a dependent command using actual completed output.
+description: Verify a dependent command using actual completed output.
 execution:
   runs: 1
   max_turns: 20
@@ -28,9 +28,7 @@ graders:
     criteria: |-
       Inspect actual command invocations, completion output, turn boundaries, and the final report.
       The first command starts as a native background Bash operation.
-      While only its callback remains, Main ends the turn with the required waiting response.
-      Main adds no post-submission narration or tool calls before that turn ends.
-      Main does not poll, request progress, or start another wait while the command remains pending.
+      Main uses supported wait or callback controls and does not start a polling loop.
       Completion output contains WORKGRAPH_BACKGROUND_RESULT=42 and a successful exit.
       After inspecting that actual output, Main passes its value to the dependent command.
       The dependent command completes successfully with WORKGRAPH_DEPENDENT_RESULT=84.
