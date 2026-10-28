@@ -1,0 +1,41 @@
+schema_version: "1.1"
+name: workflow-invocation
+description: Verify that the bundled native source completes a predecessor-consuming Workflow run.
+execution:
+  runs: 1
+  max_turns: 20
+  timeout_seconds: 240
+  allowed_tools:
+    - Workflow
+    - Read
+    - Skill(workgraph:workflow)
+  prompt: |-
+    Please use native Claude Code Workflow to verify a calculation without editing files or running Git commands.
+    Load Workgraph Workflow unless its complete content is already present.
+    Use the registered workgraph:sum-check workflow.
+    Invoke the registered workflow with numbers [17, 23, 31] and Main-selected internal model and effort.
+    Do not recreate the graph or dispatch an additional host Agent for the same outcome.
+    Let its first worker add the numbers and its dependent worker independently check the actual predecessor result.
+    Use no more than these two workers.
+    Report the checked sum only after the returned result has complete: true and both phase records are completed.
+graders:
+  - name: workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+    max: 1
+  - name: workflow-completed
+    type: llm
+    focus: trace
+    criteria: |-
+      The session reads the maintained sum-check.js resource through the selected Workflow skill.
+      Its first native Workflow call uses the registered name and structured arguments containing the original numbers and selected settings.
+      A freshly authored replacement graph does not establish source consumption.
+      The session receives completed native results from the sum worker and the dependent check worker.
+      The check receives the original numbers and actual predecessor sum and evidence.
+      The returned result has complete: true and completed Sum and Check phase records.
+      The final report uses those completed results and gives the correct sum of 71.
+      There are at most two live internal workers and no duplicate host Agent or Workflow dispatch.
+      Because the goal is read-only, the session skips branch publication and PR/MR creation.
+      A proposed workflow, permission denial, execution error, incomplete required result, or report before completion fails this check.
+      Judge observed tool results and evidence, not specific prose wording.

@@ -201,7 +201,7 @@ Claude Main selects direct Agent when one assignment completes the work without 
 It selects Workflow for dependent agent stages, required joins, or expected continuation.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
-Its [bundled design source](../workflows/design.js) supplies a discoverable native workflow.
+Its [bundled native source](../workflows/sum-check.js) supplies a discoverable native workflow.
 The [caller contract](../skills/workflow/references/authoring.md#use-the-bundled-source) separates native source from Node modules and run-specific script copies.
 The plugin registers workflows by convention and supplies no replacement executor.
 Its delivery reference maps authorized engineering operations to node inputs and outputs while Main owns graph readiness.

@@ -770,6 +770,34 @@ Workgraph retains dependency selection, role ownership, evidence freshness, and 
 The native tool defines its API, permissions, model controls, and notification delivery.
 The bundled Workflow reference adds graph mapping, result acceptance, journal checks, and conservative same-run recovery.
 
+#### Reusable Native Source
+
+The Workflow skill now selects skill-internal exact-body text for its supported sum-and-check outcome.
+The caller contract distinguishes inline execution from named registration, skill selection, and installed activation.
+A native body needs top-level `return`, which Node module parsing and the unchanged Ultracite `prefer-module` rule reject in `.js`.
+A text resource preserves the native body without adding a transform, runner, registry, dependency, or lint exception.
+
+On Claude Code 2.1.305, the maintained source ran inline with numbers `[17, 23, 31]` and requested internal settings `haiku` and `medium`.
+A byte comparison confirmed that the persisted first-run source matched the bundled resource.
+Both workers completed, the dependent check consumed the actual predecessor, and the result reported a checked sum of 71.
+The host did not expose a resolved model identity through that result.
+
+Independent finding verification identified a matching-wrong-answer case that peer agreement alone could accept.
+The source now validates the predecessor against an exact BigInt total and rejects out-of-range totals before dispatch.
+Native execution confirmed BigInt reduction for `[9007199254740991, 2, -2]` without intermediate Number rounding.
+The repaired source completed that full two-worker boundary case and rejected an injected matching-wrong-answer result for `[1, 1]`.
+
+Same-session postprocessing probes discarded one returned value in the per-run copy without changing either agent call.
+Discarding Check returned `complete: false` while retaining the completed Sum.
+Discarding Sum failed that partition and skipped dependent Check dispatch.
+Restoring the copy returned the original successful result.
+Each replay reported zero additional subagent tokens and tool calls, establishing completed-call reuse for these unchanged inputs.
+These injected missing-result probes do not establish provider-failure or skip behavior.
+
+The maintained `workflow-invocation` evaluator was refused before execution because the worktree guard treated its CLI subcommand as shell `eval`.
+That refusal remains distinct from a failed behavioral evaluation and was not bypassed.
+The source-loaded case, automatic skill selection, named discovery, installed activation, and general model adherence remain unverified.
+
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
 Workgraph uses sentence-level source lines for all documents, including table explanations.
 Required syntax and exact quotations retain their original form.

@@ -97,9 +97,15 @@ Collect both complete reviewer results.
 Keep missing or failed passes visible as incomplete coverage.
 Do not treat model agreement as proof.
 
-Verify each candidate under the Main Agent Contract's independent-verification rules, excluding its finders and source fixers.
+Assign separate verification agents to check candidates independently of their finders and source fixers.
+As manager, inspect each candidate against the actual source and owning requirement.
 Use the narrowest permitted existing check when source inspection cannot settle the claim.
-Mark a candidate without independent verification unverified, and do not register it as a confirmed defect.
+Do not rely on the finding author's summary as verification.
+Do not fix the code to prove the finding.
+
+Keep the manager separate from the candidate finder and source fixer.
+If the manager cannot supply independent verification, mark the candidate unverified.
+Do not register it as a confirmed defect.
 
 Merge duplicate candidates while retaining their evidence and origins in the private handback.
 Assign each candidate one disposition:

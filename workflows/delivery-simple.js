@@ -13,6 +13,7 @@ export const meta = {
   ]
 }
 
+const variant = 'simple'
 const maxScopes = 2
 const unitCap = 1
 const defaultFixRounds = 1
@@ -952,5 +953,6 @@ return {
     branch: unitResults.find(result => result.key === unit.key)?.branch ?? null,
     key: unit.key,
     paths: unit.paths
-  }))
+  })),
+  variant
 }
