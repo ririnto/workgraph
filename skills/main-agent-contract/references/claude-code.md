@@ -11,14 +11,14 @@ Select model tier and effort from the concrete task's difficulty and boundedness
 For ordinary tasks, choose the lowest sufficient tier.
 Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
 
-| Model | Difficulty | Effort guidance |
+| Model | Workload | Effort guidance |
 | --- | --- | --- |
-| `haiku` | Simple extraction | Use `low`. |
-| | Bounded read-only analysis | Use `medium`, or `high` for harder tasks. |
-| | Demanding bounded work | Use `xhigh`. |
-| `sonnet` | Harder tasks | Use `medium`, or `high` for harder tasks. |
-| `opus` | The hardest reasoning and judgment | Use `medium`, or `high` for harder tasks. |
-| `fable` | Explicit request only | Follow the request. |
+| `haiku` | Extraction | Use `low`. |
+| | Coding, debugging, refactoring, and code review | Use `xhigh`. |
+| | Other clear analysis and agentic work | Use `medium`, or `high` for harder tasks. |
+| `sonnet` | Edits and code review | Use `medium`, or `high` for harder tasks. |
+| `opus` | Planning and complex reasoning | Use `medium`, or `high` for harder tasks. |
+| `fable` | Explicitly requested work | Use `high`, `xhigh` for difficult terminal work, or `max` for the hardest reasoning. |
 
 Where the host provides equivalent tier aliases, map each alias to its corresponding tier.
 Haiku defaults to adaptive `medium` and cannot disable thinking.
