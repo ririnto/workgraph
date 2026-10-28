@@ -595,8 +595,7 @@ test("bundled native Workflow sources remain relocatable", (t) => {
     new Set([
       "delivery-complex.js",
       "delivery-simple.js",
-      "design.js",
-      "sum-check.js"
+      "design.js"
     ])
   );
   for (const file of files) {
