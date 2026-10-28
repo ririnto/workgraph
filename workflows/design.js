@@ -251,7 +251,7 @@ const designAttempts = await parallel([
     'evidence',
     'Design',
     'workgraph:design-evidence',
-    `Build the evidence and test plan for this request.\n\n<request>${inputData}</request>\n\n${requirementIndexing}\nReturn exactly one coverage item for each listed requirement.\nMap every requirement to evidence in a proposed design.\nList up to three representative regression cases and evaluation cases.\nKeep each entry concise and state evidence limits briefly.\nDo not invent passing test results.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Build the evidence and test plan for this request.\n\n<request>${inputData}</request>\n\n${requirementIndexing}\nReturn exactly one coverage item for each listed requirement.\nMap every requirement to evidence in a proposed design.\nList regression and evaluation cases sufficient for the task and its requirements.\nKeep each entry concise and state evidence limits briefly.\nDo not invent passing test results.\n${readOnly} ${authority} ${dataBoundary}`,
     evidenceSchema,
     validate.evidence)
 ])
@@ -269,7 +269,7 @@ if (phaseRecords.design.status !== 'completed') {
     'compose',
     'Compose',
     'workgraph:design-composer',
-    `Compose one implementation-ready design from the accepted architecture and evidence results.\n\n<request>${inputData}</request>\n\n<architecture>${serializePromptData(architecture.result)}</architecture>\n\n<evidence>${serializePromptData(evidence.result)}</evidence>\n\n${requirementIndexing}\nResolve interface conflicts using evidence from both results.\nCover every requirement using its one-based identifier.\nReturn a concise design with key decisions, implementation steps, requirement coverage, test plan, and open questions.\nKeep the design under 800 words and lists to the smallest useful set.\nDo not invent missing predecessor work.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Compose one implementation-ready design from the accepted architecture and evidence results.\n\n<request>${inputData}</request>\n\n<architecture>${serializePromptData(architecture.result)}</architecture>\n\n<evidence>${serializePromptData(evidence.result)}</evidence>\n\n${requirementIndexing}\nResolve interface conflicts using evidence from both results.\nCover every requirement using its one-based identifier.\nReturn a concise design with key decisions, implementation steps, requirement coverage, test plan, and open questions.\nKeep the design and lists concise without omitting required detail.\nDo not invent missing predecessor work.\n${readOnly} ${authority} ${dataBoundary}`,
     schemas.compose,
     validate.compose)
 }

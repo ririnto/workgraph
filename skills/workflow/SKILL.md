@@ -38,7 +38,8 @@ Resume authorized edit work only after that approval, without adding gates to wo
 When an assigned read-only design warrants the bundled specialist stages, read [the design source](../../workflows/design.js).
 Follow its validated phase and result contract only when the graph fits the scope, authority, and staffing limits.
 Pass the design task, requirements, constraints, optional repository-relative source paths, and runtime model selectors through structured `args`.
-Omit any model selector not supplied by the request or supported host configuration, and never add a fixed workflow default.
+Use supported selectors chosen under Main's model policy.
+Omit unspecified selectors and never add a fixed workflow default.
 Do not replace the specialist outputs with coordinator-authored design content.
 Call native Workflow with the registered plugin workflow name for bundled graphs.
 For other accepted graphs, author native source under the authoring reference and pass it as inline `script`.

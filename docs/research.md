@@ -244,11 +244,7 @@ The exact Haiku 5.5 ID is `claude-haiku-5-5`, without a date suffix.
 The Haiku guidance assumes Haiku 5.5.
 Claude Code does not accept `max` in persistent `effortLevel` or `modelSettings` values.
 Use `max` per session, through an effort frontmatter override, or through `CLAUDE_CODE_EFFORT_LEVEL`.
-The locally installed Codex catalog lists Terra as a Codex model with low through ultra reasoning levels.
-The local administrator policy maps its Sonnet roles to the Terra alias for Codex.
-These local records do not establish external verification, provider identity, performance, or runtime adherence.
-Codex's Astra, Sol, Terra, and Luna display names do not establish support for bare aliases in dispatch tools.
-Use the host's supported exact IDs and preserve pinned versions.
+Use model identifiers supported by the active host and preserve explicitly required versions.
 Record requested settings and report resolved settings only when the host supplies them, otherwise mark them unknown.
 Follow the current tool contract for fork inheritance and override support.
 

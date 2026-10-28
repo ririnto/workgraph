@@ -14,7 +14,6 @@ Synchronize shared memory between goroutines.
 Define interfaces at consumption sites, accept interfaces, and return concrete types.
 Use pointer receivers for mutation or shared identity and value receivers for small independent structs.
 Use `any`, `slices`, and `maps` only when the declared Go version supports them.
-Use `maps.Values` and `slices.Values` for value-only loops when Go 1.23 or later is declared.
 Retain key or index iteration when the loop needs those values or must preserve its behavior.
 
 Use `strings.Builder` for repeated concatenation in loops.
@@ -29,17 +28,12 @@ Use `t.Parallel()` for independent cases whose setup and shared resources permit
 
 ## Workspaces and tool dependencies
 
-Use `go.work` to coordinate repository modules when the declared Go version supports workspaces.
-Keep adopted Go tools and their versions in a repository-owned `go.mod` or dedicated modfile.
-Workspace coordination does not replace module ownership of tool dependencies.
-Manage and run tools using their owning module.
+Use the project's existing workspace and tool dependency management conventions.
+When using workspaces, verify support in the declared Go version and keep tool dependencies owned by their module.
 Use an explicit `-modfile=<file>.mod` only outside workspace mode.
 
-For Go 1.24 or later, use `go get -tool <tool-package>@<version>` to record tool dependencies in the module file.
-Run them with `go tool <tool-package>`.
-For earlier declared versions, retain tool dependencies through blank imports in a build-constrained `tools.go` file.
-Use build constraints supported by the declared Go version.
-Run those tools with `go run <tool-package>` without a version suffix to use the module's dependency requirements.
+When managing tools in a module, use tool directives only with a compatible Go version.
+For earlier versions, use build constraints supported by the declared Go version.
 See the official [tool dependency guidance](https://go.dev/doc/modules/managing-dependencies#tools) and [workspace reference](https://go.dev/ref/mod#workspaces).
 
 ## Linting

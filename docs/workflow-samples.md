@@ -96,7 +96,7 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
-| `models` | Optional object of per-phase model selector strings. |
+| `models` | Optional object of per-phase model selector strings and a separate `verify` selector. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds. |
 
@@ -149,7 +149,8 @@ The run result retains the branch identity and state of every attempt, and a sup
 A retained resource never counts as passing evidence.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.
 A separate read-only agent verifies every `fix-required` finding before repair.
-The verifier uses the Review phase model selector, including any `args.models.review` override.
+The verifier uses `args.models.verify` when supplied, independently of `args.models.review`.
+Without a verifier selector, the agent call leaves its model unset for host configuration.
 It reports a confirmed, refuted, or unverified disposition with evidence for each finding.
 Missing, malformed, failed, or unverified dispositions block repairs and acceptance.
 Confirmed findings alone go to their owning units, bounded by `maxFixRounds`.
@@ -160,7 +161,7 @@ A confirmed finding outside one unambiguous owned unit blocks the round for repl
 
 ## Models
 
-Delivery samples accept optional selectors by phase through `args.models`.
+Delivery samples accept optional selectors by phase through `args.models`, plus `args.models.verify` for finding verification.
 The design workflow accepts optional selectors by specialist role through `args.models`.
 An omitted selector stays unset so the host can apply its current configuration.
 Every selector must be a nonempty string the host supports for agent calls.

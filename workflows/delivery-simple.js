@@ -53,7 +53,7 @@ const modelsInput = settingsMap(input.models, 'args.models')
 const partsInput = settingsMap(input.promptParts, 'args.promptParts')
 for (const map of [skipsInput, modelsInput, partsInput]) {
   for (const key of Object.keys(map)) {
-    if (!phaseKeys.includes(key)) {
+    if (!phaseKeys.includes(key) && !(map === modelsInput && key === 'verify')) {
       throw new Error(`Unknown phase key ${key}; supported phases are ${phaseKeys.join(', ')}`)
     }
   }
@@ -78,6 +78,10 @@ for (const key of phaseKeys) {
   models[key] = model
   promptParts[key] = part ?? ''
 }
+if (modelsInput.verify !== undefined && (typeof modelsInput.verify !== 'string' || !modelsInput.verify.trim())) {
+  throw new Error('Provide models.verify as a nonempty model selector string')
+}
+models.verify = modelsInput.verify
 let maxFixRounds = defaultFixRounds
 if (input.maxFixRounds !== undefined) {
   if (!Number.isSafeInteger(input.maxFixRounds) || input.maxFixRounds < 0 || input.maxFixRounds > 3) {
@@ -758,7 +762,7 @@ const verifyFindings = async (review, integration, publication, round) => {
     'Return exactly one disposition per finding with its id, status confirmed, refuted, or unverified, and nonempty evidence.',
     readOnlyPart,
     promptParts.review
-  ), { label: `verify-findings:${round + 1}`, ...(models.review === undefined ? {} : { model: models.review }), phase: 'Verify', schema: {
+  ), { label: `verify-findings:${round + 1}`, ...(models.verify === undefined ? {} : { model: models.verify }), phase: 'Verify', schema: {
     properties: { dispositions: { items: { properties: { id: { type: 'string' }, status: { enum: ['confirmed', 'refuted', 'unverified'], type: 'string' }, evidence: { type: 'string' } }, required: ['id', 'status', 'evidence'], type: 'object' }, type: 'array' } },
     required: ['dispositions'], type: 'object'
   } })

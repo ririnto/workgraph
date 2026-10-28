@@ -63,8 +63,9 @@ execution:
     State whether starting the Task calls for separate model or effort overrides or changes to existing sessions.
     An internal Agent call supports optional model and effort fields, but its assignment pins both settings.
     State whether a harder retry permits changing those pinned settings.
-    Two unpinned calls perform routine extraction and difficult judgment, respectively.
-    State how their workload affects model and effort selection under the active host's guidance.
+    Two unpinned edit calls differ in difficulty: one is narrowly scoped and simple, while the other requires difficult judgment.
+    Explain tier and effort selection without treating edit work as a fixed tier.
+    Explain when likely failure and retry costs justify a higher tier despite lower per-call savings.
     The host exposes model and effort controls, but no model-specific routing is assigned.
     State how the agent selects settings without inventing fixed defaults or changing the session configuration.
     The user then explicitly requests a supported model for difficult terminal work.
@@ -106,9 +107,9 @@ graders:
     criteria: |-
       Judge decisions by meaning, not fixed wording.
       Tracking and review follow the task, repository requirements, and risk instead of requiring an Issue or independent review universally.
-      Main determines the complete initial candidate, including committed, staged, unstaged, and untracked content, and gives it to the scanner when nonempty.
-      Main records a verified empty initial candidate without dispatching a scan and limits the result to that snapshot.
-      A nonempty initial candidate receives exactly one delegated read-only exposure scan and its completed result before implementation.
+      Main determines the complete initial candidate, including committed, staged, unstaged, and untracked content.
+      Any verified empty-candidate result covers only its snapshot.
+      Main assesses exposure risks before sending candidate content outside its trusted boundary.
       A read-only delegate scans the complete diff for exposures before each push, allowing reuse only while that diff remains unchanged.
       Explicitly required independent reviewers run in parallel when ready, and dependent verification receives the relevant predecessor evidence.
       Finding verification excludes both finder and fixer and receives the complete predecessor result and candidate evidence.
@@ -135,7 +136,9 @@ graders:
       A per-Task manager controls only that Task's assigned native host while its native Main owns source and complete delivery.
       Native Task starts omit separate model and effort overrides and preserve existing sessions.
       Explicit or configured model and effort pins remain intact on the harder internal-Agent retry.
-      Unpinned model and effort choices suit extraction or difficult judgment under the active host's guidance.
+      Unpinned model and effort choices match each task's difficulty and boundedness, not its work kind.
+      A simple bounded edit can use a light tier; difficult judgment can require a stronger tier and higher effort.
+      A higher tier can be selected directly when likely failure and retry costs outweigh lower-tier per-call savings.
       Without assigned model-specific routing, the agent does not invent fixed defaults or change session configuration.
       An explicit supported model request takes precedence and does not establish a resolved release.
       Main delegates the substantial ready outcome and handles trivial work directly unless delegation is requested.

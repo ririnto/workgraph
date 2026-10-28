@@ -19,7 +19,6 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/subagent-context/references/{claude-code,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
 | `skills/fix-queue-delivery/SKILL.md` | Assigned repository queue owners | Queue Main, issue owners, and the integration owner coordinate bounded fixes and confirm original acceptance before closure. |
-| `skills/dual-review/SKILL.md` | Assigned dual-review managers | Managers collect independent native passes, verify candidates, read back issue writes, and hand fixes to separate units. |
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
 | `skills/delivery/references/{claude-code,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |

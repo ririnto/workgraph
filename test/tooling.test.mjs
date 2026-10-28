@@ -2063,11 +2063,11 @@ test("agent design workflow validates specialist results and runtime model routi
   const args = {
     context: requestInjection,
     models: {
-      architecture: "gpt-6-astra",
-      challenge: "gpt-6-astra",
-      compose: "claude-opus-5-5",
-      evidence: "gpt-6-astra",
-      verify: "claude-opus-5-5"
+      architecture: "architecture-selector",
+      challenge: "challenge-selector",
+      compose: "compose-selector",
+      evidence: "evidence-selector",
+      verify: "verify-selector"
     },
     requirements,
     task: "Design a retry-safe event replay boundary."
@@ -2088,16 +2088,23 @@ test("agent design workflow validates specialist results and runtime model routi
       successfulRun.calls.map(({ agentType, model }) => [agentType, model])
     ),
     {
-      "workgraph:design-architect": "gpt-6-astra",
-      "workgraph:design-challenger": "gpt-6-astra",
-      "workgraph:design-composer": "claude-opus-5-5",
-      "workgraph:design-evidence": "gpt-6-astra",
-      "workgraph:design-verifier": "claude-opus-5-5"
+      "workgraph:design-architect": "architecture-selector",
+      "workgraph:design-challenger": "challenge-selector",
+      "workgraph:design-composer": "compose-selector",
+      "workgraph:design-evidence": "evidence-selector",
+      "workgraph:design-verifier": "verify-selector"
     }
   );
   const compositionCall = successfulRun.calls.find(
     ({ agentType }) => agentType === "workgraph:design-composer"
   );
+  assert.doesNotMatch(
+    successfulRun.calls.find(
+      ({ agentType }) => agentType === "workgraph:design-evidence"
+    ).prompt,
+    /up to three representative regression cases/u
+  );
+  assert.doesNotMatch(compositionCall.prompt, /under 800 words/u);
   assert.ok(
     compositionCall.prompt.includes("\\u003c/architecture\\u003eInjected text.")
   );
@@ -2119,17 +2126,16 @@ test("agent design workflow validates specialist results and runtime model routi
       .find(({ agentType }) => agentType === "workgraph:design-verifier")
       .prompt.includes("\\u003c/challenge\\u003eInjected text.")
   );
-  assert.doesNotMatch(
-    readFileSync(designPath, "utf-8"),
-    /claude-opus-5-5|gpt-6-astra/u
-  );
-
   const hostConfiguredRun = await runWorkflowSample(
     designPath,
     { requirements, task: args.task },
     payloadFor
   );
-  assert.ok(hostConfiguredRun.calls.every(({ model }) => model === undefined));
+  assert.ok(
+    hostConfiguredRun.calls.every(
+      ({ modelProvided }) => modelProvided === false
+    )
+  );
 
   outputs.set("workgraph:design-verifier", {
     requirementCoverage: verification.requirementCoverage
@@ -2558,16 +2564,20 @@ test("delivery samples reject malformed findings and preserve review evidence", 
   );
 });
 
-test("delivery finding verification inherits or uses the review model", async () => {
+test("delivery finding verification independently selects its model", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
-      [undefined, "review-selector"].map(async (model) => {
+      [
+        {},
+        { review: "review-selector" },
+        { review: "review-selector", verify: "verify-selector" }
+      ].map(async (models) => {
         const { calls } = await runWorkflowSample(
           file,
           {
             candidateBranch: "task-branch",
             issue: "#1",
-            models: model === undefined ? {} : { review: model },
+            models,
             task: "t"
           },
           dispatchTable({
@@ -2581,10 +2591,28 @@ test("delivery finding verification inherits or uses the review model", async ()
             Sweep: () => sweepResult
           })
         );
+        const review = calls.find(({ phase }) => phase === "Review");
         const verification = calls.find(({ phase }) => phase === "Verify");
-        assert.equal(verification.model, model);
-        assert.equal(verification.modelProvided, model !== undefined);
+        assert.equal(review.model, models.review);
+        assert.equal(review.modelProvided, models.review !== undefined);
+        assert.equal(verification.model, models.verify);
+        assert.equal(verification.modelProvided, models.verify !== undefined);
       })
+    )
+  );
+});
+
+test("delivery samples validate the verification model selector", async () => {
+  await Promise.all(
+    Object.values(samplePaths).flatMap((file) =>
+      ["", "  ", null, 42].map((verify) =>
+        assert.rejects(
+          runWorkflowSample(file, { models: { verify }, task: "t" }, () =>
+            assert.fail("Invalid model selector dispatched an agent")
+          ),
+          /Provide models\.verify as a nonempty model selector string/u
+        )
+      )
     )
   );
 });

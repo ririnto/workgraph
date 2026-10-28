@@ -35,17 +35,11 @@ Preserve condition order, smart casts, nullability, effects, exceptions, allocat
 Keep negative or mixed-polarity predicates together when splitting would change their logic.
 Use sequences only when lazy evaluation matches the contract.
 Use `?.let` or an equivalent safe call for null-present work when behavior stays unchanged.
-Prefer `.run` over `.let`, and `?.run` over `?.let`, when the lambda uses only properties of the bound argument.
-Apply this preference to named lambda parameters and the implicit `it`.
-Keep `let` when the body requires the bound value itself or no equivalent preserves its semantics.
-When replacing `.let` on a nullable receiver, use `.run` rather than `?.run` to preserve execution for `null`.
-Use explicit receiver labels or qualification when nested receivers would otherwise bind a property to another receiver.
 Preserve stable-value semantics, getter evaluation count, smart casts, nullable-result and Elvis behavior, captures, and non-local returns.
 Use the captured non-null value instead of rereading a nullable property when access timing and getter evaluation stay equivalent.
 Keep required validation and failure behavior explicit.
 Use subject-based `when` for complete comparisons of one stable subject when semantics match.
 Use braces for every `if` and `else` branch.
-Use no trailing commas in function and constructor arguments.
 Use `=== null` and `!== null` for null checks when repository lint permits this style.
 Prefer `requireNotNull` for required arguments and `checkNotNull` for required state, preserving exception and return behavior.
 
@@ -98,7 +92,6 @@ Keep assertions that depend on coroutine work inside the group after that work c
 Await structured child work in the surrounding coroutine scope.
 Verify assertion-context propagation for the project's Kotest version when assertions cross coroutine dispatchers or context boundaries.
 Inline a single-use test value only when construction timing, side effects, readability, resource lifetime, and fixture isolation remain unchanged.
-Inline a service used only as the `assertSoftly` subject when its construction or expression can move safely.
 Preserve setup timing, evaluation order, resource lifetime, mock verification order, and fixture isolation.
 
 ## Automation
