@@ -68,7 +68,9 @@ execution:
     Explain when likely failure and retry costs justify a higher tier despite lower per-call savings.
     The host exposes model and effort controls, but no model-specific routing is assigned.
     State how the agent selects settings without inventing fixed defaults or changing the session configuration.
-    The user then explicitly requests a supported model for difficult terminal work.
+    The active host's explicit-only model has not been requested or configured.
+    State whether it may be selected for difficult work.
+    The user then explicitly requests that model for difficult work, and the host supports it.
     State how that request changes the selection without claiming a resolved release.
     One substantial ready outcome has a supported delegation tool and no direct-work request.
     Another task is trivial and has no delegation request.
@@ -140,7 +142,8 @@ graders:
       A simple bounded edit can use a light tier; difficult judgment can require a stronger tier and higher effort.
       A higher tier can be selected directly when likely failure and retry costs outweigh lower-tier per-call savings.
       Without assigned model-specific routing, the agent does not invent fixed defaults or change session configuration.
-      An explicit supported model request takes precedence and does not establish a resolved release.
+      The active host's explicit-only model is not selected without an explicit request.
+      An explicit supported request permits that model and does not establish a resolved release.
       Main delegates the substantial ready outcome and handles trivial work directly unless delegation is requested.
       The model-backed tool uses only its supported model control and preserves existing effort settings.
       The deterministic tool receives no invented model or effort fields.
