@@ -932,6 +932,51 @@ const reviewFix = {
 };
 const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
 
+test("delivery samples name the integrated candidate in sweep and publication on repair", async () => {
+  await Promise.all(
+    Object.entries(samplePaths).map(async ([variant, file]) => {
+      const candidate = "delivery/accepted-candidate";
+      const { calls, result } = await runWorkflowSample(
+        file,
+        { candidateBranch: candidate, issue: "#1", maxFixRounds: 1, task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: (options) => ({
+            ...(variant === "simple"
+              ? simpleImplement
+              : splitImplement(options)),
+            startRef: candidate
+          }),
+          Integrate: () => ({
+            ...(variant === "simple" ? integrateSingle : integrateResult),
+            branch: candidate
+          }),
+          Plan: () => (variant === "simple" ? singleUnits : splitUnits),
+          Publish: sequence(publishCreated, publishUpdated),
+          Review: sequence(reviewFix, reviewPass),
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.equal(result.complete, true);
+      for (const phase of ["Sweep", "Publish"]) {
+        const phaseCalls = calls.filter((call) => call.phase === phase);
+        assert.equal(phaseCalls.length, 2);
+        for (const call of phaseCalls) {
+          assert.ok(call.prompt.includes(`Candidate branch: ${candidate}`));
+          assert.ok(
+            call.prompt.includes(
+              phase === "Sweep"
+                ? "Inspect the candidate branch diff against the base branch"
+                : "Push and create or update the review request for this exact candidate branch"
+            )
+          );
+        }
+      }
+    })
+  );
+});
+
 test("delivery samples reject a passing review with unresolved findings", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {

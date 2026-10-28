@@ -587,11 +587,12 @@ const applyLedger = (integrationState, attemptLedger) => {
     }
   })
 }
-const dispatchSweep = async () => {
+const dispatchSweep = async candidate => {
   const attempt = await runAgent(compose(
-    'Run a quick environment-exposure sweep over the current change only.',
+    'Run a quick environment-exposure sweep over the integrated change only.',
     basePart,
-    'Inspect the branch diff against the base branch and the untracked files, and read only those files.',
+    `Candidate branch: ${candidate}`,
+    'Inspect the candidate branch diff against the base branch and its checkout untracked files, and read only those files.',
     'Flag credentials, tokens, private hostnames, absolute home paths, session identifiers, and private environment details.',
     'Report each exposure with its file, a kind, and the exposing detail.',
     'Report an empty list when the change is clean.',
@@ -640,9 +641,11 @@ const dispatchSweep = async () => {
 }
 const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   const attempt = await runAgent(compose(
-    'Publish the current task branch for review.',
+    'Publish the integrated candidate branch for review.',
     taskPart,
     basePart,
+    `Candidate branch: ${integrationState.branch}`,
+    'Push and create or update the review request for this exact candidate branch.',
     issuePart,
     priorUrl === null ? '' : `Update the existing open request at ${priorUrl} with the fixed change instead of creating another request.`,
     `Change summary: ${JSON.stringify({
@@ -840,7 +843,7 @@ if (phaseRecords.integrate.status !== 'completed') {
   sweepState = { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
 } else {
   log('Sweeping the change for environment exposures')
-  sweepState = await dispatchSweep()
+  sweepState = await dispatchSweep(integrationState.branch)
 }
 recordPhase('sweep', sweepState.status, sweepState.reason)
 let publishState = null
@@ -902,7 +905,7 @@ while (
     ? { reason: 'Integration did not complete', status: 'skipped' }
     : skipped.sweep
     ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
-    : await dispatchSweep()
+    : await dispatchSweep(integrationState.branch)
   recordPhase('sweep', sweepState.status, sweepState.reason)
   phase('Publish')
   publishState = await runPublish(sweepState, unitResults, integrationState, postedUrl)
