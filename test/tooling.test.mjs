@@ -1164,6 +1164,32 @@ test("delivery workflow samples allow explicitly omitted exploration", async () 
   );
 });
 
+test("delivery workflow samples stop planning when exploration fails", async () => {
+  await Promise.all(
+    Object.values(samplePaths).map(async (file) => {
+      const { calls, result } = await runWorkflowSample(
+        file,
+        { candidateBranch: "task-branch", task: "t" },
+        dispatchTable({ Explore: () => null, Scope: () => scopeResult })
+      );
+      assert.equal(
+        calls.some((call) => call.phase === "Explore"),
+        true
+      );
+      assert.equal(
+        result.phaseEvidence.find((record) => record.title === "Explore")
+          .status,
+        "failed"
+      );
+      assert.equal(
+        calls.some((call) => call.phase === "Plan"),
+        false
+      );
+      assert.equal(result.complete, false);
+    })
+  );
+});
+
 test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   for (const file of Object.values(samplePaths)) {
     const text = readFileSync(file, "utf-8");

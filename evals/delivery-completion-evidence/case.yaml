@@ -1,0 +1,56 @@
+schema_version: "1.1"
+name: delivery-completion-evidence
+description: Verify the bundled delivery sample gates a planning-only run on completed predecessors with fail-closed completion evidence.
+execution:
+  runs: 2
+  max_turns: 20
+  timeout_seconds: 1200
+  allowed_tools:
+    - Workflow
+    - Read
+    - Skill(workgraph:workflow)
+  prompt: |-
+    Use the planning-only run of the Workgraph delivery sample.
+    Read the complete workflow skill and its bundled workflows/delivery-simple.js source.
+    Invoke the registered workgraph:delivery-simple workflow.
+    Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.
+    Keep scope separation, exploration, and planning enabled.
+    Because this request edits nothing and publishes nothing, skip implementation, integration, sweep, publication, and review through structured args.skips.
+    Run exactly one native Workflow invocation.
+    Do not retry or duplicate it after failure, incomplete results, or timeout.
+    If the run launches in the background, wait for its completion notification.
+    Then read its task output file once so the returned result appears in the trace.
+    Report the returned phase evidence and completion outcome only from the returned result.
+    Do not edit files, run shell commands, use Git, publish, or dispatch host Agents.
+graders:
+  - name: delivery-workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+    max: 1
+  - name: completion-evidence-recorded
+    type: llm
+    focus: trace
+    criteria: |-
+      Judge the observed tool trace, Workflow results, and final report together.
+      Require the session to use Skill(workgraph:workflow) and read the complete maintained delivery-simple.js source.
+      Require its first native Workflow call to use the registered workgraph:delivery-simple name.
+      Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
+      A freshly authored replacement graph or an inline script does not establish source consumption.
+      Require actual completed results from the scope phase and one explorer per returned scope.
+      Require each such result to match the schema that the maintained source declares.
+      Require the returned phase evidence to record Scope and Explore as completed.
+      Require the plan input to contain the actual returned scopes and each explorer's summary and risks.
+      Require the plan phase to run and its record to be completed or failed.
+      Accept a failed plan record only with the source's own validation or agent-failure reason.
+      Require every later phase record to be skipped with the nonempty reason that the source records for that outcome.
+      Require no dispatch of Implement, Integrate, Sweep, Publish, or Review agents.
+      For a background run, require one Read of its completed task output file before the final report.
+      Judge the returned result from that Read result or the synchronous Workflow result.
+      Require the returned result to report `complete` false, `publish` null, and `fixRounds.used` zero.
+      Require the final report to restate the recorded statuses and reasons from the returned evidence.
+      Fail a report that claims edits, publication, completed delivery, or a phase record that the run did not return.
+      Fail a proposed-only workflow, an execution error, a retried or duplicated invocation, or a second host Agent or Workflow dispatch.
+      Fail fabricated phase records or a report before the returned result exists.
+      A launch acknowledgment that reports no phase results is not such a report.
+      Judge observed tool results and evidence, not specific prose wording.
