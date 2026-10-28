@@ -47,7 +47,7 @@ The dispatching session owns the task branch, initial candidate inspection, and 
 
 ## Agent Design
 
-Run `/workgraph:workflow` with a design goal to launch the bundled source through native Workflow.
+Request the bundled design graph through `/workgraph:workflow` when its specialist stages fit the task.
 The `workgraph:design-lead` plugin agent is an optional main-session coordinator that uses the same skill and source.
 The skill invokes the registered `workgraph:design` workflow.
 Run the skill again for a fresh design, or continue the same session with the returned `scriptPath` and run ID.

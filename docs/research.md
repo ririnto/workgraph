@@ -131,7 +131,7 @@ Anthropic recommends evaluating effort on the target workload because effort nam
 Fable 5.1 starts at its default `high`, while Opus 5.5 starts at its default `medium`.
 Sonnet 5.5 defaults to `high` in the API but recommends `medium` for well-defined agentic tasks and `high` for harder work.
 Anthropic recommends lowering host effort settings to reduce thinking.
-Check each model's settings before reuse, and preserve the Claude routing guidance.
+Check each model's settings before reuse and honor the active assignment.
 
 Effort settings, token limits, response-block parsing, progress-update display, and bounded automatic continuations belong to the host or API integration.
 Time signals require host-supplied measurements, and pasted-content tags require application support.
@@ -493,7 +493,7 @@ This practitioner report does not establish Workgraph effectiveness or authorize
 | Runnable verification precedes review. | Development and Verification already require observable checks, commands, outcomes, and evidence limits. |
 | Review evaluates intent and system impact. | Delivery now supplies the complete candidate, project review instructions, acceptance, and affected real consumers. |
 | Findings need verification and disposition. | Delivery now distinguishes introduced defects, pre-existing issues, evidence-based rejection, fixes, and tracked deferrals. |
-| Review effort follows risk. | Main host references now select reviewer staffing and depth by uncovered failure modes and failure consequences. |
+| Review effort follows risk. | Delivery selects reviewer staffing and depth by task risk and explicit requirements. |
 | Review must converge. | Delivery and its Workflow consumer now retain prior dispositions and reassess affected interactions without repeating resolved findings. |
 | Human authority and ownership remain explicit. | Main already owns authorized delivery, while Delivery preserves required human approvals and now records recovery considerations. |
 | Repeated failures should improve the responsible layer. | Development already prioritizes root causes, existing checks, and narrowly justified instruction changes. |
@@ -755,7 +755,7 @@ A separate source-adoption authorization permits its specified source delivery w
 No quoted example grants permission to change live models, ultracode, credentials, permissions, or plugin activation.
 Main ownership, complete-candidate review, and normal Delivery integration boundaries remain required.
 
-The model split is Workgraph guidance inspired by the post, not an official universal Workflow default or measured performance ranking.
+The post's model split is not an official universal Workflow default or a measured performance ranking.
 Provider routing and model overrides can resolve aliases differently, so requested names do not prove resolved releases.
 Codex uses its configured model settings and cannot execute Claude's native Workflow.
 The post's throughput and cost claims are unverified here, and script-held results do not eliminate planning or worker costs.

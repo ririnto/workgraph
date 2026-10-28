@@ -146,7 +146,7 @@ Do not implement fixes or create a task branch in this review unit.
 Do not keep either original reviewer alive for a fix round.
 Do not run an external review-until-clean loop.
 
-Each resolution unit owns its source, scoped checks, independent delivery reviews, integration, and named-main readback.
+Each resolution unit owns its source, scoped checks, independent delivery reviews, integration, and authorized-base readback.
 Those delivery reviews do not resume this dual-review assignment.
 
 ## Completion And Handback

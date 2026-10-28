@@ -8,7 +8,6 @@ description: Use when implementing, refactoring, debugging, or reviewing source 
 Apply the target repository's rules, lint configuration, and existing tools before these defaults.
 Read only matching playbooks and language references unless their complete content is already loaded.
 For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
-Use `.yaml` for YAML files unless the consuming platform requires another exact filename.
 
 ## Development Lifecycle
 
@@ -60,39 +59,16 @@ Fix recurring causes in code or data architecture first.
 Use official SDK or framework properties directly when they satisfy the required behavior.
 Prefer immutable bindings and minimize mutable state.
 
-Use named regex capture groups and name-based access for extracted matches and subgroups, including the full match.
-Use named backreferences and replacement references instead of positional references.
 Prefer an existing parser or literal operation when it expresses the requirement more clearly.
-Use the language or platform's native named-group facilities instead of adding unnecessary custom wrappers.
-If the engine lacks named groups, report that limit.
-Do not treat ordinary array indexing as regex capture access.
 
 Before control-flow or expression changes, including condition inversion, read [Preserve Behavior](../principle-preserve-behavior/SKILL.md) unless its complete content is already loaded.
 Before helper, abstraction, or test-observation decisions, read [Production Interfaces](../principle-production-interfaces/SKILL.md) unless its complete content is already loaded.
 
-## Spacing
-
-Remove blank lines inside functions, except where lint requires them or line breaks carry meaning, including string literals.
-Keep exactly one blank line between functions and between sibling test or lifecycle-hook blocks.
-Apply that separation inside test callbacks, including `beforeTest`, `afterTest`, `beforeEach`, `afterEach`, and `it` blocks.
-The sibling-block separation takes precedence over removing blank lines inside functions.
-Do not insert blank lines between object-literal methods or function-valued properties.
-This object-literal rule takes precedence over separation between functions.
-Preserve required formatter output and meaningful line breaks when these spacing defaults conflict.
-
 ## Documentation And Comments
 
-Document effective public, protected, and exported declarations using the language's declaration documentation syntax.
-Check implicit visibility, enclosing scopes, re-exports, and default exports when identifying these declarations.
-Format documentation comments and docstrings as multiline, even for one sentence, wherever language syntax supports them.
-Preserve their text, indentation, declaration attachment, and language-native semantics when formatting or moving them.
-Documentation for other declarations is optional unless tooling or a safety contract requires it.
-
+Follow the project's documentation and comment conventions.
+Preserve declaration attachment, directives, licenses, and safety invariants when changing documentation or comments.
 Remove obsolete workaround comments when changing affected code.
-General comments are banned.
-Use declaration documentation comments when an explanation is needed, rather than general comments.
-Preserve required directives, licenses, existing suppressions, and safety invariants expressed as documentation.
-Do not add runtime logging calls to preserve an explanation.
 
 ## Side-Effect Boundaries
 
@@ -117,7 +93,6 @@ When selecting dependency versions, prefer officially supported LTS releases, or
 Verify current support status and compatibility with the project's runtime, toolchain, and dependent APIs.
 Use existing native dependency catalogs and lockfiles, preserving compatible managed versions.
 Avoid unrelated upgrades.
-Do not add commit-hash or image-digest pinning as part of version selection.
 Preserve existing integrity checks, including lockfile integrity fields and signature or checksum verification.
 
 ## Automation
@@ -125,18 +100,8 @@ Preserve existing integrity checks, including lockfile integrity fields and sign
 Use the project's existing formatters, checkers, and test frameworks for ordinary development changes.
 Preserve existing lint and formatter choices when adding guidance or filling configuration gaps.
 
-For authorized lint setup in projects without an existing lint configuration, use these defaults.
-
-| Language | Default |
-| --- | --- |
-| Python | Ruff |
-| JavaScript and TypeScript | Ultracite, invoking Oxlint and Oxfmt through Ultracite |
-| Kotlin | ktlint |
-| Go | golangci-lint |
-
-When lint automation is authorized, prefer built-in rules and supported configuration before custom rules.
-Use the Kotlin and Node.js tooling guidance in the matching language references.
-For other languages, use their existing standard tools.
+For authorized lint setup, select tools appropriate to the project and task.
+Prefer built-in rules and supported configuration before custom rules.
 Verify tool-version support and edge cases before adding a custom rule.
 Make rules AST-aware and preserve literals, comments, and automatic semicolon insertion where applicable.
 

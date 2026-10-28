@@ -72,7 +72,7 @@ Create local evidence only when a current check, failure investigation, or recov
 
 Use project roles or the user's statement to determine whether the user maintains the project.
 Review each complete delivery unit at the depth required by the task and its risks.
-Select reviewer staffing and effort from the active Main host reference and explicit user requirements.
+Select reviewer staffing and effort from the task's risks, available controls, and explicit requirements.
 Run selected independent reviewers in parallel when there is more than one.
 Follow required repository review timing and any requested independent review.
 Keep completed valid reviews without mislabeling sequential work as parallel or restarting it solely to change timing.

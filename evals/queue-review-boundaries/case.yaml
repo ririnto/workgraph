@@ -26,15 +26,16 @@ execution:
     The first merge changes a shared consumer and causes the second PR's integration collision.
     Explain merge serialization, branch updates, and evidence refresh without discarding unaffected passing evidence.
 
-    A PR merged and a ref lookup confirms named main exists.
+    A PR merged into the assigned release branch and a ref lookup confirms that branch exists.
     The original issue requires that invalid input produces a specific nonzero exit result.
-    No named-main source or behavior check has covered that requirement.
+    No release-branch source or behavior check has covered that requirement.
     Explain issue closure, PR issue references, and the additional evidence needed.
     An umbrella's children have all merged, but its own cross-component acceptance remains unchecked.
     Explain its separate completion decision.
 
-    A request asks for one ordinary review without cross-host coverage.
-    Contrast it with an explicit bounded dual-host review assignment.
+    A request asks for one ordinary review without a dual-review assignment.
+    Contrast it with an explicit dual-review assignment using two reviewers on one host.
+    Then consider an explicit bounded dual-host review assignment.
     The latter names the same target and base for one native Claude pass and one native Codex pass.
     It names configured model and effort settings, excludes native review mode, permits source reads only, and authorizes issue filing.
     State reviewer independence, settings, check limits, and the manager's independent verification role.
@@ -74,11 +75,12 @@ graders:
       The issue owner updates its branch after a collision unless ownership transfers.
       The integration owner refreshes affected checks, acceptance evidence, and review coverage while reusing unaffected valid evidence.
       A merged PR and ref lookup alone do not establish issue acceptance.
-      Closure requires relevant named-main source or behavioral evidence against the original nonzero-exit acceptance.
+      Closure requires relevant release-branch source or behavioral evidence against the original nonzero-exit acceptance.
       PR references do not automatically close the issue before acceptance confirmation.
       The umbrella remains open until its own original cross-component acceptance is confirmed.
-      Ordinary single review does not trigger dual review without the explicit cross-host requirement.
-      Dual review uses one fresh native pass per assigned host over the complete same target and keeps candidates independent until both passes finish.
+      Ordinary single review does not trigger dual review without an explicit dual-review assignment.
+      An explicit same-host dual review uses two independent reviewers without inventing a cross-host requirement.
+      The dual-host assignment uses one fresh native pass per assigned host over the complete same target and keeps candidates independent until both passes finish.
       Assigned settings and excluded native review mode remain intact, and source-only authority permits no behavioral commands.
       The manager verifies candidates independently of finder and fixer before confirmed registration.
       Two Claude-hosted models do not replace the missing native Codex pass, and required dual coverage remains incomplete.
@@ -87,7 +89,7 @@ graders:
       The source-only unprovable candidate remains unverified and is not filed as confirmed.
       An ambiguous create response requires authenticated tracker-state inspection before retry, with failed readback reported as unverified registration.
       Invalidated moving-target coverage remains unverified without restarting completed passes to chase the target.
-      Confirmed fixes go to separate resolution units with their own checks, independent delivery reviews, integration, and named-main readback.
+      Confirmed fixes go to separate resolution units with their own checks, independent delivery reviews, integration, and authorized-base readback.
       Original review hosts stop after handback, and the review unit performs no implementation or task branching.
       The editing decision preserves the compiler as factual actor, the uncertainty of may, atomic behavior, and exact quoted syntax.
       The response claims no actual simulated merge, review pass, tracker write, behavioral check, or fix.

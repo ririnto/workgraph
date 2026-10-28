@@ -44,23 +44,9 @@ See the official [tool dependency guidance](https://go.dev/doc/modules/managing-
 
 ## Linting
 
-When the repository already uses golangci-lint or the user authorizes adopting it, use golangci-lint for Go linting.
-
-When using tool directives or `tools.go` for golangci-lint, isolate it in a dedicated repository-owned module or modfile.
-For `tools.go`, use the isolated tool module to keep its imports out of application `go mod tidy`.
-Keep its dependency graph separate from application modules and other tools.
-Do not add its module to the application's `go.work`.
-Resolve and build it with `GOWORK=off` to prevent workspace dependency selection.
-Run the built executable with the application's workspace configuration.
-Do not upgrade golangci-lint's dependencies independently.
-See golangci-lint's [source-install guidance](https://golangci-lint.run/docs/welcome/install/local/#install-from-sources) for the limitations of module-based installation.
-
-Prefer built-in linters before custom extensions.
-Use its module plugin system for custom linters because golangci-lint recommends it over Go plugins.
-
-Separately from tool dependency management, check whether golangci-lint's build Go version supports the project's Go version.
-Check custom-linter API compatibility with the selected golangci-lint version.
-
+Use the project's existing lint tools and authorized configuration.
+Keep tooling dependencies isolated when they would otherwise alter application dependencies.
+Check toolchain and custom-linter API compatibility before selecting versions.
 Cover intended reports and non-reports with meaningful custom-linter tests.
 Offer automatic fixes only when tests verify behavior preservation.
-Do not assume golangci-lint automatically replaces NilAway or independently required security or semantic checks.
+Preserve independently required security and semantic checks.

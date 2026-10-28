@@ -61,7 +61,6 @@ For Claude Code graph execution, [Workflow](skills/workflow/SKILL.md) adds nativ
 Its [authoring reference](skills/workflow/references/authoring.md) supplies script-specific guidance.
 Its [delivery reference](skills/workflow/references/delivery.md) maps Delivery operations to node inputs and outputs without owning another delivery checklist.
 Codex uses native delegation rather than Claude Code Workflow.
-Its [authoring reference](skills/workflow/references/authoring.md) covers native scripts and their result evidence.
 Workgraph bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
 Those samples use injectable prompt parts, optional per-phase model selectors, and explicit skip, failure, and bounded-recovery records.
 It also includes an [agent-authored design workflow](workflows/design.js) with runtime model inputs and independent verification.
