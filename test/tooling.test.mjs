@@ -2342,6 +2342,39 @@ test("delivery samples gate repairs on independent finding dispositions", async 
           );
         })
       );
+      const unowned = await runWorkflowSample(
+        file,
+        { candidateBranch: "task-branch", issue: "#1", task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: () => simpleImplement,
+          Integrate: () => integrateSingle,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => ({
+            ...reviewFix,
+            findings: [{ detail: "d", file: "README.md", scenario: "s" }]
+          }),
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.equal(unowned.result.complete, false);
+      const reviewRecord = unowned.result.phaseEvidence.find(
+        (record) => record.title === "Review"
+      );
+      assert.equal(reviewRecord.status, "failed");
+      assert.equal(
+        reviewRecord.reason,
+        "Confirmed findings do not map to exactly one owned unit"
+      );
+      assert.equal(unowned.result.fixRounds.used, 0);
+      for (const phase of ["Implement", "Integrate", "Publish", "Review"]) {
+        assert.equal(
+          unowned.calls.filter((call) => call.phase === phase).length,
+          1
+        );
+      }
     })
   );
 });
