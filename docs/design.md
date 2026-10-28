@@ -76,15 +76,14 @@ Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating common role rules.
 
 Main remains the entry point for complete authorized outcomes, including review, integration, readback, and cleanup.
-Delivery defines authorize-once Git operations, repository eligibility, and current-unit integration gates without enlarging host permissions.
+Delivery defines authorized Git operations and current-unit integration gates without enlarging host permissions.
 The [Delivery skill](../skills/delivery/SKILL.md) owns its sequence, scan, review, deferral, integration, and cleanup procedures.
 The role contracts and their references own autonomy, recovery, evidence freshness, and resource cleanup.
 The [orchestration section](#compose-work-through-the-host) describes graph composition without restating those procedures.
 
 Both role contracts classify communication by the initiating sender rather than a relayed message envelope.
 Agent assignments remain agent-originated when they relay a human request.
-Agent-origin messages omit routine narration while preserving required human input, actionable blockers, and mandatory host messages.
-All agent-authored communication uses English, including direct human replies.
+Communication follows the user's language and assignment requirements.
 Writing defers to the active role's policy.
 
 The host supplies general execution rules and tool mechanics.
@@ -95,7 +94,7 @@ Each role has separate host references because Main and Worker load at different
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](research.md#model-effort-and-cost).
 
 Both Codex role references select [Codex Scoped Cleanup](../skills/codex-scoped-cleanup/SKILL.md) before resource retirement.
-The skill routes cleanup through the authorized resource owner and supported herdr agent operations.
+The skill routes cleanup through the authorized resource owner and supported host operations.
 Its owner-mediated lifecycle reference loads before cleanup inventory or lifecycle changes.
 Attachment details load when Worktree Artifact connections require changes.
 Claude references contain no cleanup-skill routing, and neither hook injects the conditional cleanup procedure.
@@ -188,7 +187,7 @@ This example does not prescribe the same nodes for other goals.
 
 The [Main contract](../skills/main-agent-contract/SKILL.md) owns node selection, dispatch, evidence acceptance, and reporting rules.
 The [Worker contract](../skills/subagent-context/SKILL.md) owns bounded assignment execution and handbacks.
-The [Delivery skill](../skills/delivery/SKILL.md) owns the required repository sequence, exposure scans, independent review, current-unit deferrals, integration, and owned cleanup.
+The [Delivery skill](../skills/delivery/SKILL.md) owns repository tracking, exposure scans, review, current-unit deferrals, integration, and owned cleanup.
 The delivery skill's sequence and gates govern authorized repository delivery, and this design does not restate them.
 Workgraph contributor reviews follow the scoped policy in [docs/reviews.md](reviews.md).
 
@@ -198,13 +197,14 @@ The host may relay the user's `/workgraph:workflow` invocation to a dispatched a
 That relay carries no Workflow launch authority.
 The dispatched agent should complete the assigned task within its authority instead of launching another Workflow or returning it unworked.
 
-Claude Main prefers Agent for one-phase work and permits a one-phase Workflow when actual follow-up phases are expected.
+Claude Main selects direct Agent when one assignment completes the work without dependent agent stages or joins.
+It selects Workflow for dependent agent stages, required joins, or expected continuation.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
 Its [bundled native source](../workflows/sum-check.js) supplies a discoverable native workflow.
 The [caller contract](../skills/workflow/references/authoring.md#use-the-bundled-source) separates native source from Node modules and run-specific script copies.
 The plugin registers workflows by convention and supplies no replacement executor.
-Its delivery reference maps authorized engineering operations to node inputs and outputs without owning a second delivery checklist.
+Its delivery reference maps authorized engineering operations to node inputs and outputs while Main owns graph readiness.
 Worker and Codex contexts do not load Workflow procedures.
 Codex uses available native delegation tools, and its Main host reference owns tool routing.
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe those host contracts.
@@ -260,8 +260,8 @@ Workgraph's scoped contributor review policy lives in [docs/reviews.md](reviews.
 Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover single and parallel independent Agent selection, bundled-source Workflow invocation, expected continuation, and both conditional follow-up outcomes.
 Additional cases check an idle background command and an Agent completion callback.
-The English communication case checks assignments, worker handoffs, and human reports after a Spanish human request.
-The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, isolated parallel work, and repository eligibility.
+The communication case checks a worker handoff and the requested language of the human report.
+The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, and isolated parallel work.
 The Workflow-selection case uses keyed parser and documentation assessments with one necessary reconciliation rather than a domain-by-phase review matrix.
 These policy assessments do not perform Git delivery or establish installed activation.
 Completion graders inspect actual traces rather than relying on final claims.

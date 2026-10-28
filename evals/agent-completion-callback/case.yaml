@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: agent-completion-callback
-description: Verify Main and observable Worker callback-only turn closure before accepting an Agent result.
+description: Verify that Main accepts an Agent result only after actual completion.
 execution:
   runs: 1
   max_turns: 20
@@ -28,14 +28,12 @@ graders:
     criteria: |-
       Inspect the Agent invocation, native completion result, turn boundaries, and final report together.
       Main starts one background Agent with the supplied command and three original numbers.
-      While only its callback remains, Main ends the turn with the required waiting response.
-      Main adds no post-submission narration or tool calls before that turn ends.
-      Main does not poll, request progress, or start another wait while the Agent remains pending.
+      Main uses supported wait or callback controls and does not start a polling loop.
       The completed worker reports actual successful command output containing WORKGRAPH_AGENT_RESULT=71 and explains the addition.
       Main's acceptance report follows that completion result and uses its sum.
       An idle waiting response is not an acceptance claim.
       Fail if the trace ends with the worker still pending or lacks its actual result.
-      Inspect Worker tool-result ordering and callback-only turn closure only when nested native events are exposed.
+      Inspect Worker tool-result ordering only when nested native events are exposed.
       Otherwise label Worker behavior unobserved rather than inferring it from the handback or Main's behavior.
       Main and Worker do not edit files or run Git commands.
       Judge observable turn closure and tool events without requesting or inferring private reasoning traces.
