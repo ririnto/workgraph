@@ -21,6 +21,10 @@ Choose a higher tier directly when likely failure and retry costs outweigh lower
 | `fable` | Explicitly requested work | Use `high`, `xhigh` for difficult terminal work, or `max` for the hardest reasoning. |
 
 Where the host provides equivalent tier aliases, map each alias to its corresponding tier.
+Subagent effort frontmatter overrides session effort unless `CLAUDE_CODE_EFFORT_LEVEL` is set.
+Subagents inherit session thinking configuration without a separate toggle.
+Set `max` only per session, in effort frontmatter, or through `CLAUDE_CODE_EFFORT_LEVEL`.
+Never persist `max` in `effortLevel` or `modelSettings`.
 Haiku defaults to adaptive `medium` and cannot disable thinking.
 With Haiku, multi-turn `xhigh` can return no visible response.
 Verify that a response was produced at `xhigh` effort.

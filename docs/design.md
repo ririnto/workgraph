@@ -251,7 +251,8 @@ It checks Claude's inline limit with complete instructions, long plugin paths, a
 Each test removes its disposable plugin copies.
 
 The tests also check skill names, descriptions, and invocation metadata.
-Source checks reject bundled instruction reference links that resolve outside the bundled skills tree, without judging model behavior.
+Source checks scan `SKILL.md` bodies for instruction reference links that resolve outside the bundled skills tree.
+They do not scan host reference files or judge model behavior.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
 Plugin validation checks configuration rather than model behavior.
 Use the validation commands and prose review requirements from the auto-injected repository guidance.
