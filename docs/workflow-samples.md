@@ -123,6 +123,9 @@ Checks report explicit passed, failed, or skipped statuses, and a gate passes on
 Every unit commits to a branch named for the unit, so each attempt retains its known branch identity even when its checks fail.
 Integration receives the named candidate and each planned unit path.
 It checks the destination, resolved base, protections, and actual branch diffs before writing.
+Each unit is judged by its own changes since its merge base with the destination, because the destination advances as other units integrate.
+A direct comparison with the advanced destination would show another unit's integrated files as deletions and could reject a valid unit or repair.
+A retained unit branch that the destination already contains has no new changes and reports as merged.
 It merges only the named unit branches and reports changed paths and actual diff evidence.
 The result must name the candidate, keep changed paths within ownership, account for every named branch, and pass combined checks.
 These reports are evidence claims, not independent proof of Git state.
@@ -171,6 +174,10 @@ A changed candidate, destination, owned path, finding set, or verification contr
 Before resuming, check the live checkout, the named task and base branch refs, the toolchain configuration, and the posted request against what the recorded run used, because native cache keys carry none of that state.
 A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.
 Never reuse a sweep or a posted review for a changed accepted candidate, because the recorded evidence describes the earlier candidate.
+A repair round keeps the candidate branch name, so a repair sweep prompt can match an earlier one while the branch content differs.
+Continuation replays cached results without replaying their Git effects, so a cached sweep describes the candidate as it stood when that sweep first ran.
+A later round inside the same recorded run can advance the candidate, so the live branch can match the run's final state while an earlier cached sweep describes an earlier candidate.
+Before publishing from a resumed run, confirm that the gating sweep ran live against the current candidate, or change its inputs so it re-runs.
 A cached result avoids repeated work but does not prove acceptance, so a resumed run still needs its phase evidence checked.
 Sibling agents with matching settings can share the host prompt-cache prefix, which affects cost and speed but not the recorded phase evidence.
 Inspect the run journal when a result is missing or unexpected, as the [authoring reference](../skills/workflow/references/authoring.md) describes.
