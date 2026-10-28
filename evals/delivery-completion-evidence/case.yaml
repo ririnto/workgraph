@@ -1,0 +1,50 @@
+schema_version: "1.1"
+name: delivery-completion-evidence
+description: Verify the bundled delivery sample gates a read-only slice on completed predecessors with fail-closed completion evidence.
+execution:
+  runs: 2
+  max_turns: 20
+  timeout_seconds: 1200
+  allowed_tools:
+    - Workflow
+    - Read
+    - Skill(workgraph:workflow)
+  prompt: |-
+    Use the read-only planning slice of the Workgraph delivery sample for this request.
+    Read the complete workflow skill and its bundled workflows/delivery-simple.js source.
+    Invoke the registered workgraph:delivery-simple workflow.
+    Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.
+    Keep scope separation, exploration, and planning enabled.
+    Skip implementation, integration, sweep, publication, and review through structured args.skips, because this request edits nothing and publishes nothing.
+    Run exactly one native Workflow invocation for this request.
+    Do not retry or duplicate it after failure, incomplete results, or timeout.
+    Report the returned phase evidence and completion outcome only from the returned result.
+    Do not edit files, run shell commands, use Git, publish, or dispatch host Agents.
+graders:
+  - name: delivery-workflow-invoked
+    type: tool_used
+    tool: Workflow
+    min: 1
+    max: 1
+  - name: completion-evidence-recorded
+    type: llm
+    focus: trace
+    criteria: |-
+      Judge the observed tool trace, Workflow results, and final report together.
+      Require the session to use Skill(workgraph:workflow) and read the complete maintained delivery-simple.js source.
+      Require its first native Workflow call to use the registered workgraph:delivery-simple name.
+      Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
+      A freshly authored replacement graph or an inline script does not establish source consumption.
+      Require actual completed results from the scope stage, one explorer per returned scope, and the plan stage.
+      Require each stage result to match the schema the maintained source declares.
+      Require the plan stage input to contain the actual returned scopes and each explorer summary and risks.
+      Require the returned phase evidence to record Scope, Explore, and Plan as completed.
+      Require it to record Implement as skipped for the explicit dispatch skip.
+      Require it to record Integrate, Sweep, Publish, and Review as skipped with their actual predecessor or blocking reasons.
+      Require every skipped record to carry a nonempty reason.
+      Require the returned result to report complete false with no publication URL and no fix rounds used.
+      Require the final report to restate that incomplete outcome and its reasons from the returned evidence.
+      Fail a report that claims edits, publication, or completed delivery.
+      Fail a proposed-only workflow, an execution error, a retried or duplicated invocation, or a second host Agent or Workflow dispatch.
+      Fail fabricated phase records or a report before the returned result exists.
+      Judge observed tool results and evidence, not specific prose wording.
