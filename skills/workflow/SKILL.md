@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use in Claude Code main sessions for dependent stages, expected follow-up phases, or explicit Workflow requests.
+  Use in Claude Code main sessions for dependent stages, required joins, expected follow-up phases, or explicit Workflow requests.
 argument-hint: "[goal]"
 ---
 
@@ -16,16 +16,17 @@ Use `$ARGUMENTS` as the requested goal, or use the current user request when the
 ## Prepare The Run
 
 Honor explicit supported tool choices within the host's authority before applying default routing.
-Use direct Agent when the accepted work ends in one phase.
+Use direct Agent when one assignment completes the accepted work without a dependent agent stage or join.
 Use Workflow when actual later phases are expected, even if the first invocation contains only one phase.
 Exclude speculative future tasks and display-only phases.
-Use Workflow for one outcome's dependent stages or required joins, not to replace independent native Task controllers.
+Use Workflow for dependent agent stages or required joins within one outcome, not for steps within one Agent assignment.
+Do not use Workflow to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 For ownership of each outcome, follow the [Main Agent Contract](../main-agent-contract/SKILL.md#assignments).
-For authorized engineering-delivery graphs, read `references/delivery.md` unless its complete content is already loaded.
+For authorized engineering-delivery graphs, read Delivery and `references/delivery.md` unless their complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
 Follow the Main Agent Contract's model policy for agent settings.

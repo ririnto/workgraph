@@ -9,7 +9,8 @@ description: Use in the Workgraph main-session mode when orchestrating authorize
 
 Use only in main.
 Invocation changes no role or authority.
-Own authorized outcomes through planning, design, publication, checks, independent review, integration, readback, cleanup, and reporting.
+Own authorized outcomes through investigation, planning, design, implementation, verification, delivery, cleanup, and handback.
+Omit unnecessary steps while preserving explicit requirements and applicable boundaries.
 Proceed with user-requested actions, tools, and Git publication.
 Honor diff-first gates and await user approval before gated edits.
 Block integration on own unmet acceptance and defer per Delivery.
@@ -20,7 +21,7 @@ Update outcomes for material scope changes.
 ## Context
 
 Read current contracts, knowledge, and handoffs.
-Verify current authority, access, ownership, repository state, and completion.
+Verify authority, access, ownership, state, and completion where the task requires them.
 Read Memory Maintenance before durable memory edits unless fully loaded.
 
 ## Rules
@@ -36,9 +37,7 @@ Never fabricate results, circumvent credentials or privileges, or weaken checks 
 
 ### Communication
 
-Use English for all agent-authored communication, including human replies.
-Use final-only reporting for agent-origin work.
-Do not send nonblocking observations, acknowledgements, or harmless-state coordination questions.
+Follow the user's language and communication requirements.
 
 Classify origin by initiating sender, retaining agent origin for relayed human requests.
 Preserve origin and communication mode through recursive assignments and handoffs.
@@ -70,30 +69,22 @@ Assign one writer per file, worktree, ref, and shared record.
 Assign one owner and execution path per outcome.
 Give each native Task one host manager while its Main owns source and delivery.
 Run authorized ready outcomes concurrently.
-Create separate editor worktrees with agent-native tools outside `/tmp` and system-temporary paths.
-Report unavailable native isolation without volatile fallback.
-Allow temporary evidence directories.
+Isolate concurrent editors with supported tools and preserve their work until handback.
 Require only relevant predecessor results and conflicting ownership returns.
-Assess unexpected changes without stopping or tracing origin, then adopt or drop them.
+Assess unexpected changes against the task and applicable safety boundaries before adopting them.
 
-After calls, handle only required results, ready work, or required human interaction.
-After deciding to yield, add no thinking blocks, narration, or tool calls.
 Keep one live background wait per target.
-Silence means wait, not another shell, command, or wait.
-Inspect the existing background task for status.
-Resume waiting work only on actionable completion signals.
-Never speculate, poll or request progress, redispatch, or claim completion while waiting.
+Continue ready work while waiting, and avoid duplicate dispatch or unsupported completion claims.
 
 Reuse passing evidence while relevant behavior, inputs, configuration, and toolchain remain unchanged.
 Compare named references and relevant changes without hash pins.
-Unrelated edits, commit identity, parents, and branch names alone do not invalidate evidence.
+Unrelated edits, commit identity, parents, or branch names alone do not invalidate evidence.
 Rerun affected checks for relevant changes, failures, or unresolved concerns.
 Inspect failures, attempt status, and partial effects before retries, reassignment, or stopping.
-Try all reasonable authorized repairs, retries, and alternative supported commands or tools.
+Try all reasonable authorized repairs, retries, and supported alternatives.
 Report each attempt, outcome, evidence, and limits honestly.
 Bound retries by new evidence, progress, and an exit condition.
-After two no-progress rounds, reassess authorized avenues without waiving acceptance.
-Reset after progress, independently of host retries and inference sampling.
+Reassess stalled work without waiving acceptance.
 Independently verify findings before reporting, excluding the finder and fixer.
 Label unsupported findings and unavailable or inconclusive verification unverified.
 
@@ -116,8 +107,8 @@ Use graphs when dependencies aid coordination.
 Record node operations, prerequisites, inputs, outputs, owners, authority, and completion evidence.
 Connect result or condition dependencies and pass required evidence.
 Treat null, missing, or unsupported evidence as incomplete.
-Join needed results without losing unaffected work after failures or requirement changes.
-Use Mermaid or LaTeX to clarify dependencies or readiness.
+Join results and preserve unaffected work after failures or changes.
+Use Mermaid or LaTeX when useful.
 Verify diagrams and formulas with their renderer.
 Choose only needed nodes.
 Report unavailable selected or delegation tools.

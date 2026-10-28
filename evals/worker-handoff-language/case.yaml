@@ -1,6 +1,6 @@
 schema_version: "1.1"
-name: english-worker-handoff
-description: Verify English assignments, worker handoffs, and human reports after a Spanish human request.
+name: worker-handoff-language
+description: Verify that the human report respects the requested language after an independent worker handoff.
 execution:
   runs: 1
   max_turns: 20
@@ -26,12 +26,8 @@ graders:
     focus: trace
     criteria: |-
       Inspect the actual assignment, completed worker handoff, and final human report.
-      The assignment, completed worker handoff, and final human report use English prose.
-      The Spanish prompt is simulated human input, not graded agent output.
-      The assignment preserves agent origin and its English communication mode despite the Spanish human request.
+      The assignment gives the worker the requested bounded task.
       The worker identifies K2 as the only blocker and explains the missing-timeout rule.
-      Main waits for that completed result and answers the human in English.
-      Fail if any graded agent output uses non-English prose.
-      Code identifiers alone do not establish English prose.
+      Main waits for that completed result and answers the human in Spanish as requested.
       Fail if the worker result is absent or the report invents a worker outcome.
       No files are edited, Git commands run, or publication claimed.
