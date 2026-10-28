@@ -2558,33 +2558,34 @@ test("delivery samples reject malformed findings and preserve review evidence", 
   );
 });
 
-test("delivery finding verification uses the configured review model", async () => {
+test("delivery finding verification inherits or uses the review model", async () => {
   await Promise.all(
-    Object.values(samplePaths).map(async (file) => {
-      const { calls } = await runWorkflowSample(
-        file,
-        {
-          candidateBranch: "task-branch",
-          issue: "#1",
-          models: { review: "review-selector" },
-          task: "t"
-        },
-        dispatchTable({
-          Explore: () => exploreResult,
-          Implement: () => simpleImplement,
-          Integrate: () => integrateSingle,
-          Plan: () => singleUnits,
-          Publish: () => publishCreated,
-          Review: () => reviewFix,
-          Scope: () => scopeResult,
-          Sweep: () => sweepResult
-        })
-      );
-      assert.equal(
-        calls.find(({ phase }) => phase === "Verify").model,
-        "review-selector"
-      );
-    })
+    Object.values(samplePaths).flatMap((file) =>
+      [undefined, "review-selector"].map(async (model) => {
+        const { calls } = await runWorkflowSample(
+          file,
+          {
+            candidateBranch: "task-branch",
+            issue: "#1",
+            models: model === undefined ? {} : { review: model },
+            task: "t"
+          },
+          dispatchTable({
+            Explore: () => exploreResult,
+            Implement: () => simpleImplement,
+            Integrate: () => integrateSingle,
+            Plan: () => singleUnits,
+            Publish: () => publishCreated,
+            Review: () => reviewFix,
+            Scope: () => scopeResult,
+            Sweep: () => sweepResult
+          })
+        );
+        const verification = calls.find(({ phase }) => phase === "Verify");
+        assert.equal(verification.model, model);
+        assert.equal(verification.modelProvided, model !== undefined);
+      })
+    )
   );
 });
 
