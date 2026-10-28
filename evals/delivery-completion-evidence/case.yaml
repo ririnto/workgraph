@@ -39,8 +39,8 @@ graders:
       Require each such result to match the schema the maintained source declares.
       Require the returned phase evidence to record Scope and Explore as completed.
       Require the plan stage input to contain the actual returned scopes and each explorer summary and risks.
-      Require the plan stage to return a result that the source either accepts or rejects by its own recorded validation reason.
-      Accept a completed plan or a plan record failed with the source validation or agent failure reason.
+      Require the plan stage to run and its record to be completed or failed.
+      Accept a failed plan record only with the source's own validation or agent-failure reason.
       Require every later phase to be recorded as skipped with the nonempty reason the source records for that outcome.
       Require no dispatch of Implement, Integrate, Sweep, Publish, or Review agents.
       Require the returned result to report complete false with no publication URL and no fix rounds used.
