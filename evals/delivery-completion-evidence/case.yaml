@@ -18,6 +18,8 @@ execution:
     Because this request edits nothing and publishes nothing, skip implementation, integration, sweep, publication, and review through structured args.skips.
     Run exactly one native Workflow invocation.
     Do not retry or duplicate it after failure, incomplete results, or timeout.
+    If the run launches in the background, wait for its completion notification.
+    Then read its task output file once so the returned result appears in the trace.
     Report the returned phase evidence and completion outcome only from the returned result.
     Do not edit files, run shell commands, use Git, publish, or dispatch host Agents.
 graders:
@@ -43,9 +45,12 @@ graders:
       Accept a failed plan record only with the source's own validation or agent-failure reason.
       Require every later phase record to be skipped with the nonempty reason that the source records for that outcome.
       Require no dispatch of Implement, Integrate, Sweep, Publish, or Review agents.
+      For a background run, require one Read of its completed task output file before the final report.
+      Judge the returned result from that Read result or the synchronous Workflow result.
       Require the returned result to report `complete` false, `publish` null, and `fixRounds.used` zero.
       Require the final report to restate the recorded statuses and reasons from the returned evidence.
       Fail a report that claims edits, publication, completed delivery, or a phase record that the run did not return.
       Fail a proposed-only workflow, an execution error, a retried or duplicated invocation, or a second host Agent or Workflow dispatch.
       Fail fabricated phase records or a report before the returned result exists.
+      A launch acknowledgment that reports no phase results is not such a report.
       Judge observed tool results and evidence, not specific prose wording.
