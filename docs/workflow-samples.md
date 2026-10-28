@@ -43,7 +43,7 @@ Workflow({
 ```
 
 The plugin discovers the bundled `.js` definitions in `workflows/`.
-The dispatching session owns the linked issue, the task branch, and the initial complete-candidate scan before it authorizes implementation, as its Delivery procedure requires.
+The dispatching session owns the task branch, initial candidate inspection, and any required issue.
 
 ## Agent Design
 
@@ -65,8 +65,6 @@ Optional `requirements`, `constraints`, and `context` fields carry the design br
 Optional `sources` must contain unique canonical repository-relative paths.
 The `models` object accepts one host-supported selector per specialist role, with no workflow defaults.
 When a selector is omitted, the agent call leaves its model unset for host configuration.
-For the requested two-model assignment, pass `gpt-6-astra` to architecture, evidence, and challenge, and pass `claude-opus-5-5` to compose and verify.
-Those values are invocation inputs rather than aliases or committed workflow defaults.
 
 ```js
 Workflow({
@@ -94,10 +92,10 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | Input | Contract |
 | --- | --- |
 | `task` | Required nonempty string holding the delivery goal. |
-| `issue` | Required issue reference string included in the publication and review prompts. |
+| `issue` | Optional nonempty issue reference included in the publication and review prompts. |
 | `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference. |
-| `skips` | Optional object of boolean phase flags that skip dispatch without waiving acceptance. |
+| `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
 | `models` | Optional object of per-phase model selector strings overriding the defaults. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds. |
@@ -108,11 +106,11 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | --- | --- | --- | --- |
 | Scope | `opus` | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
 | Explore | `haiku` | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
-| Plan | `opus` | The scopes and exploration findings. | Work units with disjoint owned paths and instructions. |
-| Implement | `sonnet` | One unit per agent, with matching exploration only. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
+| Plan | `opus` | The scopes and any exploration findings. | Work units with disjoint owned paths and instructions. |
+| Implement | `sonnet` | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
 | Integrate | `sonnet` | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
 | Sweep | `haiku` | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
-| Publish | `sonnet` | Completed implementation, completed integration, a clean sweep, the change summary, and the issue reference. | PR or MR URL with a created or updated action. |
+| Publish | `sonnet` | Completed implementation, completed integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
 | Review | `sonnet` | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
 
 Implementation runs every unit in its own isolated native worktree, including a single-unit plan.
@@ -135,8 +133,10 @@ The scope, exploration, and sweep stages run with the built-in read-only Explore
 
 ## Skip, Failure, And Recovery
 
-Each phase records `completed`, `skipped`, or `failed` with a reason, and the run returns `complete` only when every required phase completed and review passed.
-A skipped phase never counts as passing, so a dispatch that skips implementation or publication returns `complete: false` with the skips recorded.
+Each phase records `completed`, `skipped`, or `failed` with a reason.
+The run returns `complete` only when every required phase completed and review passed.
+Exploration may be explicitly skipped when the accepted task does not need it.
+A skipped required phase does not pass, so skipping implementation or publication returns `complete: false`.
 Integration is required after any completed implementation, so a skipped or failed integration blocks publication.
 The run result retains the branch identity and state of every attempt, and a superseded branch stays listed because the samples retire nothing.
 A retained resource never counts as passing evidence.

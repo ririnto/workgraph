@@ -43,10 +43,10 @@ if (typeof input.task !== 'string' || !input.task.trim()) {
   throw new Error('Provide the delivery goal as a nonempty args.task string')
 }
 const task = input.task
-const issue = typeof input.issue === 'string' ? input.issue.trim() : ''
-if (!issue) {
-  throw new Error('Provide the linked issue reference as a nonempty args.issue string')
+if (input.issue !== undefined && (typeof input.issue !== 'string' || !input.issue.trim())) {
+  throw new Error('Provide args.issue as a nonempty issue reference when supplied')
 }
+const issue = input.issue?.trim() ?? ''
 const baseBranch = typeof input.baseBranch === 'string' ? input.baseBranch.trim() : ''
 const candidateBranch = typeof input.candidateBranch === 'string' ? input.candidateBranch.trim() : ''
 const settingsMap = (value, name) => {
@@ -270,7 +270,7 @@ if (phaseRecords.scope?.status !== 'completed') {
 
 phase('Plan')
 let units = []
-if (phaseRecords.explore?.status !== 'completed') {
+if (phaseRecords.explore?.status !== 'completed' && !(skipped.explore && phaseRecords.scope?.status === 'completed')) {
   recordPhase('plan', 'skipped', 'Required Explore predecessor is incomplete')
 } else if (skipped.plan) {
   recordPhase('plan', 'skipped', 'Explicit dispatch skip, so planning did not run')
@@ -891,7 +891,7 @@ if (
   throw new Error('Phase evidence is incomplete')
 }
 const complete =
-  phaseEvidence.every(record => record.status === 'completed') &&
+  phaseEvidence.every(record => record.status === 'completed' || (record.title === 'Explore' && skipped.explore && record.status === 'skipped')) &&
   (phaseRecords.review.status !== 'completed' || reviewState.verdict === 'pass')
 return {
   complete,

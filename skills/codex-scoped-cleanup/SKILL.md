@@ -6,7 +6,7 @@ description: Use in Codex when archiving or deleting native threads, or retiring
 # Codex Scoped Cleanup
 
 Apply this procedure only in Codex and within the current cleanup authority.
-Route every cleanup operation through the authorized resource owner using supported herdr agent operations.
+Route cleanup through the authorized resource owner using supported host operations.
 
 ## Authority And Native Lifecycle
 
@@ -20,7 +20,6 @@ Before cleanup inventory or lifecycle changes, read [Owner-mediated resource lif
 Use supported owner-controlled operations rather than editing authoritative SQLite, rollout files, or raw host state.
 Do not restart shared services or terminate unrelated workers to evade ownership guards.
 When an owner or supported operation is unavailable, preserve affected resources and report the exact limitation.
-Do not use direct app-server access.
 Keep temporary private identities, paths, payloads, and logs out of published instructions and shared reports.
 
 ## Git Preservation
@@ -38,7 +37,7 @@ Remove redundant recovery copies without creating another complete backup.
 
 Evaluate each session or worktree independently.
 The parent project's recent activity does not prove that a particular worktree remains in use.
-Use three days of inactivity to discover session candidates only when the request relies on inactivity and supplies no window.
+Use the requested inactivity window when inactivity defines the cleanup scope.
 Retire verified completed, unnecessary resources within explicit authority without adding an age delay after completed handback.
 Do not treat recent timestamps alone as proof that a resource remains needed or is eligible for retirement.
 Include session events, compressed rollouts, running descendants, and exact worktree consumers when checking activity.
