@@ -175,8 +175,9 @@ Before resuming, check the live checkout, the named task and base branch refs, t
 A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.
 Never reuse a sweep or a posted review for a changed accepted candidate, because the recorded evidence describes the earlier candidate.
 A repair round keeps the candidate branch name, so a repair sweep prompt can match an earlier one while the branch content differs.
-Claude Code documents native continuation as reusing the longest unchanged prefix of calls, so a cached repair sweep also implies cached repair and integration results from the same recorded run.
-A stale repair sweep therefore needs branch movement outside the recorded run, which the pre-resume ref check must catch, and the journal still confirms the actual cache hits.
+Continuation replays cached results without replaying their Git effects, so a cached sweep describes the candidate as it stood when that sweep first ran.
+A later round inside the same recorded run can advance the candidate, so the live branch can match the run's final state while an earlier cached sweep describes an earlier candidate.
+Before publishing from a resumed run, confirm that the gating sweep ran live against the current candidate, or change its inputs so it re-runs.
 A cached result avoids repeated work but does not prove acceptance, so a resumed run still needs its phase evidence checked.
 Sibling agents with matching settings can share the host prompt-cache prefix, which affects cost and speed but not the recorded phase evidence.
 Inspect the run journal when a result is missing or unexpected, as the [authoring reference](../skills/workflow/references/authoring.md) describes.
