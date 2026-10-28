@@ -15,7 +15,7 @@ This adapter therefore supplies no unverified universal installation command.
 
 SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Codex reference](../../skills/main-agent-contract/references/codex.md).
 SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Codex reference](../../skills/subagent-context/references/codex.md).
-Those references own execution timing and, for Main only, orchestration and model policy.
+Those references own execution timing and, for Main only, host-specific orchestration.
 This user adapter does not replace them.
 
 The hook's native `<skill>` fragment includes the qualified name, source path, and complete skill file with YAML frontmatter.

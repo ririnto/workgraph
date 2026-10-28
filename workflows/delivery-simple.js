@@ -28,16 +28,6 @@ const phaseTitles = {
   scope: 'Scope',
   sweep: 'Sweep'
 }
-const defaultModels = {
-  explore: 'haiku',
-  implement: 'sonnet',
-  integrate: 'sonnet',
-  plan: 'opus',
-  publish: 'sonnet',
-  review: 'sonnet',
-  scope: 'opus',
-  sweep: 'haiku'
-}
 const input = args === null || typeof args !== 'object' || Array.isArray(args) ? {} : args
 if (typeof input.task !== 'string' || !input.task.trim()) {
   throw new Error('Provide the delivery goal as a nonempty args.task string')
@@ -85,7 +75,7 @@ for (const key of phaseKeys) {
     throw new Error(`Provide promptParts.${key} as a nonempty instruction string`)
   }
   skipped[key] = skip === true
-  models[key] = model ?? defaultModels[key]
+  models[key] = model
   promptParts[key] = part ?? ''
 }
 let maxFixRounds = defaultFixRounds
@@ -155,7 +145,7 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
 ), {
   agentType: 'Explore',
   label: 'scope',
-  model: models.scope,
+  ...(models.scope === undefined ? {} : { model: models.scope }),
   phase: 'Scope',
   schema: {
     properties: {
@@ -227,7 +217,7 @@ if (phaseRecords.scope?.status !== 'completed') {
     ), {
       agentType: 'Explore',
       label: `explore:${scope.key}`,
-      model: models.explore,
+      ...(models.explore === undefined ? {} : { model: models.explore }),
       phase: 'Explore',
       schema: {
         properties: {
@@ -288,7 +278,7 @@ if (phaseRecords.explore?.status !== 'completed' && !(skipped.explore && phaseRe
     promptParts.plan
   ), {
     label: 'plan',
-    model: models.plan,
+    ...(models.plan === undefined ? {} : { model: models.plan }),
     phase: 'Plan',
     schema: {
       properties: {
@@ -360,7 +350,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     const options = {
       isolation: 'worktree',
       label: `implement:${unit.key}${roundLabel}`,
-      model: models.implement,
+      ...(models.implement === undefined ? {} : { model: models.implement }),
       phase: 'Implement',
       schema: {
         properties: {
@@ -476,7 +466,7 @@ const dispatchIntegration = async currentUnits => {
     promptParts.integrate
   ), {
     label: 'integrate',
-    model: models.integrate,
+    ...(models.integrate === undefined ? {} : { model: models.integrate }),
     phase: 'Integrate',
     schema: {
       properties: {
@@ -601,7 +591,7 @@ const dispatchSweep = async candidate => {
   ), {
     agentType: 'Explore',
     label: 'sweep',
-    model: models.sweep,
+    ...(models.sweep === undefined ? {} : { model: models.sweep }),
     phase: 'Sweep',
     schema: {
       properties: {
@@ -652,14 +642,14 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
       combinedChecks: integrationState !== null && integrationState.status === 'completed' ? integrationState.checks : 'not required',
       units: currentUnits.map(unit => ({ branch: unit.branch, changedFiles: unit.changedFiles, checks: unit.checks, key: unit.key }))
     })}`,
-    'Create a pull request with gh for a GitHub remote, or a merge request with glab for a GitLab remote.',
+    'Create a review request using an authorized interface supported by the destination.',
     'Reuse the existing open request for this branch instead of creating a duplicate.',
     'Describe the change, the per-unit and combined checks that ran, and the remaining limits, and keep private environment details out of the request.',
     'Do not merge, close, approve, or change repository settings.',
     promptParts.publish
   ), {
     label: 'publish',
-    model: models.publish,
+    ...(models.publish === undefined ? {} : { model: models.publish }),
     phase: 'Publish',
     schema: {
       properties: {
@@ -712,7 +702,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     promptParts.review
   ), {
     label: 'review',
-    model: models.review,
+    ...(models.review === undefined ? {} : { model: models.review }),
     phase: 'Review',
     schema: {
       properties: {
@@ -768,7 +758,7 @@ const verifyFindings = async (review, integration, publication, round) => {
     'Return exactly one disposition per finding with its id, status confirmed, refuted, or unverified, and nonempty evidence.',
     readOnlyPart,
     promptParts.review
-  ), { label: `verify-findings:${round + 1}`, model: models.review, phase: 'Verify', schema: {
+  ), { label: `verify-findings:${round + 1}`, ...(models.review === undefined ? {} : { model: models.review }), phase: 'Verify', schema: {
     properties: { dispositions: { items: { properties: { id: { type: 'string' }, status: { enum: ['confirmed', 'refuted', 'unverified'], type: 'string' }, evidence: { type: 'string' } }, required: ['id', 'status', 'evidence'], type: 'object' }, type: 'array' } },
     required: ['dispositions'], type: 'object'
   } })

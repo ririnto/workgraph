@@ -1,16 +1,16 @@
 ---
-name: astra-dual-review
-description: "Use in a main session for an explicit cross-host review and adjudication request, ending with verified issue handoffs before implementation."
+name: dual-review
+description: "Use in a main session for an explicitly assigned independent dual review and verified issue handoffs before implementation."
 ---
 
-# Astra Dual Review
+# Dual Review
 
 Use this skill in a main session.
 
 ## Outcome And Role
 
 Manage one bounded dual-review assignment.
-Obtain one native Codex pass and one native Claude pass over the same target.
+Obtain two independent review passes over the same target using the assigned hosts and controls.
 Verify each candidate against source, requirements, or an authorized scoped check before issue registration.
 Read back each issue write and return the verified result.
 End this assignment before implementation.
@@ -38,8 +38,7 @@ Continue independent permitted work while an affected action remains blocked.
 
 Use [Development](../development/SKILL.md) for source-review criteria unless fully loaded.
 Use [Verification](../verification/SKILL.md) for additional behavioral checks unless fully loaded.
-In Claude Code, use the [Claude host reference](../main-agent-contract/references/claude-code.md) unless fully loaded.
-In Codex, use the [Codex host reference](../main-agent-contract/references/codex.md) unless fully loaded.
+Follow the [Main Agent Contract](../main-agent-contract/SKILL.md) for host guidance before dispatch.
 Resolve required bundled skill paths at invocation and include them in each reviewer brief.
 Keep all required instruction links inside this plugin.
 Do not start another review workflow or expand the assignment to another capability.
@@ -60,8 +59,8 @@ A new target requires a separate authorized unit.
 
 ## Dispatch Two Independent Passes
 
-Start one fresh Codex reviewer and one fresh Claude reviewer through their supported host controls.
-Run them concurrently when both hosts and their required resources are available.
+Start two fresh reviewers through their assigned hosts and supported controls.
+Run them concurrently when their assigned hosts and required resources are available.
 Keep one host-control owner per reviewer and verification session.
 Do not expose one reviewer's candidates to the other before its pass ends.
 Do not cancel a valid running review to replace it with a preferred configuration.
@@ -69,7 +68,7 @@ Do not cancel a valid running review to replace it with a preferred configuratio
 Preserve configured native models unless an explicit assignment override covers this work.
 Use an assigned override only through the supported host mechanism.
 Record requested and host-exposed resolved settings without inventing reviewer identity.
-Do not substitute one host for the other and claim cross-host coverage.
+Do not substitute a host or reviewer setting and claim the assigned coverage.
 Do not invoke native review mode when the active program excludes it.
 
 Each reviewer performs one read-only pass over the complete assigned target.

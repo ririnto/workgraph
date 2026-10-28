@@ -1,7 +1,7 @@
 # Workflow Samples
 
 Workgraph bundles two native Workflow delivery samples and one read-only agent-authored design workflow.
-The delivery samples provide per-phase model defaults, while design selectors come from runtime inputs or host configuration.
+All samples accept optional model selectors and otherwise use host configuration.
 All three use the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 
 | Variant | Source | Shape |
@@ -96,22 +96,22 @@ The workflow returns the candidate design, phase evidence, findings, blockers, a
 | `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
-| `models` | Optional object of per-phase model selector strings overriding the defaults. |
+| `models` | Optional object of per-phase model selector strings. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds. |
 
 ## Phases
 
-| Phase | Default model | Required predecessor data | Completion evidence |
-| --- | --- | --- | --- |
-| Scope | `opus` | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
-| Explore | `haiku` | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
-| Plan | `opus` | The scopes and any exploration findings. | Work units with disjoint owned paths and instructions. |
-| Implement | `sonnet` | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
-| Integrate | `sonnet` | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
-| Sweep | `haiku` | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
-| Publish | `sonnet` | Completed implementation, completed integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
-| Review | `sonnet` | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
+| Phase | Required predecessor data | Completion evidence |
+| --- | --- | --- |
+| Scope | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
+| Explore | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
+| Plan | The scopes and any exploration findings. | Work units with disjoint owned paths and instructions. |
+| Implement | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
+| Integrate | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
+| Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
+| Publish | Completed implementation, completed integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
+| Review | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
 
 Implementation runs every unit in its own isolated native worktree, including a single-unit plan.
 Each isolated worker verifies its worktree starts from the named task candidate before editing and synchronizes first when it does not.
@@ -160,11 +160,10 @@ A confirmed finding outside one unambiguous owned unit blocks the round for repl
 
 ## Models
 
-The two delivery samples provide per-phase defaults, and `args.models` overrides a phase for one dispatch.
-Their defaults are host-resolved aliases, so those sources carry no specific model identity or routing.
-The design workflow has no model defaults and accepts optional selectors by specialist role through `args.models`.
-An omitted design selector stays unset so the host can apply its current configuration.
-Every override must be a nonempty selector string the host supports for agent calls.
+Delivery samples accept optional selectors by phase through `args.models`.
+The design workflow accepts optional selectors by specialist role through `args.models`.
+An omitted selector stays unset so the host can apply its current configuration.
+Every selector must be a nonempty string the host supports for agent calls.
 
 ## Cache Reuse
 

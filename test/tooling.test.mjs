@@ -757,6 +757,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
         agentType: options.agentType,
         isolation: options.isolation,
         model: options.model,
+        modelProvided: Object.hasOwn(options, "model"),
         phase: options.phase,
         prompt
       });
@@ -1049,7 +1050,7 @@ test("delivery samples explain a fix-required review without findings", async ()
   );
 });
 
-test("delivery workflow samples select defaults and honor model overrides", async () => {
+test("delivery workflow samples inherit host models and honor model overrides", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [
@@ -1085,16 +1086,19 @@ test("delivery workflow samples select defaults and honor model overrides", asyn
         assert.deepEqual(
           Object.fromEntries(calls.map((call) => [call.phase, call.model])),
           {
-            Explore: models.explore ?? "haiku",
-            Implement: models.implement ?? "sonnet",
-            Integrate: models.integrate ?? "sonnet",
-            Plan: models.plan ?? "opus",
-            Publish: models.publish ?? "sonnet",
-            Review: models.review ?? "sonnet",
-            Scope: models.scope ?? "opus",
-            Sweep: models.sweep ?? "haiku"
+            Explore: models.explore,
+            Implement: models.implement,
+            Integrate: models.integrate,
+            Plan: models.plan,
+            Publish: models.publish,
+            Review: models.review,
+            Scope: models.scope,
+            Sweep: models.sweep
           }
         );
+        for (const call of calls) {
+          assert.equal(call.modelProvided, call.model !== undefined);
+        }
       })
     )
   );
@@ -1216,7 +1220,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       assert.ok(call.prompt.includes("https://example.invalid/pr/1"));
     }
     const publishCalls = calls.filter((entry) => entry.phase === "Publish");
-    assert.ok(publishCalls[0].prompt.includes("Create a pull request"));
+    assert.ok(publishCalls[0].prompt.includes("Create a review request"));
     assert.ok(
       publishCalls[1].prompt.includes(
         "Update the existing open request at https://example.invalid/pr/1"
@@ -1457,7 +1461,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       calls.map((call) => [call.phase, call.model])
     );
     assert.equal(models.Scope, "configured-selector");
-    assert.equal(models.Plan, "opus");
+    assert.equal(models.Plan, undefined);
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );

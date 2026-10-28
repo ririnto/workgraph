@@ -36,7 +36,7 @@ All selected files load before context emission, so the injected role and host g
 
 Hooks do not inject contributor instructions, research, task skills, playbooks, or principle skills.
 Main and Worker keep their role contracts self-contained because they can load in separate sessions.
-Main host references own orchestration and model guidance, while Worker references own execution timing only.
+Main host references add host-specific orchestration, while Worker references own execution timing only.
 Parent history can still carry Main context into a forked Worker.
 
 The [delivery design](docs/design.md#deliver-context) explains native loading formats, message-envelope differences, and Claude's inline-context limit.
@@ -61,10 +61,9 @@ For Claude Code graph execution, [Workflow](skills/workflow/SKILL.md) adds nativ
 Its [authoring reference](skills/workflow/references/authoring.md) supplies script-specific guidance.
 Its [delivery reference](skills/workflow/references/delivery.md) maps Delivery operations to node inputs and outputs without owning another delivery checklist.
 Codex uses native delegation rather than Claude Code Workflow.
-Workgraph bundles [native sum-and-check source](workflows/sum-check.js) selected by the Workflow skill for that read-only outcome.
-Its [caller contract](skills/workflow/references/authoring.md#use-the-bundled-source) distinguishes inline execution, named discovery, skill selection, and installed activation.
+Its [authoring reference](skills/workflow/references/authoring.md) covers native scripts and their result evidence.
 Workgraph bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
-Those samples use injectable prompt parts, per-phase model defaults, and explicit skip, failure, and bounded-recovery records.
+Those samples use injectable prompt parts, optional per-phase model selectors, and explicit skip, failure, and bounded-recovery records.
 It also includes an [agent-authored design workflow](workflows/design.js) with runtime model inputs and independent verification.
 All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
 
@@ -85,7 +84,7 @@ Conditional skills load only when their stated task scope matches and their comp
 | Interface principle | [Production Interfaces](skills/principle-production-interfaces/SKILL.md) | Interface, abstraction, helper, or test-design decisions load production-contract guidance. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
 | Scoped procedure | [Fix-Queue Delivery](skills/fix-queue-delivery/SKILL.md) | Queue owners deliver an assigned repository queue with serialized integration and acceptance-based closure. |
-| Scoped procedure | [Astra Dual Review](skills/astra-dual-review/SKILL.md) | Explicit dual-host assignments end with independently verified findings, issue readbacks, and separate resolution handoffs. |
+| Scoped procedure | [Dual Review](skills/dual-review/SKILL.md) | Explicit independent review assignments end with independently verified findings, issue readbacks, and separate resolution handoffs. |
 | Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main loads native Workflow procedures for the host reference's selection conditions. |
 | Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose and Markdown work loads writing guidance. |
 | Scoped procedure | [Instruction Authoring](skills/instruction-authoring/SKILL.md) | Instruction work loads task-contract design, source separation, and loading-boundary guidance. |
