@@ -14,6 +14,8 @@ Where supported, use `haiku` as the light tier with low effort for trivial or na
 Use `sonnet` as the middle tier with medium or high effort for harder tasks.
 Use `opus` for the hardest reasoning and judgment with high or maximum supported effort.
 Use `fable` only on explicit request.
+Where the host provides equivalent tier aliases, map each alias to its corresponding tier.
+Do not pin a specific model version.
 When these models or effort levels are unavailable, report the limitation and use a supported alternative only when permitted.
 Use supported agent and tool controls, honoring explicit user and configuration choices.
 Report unavailable or substituted settings using host evidence.
