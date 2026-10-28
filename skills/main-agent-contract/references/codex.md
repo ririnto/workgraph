@@ -40,6 +40,7 @@ Reserve efforts above high for explicit or configured choices under host rules.
 Some coding evidence favors higher `luna` efforts without establishing a universal optimum.
 The evidence does not establish the `terra` alias's model identity or effort performance.
 Do not pin a specific model version.
+If a requested or configured setting requires a version pin, report the incompatibility without substituting it.
 When these models or effort levels are unavailable, report the limitation and use a supported alternative only when permitted.
 Use supported agent and tool controls, honoring explicit user and configuration choices.
 Report unavailable or substituted settings using host evidence.

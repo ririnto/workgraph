@@ -36,7 +36,8 @@ All selected files load before context emission, so the injected role and host g
 
 Hooks do not inject contributor instructions, research, task skills, playbooks, or principle skills.
 Main and Worker keep their role contracts self-contained because they can load in separate sessions.
-Main host references add host-specific orchestration, while Worker references own execution timing only.
+Main host references add orchestration and model selection guidance for each host.
+Worker references own execution timing.
 Parent history can still carry Main context into a forked Worker.
 
 The [delivery design](docs/design.md#deliver-context) explains native loading formats, message-envelope differences, and Claude's inline-context limit.

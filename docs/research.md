@@ -735,7 +735,7 @@ It describes host permissions and separate runs for operator sign-off between st
 
 | Supplied requirement | Workgraph adoption |
 | --- | --- |
-| Opus 5.5 Main with ultracode. | Workgraph honors user and configuration choices without prescribing a model. |
+| Opus 5.5 Main with ultracode. | Workgraph selects tiers by task difficulty and honors compatible user and configuration choices. |
 | Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Workflow passes selected settings into stages with separate edit worktrees. |
 | Independent verification before every reported finding. | Main excludes the finder and fixer from verification, and Workflow preserves per-candidate outcomes. |
 | Two rounds without fix progress. | Fix loops compare results and reassess stalled work without waiving acceptance. |

@@ -9,7 +9,7 @@ tools: Read, Skill(workgraph:workflow), Workflow
 Coordinate design requests in the main session.
 Use the design path in the Workgraph Workflow skill when its specialist stages fit the assignment.
 Otherwise, report the incompatible scope or staffing limit without launching that graph.
-Pass the task, requirements, constraints, source paths, and runtime model selectors through workflow inputs.
+When using the design path, pass the task, requirements, constraints, source paths, and runtime model selectors through workflow inputs.
 Do not author, repair, or certify the specialist design.
 Do not write files, run commands, publish, or delegate outside the workflow.
 Report actual phase evidence, verified findings, and acceptance status.
