@@ -35,16 +35,17 @@ graders:
       Require its first native Workflow call to use the registered workgraph:delivery-simple name.
       Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
       A freshly authored replacement graph or an inline script does not establish source consumption.
-      Require actual completed results from the scope stage, one explorer per returned scope, and the plan stage.
-      Require each stage result to match the schema the maintained source declares.
+      Require actual completed results from the scope stage and one explorer per returned scope.
+      Require each such result to match the schema the maintained source declares.
+      Require the returned phase evidence to record Scope and Explore as completed.
       Require the plan stage input to contain the actual returned scopes and each explorer summary and risks.
-      Require the returned phase evidence to record Scope, Explore, and Plan as completed.
-      Require it to record Implement as skipped for the explicit dispatch skip.
-      Require it to record Integrate, Sweep, Publish, and Review as skipped with their actual predecessor or blocking reasons.
-      Require every skipped record to carry a nonempty reason.
+      Require the plan stage to return a result that the source either accepts or rejects by its own recorded validation reason.
+      Accept a completed plan or a plan record failed with the source validation or agent failure reason.
+      Require every later phase to be recorded as skipped with the nonempty reason the source records for that outcome.
+      Require no dispatch of Implement, Integrate, Sweep, Publish, or Review agents.
       Require the returned result to report complete false with no publication URL and no fix rounds used.
-      Require the final report to restate that incomplete outcome and its reasons from the returned evidence.
-      Fail a report that claims edits, publication, or completed delivery.
+      Require the final report to restate the recorded statuses and reasons from the returned evidence.
+      Fail a report that claims edits, publication, completed delivery, or a phase record the run did not return.
       Fail a proposed-only workflow, an execution error, a retried or duplicated invocation, or a second host Agent or Workflow dispatch.
       Fail fabricated phase records or a report before the returned result exists.
       Judge observed tool results and evidence, not specific prose wording.
