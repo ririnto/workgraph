@@ -26,6 +26,18 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/hooks/bash-polling-guard.mjs\" codex",
+            "timeout": 3
+          }
+        ],
+        "matcher": "Bash"
+      }
     ]
   }
 }

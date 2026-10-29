@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "check": "run-p check:*",
-    "check:hooks": "node --test hooks/inject-context.test.mjs",
+    "check:hooks": "node --test hooks/*.test.mjs",
     "check:issue-forms": "node test/validation/issue-forms.mjs",
     "check:markdownlint-cli2": "markdownlint-cli2",
     "check:plugin-version": "node test/validation/plugin-version.mjs",
