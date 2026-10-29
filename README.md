@@ -127,13 +127,12 @@ Conditional skills load only when their stated task scope matches and their comp
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
 | Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main loads native Workflow procedures for the host reference's selection conditions. |
-| Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose and Markdown work loads writing guidance. |
-| Scoped procedure | [Instruction Authoring](skills/instruction-authoring/SKILL.md) | Instruction work loads task-contract design, source separation, and loading-boundary guidance. |
+| Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose, Markdown, and instruction work load writing and task-contract guidance. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads the bundled lifecycle and attachment procedures. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
-Writing owns prose, while Instruction Authoring owns agent-facing prompt contracts and example separation.
+Writing owns prose, agent-facing prompt contracts, and example separation.
 Consumer links and required resources stay bundled, without another plugin dependency or required online research.
 
 Manual role loading also loads the active host reference unless its complete content is already present.

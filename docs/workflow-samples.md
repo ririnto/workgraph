@@ -47,23 +47,22 @@ The dispatching session owns the task branch, initial candidate inspection, and 
 
 ## Agent design
 
-Request the bundled design graph through `/workgraph:workflow` when its specialist stages fit the task.
-The `workgraph:design-lead` plugin agent is an optional main-session coordinator that uses the same skill and source.
+Request the bundled design graph through `/workgraph:workflow` when its design stages fit the task.
 The skill invokes the registered `workgraph:design` workflow.
 Run the skill again for a fresh design, or continue the same session with the returned `scriptPath` and run ID.
 
-| Phase | Specialist | Runtime model input | Completion evidence |
+| Phase | Work | Runtime model input | Completion evidence |
 | --- | --- | --- | --- |
-| Design | `workgraph:design-architect` and `workgraph:design-evidence` run in parallel. | `args.models.architecture` and `args.models.evidence`. | Both schema-valid architecture and evidence results cover every requirement. |
-| Compose | `workgraph:design-composer` consumes both Design results. | `args.models.compose`. | One design, decisions, implementation steps, requirement mapping, and test plan. |
-| Challenge | `workgraph:design-challenger` tests the composed design with counterexamples. | `args.models.challenge`. | Evidence-backed findings and substantive coverage, including when findings are empty. |
-| Verify | `workgraph:design-verifier` independently assesses findings and requirements. | `args.models.verify`. | One disposition per finding and evidence-backed status for every requirement. |
+| Design | Architecture and evidence work run in parallel using read-only Explore agents. | `args.models.architecture` and `args.models.evidence`. | Both schema-valid architecture and evidence results cover every requirement. |
+| Compose | A composer consumes both Design results. | `args.models.compose`. | One design, decisions, implementation steps, requirement mapping, and test plan. |
+| Challenge | A challenger tests the composed design with counterexamples. | `args.models.challenge`. | Evidence-backed findings and substantive coverage, including when findings are empty. |
+| Verify | A verifier independently assesses findings and requirements. | `args.models.verify`. | One disposition per finding and evidence-backed status for every requirement. |
 | Acceptance | The workflow computes status from validated phase results. | No model call. | `complete` records phase completion, while `accepted` requires no unresolved blocker or requirement gap. |
 
 The task input requires a nonempty `args.task` string.
 Optional `requirements`, `constraints`, and `context` fields carry the design brief.
 Optional `sources` must contain unique canonical repository-relative paths.
-The `models` object accepts one host-supported selector per specialist role, with no workflow defaults.
+The `models` object accepts one host-supported selector per stage, with no workflow defaults.
 When a selector is omitted, the agent call leaves its model unset for host configuration.
 
 ```js
@@ -83,7 +82,7 @@ Workflow({
 })
 ```
 
-A failed or malformed specialist result blocks dependent phases and preserves successful sibling results.
+A failed or malformed stage result blocks dependent phases and preserves successful sibling results.
 Verified blocking or major findings, inconclusive findings, and unmet requirements make `accepted` false.
 The workflow returns the candidate design, phase evidence, findings, blockers, and requested model inputs without performing implementation.
 
@@ -162,7 +161,7 @@ A confirmed finding outside one unambiguous owned unit blocks the round for repl
 ## Models
 
 Delivery samples accept optional selectors by phase through `args.models`, plus `args.models.verify` for finding verification.
-The design workflow accepts optional selectors by specialist role through `args.models`.
+The design workflow accepts optional selectors by stage through `args.models`.
 An omitted selector stays unset so the host can apply its current configuration.
 Every selector must be a nonempty string the host supports for agent calls.
 

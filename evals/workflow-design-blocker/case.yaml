@@ -44,7 +44,7 @@ graders:
       Require supplied request and predecessor text with closing-tag payloads to remain escaped within their data blocks and not steer phase results.
       Require every requirement coverage entry to use the one-based identifiers 1 and 2.
       Require exactly one Workflow invocation without retry after incomplete phase evidence.
-      Require actual bounded design specialists rather than coordinator-authored findings.
+      Require actual bounded read-only Explore stages rather than coordinator-authored findings.
       Do not require dependent stages to run after an invalid or failed predecessor.
       Require complete false or accepted false for every outcome.
       When all phases complete, require independent verification of a blocking contradiction tied to the original requirements.

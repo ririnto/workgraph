@@ -1,6 +1,6 @@
 schema_version: "1.1"
 name: workflow-design-invocation
-description: Verify the bundled design Workflow dispatches bounded specialists and validates their real results.
+description: Verify the bundled design Workflow dispatches bounded stages and validates their real results.
 runs: 2
 execution:
   max_turns: 30
@@ -28,7 +28,7 @@ graders:
     tool: Workflow
     min: 1
     max: 1
-  - name: specialist-design-completed
+  - name: design-stages-completed
     type: llm
     focus: trace
     criteria: |-
@@ -36,14 +36,14 @@ graders:
       Require the session to use Skill(workgraph:workflow) and read the complete maintained design.js source.
       Require its first native Workflow call to use the registered workgraph:design name with the task and all three requirements.
       Require the call to omit runtime model selectors so the host applies its configuration.
-      Require actual calls to workgraph:design-architect, workgraph:design-evidence, workgraph:design-composer, workgraph:design-challenger, and workgraph:design-verifier.
-      Require the architecture and evidence specialists to run in the Design phase and the later specialists to consume actual predecessor results.
-      Require the workflow to leave specialist model settings unset when no selector is supplied.
+      Require actual read-only Explore calls labeled architecture, evidence, compose, challenge, and verify.
+      Require the architecture and evidence stages to run in the Design phase and the later stages to consume actual predecessor results.
+      Require the workflow to leave stage model settings unset when no selector is supplied.
       Require every requirement coverage entry to use the one-based identifiers 1, 2, and 3.
       Require the candidate design to originate in the composer result rather than coordinator prose.
       Require completed phase evidence, one verifier disposition per actual finding, and evidence-backed assessment of all three requirements.
       Require exactly one Workflow invocation and no retry after incomplete phase evidence.
       Require complete true and accepted true only when the actual results justify acceptance.
       Require no file edits, shell commands, Git commands, publication, or extra host Agent dispatch.
-      Fail a proposed-only response, fabricated predecessor data, missing specialist result, malformed phase output, unsupported model claim, or premature acceptance.
+      Fail a proposed-only response, fabricated predecessor data, missing stage result, malformed phase output, unsupported model claim, or premature acceptance.
       Judge observed behavior rather than fixed wording.

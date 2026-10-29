@@ -38,7 +38,7 @@ Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 
 Write maintained instructions and documentation in concise English.
 Follow the active role's request-origin communication policy for conversations and handbacks.
-Instruction Authoring owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
+Writing owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
 
 When drafting, editing, or reviewing prose, read Writing unless its complete content is already loaded.
 

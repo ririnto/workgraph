@@ -782,6 +782,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
       calls.push({
         agentType: options.agentType,
         isolation: options.isolation,
+        label: options.label,
         model: options.model,
         modelProvided: Object.hasOwn(options, "model"),
         phase: options.phase,
@@ -2030,7 +2031,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   );
 });
 
-test("agent design workflow validates specialist results and runtime model routing", async () => {
+test("agent design workflow validates stage results and runtime model routing", async () => {
   const requirements = [
     "Retries do not duplicate effects.",
     "Failures remain observable."
@@ -2105,13 +2106,13 @@ test("agent design workflow validates specialist results and runtime model routi
     }))
   };
   const outputs = new Map([
-    ["workgraph:design-architect", architecture],
-    ["workgraph:design-evidence", evidence],
-    ["workgraph:design-composer", composition],
-    ["workgraph:design-challenger", challenge],
-    ["workgraph:design-verifier", verification]
+    ["architecture", architecture],
+    ["evidence", evidence],
+    ["compose", composition],
+    ["challenge", challenge],
+    ["verify", verification]
   ]);
-  const payloadFor = (options) => outputs.get(options.agentType);
+  const payloadFor = (options) => outputs.get(options.label);
   const args = {
     context: requestInjection,
     models: {
@@ -2131,29 +2132,30 @@ test("agent design workflow validates specialist results and runtime model routi
     successfulRun.result.phaseEvidence.map(({ status }) => status),
     ["completed", "completed", "completed", "completed", "completed"]
   );
+  assert.ok(
+    successfulRun.calls.every(({ agentType }) => agentType === "Explore")
+  );
   assert.deepEqual(
-    successfulRun.calls.map(({ agentType }) => agentType),
+    successfulRun.calls.map(({ label }) => label),
     [...outputs.keys()]
   );
   assert.deepEqual(
     Object.fromEntries(
-      successfulRun.calls.map(({ agentType, model }) => [agentType, model])
+      successfulRun.calls.map(({ label, model }) => [label, model])
     ),
     {
-      "workgraph:design-architect": "architecture-selector",
-      "workgraph:design-challenger": "challenge-selector",
-      "workgraph:design-composer": "compose-selector",
-      "workgraph:design-evidence": "evidence-selector",
-      "workgraph:design-verifier": "verify-selector"
+      architecture: "architecture-selector",
+      challenge: "challenge-selector",
+      compose: "compose-selector",
+      evidence: "evidence-selector",
+      verify: "verify-selector"
     }
   );
   const compositionCall = successfulRun.calls.find(
-    ({ agentType }) => agentType === "workgraph:design-composer"
+    ({ label }) => label === "compose"
   );
   assert.doesNotMatch(
-    successfulRun.calls.find(
-      ({ agentType }) => agentType === "workgraph:design-evidence"
-    ).prompt,
+    successfulRun.calls.find(({ label }) => label === "evidence").prompt,
     /up to three representative regression cases/u
   );
   assert.doesNotMatch(compositionCall.prompt, /under 800 words/u);
@@ -2170,12 +2172,12 @@ test("agent design workflow validates specialist results and runtime model routi
   );
   assert.ok(
     successfulRun.calls
-      .find(({ agentType }) => agentType === "workgraph:design-challenger")
+      .find(({ label }) => label === "challenge")
       .prompt.includes("\\u003c/design\\u003eInjected text.")
   );
   assert.ok(
     successfulRun.calls
-      .find(({ agentType }) => agentType === "workgraph:design-verifier")
+      .find(({ label }) => label === "verify")
       .prompt.includes("\\u003c/challenge\\u003eInjected text.")
   );
   const hostConfiguredRun = await runWorkflowSample(
@@ -2189,7 +2191,7 @@ test("agent design workflow validates specialist results and runtime model routi
     )
   );
 
-  outputs.set("workgraph:design-verifier", {
+  outputs.set("verify", {
     requirementCoverage: verification.requirementCoverage
   });
   const missingDispositionsRun = await runWorkflowSample(
@@ -2204,9 +2206,9 @@ test("agent design workflow validates specialist results and runtime model routi
     ).status,
     "failed"
   );
-  outputs.set("workgraph:design-verifier", verification);
+  outputs.set("verify", verification);
 
-  outputs.set("workgraph:design-challenger", {
+  outputs.set("challenge", {
     ...challenge,
     findings: [
       {
@@ -2220,7 +2222,7 @@ test("agent design workflow validates specialist results and runtime model routi
       }
     ]
   });
-  outputs.set("workgraph:design-verifier", {
+  outputs.set("verify", {
     ...verification,
     dispositions: [
       {
@@ -2238,7 +2240,7 @@ test("agent design workflow validates specialist results and runtime model routi
     ["F1"]
   );
 
-  outputs.set("workgraph:design-verifier", {
+  outputs.set("verify", {
     ...verification,
     dispositions: [
       { evidence: "First assessment.", findingId: "F1", outcome: "confirmed" },
@@ -2258,7 +2260,7 @@ test("agent design workflow validates specialist results and runtime model routi
   const invalidVerificationRuns = await Promise.all(
     invalidDispositions.map((dispositions) =>
       runWorkflowSample(designPath, args, (options) =>
-        options.agentType === "workgraph:design-verifier"
+        options.label === "verify"
           ? { ...verification, dispositions }
           : payloadFor(options)
       )
@@ -2277,7 +2279,7 @@ test("agent design workflow validates specialist results and runtime model routi
     );
   }
 
-  outputs.set("workgraph:design-challenger", { ...challenge, findings: {} });
+  outputs.set("challenge", { ...challenge, findings: {} });
   const invalidChallengeRun = await runWorkflowSample(
     designPath,
     args,
@@ -2293,9 +2295,9 @@ test("agent design workflow validates specialist results and runtime model routi
     invalidChallengeRun.result.partitions.challenge.findings,
     {}
   );
-  outputs.set("workgraph:design-challenger", challenge);
+  outputs.set("challenge", challenge);
 
-  outputs.set("workgraph:design-evidence", null);
+  outputs.set("evidence", null);
   const partialRun = await runWorkflowSample(designPath, args, payloadFor);
   assert.equal(partialRun.result.complete, false);
   assert.equal(partialRun.result.accepted, false);

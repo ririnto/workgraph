@@ -43,7 +43,7 @@ Classify origin by initiating sender, retaining agent origin for relayed human r
 Preserve origin and communication mode through recursive assignments and handoffs.
 
 Preserve required human input, genuine blockers, and host messages.
-Read Writing for prose and Instruction Authoring for instructions unless fully loaded.
+Read Writing for prose or instructions unless fully loaded.
 
 ### Select host guidance
 

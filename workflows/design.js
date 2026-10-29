@@ -204,8 +204,8 @@ const validate = {
         validText(item?.evidence))
   }
 }
-const callAgent = async (key, title, agentType, prompt, schema, isValid, challenge = null) => {
-  const options = { agentType, label: key, phase: title, schema }
+const callAgent = async (key, title, prompt, schema, isValid, challenge = null) => {
+  const options = { agentType: 'Explore', label: key, phase: title, schema }
   if (models[key] !== undefined) {
     options.model = models[key].trim()
   }
@@ -243,15 +243,13 @@ const designAttempts = await parallel([
   () => callAgent(
     'architecture',
     'Design',
-    'workgraph:design-architect',
-    `Design the architecture for this request.\n\n<request>${inputData}</request>\n\n${requirementIndexing}\nReturn system components, their contracts, data flow, major decisions and alternatives, failure behavior, evidence, and assumptions.\nName concrete interfaces and the responsibility of each component.\nKeep each field concise and limit arrays to the smallest useful set.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Design the architecture for this request.\n\n<request>${inputData}</request>\n\n${requirementIndexing}\nReturn system components, their contracts, data flow, major decisions and alternatives, failure behavior, evidence, and assumptions.\nName concrete interfaces and the responsibility of each component.\nCite relevant repository paths when supplied, and distinguish observed evidence from inference and assumptions.\nDo not invent execution results or defer architecture work to the coordinator.\nKeep each field concise and limit arrays to the smallest useful set.\n${readOnly} ${authority} ${dataBoundary}`,
     architectureSchema,
     validate.architecture),
   () => callAgent(
     'evidence',
     'Design',
-    'workgraph:design-evidence',
-    `Build the evidence and test plan for this request.\n\n<request>${inputData}</request>\n\n${requirementIndexing}\nReturn exactly one coverage item for each listed requirement.\nMap every requirement to evidence in a proposed design.\nList regression and evaluation cases sufficient for the task and its requirements.\nKeep each entry concise and state evidence limits briefly.\nDo not invent passing test results.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Build the evidence and test plan for this request.\n\n<request>${inputData}</request>\n\n${requirementIndexing}\nReturn exactly one coverage item for each listed requirement.\nMap every requirement to evidence in a proposed design.\nList regression and evaluation cases sufficient for the task and its requirements.\nKeep each entry concise and state evidence limits briefly.\nCite relevant repository paths when supplied.\nDistinguish proposed checks from executed checks, and do not author the architecture or invent passing test results.\n${readOnly} ${authority} ${dataBoundary}`,
     evidenceSchema,
     validate.evidence)
 ])
@@ -268,8 +266,7 @@ if (phaseRecords.design.status !== 'completed') {
   composed = await callAgent(
     'compose',
     'Compose',
-    'workgraph:design-composer',
-    `Compose one implementation-ready design from the accepted architecture and evidence results.\n\n<request>${inputData}</request>\n\n<architecture>${serializePromptData(architecture.result)}</architecture>\n\n<evidence>${serializePromptData(evidence.result)}</evidence>\n\n${requirementIndexing}\nResolve interface conflicts using evidence from both results.\nCover every requirement using its one-based identifier.\nReturn a concise design with key decisions, implementation steps, requirement coverage, test plan, and open questions.\nKeep the design and lists concise without omitting required detail.\nDo not invent missing predecessor work.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Compose one implementation-ready design from the accepted architecture and evidence results.\n\n<request>${inputData}</request>\n\n<architecture>${serializePromptData(architecture.result)}</architecture>\n\n<evidence>${serializePromptData(evidence.result)}</evidence>\n\n${requirementIndexing}\nResolve interface conflicts using evidence from both results.\nCover every requirement using its one-based identifier.\nReturn a concise design with key decisions, implementation steps, requirement coverage, test plan, and open questions.\nKeep the design and lists concise without omitting required detail.\nDo not invent missing predecessor work or claim unperformed checks.\n${readOnly} ${authority} ${dataBoundary}`,
     schemas.compose,
     validate.compose)
 }
@@ -283,8 +280,7 @@ if (composed.status !== 'completed') {
   challenged = await callAgent(
     'challenge',
     'Challenge',
-    'workgraph:design-challenger',
-    `Challenge the composed design with concrete failure scenarios.\n\n<request>${inputData}</request>\n\n<design>${serializePromptData(composed.result)}</design>\n\n${requirementIndexing}\nExamine each requirement, interface, failure mode, test claim, and open question.\nReturn concise, actionable, evidence-backed findings with severity and a proposed correction.\nAn empty findings list is valid only when coverage describes what you examined.\n${readOnly} ${authority} ${dataBoundary}`,
+    `Challenge the composed design with concrete failure scenarios.\n\n<request>${inputData}</request>\n\n<design>${serializePromptData(composed.result)}</design>\n\n${requirementIndexing}\nExamine each requirement, interface, failure mode, test claim, and open question.\nReport unmet requirements and contradictions as blocking even when acknowledged.\nDistinguish specification blockers from new design defects.\nReturn concise, actionable, evidence-backed findings with severity and a proposed correction.\nDo not edit or certify the design.\nAn empty findings list is valid only when coverage describes what you examined.\n${readOnly} ${authority} ${dataBoundary}`,
     schemas.challenge,
     validate.challenge)
 }
@@ -298,7 +294,6 @@ if (challenged.status !== 'completed' || composed.status !== 'completed') {
   verified = await callAgent(
     'verify',
     'Verify',
-    'workgraph:design-verifier',
     `Independently verify every challenge finding against the composed design and original requirements.\n\n<request>${inputData}</request>\n\n<design>${serializePromptData(composed.result)}</design>\n\n<challenge>${serializePromptData(challenged.result)}</challenge>\n\n${requirementIndexing}\nReturn exactly one concise disposition per finding and evidence-backed status for every requirement.\nUse inconclusive when the available evidence cannot settle a claim.\nDo not repeat predecessor text or repair the design.\n${readOnly} ${authority} ${dataBoundary}`,
     schemas.verify,
     validate.verify,

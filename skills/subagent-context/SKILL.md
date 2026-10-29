@@ -34,8 +34,7 @@ Agent assignments remain agent-origin even when relaying a human project request
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
 Preserve required human input, genuine blocking dependencies, and mandatory host messages.
-For prose or Markdown work, read Writing unless its complete content is already loaded.
-For instruction files, read Instruction Authoring unless its complete content is already loaded.
+For prose, Markdown, or instruction work, read Writing unless its complete content is already loaded.
 Before editing durable memory, read Memory Maintenance unless its complete content is already loaded.
 
 ### Select host guidance

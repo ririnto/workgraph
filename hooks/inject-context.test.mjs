@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
   cpSync,
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -549,6 +550,18 @@ test("Codex delimiter lines preserve raw files and remove Claude body prefixes",
       }
     }
   }
+});
+
+test("plugin does not bundle agent definitions or a separate instruction skill", () => {
+  assert.equal(existsSync(new URL("../agents/", import.meta.url)), false);
+  assert.equal(
+    existsSync(new URL("../skills/instruction-authoring/", import.meta.url)),
+    false
+  );
+  assert.equal(
+    existsSync(new URL("../skills/writing/SKILL.md", import.meta.url)),
+    true
+  );
 });
 
 test("bundled skills retain invocation metadata and supporting reference files", (t) => {
