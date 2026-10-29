@@ -5,8 +5,10 @@ Default new portable scripts to POSIX `sh` unless the contract requires another 
 Use Bash-specific syntax only under a Bash shebang and its supported version.
 Quote expansions unless the shell syntax or required splitting calls for another form.
 Forward arguments with `"$@"`.
+Use explicit `if`, `then`, and `fi` for conditional actions instead of compact `condition && action` chains.
 Preserve exit status and evaluation order when changing conditional forms.
-Check failures that change the result and retain actionable diagnostics.
+Check failures that change the result and keep diagnostics visible.
+Do not hide failures with `|| true` or redirect diagnostics to `/dev/null`.
 Use `if command; then` instead of testing `$?` after intervening work.
 Use `eval` only for a stated requirement with trusted input and correct quoting.
 Create temporary directories with `mktemp -d` and clean task-owned paths through a trap.

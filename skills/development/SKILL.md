@@ -59,7 +59,12 @@ Fix recurring causes in code or data architecture first.
 Use official SDK or framework properties directly when they satisfy the required behavior.
 Prefer immutable bindings and minimize mutable state.
 
+Use named regex capture groups and name-based access for extracted matches and subgroups, including the full match.
+Use named backreferences and replacement references instead of positional references.
 Prefer an existing parser or literal operation when it expresses the requirement more clearly.
+Use the language or platform's native named-group facilities instead of adding unnecessary custom wrappers.
+If the engine lacks named groups, report that limit.
+Do not treat ordinary array indexing as regex capture access.
 
 Before control-flow or expression changes, including condition inversion, read [Preserve Behavior](../principle-preserve-behavior/SKILL.md) unless its complete content is already loaded.
 Before helper, abstraction, or test-observation decisions, read [Production Interfaces](../principle-production-interfaces/SKILL.md) unless its complete content is already loaded.
@@ -100,8 +105,18 @@ Preserve existing integrity checks, including lockfile integrity fields and sign
 Use the project's existing formatters, checkers, and test frameworks for ordinary development changes.
 Preserve existing lint and formatter choices when adding guidance or filling configuration gaps.
 
-For authorized lint setup, select tools appropriate to the project and task.
-Prefer built-in rules and supported configuration before custom rules.
+For authorized lint setup in projects without an existing lint configuration, use these defaults.
+
+| Language | Default |
+| --- | --- |
+| Python | Ruff |
+| JavaScript and TypeScript | Ultracite, invoking Oxlint and Oxfmt through Ultracite |
+| Kotlin | ktlint |
+| Go | golangci-lint |
+
+When lint automation is authorized, prefer built-in rules and supported configuration before custom rules.
+Use the Kotlin and Node.js tooling guidance in the matching language references.
+For other languages, use their existing standard tools.
 Verify tool-version support and edge cases before adding a custom rule.
 Make rules AST-aware and preserve literals, comments, and automatic semicolon insertion where applicable.
 
