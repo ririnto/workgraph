@@ -1,4 +1,4 @@
-# Codex Plugin Updates
+# Codex plugin updates
 
 Run `codex plugin marketplace upgrade`.
 

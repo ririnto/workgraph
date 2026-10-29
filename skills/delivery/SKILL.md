@@ -3,17 +3,17 @@ name: delivery
 description: Use in the main session for repository changes or authorized branch publication and integration.
 ---
 
-# Repository Delivery
+# Repository delivery
 
 Use this skill in the main session.
 
-## Confirm Repository Eligibility
+## Confirm repository eligibility
 
 Before repository writes, verify the target, access, and authorization required for the operation.
 Respect repository protections and explicit restrictions on destinations or forks.
 If required access or authority is unverified, stop affected writes and report the missing evidence.
 
-## Plan Delivery Units
+## Plan delivery units
 
 Split broad goals into cohesive, independently verifiable units with acceptance evidence and one accountable owner.
 Keep coupled work together when splitting prevents independent verification or mergeability.
@@ -24,6 +24,8 @@ Complete authorized Git operations and required checks without repeated permissi
 Preserve explicit user gates, new-scope boundaries, and authorization limits for irreversible actions.
 Git delivery does not authorize deployment, credential handling, live assets, forks, or upstream destinations.
 
+### Select the base and working branches
+
 Use the user's specified base branch, otherwise retain the recorded base or use the current branch.
 Without a base, confirm the active development branch.
 Record working and authorized base branches before branch creation, commits, or publication.
@@ -31,13 +33,15 @@ If they match, create a separate branch from the base before committing or pushi
 Push only the working branch for PR delivery, and never push task changes directly to the base before PR review.
 Use the named branch references and current PR changes for delivery.
 
-## Make Development Progress Visible
+## Make development progress visible
 
 Follow the task's and repository's tracking and delivery requirements.
 Create or reuse an issue when the task or repository requires one.
 Do not restart completed work.
 When tracking work, keep its stage, evidence, blockers, links, and next action current.
 Report actual completed stages rather than guessed percentages.
+
+### Inspect the complete candidate
 
 Before implementation, determine the complete initial or incoming candidate against its named base.
 Include committed changes against the base, staged changes, unstaged changes, and every untracked non-ignored file with its full content.
@@ -47,7 +51,7 @@ Limit any empty-candidate finding to that snapshot without clearing later change
 If the complete candidate cannot be determined, do not treat it as empty.
 Before exposing candidate content outside its trusted boundary, assess and address private information and secret risks.
 
-## Check Before Publication
+## Check before publication
 
 Inspect changed files and required evidence before publishing to the authorized base.
 
@@ -59,13 +63,13 @@ Treat this scan as exploration, without a code review.
 Require file locations and the type of exposure, or a clear no-findings result.
 Inspect flagged content and remove exposed details before pushing the branch.
 
-## Evidence Retention
+## Retain validation evidence
 
 Record concise validation summaries in authorized PR/MR descriptions or comments.
 Include commands, outcomes, coverage, and material limitations without uploading raw logs by default.
 Create local evidence only when a current check, failure investigation, or recovery needs files.
 
-## Review And Publish
+## Review and publish
 
 Use project roles or the user's statement to determine whether the user maintains the project.
 Review each complete delivery unit at the depth required by the task and its risks.
@@ -73,6 +77,8 @@ Select reviewer staffing and effort from the task's risks, available controls, a
 Run selected independent reviewers in parallel when there is more than one.
 Follow required repository review timing and any requested independent review.
 Keep completed valid reviews without mislabeling sequential work as parallel or restarting it solely to change timing.
+
+### Review the complete candidate
 
 Reuse an existing PR/MR for the unit.
 Follow the consumer repository's review method.
@@ -87,6 +93,8 @@ Do not change code solely for unsupported style requests, cleanup suggestions, o
 Keep required human approvals distinct from agent review.
 Record failure consequences, uncovered risks, and the recovery approach with delivery evidence.
 
+### Resolve review blockers
+
 Fix current-unit blockers before integration when they violate acceptance, required behavior, correctness, safety, or required checks.
 Only confirmed blockers require code changes before integration.
 Keep blocker fixes on the same working branch and update its existing PR/MR, if any.
@@ -96,13 +104,15 @@ When review cycles repeat without progress, reconsider the cause and approach in
 Apply Main's no-progress reassessment separately from productive fixes and native runtime retries.
 Keep unresolved blockers explicit, and never treat a review limit as permission to waive acceptance or required checks.
 
-## Defer And Integrate
+## Defer and integrate
 
 Classify findings against the current unit's acceptance, changed behavior, dependencies, and required gates.
 Block integration for own unmet acceptance, introduced or worsened defects, actual dependencies, or required-gate failures.
 An unrelated pre-existing issue, umbrella issue, older failed unit, or severity label alone does not block independently verified delivery.
 Merge independently verified A while unrelated pre-existing B remains open.
 Require no new deferred tracker record for existing unrelated B.
+
+### Record permitted deferrals
 
 For newly accepted current-unit follow-ups, defer only noncritical findings outside required behavior, acceptance, correctness, and safety.
 Before integration, register those deferrals in the authorized long-term issue tracker.
@@ -113,12 +123,16 @@ Implement deferred follow-ups only after updating the base branch.
 Repeat base syncs or rebases only for conflicts or invalidated evidence.
 Follow Main Agent Contract for retry bounds and progress requirements.
 
+### Integrate and read back the base
+
 Integrate after current-unit checks pass, confirmed blockers are resolved, and required current-unit deferrals have records.
 Require only relevant resource returns, not unrelated global ownership returns.
 Finish delivery by reading back the named authorized base branch after normal merge.
 After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
 For an authorized plugin update, read `references/plugin-updates.md` after the plugin's merge and base update.
 Complete already-authorized task-owned cleanup without renewed stage approval.
+
+### Retire owned resources
 
 Before native retirement with retained work, use a supported non-destructive keep operation and verify worktree detachment.
 An idle prompt alone does not prove preservation because native exit can remove attached worktrees.

@@ -1,4 +1,4 @@
-# Research Behind The Instructions
+# Research behind the instructions
 
 ## Scope
 
@@ -10,9 +10,9 @@ Their results do not establish Workgraph performance or model adherence.
 Maintainers can use these sources when changing context boundaries, task dependencies, verification, or writing rules.
 See [the design](design.md) for delivery mechanics and [third-party notices](../THIRD_PARTY_NOTICES.md) for attribution.
 
-## Prompt And Skill Design
+## Prompt and skill design
 
-### Agent-Facing Prompt Contracts
+### Agent-facing prompt contracts
 
 We read the complete official [Claude prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md), including its examples and model-specific qualifications.
 We also read the complete [Codex best-practices article](https://learn.chatgpt.com/guides/best-practices) and [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md).
@@ -32,7 +32,7 @@ These adaptations do not add SDK integrations, model configuration, settings cha
 The guides' model-specific observations require evaluation on the selected workload and do not establish Workgraph adherence.
 Source validation, native behavior evidence, and installed activation remain separate claims.
 
-### Official Prompt-Engineering Guides
+### Official prompt-engineering guides
 
 We fetched the official [Anthropic prompt-engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md) in full on October 20, 2026.
 It is a hub page that links the separately cited best-practices guide, rather than replacing that guide.
@@ -66,7 +66,7 @@ It does not request private chain-of-thought, build majority-vote or program-exe
 Meta's HTML extraction flattens code-block and table styling, so its read does not establish rendered inspection.
 The guides document different models and products, so their lessons remain unverified for Workgraph model adherence without a behavioral evaluation.
 
-### OpenAI Guidance
+### OpenAI guidance
 
 [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) recommends action within the user's scope.
 It calls for explicit completion criteria, clear instruction priority, and checks proportional to the change.
@@ -109,7 +109,7 @@ Main loads the separate Delivery skill for repository changes or delivery, while
 The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
-### Claude Model Guidance
+### Claude model guidance
 
 [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5) distinguishes prompt changes from host and API changes.
 We reviewed a supplied copy and fetched the official guide's effort and completion sections.
@@ -139,7 +139,7 @@ The guide's broad context search targets multi-app workflows rather than every r
 Workgraph does not implement those integrations or change model settings through instruction text.
 Its runtime delivers context through Claude Code hooks, and its instructions use the host's existing completion lifecycle.
 
-### Model Effort And Cost
+### Model effort and cost
 
 We reviewed nine exact models using official model, effort, pricing, host, and prompting documentation.
 The table compares seven models with standard API pricing and host guidance, separating API defaults from documented host recommendations.
@@ -236,7 +236,7 @@ These provider labels do not equate to Claude or OpenAI effort levels.
 Native Claude Code effort translation, effective context, and current pricing remain unverified.
 The detailed model limits, Copilot pricing, and Claude Code 2.1.302 schema observations are maintained in the [model-effort evidence](model-effort-evidence.md#gemini-38-flash-and-gemini-4-argon).
 
-### Host Model Selection
+### Host model selection
 
 Claude Code supports `fable`, `opus`, `sonnet`, and `haiku` aliases, as documented in its [model configuration](https://code.claude.com/docs/en/model-config.md).
 Provider routing, overrides, and allowlists can resolve an alias to another release.
@@ -253,7 +253,7 @@ Host adapters use current tool names and supported model settings.
 The current host's fork contract governs inheritance and overrides.
 These structural choices supply no model-performance evidence.
 
-### Skill Structure
+### Skill structure
 
 We reviewed the official [Claude Code skills documentation](https://code.claude.com/docs/en/skills) and the complete [Agent Skills source](https://agentskills.io/llms-full.txt).
 Claude uses descriptions to select skills and supports user-only invocation through frontmatter.
@@ -286,7 +286,7 @@ User adapters separate host setup from role policy, while Workgraph retains its 
 The official skills and prompting documents above support the adapter and contract separation.
 These structural choices remain unverified for model adherence until a behavioral evaluation covers them.
 
-### Host Instruction Comparison
+### Host instruction comparison
 
 We compared the local Codex checkout with instructions bundled in Claude Code 2.1.287.
 The following sources establish overlapping instructions.
@@ -330,7 +330,7 @@ Worker isolation therefore describes newly injected content rather than the comp
 References provide their own details without explaining upper-level instructions.
 Benchmark tables, prices, and workload anecdotes remain in maintainer research.
 
-### Repository Context Studies
+### Repository context studies
 
 [Evaluating AGENTS.md](https://arxiv.org/html/2602.11988v2) evaluates context files on Python coding tasks with four agent-model pairings.
 The authors report no general improvement in task success and higher average inference cost.
@@ -349,7 +349,7 @@ They support measuring instruction effects rather than assuming that more or few
 Workgraph retains local conventions and required checks but avoids copying the runtime contract into `AGENTS.md`.
 Neither study evaluates this plugin or GPT-6 Astra.
 
-### Context Selection
+### Context selection
 
 [Lost in the Middle](https://arxiv.org/abs/2307.03172) studies retrieval from long contexts in question answering and key-value tasks.
 Its abstract reports sensitivity to the position of relevant information.
@@ -363,9 +363,9 @@ We apply focused context selection through the [role and audience boundaries](de
 Research and maintenance details stay outside consumer context.
 A dispatch must include missing constraints when the receiver's context is unknown.
 
-## Graph Engineering
+## Graph engineering
 
-### Task, Agent, And State Graphs
+### Task, agent, and state graphs
 
 [Graph Engineering in the Era of LLM Agents](https://arxiv.org/abs/2608.21156) surveys graph structures for tasks, agents, and system states.
 Its abstract argues for explicit coordination as tasks become more interdependent.
@@ -378,7 +378,7 @@ The host retains ownership of task execution and execution state.
 We reviewed its abstract to distinguish that approach from a task dependency graph.
 Workgraph does not request private reasoning traces or construct a thought graph.
 
-### Scheduling And Dependency Evidence
+### Scheduling and dependency evidence
 
 [An LLM Compiler for Parallel Function Calling](https://arxiv.org/abs/2312.04511) separates planning, task dispatch, and execution.
 Its abstract describes parallel function calls and task-specific latency, cost, and accuracy results.
@@ -406,7 +406,7 @@ Those task-specific results support choosing meaningful edges rather than linkin
 [ADaPT](https://arxiv.org/abs/2311.05772) decomposes tasks when the executor cannot complete them.
 Its benchmark improvements support as-needed decomposition, not prebuilding speculative phases for Workgraph.
 
-### Coordination Costs
+### Coordination costs
 
 [Building effective agents](https://www.anthropic.com/engineering/building-effective-agents) recommends starting with the simplest design and adding complexity only when outcomes improve.
 It distinguishes predefined workflow paths from agents that choose their own actions.
@@ -435,9 +435,9 @@ This supports testing independent fan-out as a simpler baseline, not assuming mo
 In Claude Code, Workgraph selects Workflow when an identified follow-up may depend on a prior result.
 The sources do not establish that this routing improves Workgraph outcomes.
 
-## Verification And Recovery
+## Verification and recovery
 
-### Lauren Tan On Verification And Agent Environments
+### Lauren Tan on verification and agent environments
 
 We reviewed Lauren Tan's [recorded presentation](https://x.com/poteto/status/2102050467505430555), published on September 21, 2026 UTC.
 The approximately 38-minute recording and its automatic English captions describe practitioner experience at Cursor and Grok Bot.
@@ -478,7 +478,7 @@ Its abstract describes persistent memory, compensation, and independent validati
 It motivates checking partial effects before retrying a write.
 Workgraph does not implement transactions, automatic compensation, or durable recovery.
 
-### Bounded Feedback And Review Evidence
+### Bounded feedback and review evidence
 
 We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md), published October 15, 2026.
 Addy Osmani, Morgan Westlee Lunt, and Qing Wang describe Anthropic's layered review process and its operational results.
@@ -562,7 +562,7 @@ Keep these Claude Agent restrictions separate from Codex's native wait policy.
 The injected skills do not repeat restrictions already supplied by native tools.
 The papers do not establish the effectiveness of Workgraph's waiting instructions.
 
-### Harness2 Verification Evidence Evaluation
+### Harness2 verification evidence evaluation
 
 We compared the unchanged public [Verification skill](../skills/verification/SKILL.md) with an unmerged three-line expansion on a fixed synthetic evidence-attribution task.
 The task had eight status-and-citation criteria and five semantic criteria across three trials.
@@ -583,7 +583,7 @@ The new native [case](../evals/verification-evidence/case.yaml) defines regressi
 Neither provides evidence of runtime or model-adherence gains.
 No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
 
-### Instruction Boundary Reinforcement Rerun
+### Instruction boundary reinforcement rerun
 
 We compared Instruction Authoring and the shared plugin-update router before and after their auto-injection and host-neutrality changes.
 The fixed synthetic task combined skill revision with a separate update plan for one project-declared host.
@@ -614,7 +614,7 @@ All requests used the maintained local gateway without changing provider configu
 The run establishes neither native activation, permission enforcement, broad model adherence, nor stock benchmark or recursive-sweep coverage.
 The maintained native evidence-assessment case remains unrun because the worktree isolation guard refused its evaluator invocation.
 
-### Scoped Contributor Review Reinforcement
+### Scoped contributor review reinforcement
 
 We compared shared review routing and role Scope text before and after the scoped contributor-policy move and requested deletions.
 The fixed synthetic task combined source transformations, requirement preservation, and a plan for a complete posted candidate.
@@ -644,7 +644,7 @@ Dropped capabilities, resource limits, and a 1,200-second timeout bounded execut
 Network egress was not enforced, and model output was never executed.
 The result establishes neither native activation, permission enforcement, stock benchmark coverage, nor general model adherence.
 
-## Language Tooling And Rule Mappings
+## Language tooling and rule mappings
 
 Preserve a project's working lint and formatter choices before applying defaults to an unconfigured project.
 The Development skill selects Ruff, Ultracite with Oxlint and Oxfmt, ktlint, and golangci-lint for authorized setup.
@@ -674,7 +674,7 @@ Verify the target's supported combination instead of assuming the newest stable 
 Register custom rulesets with the consumer's ktlint runtime and prove native lint discovers them.
 Workgraph bundles language guidance only and does not install consumer rules, plugins, or hooks.
 
-## Codex Native Cleanup
+## Codex native cleanup
 
 This section records historical, non-operational transport research.
 It supplies no cleanup interface or fallback authority.
@@ -714,7 +714,7 @@ The inspected native worktree tool contracts described snapshot preservation and
 Those contracts distinguished conversation archival from physical worktree archival.
 This research did not establish installed-version parity, actual deletion results, Cloud filesystem cleanup, or model adherence.
 
-## Go Linting
+## Go linting
 
 The official [Go Plugin System documentation](https://golangci-lint.run/docs/plugins/go-plugins/) recommends the Module Plugin System for custom linters.
 The official [Module Plugin System documentation](https://golangci-lint.run/docs/plugins/module-plugins/) describes its setup.
@@ -723,9 +723,9 @@ The official [FAQ](https://golangci-lint.run/docs/welcome/faq/) describes suppor
 These sources support guidance to prefer built-in linters, check toolchain compatibility, and use the recommended plugin mechanism.
 They do not establish compatibility for a particular repository or replace independent security and semantic checks.
 
-## Writing And Host Contracts
+## Writing and host contracts
 
-### Native Workflow Stage Adoption
+### Native Workflow stage adoption
 
 We read the complete original [mirku post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
 We also read the complete official [Workflow documentation](https://code.claude.com/docs/en/workflows.md).
@@ -759,7 +759,7 @@ Schema validity does not establish factual correctness or replace an independent
 Native schema retries, stall restarts, inference sampling, and task retries remain separate from the no-progress fix-round count.
 Source checks establish instruction delivery, while native execution, installed activation, and model adherence require separate host evidence.
 
-### Claude Code Workflow And Subagent Contracts
+### Claude Code Workflow and subagent contracts
 
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe host execution.
 Workgraph retains dependency selection, role ownership, evidence freshness, and delivery gates.
@@ -793,7 +793,7 @@ We read the complete [combined Agent Skills source](https://agentskills.io/llms-
 A conditional delivery reference can reduce unrelated Workflow context, but no behavioral evaluation yet establishes that it improves model performance.
 Source and delivery checks cannot establish interactive invocation or model adherence.
 
-## Document And Release Validation
+## Document and release validation
 
 GitHub's [issue form schema](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/syntax-for-githubs-form-schema) defines form fields and field ID constraints.
 Workgraph validates a bounded subset: top-level strings, nonempty bodies, and required textarea fields with unique labels and IDs.
@@ -813,7 +813,7 @@ The workflow uses current [checkout](https://github.com/actions/checkout) and [s
 Separate dependency-free jobs exercise the declared hook runtime floor and macOS without claiming development-tool compatibility on Node.js 18.
 These checks establish source validation and runtime evidence, while model adherence requires a separate behavioral run.
 
-## Development Lifecycle
+## Development lifecycle
 
 Workgraph's conditional [Development](../skills/development/SKILL.md) skill selects the lifecycle matching the requested outcome.
 Feature work defines behavior and acceptance before implementation.
@@ -827,7 +827,7 @@ Delivery checks that review verdicts still cover the current candidate.
 Main, Delivery, and Verification retain orchestration, publication authority, evidence freshness, and cleanup.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.
 
-## pnpm And Git Hook Tooling
+## pnpm and Git hook tooling
 
 The root maintains compatible lint versions, a common check and fix surface, Markdown settings, and Ultracite ownership.
 Ultracite supplies the Oxlint source-lint preset and Oxfmt formatting defaults.

@@ -3,7 +3,7 @@ name: main-agent-contract
 description: Use in the Workgraph main-session mode when orchestrating authorized outcomes, not as a dispatched node.
 ---
 
-# Main Agent Contract
+# Main agent contract
 
 ## Authority
 
@@ -26,7 +26,7 @@ Read Memory Maintenance before durable memory edits unless fully loaded.
 
 ## Rules
 
-### Scope
+### Protect session boundaries
 
 Main owns session settings, permission changes, and credential handling.
 Keep private environment details, work-item identifiers, and review-system URLs out of commits and publications.
@@ -35,7 +35,7 @@ Use repository-relative paths and portable examples in committed content.
 Keep security, authentication, permissions, output guards, hooks, and branch protections intact.
 Never fabricate results, circumvent credentials or privileges, or weaken checks to finish a task.
 
-### Communication
+### Communicate by request origin
 
 Follow the user's language and communication requirements.
 
@@ -45,7 +45,7 @@ Preserve origin and communication mode through recursive assignments and handoff
 Preserve required human input, genuine blockers, and host messages.
 Read Writing for prose and Instruction Authoring for instructions unless fully loaded.
 
-### Host
+### Select host guidance
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
 Read the matching bundled `references/` file before dispatch unless fully loaded.
@@ -73,8 +73,12 @@ Isolate concurrent editors with supported tools and preserve their work until ha
 Require only relevant predecessor results and conflicting ownership returns.
 Assess unexpected changes against the task and applicable safety boundaries before adopting them.
 
+#### Wait for assigned work
+
 Keep one live background wait per target.
 Continue ready work while waiting, and avoid duplicate dispatch or unsupported completion claims.
+
+#### Reuse evidence and resolve failures
 
 Reuse passing evidence while relevant behavior, inputs, configuration, and toolchain remain unchanged.
 Compare relevant references and changes against the evidence's scope.
@@ -85,15 +89,21 @@ Try all reasonable authorized repairs, retries, and supported alternatives.
 Report each attempt, outcome, evidence, and limits honestly.
 Bound retries by new evidence, progress, and an exit condition.
 Reassess stalled work without waiving acceptance.
+
+#### Verify findings independently
+
 Independently verify findings before reporting, excluding the finder and fixer.
 Label unsupported findings and unavailable or inconclusive verification unverified.
 
-### Cleanup
+### Return owned resources
 
 Record owned resources.
 Retain evidence only for checks, investigation, recovery, or retention.
 Exclude dependency trees, build caches, and redundant logs.
 Confirm ownership before deleting shared evidence.
+
+#### Retire owned resources
+
 At handback, check owned background processes and descendants, including unrecorded ones.
 Stop unneeded owned processes and verify exit.
 Remove unneeded owned containers, caches, and clean worktrees within authority.
@@ -101,15 +111,21 @@ Preserve shared assets and required delivery or recovery artifacts.
 Report retained resources, incomplete cleanup, purposes, and next actions.
 Return source, Git, reader, process, and descendant ownership.
 
-## Orchestration
+## Coordinate outcomes
 
 Use graphs when dependencies aid coordination.
 Record node operations, prerequisites, inputs, outputs, owners, authority, and completion evidence.
 Connect result or condition dependencies and pass required evidence.
 Treat null, missing, or unsupported evidence as incomplete.
 Join results and preserve unaffected work after failures or changes.
+
+### Choose and verify graph tools
+
 Use Mermaid or LaTeX when useful.
 Verify diagrams and formulas with their renderer.
+
+### Select an execution path
+
 Choose only needed nodes.
 Report unavailable selected or delegation tools.
 Preserve explicit tool choices.
@@ -117,7 +133,7 @@ Proceed directly only when safe and the user's tool choice permits it.
 Delegate substantial ready outcomes unless the user selects direct work or permits fallback.
 Handle trivial work unless delegation is requested.
 
-## Repository
+## Apply repository procedures
 
 Read Development before source work unless fully loaded.
 

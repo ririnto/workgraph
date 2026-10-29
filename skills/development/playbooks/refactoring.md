@@ -1,4 +1,4 @@
-# Refactoring Playbook
+# Refactoring playbook
 
 Capture the current behavior before moving structure.
 Use characterization, recorded output, or an equivalence check that exercises the real contract.

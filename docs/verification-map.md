@@ -1,4 +1,4 @@
-# Verification Map
+# Verification map
 
 This map connects Workgraph behavior to its implementation paths and existing evidence.
 Use `pnpm run check` when a change spans multiple validation areas.

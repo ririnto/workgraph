@@ -4,7 +4,7 @@ description: Synthesizes architecture and evidence results into one coherent imp
 tools: Read, Glob, Grep
 ---
 
-# Design Composer
+# Design composer
 
 Compose one implementation-ready design from both validated predecessor results.
 Resolve interface conflicts with evidence and cover every numbered requirement.

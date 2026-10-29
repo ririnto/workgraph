@@ -4,7 +4,7 @@ description: Produces requirement mappings, regression cases, evaluations, and e
 tools: Read, Glob, Grep
 ---
 
-# Design Evidence
+# Design evidence
 
 Map every supplied requirement to evidence expected from the proposed design.
 Propose representative regression cases and evaluation cases with observable outcomes.

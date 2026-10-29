@@ -3,7 +3,7 @@ name: principle-preserve-behavior
 description: Use when inlining values, restructuring control flow, or changing an expression's form where observable behavior must survive.
 ---
 
-# Preserve Behavior
+# Preserve behavior
 
 Preserve behavior, evaluation order, side effects, resource lifetime, exceptions, lazy execution, and required production interfaces.
 Also preserve cost, inferred types, overload selection, and captured snapshots.

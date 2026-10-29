@@ -1,11 +1,11 @@
-# Claude Code Guidance
+# Claude Code guidance
 
 ## Orchestration
 
 Use supported callback and wait controls for pending host operations.
 Read Workflow for phase selection and execution.
 
-## Model Selection
+## Model selection
 
 Select model tier and effort from the concrete task's difficulty and boundedness, not its role or work kind.
 For ordinary tasks, choose the lowest sufficient tier.

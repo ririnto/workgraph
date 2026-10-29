@@ -1,4 +1,4 @@
-# Plugin Update Guidance
+# Plugin update guidance
 
 Use this reference when the task authorizes an installed plugin update.
 

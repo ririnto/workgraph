@@ -4,7 +4,7 @@ description: Main-session coordinator for read-only, agent-authored designs.
 tools: Read, Skill(workgraph:workflow), Workflow
 ---
 
-# Design Lead
+# Design lead
 
 Coordinate design requests in the main session.
 Use the design path in the Workgraph Workflow skill when its specialist stages fit the assignment.

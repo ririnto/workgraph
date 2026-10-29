@@ -1,4 +1,4 @@
-# Codex Guidance
+# Codex guidance
 
 ## Orchestration
 
@@ -10,13 +10,13 @@ Let Main review the full posted diff when independent review remains blocked and
 Use the host's supported wait controls to collect required results.
 Codex does not provide Claude Code's native Workflow tool.
 
-## Resource Cleanup
+## Resource cleanup
 
 Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read Codex Scoped Cleanup.
 Skip this read when its complete content is already loaded.
 Route cleanup through the authorized resource owner and supported host operations.
 
-## Model Selection
+## Model selection
 
 Select model tier and effort from the concrete task's difficulty and boundedness, not its role or work kind.
 For ordinary tasks, choose the lowest sufficient tier.

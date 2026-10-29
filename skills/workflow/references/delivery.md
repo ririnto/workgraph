@@ -1,4 +1,4 @@
-# Authorized Engineering Delivery Nodes
+# Authorized engineering delivery nodes
 
 This reference depends on the loaded Delivery skill as its prior dependency.
 Delivery owns repository tracking, exposure scans, review, integration gates, and cleanup authority.
@@ -20,7 +20,7 @@ Use only nodes allowed by the goal's scope and authority.
 | Integration in Main | Main integrates after current-unit gates pass. | Passing required checks, resolved current-unit blockers, required deferral records, and authorized base branch. | Normal merge and named-base readback without waiting for unrelated open work. |
 | Owned cleanup | Main or the assigned resource owner retires only authorized task-owned resources. | Named-base preservation, no unique work, no active consumers, and granted cleanup scope. | Removed disposable resources or exact retained resources and genuine blockers without renewed stage approval. |
 
-## Readiness And Transitions
+## Readiness and transitions
 
 Before starting a node, confirm its accepted inputs, owner, authority, tools, paths, and branch.
 Follow Main Agent Contract for graph readiness, dependencies, ownership, and result acceptance.

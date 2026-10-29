@@ -1,6 +1,6 @@
-# Workgraph In Codex
+# Workgraph in Codex
 
-## Install And Load
+## Install and load
 
 Use Node.js 18 or later for hook execution.
 Install or enable the repository through a Codex host that supports native plugin lifecycle hooks.
@@ -11,7 +11,7 @@ The hook commands use `PLUGIN_ROOT` and set `additionalContextLimit: 0` to keep 
 The inspected Codex source supports this configuration, while activation in the installed desktop host remains unverified.
 This adapter therefore supplies no unverified universal installation command.
 
-## Automatic Loading
+## Automatic loading
 
 SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Codex reference](../../skills/main-agent-contract/references/codex.md).
 SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Codex reference](../../skills/subagent-context/references/codex.md).
@@ -30,7 +30,7 @@ Native activation requires a host with local command hooks enabled.
 Codex uses its native delegation tools under the Main host reference.
 Claude Code's native Workflow is unavailable in Codex.
 
-## Manual Invocation
+## Manual invocation
 
 Use dollar-prefixed, plugin-qualified skill names in hosts supporting this invocation form.
 The public mode entry remains `$workgraph:main-agent-contract`.
@@ -64,7 +64,7 @@ Use the host's plugin update controls and start a new session after updating.
 Confirm the selected descriptor version and loaded source paths before evaluating changed instructions.
 Both host descriptors must retain the matching release number defined by [Version Updates](../../README.md#version-updates).
 
-## Evidence Limits
+## Evidence limits
 
 The [verification map](../verification-map.md) distinguishes source delivery, installed activation, interactive invocation, and model behavior.
 Passing hook tests does not establish installed desktop activation or model adherence.

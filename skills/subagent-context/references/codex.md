@@ -1,4 +1,4 @@
-# Codex Execution Guidance
+# Codex execution guidance
 
 Complete authorized work under native Codex execution rules and report results directly.
 Use the host's supported wait controls to collect required results.

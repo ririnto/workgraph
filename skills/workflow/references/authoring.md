@@ -1,6 +1,6 @@
-# Workflow Script Authoring
+# Workflow script authoring
 
-## Map The Main Graph
+## Map the Main graph
 
 Use Main's accepted node contracts and dependencies as script inputs.
 Encode accepted dependencies in Workflow control flow, not progress labels.
@@ -19,7 +19,7 @@ Set `isolation: 'worktree'` through the native tool contract for edits.
 Return each edit's diff, checks, and worktree ownership to Main before integration and cleanup.
 When explicit approval is required, end the proposal run before any edit and start edits only after approval.
 
-## Partition By Domain
+## Partition by domain
 
 Evaluate each phase for independent work in actual domains, keyed by owned scope and required results.
 Use bounded domain pipelines with only the stages each domain needs rather than a Cartesian domain-by-phase staffing matrix.
@@ -36,7 +36,7 @@ Use `parallel()` only when downstream work needs the complete result set.
 A barrier is justified for cross-item deduplication, comparison, or a decision based on all results.
 Do not use a barrier merely to transform results between item-local stages.
 
-## Author The Script
+## Author the script
 
 Begin the script with `export const meta = {...}` using a pure literal.
 The required metadata fields are `name` and `description`.
@@ -49,6 +49,8 @@ The script runs as JavaScript and cannot access Node.js APIs, files, or external
 Use only the standard JavaScript syntax and built-ins supported by the host runtime.
 Do not use TypeScript annotations or syntax.
 
+### Validate calls and options
+
 `agent(prompt, options)` returns a promise and may return `null` after a skip or terminal API failure.
 Await each required `agent()`, `pipeline()`, `parallel()`, and nested `workflow()` call.
 A schema requests structured output, but the script must validate required fields and acceptance criteria.
@@ -58,6 +60,8 @@ Check native descriptions before using optional settings or a custom agent type.
 They do not create dependency edges or guarantee that work ran.
 Set `opts.phase` explicitly inside concurrent stages to avoid global phase races.
 `meta.phases` describes progress and does not schedule or enforce phases.
+
+### Respect concurrency and budget
 
 Choose another permitted family or limit fan-out items when a caller enforces a per-family concurrency cap.
 Workflow fan-out does not enforce that caller's family cap.
@@ -71,7 +75,7 @@ Serialization may display that `Infinity` as `null`, which does not mean zero.
 When a token target exists, treat it as a hard ceiling for further agent calls.
 Keep retry limits independent of the token budget.
 
-## Validate Phases And Results
+## Validate phases and results
 
 Treat `null`, missing fields, malformed values, and unsupported evidence as incomplete.
 Do not filter required results by truthiness to turn failures into success.
@@ -84,6 +88,8 @@ Validate finding identifiers and evidence before passing candidates to a verifie
 Require a verification result for every candidate before synthesis or confirmed reporting.
 Retain confirmed, refuted, and unverified outcomes separately, including missing or inconclusive verifier results.
 Do not replace independent verification with schema validation, majority votes, or the finder's self-check.
+
+### Handle failed stages
 
 A pipeline stage that throws drops that item's result to `null` and skips its later stages.
 A parallel thunk that throws resolves to `null`, while Workflow can still finish.
@@ -116,6 +122,8 @@ if (
 }
 ```
 
+### Inspect execution evidence
+
 Inspect `${transcriptDir}/journal.jsonl` before diagnosing unexpected or empty results.
 The journal records agent starts, results, labels, and phases, but not every `phase()` call.
 Compare agent-backed phase entries, returned values, failure diagnostics, and usage counters with planned nodes.
@@ -123,7 +131,7 @@ Check returned phase evidence for deterministic phases that have no agent journa
 Read relevant agent transcripts when journal results are missing or unexpected.
 A completion notification or successful top-level return alone proves neither execution nor acceptance.
 
-## Bound Fix Loops
+## Bound fix loops
 
 Choose an observable progress measure before the first fix, such as remaining diagnostic identities or failing checks.
 Compare each completed fix-and-check round against its predecessor using the same acceptance criteria.
@@ -132,7 +140,7 @@ Return unresolved failures, evidence, and remaining authorized avenues to Main w
 Keep this count separate from schema retries, stalled-agent restarts, inference sampling, and task-attempt limits.
 Reassessment never waives blockers, required checks, or user approval.
 
-## Resume Conservatively
+## Resume conservatively
 
 Resume only in the same session, using the original `runId` and returned `scriptPath`.
 

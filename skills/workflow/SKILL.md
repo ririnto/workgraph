@@ -13,7 +13,7 @@ Stop this skill without substituting another execution method in that host.
 Only the main session starts native Workflow.
 Use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
 
-## Prepare The Run
+## Prepare the run
 
 Honor explicit supported tool choices within the host's authority before applying default routing.
 Use direct Agent when one assignment completes the accepted work without a dependent agent stage or join.
@@ -52,7 +52,7 @@ Wait for completion before editing the script, then append phases and resume val
 
 If the native Workflow tool is unavailable, report that it did not run.
 
-## Verify Results
+## Verify results
 
 Treat failed, missing, null, or unsupported results as incomplete rather than successful.
 Check returned evidence against acceptance criteria, including required predecessor data and phase outcomes.
