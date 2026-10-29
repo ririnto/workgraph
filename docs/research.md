@@ -141,7 +141,9 @@ Its runtime delivers context through Claude Code hooks, and its instructions use
 
 ### Model effort and cost
 
-Workload-specific evidence supports the following tier and effort starting points, subject to host support and assignment settings.
+The following tier and effort starting points combine workload evidence with design judgments.
+They depend on host support and assignment settings.
+The reviewed evidence does not establish Terra's effort performance.
 
 | Tier | Workload and effort starting point |
 | --- | --- |
@@ -186,7 +188,7 @@ We read the supplied Haiku system card and visually inspected every capability e
 FrontierCode reports five runs per task in Claude Code and uses output tokens rather than reported Haiku costs.
 Max adds 0.6 percentage points over xhigh on Main while using about 80% more output tokens, estimated from the figure.
 The source supplies no uncertainty intervals for that coding comparison.
-The runtime's debugging, refactoring, and review choices extend that coding evidence as workload judgments, rather than separate measured rankings.
+The tier table extends that coding evidence to review as a workload judgment, rather than a separately measured ranking.
 The reviewed research, visual, computer-use, professional, and healthcare results show different effort gains and latency costs.
 Their limits prevent a single effort default for every Haiku workload.
 

@@ -382,7 +382,7 @@ Keep that result separate from Artificial Analysis's scores.
 ### Public generation logs and code review
 
 [Simon Willison's article](https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/) links his exact-model generation logs.
-He uses the same SVG-generation prompt with `anthropic/claude-opus-5-5` at five effort settings.
+He uses the same SVG-generation prompt with Opus 5.5 at five effort settings.
 High returns an SVG with 3,366 output tokens in 29.462 seconds.
 Max consumes 128,000 thinking tokens, returns no final response, and takes 1,141.552 seconds.
 The article reports a second max failure and $2.56 per failed attempt.
