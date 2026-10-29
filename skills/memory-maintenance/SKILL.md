@@ -4,9 +4,9 @@ description: >-
   Use before creating, editing, merging, or deleting durable memory records or their index.
 ---
 
-# Memory Maintenance
+# Memory maintenance
 
-## Establish Scope
+## Establish scope
 
 Apply the current role, assignment, and authorized memory write scope.
 This procedure grants no additional role or write authority.
@@ -14,7 +14,7 @@ Identify the selected memory store, its index, record format, and current writer
 Preserve another owner's lease and use the host's supported memory mechanism.
 Read Writing unless its complete content is already loaded.
 
-## Read Existing Context
+## Read existing context
 
 Before any memory change, read the complete index and every existing memory file in the selected store.
 Follow cross-links needed to interpret the proposed change within authorized read access.
@@ -27,7 +27,7 @@ Distinguish historical observations from current state and authority.
 Preserve unresolved uncertainty rather than inventing a resolution.
 Keep still-valid preferences and do not restore obsolete instructions merely because older records contain them.
 
-## Reconcile And Verify
+## Reconcile and verify
 
 Make the smallest authorized update after reviewing existing context.
 Keep one durable fact per new record and preserve the store's required metadata.

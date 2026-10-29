@@ -1,6 +1,6 @@
-# Instruction And Hook Design
+# Instruction and hook design
 
-## Separate The Audiences
+## Separate the audiences
 
 Keep contributor guidance separate from consumer instructions so the plugin does not impose this repository's toolchain on other projects.
 The [README](../README.md) guides plugin users, and each host adapter guides one host's setup and invocation.
@@ -44,7 +44,7 @@ Use links for supporting explanations instead of copying procedures across docum
 Main and Worker embed their applicable role rules because their loading contexts are separate.
 Audience tables and adapters link to procedure owners rather than restating their checklists.
 
-### Composition Rules
+### Composition rules
 
 Auto-injected repository guidance defines contributor constraints for these boundaries.
 Keep that guidance at its conventional location without directing agents to retrieve it.
@@ -64,7 +64,7 @@ Workflow stays focused on its lower-level native operation without repeating the
 Host adapters stay at user altitude and link to role references and sole policy owners.
 Contributor guidance identifies these directories and forbids duplicate same-context operational rules.
 
-### Conditional Loading
+### Conditional loading
 
 Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, branch creation, implementation dispatch, commits, or publication.
 Main and Worker conditionally load Writing, Instruction Authoring, Development, and Memory Maintenance for tasks within those skills' scopes.
@@ -104,7 +104,7 @@ Keep host mechanics in the host's tool descriptions.
 Retain task procedures that the host does not supply.
 The [host comparison](research.md#host-instruction-comparison) records the reviewed version and evidence limits.
 
-## Deliver Context
+## Deliver context
 
 Claude Code loads `hooks/hooks.json` from the default plugin location and locates the injector through `CLAUDE_PLUGIN_ROOT`.
 Codex selects `hooks/codex-hooks.json` through `.codex-plugin/plugin.json` and uses `PLUGIN_ROOT`.
@@ -165,7 +165,7 @@ Do not assume that every orchestration system creates a Claude Code subagent.
 Dispatch prompts must carry the constraints needed by a receiver whose context is unknown.
 Assignments carry Workgraph model choices and acceptance requirements, and the host applies its model, effort, and fork controls.
 
-## Compose Work Through The Host
+## Compose work through the host
 
 Workgraph keeps goal definition, scope, authority, acceptance evidence, and dynamic graph planning in the main session.
 Each node describes a bounded operation, decision, or check with required inputs, expected outputs, owner, authority, and completion evidence.
@@ -218,7 +218,7 @@ Fix loops and multi-model assessments keep their boundaries in the Workflow skil
 Explicit diff-first gates split proposal and edit runs because native Workflow cannot request intermediate operator sign-off.
 These consumer rules preserve separately authorized source delivery without activating host settings.
 
-## Support Manual Invocation
+## Support manual invocation
 
 Each role keeps its own procedures inline.
 Manual Main invocation reads the active host reference before dispatch unless its complete content is already loaded.
@@ -236,7 +236,7 @@ The [skill invocation settings](../README.md#skill-invocation) control skill loa
 Automatic hooks read the selected role and its host reference without invoking skills or requiring model-side retrieval.
 Keep one injector and one configuration per host, without runtime host detection or fallback implementations.
 
-## Verify Delivery And Behavior
+## Verify delivery and behavior
 
 The [verification map](verification-map.md) connects maintained Workgraph behavior to its current commands and evidence boundaries.
 Use existing pnpm gates instead of adding a second verification CLI.
@@ -277,7 +277,7 @@ Retained local traces let maintainers distinguish completed command and worker o
 Record which model, host, and loaded plugin produced the result.
 Do not infer model adherence from a passing hook test or a shorter prompt.
 
-## Validation And Tooling
+## Validation and tooling
 
 Ultracite runs source lint and formatting through Oxlint and Oxfmt.
 The root configs use the official Ultracite presets and preserve their ignore patterns.

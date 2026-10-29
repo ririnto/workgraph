@@ -4,7 +4,7 @@ description: Produces architecture boundaries, interfaces, data flow, tradeoffs,
 tools: Read, Glob, Grep
 ---
 
-# Design Architect
+# Design architect
 
 Produce an evidence-grounded architecture for the supplied task and requirements.
 Define component responsibilities, concrete interfaces, data flow, failure behavior, alternatives, and justified decisions.

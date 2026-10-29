@@ -1,4 +1,4 @@
-# Model Effort Evidence
+# Model effort evidence
 
 ## Scope
 
@@ -13,7 +13,7 @@ Read [the research notes](research.md#model-effort-and-cost) for supported contr
 The [Main contract](../skills/main-agent-contract/SKILL.md#models) honors user settings and selects supported controls by workload.
 Local behavior checks do not establish universal model-effort rankings.
 
-### Shared Measurement Limits
+### Shared measurement limits
 
 [Artificial Analysis](https://artificialanalysis.ai/methodology/intelligence-benchmarking) uses Intelligence Index v4.3.2, a ten-evaluation composite.
 It weights agent tasks at 30%, coding at 20%, scientific reasoning at 20%, and general tasks at 30%.
@@ -49,7 +49,7 @@ Its median first-answer latency is 132.77 seconds, versus xhigh at 22.23 seconds
 These latency measurements describe answer arrival, rather than task completion time.
 The none variant scores 18 at $0.01 per task, so measured cost does not rise at every effort transition.
 
-### Coding Effort Comparisons
+### Coding effort comparisons
 
 The same release comparison publishes separate coding-component results.
 These terminal cost estimates differ from the composite index costs above.
@@ -68,7 +68,7 @@ The [methodology](https://artificialanalysis.ai/methodology/intelligence-benchma
 These terminal and scientific Python tasks do not measure general repository review or refactoring.
 The release page supplies no paired outcomes or Luna-specific terminal confidence intervals.
 
-### Repository Coding Suite
+### Repository coding suite
 
 [AI Coding Daily's Luna comparison](https://aicodingdaily.com/model/gpt-6-luna) reports an 80-point coding suite using Codex CLI.
 The suite includes Laravel, React TypeScript, bug finding, PHP import and synchronization, Flutter bank feeds, and Go shipping quotes.
@@ -91,7 +91,7 @@ It does not document repeat and scoring details for the added React and bug-find
 The component scores do not all rise with effort, and rounded costs conceal smaller differences.
 This suite supports Luna xhigh and max for coding without establishing equivalent performance across workloads.
 
-### Diagram Generation And Coding
+### Diagram generation and coding
 
 [GitDiagram's rollout record](https://github.com/ahmedkhaleel2004/gitdiagram/blob/main/docs/gpt-6-luna-rollout.md) compares two deployment configurations.
 The initial eight medium calls reused four old fixtures, producing seven valid outputs and six recoveries.
@@ -128,7 +128,7 @@ It reports the following rounded composite scores and estimated costs.
 High to max adds two rounded index points while estimated cost rises 125%.
 That comparison does not establish a coding-specific plateau.
 
-### Public Coding And Reasoning Runs
+### Public coding and reasoning runs
 
 [Joonlab's study](https://github.com/joonlab/gpt-6.1-sol-benchmark/blob/main/README.md) reports ten Python tasks with two repeats each.
 Low, medium, high, and xhigh each passed 20 of 20 calls.
@@ -164,7 +164,7 @@ The authors identify an alias rather than a dated model snapshot and omit the mo
 They normalize costs at one context rate and omit current surcharges above 272K tokens.
 Cumulative input counts do not establish each request's context length.
 
-### Application Building
+### Application building
 
 [Dyad's study](https://github.com/dyad-sh/dyad/blob/main/benchmarks/app-builder/RESULTS.md) covers three applications with three milestones each.
 The authors run each case once per setting.
@@ -184,7 +184,7 @@ Its [model configuration](https://code.claude.com/docs/en/model-config) requires
 The model has a 1M token context window, up to 128K output tokens, and API availability on the listed Claude and cloud platforms.
 The [Haiku 5.5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) recommends evaluating effort on the target task and warns that multi-turn `xhigh` responses may occasionally have no visible text.
 
-### Coding Effort Comparisons
+### Coding effort comparisons
 
 We read the supplied [October 7 system card](https://www.anthropic.com/document/claude-haiku-5-5-system-card), including every capability effort curve in Section 8.
 Pages 112–114 report Cognition's FrontierCode comparison in Claude Code.
@@ -210,7 +210,7 @@ The result files supply no uncertainty intervals, so that difference does not es
 Output counts do not establish complete request cost, especially across Haiku's prompt-length pricing boundary.
 These coding tasks do not separately measure debugging, refactoring, or code review.
 
-### Research And Computer-Use Effort Sweeps
+### Research and computer-use effort sweeps
 
 Pages 118–123 report the following labeled Haiku scores across all five effort levels.
 HLE reports accuracy, DRACO reports normalized rubric scores, and WANDR reports soft F1.
@@ -247,7 +247,7 @@ The table retains rounded visual estimates and the explicitly reported max endpo
 The offline setup and two distinct success metrics limit transfer to other computer-use tasks.
 Higher effort improves these reported means without establishing gains for simple extraction or every agentic task.
 
-### Visual And Professional Work
+### Visual and professional work
 
 We inspected Chartography's tool and no-tool curves on pages 124–125 and BenchCAD's curves on pages 126–127.
 The plots show individual points without effort labels or exact lower-effort values.
@@ -272,7 +272,7 @@ AA-Briefcase covers linked project tasks and combines rubric and pairwise gradin
 The higher professional-work scores at max come with substantially more output tokens.
 The launch-only GDPval and Terminal-Bench graph points remain unextracted and do not establish comparative effort gains.
 
-### Healthcare Effort And Latency
+### Healthcare effort and latency
 
 Pages 132–134 report these five-level results.
 HealthBench scores below are length-adjusted, while PhysicianBench reports attempt pass rates.
@@ -292,7 +292,7 @@ Its high-to-xhigh confidence interval reaches zero, while its xhigh-to-max compa
 Its median model time rises from 48 seconds at low to about 11 minutes at max, excluding tools and judging.
 These results show workload-dependent plateaus and time costs, rather than a universal high-effort advantage.
 
-### Single-Setting Coding Results And Scope
+### Single-setting coding results and scope
 
 Pages 111–117 also report coding evaluations that lack a lower-effort control.
 Terminal-Bench 4.0 scores 39.2% at max in Claude Code's bare mode, with 66 tasks and ten trials per task.
@@ -321,7 +321,7 @@ Both remain reference material rather than consumer instructions.
 | xhigh | 52 | 2.75 |
 | max | 56 | 7.67 |
 
-### Compare Higher Effort With Opus
+### Compare higher effort with Opus
 
 The same release pages report the following configurations under Artificial Analysis's shared method.
 
@@ -347,7 +347,7 @@ The authors encountered a prerelease structured-output bug, report a fix before 
 Its max cost of $7.60 differs from the live $7.67 estimate above.
 Keep each dated measurement with its source.
 
-### Practitioner Runs And A Long Kernel Task
+### Practitioner runs and a long kernel task
 
 [Claude Subagent Router's study](https://github.com/stas4000/claude-subagent-router/blob/main/README.md) covers 72 runs.
 It uses three tasks, three models, four effort levels, and two repeats, giving Sonnet six runs per setting.
@@ -381,7 +381,7 @@ The index still improves, which makes the terminal plateau workload-specific.
 The [vendor release](https://www.anthropic.com/claude-opus-5-5) reports xhigh at 66.4% under another benchmark setup.
 Keep that result separate from Artificial Analysis's scores.
 
-### Public Generation Logs And Code Review
+### Public generation logs and code review
 
 [Simon Willison's article](https://simonwillison.net/2026/Sep/22/opus-and-sol-and-luna/) links his exact-model generation logs.
 He uses the same SVG-generation prompt with `anthropic/claude-opus-5-5` at five effort settings.
@@ -418,7 +418,7 @@ Max adds 0.152 index points over xhigh while estimated index cost rises about 28
 Its terminal pass rate falls by 3.03 percentage points.
 Per-level fallback counts and targets remain unknown.
 
-### Host Coding And A Captured Request
+### Host coding and a captured request
 
 [ElectricityBench](https://electricitybench.com/models/claude-code-claude-fable-5-1/) uses Claude Code 2.1.283 at medium.
 It reports 14 of 15 real tasks, 87% capability, and a 218-second median duration.
@@ -433,7 +433,7 @@ Low therefore still permits thinking on this request.
 
 The captured request supports a latency experiment, but it supplies no acceptance evidence for lowering effort.
 
-## Gemini 3.8 Flash And Gemini 4 Argon
+## Gemini 3.8 Flash and Gemini 4 Argon
 
 Google's [thinking reference](https://ai.google.dev/gemini-api/docs/thinking) lists `low`, `medium`, and `high` as the supported thinking levels for both models.
 The default is thinking on at `medium`, and both models use dynamic thinking that adjusts reasoning effort to request complexity.

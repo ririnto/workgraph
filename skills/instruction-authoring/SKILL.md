@@ -5,11 +5,11 @@ description: >-
   role contracts, agent prompts, hook instructions, or supporting instruction references.
 ---
 
-# Instruction Authoring
+# Instruction authoring
 
 Read Writing unless its complete content is already loaded.
 
-## Define The Boundary
+## Define the boundary
 
 Identify the instruction's audience, loading point, required behavior, and acceptance evidence before editing.
 Keep repository conventions in the auto-injected repository guidance and task procedures in skills.
@@ -28,7 +28,15 @@ Put each action's completion or stop condition beside the action.
 Include only rules that change a relevant decision or action.
 Do not turn a task example or temporary environment detail into a general requirement.
 
-## Compose The Files
+## Organize by purpose
+
+Group related rules under descriptive headings that identify the action or decision.
+Break enumeration walls into purpose-based sections without arbitrary item limits.
+Use sentence-case headings with an unskipped hierarchy.
+Organize reference material for predictable lookup using patterns that reflect the subject.
+Structure tutorials as focused learning sequences with observable results.
+
+## Compose the files
 
 Put the required action before its rationale, then explain the reason when it helps.
 
@@ -57,7 +65,7 @@ Lower-level files add their procedure without explaining or repeating the caller
 Use named branches or tags for maintained source links.
 Remove replaced paths and update their consumers in the same change.
 
-## Validate The Result
+## Validate the result
 
 For changed instruction behavior, read Verification unless its complete content is already loaded.
 Enforce structural requirements through existing validators when they can check the contract safely.

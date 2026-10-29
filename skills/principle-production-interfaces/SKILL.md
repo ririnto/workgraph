@@ -3,7 +3,7 @@ name: principle-production-interfaces
 description: Use when adding helpers or abstractions, changing production code for tests, or deciding what tests may observe.
 ---
 
-# Production Interfaces
+# Production interfaces
 
 Avoid unnecessary helpers, abstractions, and custom configuration layers.
 Base production abstractions on real production requirements rather than hypothetical reuse.

@@ -5,7 +5,7 @@ description: Use when drafting, editing, or reviewing prose, Markdown documentat
 
 # Writing
 
-## Reader First
+## Reader first
 
 Lead with the answer, completed result, or next useful action.
 Put commands, paths, and code beside the action they support.
@@ -21,7 +21,7 @@ Use presentation limits to shape visible output, not analysis, source review, or
 Offer a next action only when an unresolved user dependency requires the reader to act.
 Remove tangents that do not help complete the requested task.
 
-## Direct Prose
+## Direct prose
 
 Use direct verbs, familiar words, and one term per concept.
 Name the actor and use active voice when the actor matters.
@@ -37,7 +37,7 @@ Preserve technical meaning, authority boundaries, required syntax, and exact quo
 Keep uncertainty when removing a hedge would invent confidence.
 Remove adverbs only when their removal preserves technical behavior and the claim's scope.
 
-## Markdown Sentences
+## Markdown sentences
 
 Write complete sentences in prose and list items.
 Put each sentence on its own source line.
@@ -48,12 +48,12 @@ Do not reflow prose to a fixed column width.
 Preserve headings, code, metadata, links, and exact quotations in their required syntax.
 Use lists for parallel, sequential, or comparative items, without nesting unless the hierarchy is necessary.
 
-## Human-Facing Documents
+## Human-facing documents
 
 For human-facing documents, lead with the action or outcome and use clear headings, compact lists, and short paragraphs.
 Check the rendered document for readability after editing it.
 
-## Agent-Facing Documents
+## Agent-facing documents
 
 Write agent-facing prompts and instruction-management skills as explicit task contracts.
 For their goals, context, constraints, outputs, and completion evidence, read Instruction Authoring unless its complete content is already loaded.
@@ -72,14 +72,14 @@ For multiple items under one label, leave later first cells blank and prefix des
 Use that continuation form only when the items need separate rows.
 Preserve valid Markdown row syntax instead of breaking a cell across source lines.
 
-## YAML Scalars
+## YAML scalars
 
 Use `|-` or `>-` for multiline YAML strings to omit the final line feed.
 Use `|-` for literal line breaks and `>-` for source wrapping of one logical line.
 Apply these rules to Markdown frontmatter, including memory records.
 Preserve literal or folded semantics and validate parsed values, including template strings.
 
-## Final Pass
+## Final pass
 
 Read the changed prose for filler, repeated rules, sentence boundaries, and detached conditions.
 Check table explanations for complete sentences and their required terminal punctuation.

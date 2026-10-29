@@ -9,7 +9,7 @@ Apply the target repository's rules, lint configuration, and existing tools befo
 Read only matching playbooks and language references unless their complete content is already loaded.
 For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
 
-## Development Lifecycle
+## Development lifecycle
 
 Choose the lifecycle from the requested outcome before editing.
 Record the behavior contract, affected consumers, exclusions, and observable acceptance evidence.
@@ -46,7 +46,7 @@ Guidance alone does not authorize tooling changes or changes across consumer pro
 | Rust | `.rs` | [Rust](references/rust.md) |
 | Shell | Shell scripts and maintained shell commands | [Shell](references/shell.md) |
 
-## Shared Code Style
+## Shared code style
 
 Exclude externally maintained files and configurations from these code-style defaults.
 Examples include Gradle's `gradlew` and `gradlew.bat`, and Maven's `mvnw` and `mvnw.cmd`.
@@ -59,6 +59,8 @@ Fix recurring causes in code or data architecture first.
 Use official SDK or framework properties directly when they satisfy the required behavior.
 Prefer immutable bindings and minimize mutable state.
 
+### Extract regex matches
+
 Use named regex capture groups and name-based access for extracted matches and subgroups, including the full match.
 Use named backreferences and replacement references instead of positional references.
 Prefer an existing parser or literal operation when it expresses the requirement more clearly.
@@ -66,16 +68,18 @@ Use the language or platform's native named-group facilities instead of adding u
 If the engine lacks named groups, report that limit.
 Do not treat ordinary array indexing as regex capture access.
 
+### Load conditional principles
+
 Before control-flow or expression changes, including condition inversion, read [Preserve Behavior](../principle-preserve-behavior/SKILL.md) unless its complete content is already loaded.
 Before helper, abstraction, or test-observation decisions, read [Production Interfaces](../principle-production-interfaces/SKILL.md) unless its complete content is already loaded.
 
-## Documentation And Comments
+## Documentation and comments
 
 Follow the project's documentation and comment conventions.
 Preserve declaration attachment, directives, licenses, and safety invariants when changing documentation or comments.
 Remove obsolete workaround comments when changing affected code.
 
-## Side-Effect Boundaries
+## Side-effect boundaries
 
 Keep risky preferences as policy text only.
 Do not add a lint rule, autofix, or behavior change for an item with side-effect risk.
@@ -92,7 +96,7 @@ Record the affected item and reason in the task report.
 | Structured validation identifiers | Replacing exported string diagnostics or bare errors changes observable validator contracts. |
 | | - Keep migration as policy until those consumers can be migrated safely. |
 
-## Dependency Versions
+## Dependency versions
 
 When selecting dependency versions, prefer officially supported LTS releases, or stable releases when no LTS line exists.
 Verify current support status and compatibility with the project's runtime, toolchain, and dependent APIs.
@@ -120,6 +124,8 @@ For other languages, use their existing standard tools.
 Verify tool-version support and edge cases before adding a custom rule.
 Make rules AST-aware and preserve literals, comments, and automatic semicolon insertion where applicable.
 
+### Validate lint rules
+
 Provide positive and negative fixtures covering intended matches and cases that must remain unchanged.
 Offer automatic fixes only when evaluation, side effects, and program behavior remain unchanged.
 Verify formatter idempotence and convergence between rule fixes and formatting.
@@ -131,7 +137,7 @@ If a rule cannot detect violations safely, do not add it.
 If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
 Do not promise automatic fixes that replace `void` with `await`, restructure control flow, or hoist state across lifecycle boundaries.
 
-## Verification Routing
+## Verification routing
 
 For behavioral changes, performance claims, or report reproduction, read Verification unless its complete content is already loaded.
 When correcting a defect, fix its cause in code or data architecture first.

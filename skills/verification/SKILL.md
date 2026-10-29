@@ -5,7 +5,7 @@ description: Use when running an application, reproducing reported behavior, or 
 
 # Verification
 
-## Select Evidence
+## Select evidence
 
 Confirm the target, trigger, input, and observable expected outcome before checking behavior.
 Use existing run, test, and diagnostic commands before creating temporary helpers.
@@ -20,7 +20,7 @@ Linter success alone cannot establish product behavior or performance.
 For performance claims, record timings or profiler output with the execution conditions.
 Treat formal proof, native activation, and model adherence as unverified without direct evidence.
 
-## Reproduce Reports
+## Reproduce reports
 
 Recreate the reported trigger with the narrowest safe existing command.
 Compare observed behavior with the stated expectation, not a presumed fix.

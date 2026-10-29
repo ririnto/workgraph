@@ -22,7 +22,7 @@ The adapters describe user-facing setup, not role policy.
 [Main and Worker host references](docs/design.md#separate-the-audiences) remain the injected execution adapters.
 Both host descriptors declare the same release version through [Version Updates](#version-updates).
 
-## Automatic Instructions
+## Automatic instructions
 
 | Event | Recipient | Loaded sources |
 | --- | --- | --- |
@@ -43,7 +43,9 @@ Parent history can still carry Main context into a forked Worker.
 The [delivery design](docs/design.md#deliver-context) explains native loading formats, message-envelope differences, and Claude's inline-context limit.
 Hook checks establish source delivery, not installed activation or model adherence.
 
-## Bash Polling Guard
+## Bash polling guard
+
+### Count repeated commands
 
 Both host configurations register a synchronous `PreToolUse` command hook matching `Bash`.
 The guard denies the third consecutive matching Bash call within the same host and session ID.
@@ -55,6 +57,8 @@ For an existing command without a callback, it directs agents to use the host-na
 Codex's `write_stdin` can collect completion for an existing unified execution session.
 Installation changes no host enable settings or permission configuration.
 
+### Recognize matching commands
+
 The guard recognizes literal leading `tail` and `sleep` commands with ordinary arguments and simple pipelines.
 Spaces, tabs, single quotes, double quotes without expansion, trailing comments, and one final newline are supported.
 Occurrences in prose arguments, quoted executable names, and later pipeline commands do not match.
@@ -62,12 +66,16 @@ Paths, wrappers, expansions, redirections, compound commands, functions, and uns
 These excluded forms reset the counter because safe detection takes precedence over broad coverage.
 The guard never executes or rewrites a command.
 
+### Apply the counter
+
 `tail -f`, `tail -F`, and `tail --follow` count like other `tail` calls.
 The guard limits repeated tool invocations, including repeated follow commands.
 A single inspection after completion remains allowed when fewer than two matching calls precede it.
 Completion callbacks do not reset the counter.
 Codex maps shell and unified execution calls to `Bash` with `tool_input.command` in its [hook interface](https://developers.openai.com/codex/hooks/).
 Codex subagents share the parent session ID and therefore share its counter.
+
+### Store state and handle failures
 
 State uses private directories beneath the operating system's temporary directory.
 Only a bounded counter and failure markers are stored, under hashed host and session identifiers.
@@ -80,7 +88,7 @@ Temporary state remains until operating system cleanup, avoiding session-end del
 The guard emits generic errors without commands, session identifiers, or private paths.
 Enforcement requires POSIX user IDs and no-follow file opens, so Windows fails open.
 
-## Goal-Driven Work
+## Goal-driven work
 
 Start with a goal, its scope, and an observable completion condition.
 For example, a bug-fix request can name the trigger and expected result without prescribing every stage.
@@ -104,7 +112,7 @@ Those samples use injectable prompt parts, optional per-phase model selectors, a
 It also includes an [agent-authored design workflow](workflows/design.js) with runtime model inputs and independent verification.
 All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
 
-## Skill Invocation
+## Skill invocation
 
 All skills remain user-invocable and model-invocable.
 Hooks operate without skill invocation.
@@ -137,13 +145,13 @@ Manual role loading also loads the active host reference unless its complete con
 Manual invocation changes neither the session's role nor its dispatch authority.
 The host adapters list invocation forms and host-specific availability.
 
-### Application Verification
+### Application verification
 
 The conditional [Verification skill](skills/verification/SKILL.md) owns runtime reproduction and acceptance evidence selection.
 The maintainer [verification map](docs/verification-map.md) connects Workgraph behavior to existing checks and their limits.
 Passing source or hook checks does not establish installed activation, interactive invocation, or model adherence.
 
-## Hook Errors
+## Hook errors
 
 Invalid hook arguments exit with code 2.
 Missing, unreadable, or empty instruction files exit with code 1 and produce no context.
@@ -203,7 +211,7 @@ Read [the design](docs/design.md) for instruction ownership and hook mechanics.
 Read [the research notes](docs/research.md) for source evidence and qualifications.
 [Third-party notices](THIRD_PARTY_NOTICES.md) retain attribution.
 
-## Version Updates
+## Version updates
 
 Maintain one release number in both host descriptors.
 

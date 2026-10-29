@@ -3,16 +3,16 @@ name: fix-queue-delivery
 description: "Use for an authorized bounded issue queue in one repository, excluding cross-project scheduling."
 ---
 
-# Fix-Queue Delivery
+# Fix-queue delivery
 
-## Outcome And Authority
+## Outcome and authority
 
 Deliver the assigned repository queue without weakening acceptance for a deadline.
 This skill grants no source, Git, host-control, tracker, or integration authority.
 Use the assignment's queue bounds, acceptance, concurrency, resource ownership, and publication limits.
 Do not create a scheduler or infer new work from available capacity.
 
-## Accountable Roles
+## Accountable roles
 
 | Role | Responsibility |
 | --- | --- |
@@ -27,7 +27,7 @@ Use [Delivery](../delivery/SKILL.md) for repository eligibility, publication, in
 Use [Verification](../verification/SKILL.md) for acceptance evidence unless fully loaded.
 These bundled procedures govern each issue owner and the integration owner within their assigned authority.
 
-## Triage And Assign
+## Triage and assign
 
 Read the authorized queue through the assigned tracker client.
 Prioritize correctness and safety impact within the assignment's scope.
@@ -48,7 +48,7 @@ Each issue owner completes the assigned checks and publication through Delivery,
 Use nonclosing issue references until acceptance confirmation so merging cannot close an issue before verification.
 Return blockers, uncovered acceptance, and resource ownership with the result.
 
-## Integrate Serially
+## Integrate serially
 
 The integration owner accepts each complete posted PR's independent review and relevant passing checks before merging.
 Merge one PR at a time through the normal protected integration path.
@@ -58,7 +58,7 @@ After a collision, compare the affected changes with the current authorized base
 Have the responsible owner resolve conflicts without force-pushing or rewriting shared history.
 Refresh affected checks, acceptance evidence, and review coverage before the next dependent merge.
 
-## Confirm Acceptance Before Closure
+## Confirm acceptance before closure
 
 For each issue, the integration owner confirms both the merged PR and its acceptance on the authorized base branch.
 Inspect the relevant base-branch source or run the narrowest required behavioral check against the original acceptance.
@@ -71,14 +71,14 @@ Check an umbrella against its own original acceptance before closing it.
 Child merges and child closures alone do not prove umbrella completion.
 Keep remaining criteria and their next owners visible without blocking unrelated accepted fixes.
 
-## Preserve Delivery Boundaries
+## Preserve delivery boundaries
 
 Do not push protected branches, force-push, delete writer locks, or bypass hooks and guards.
 Keep lint, security checks, assertions, and protection conditions intact.
 Add comments only for a non-obvious reason the code cannot show.
 Keep unmerged PRs open at a deadline and report their next action without weakening acceptance.
 
-## Hand Back
+## Hand back
 
 Return merged issues and PRs, original-acceptance checks, base-branch readbacks, and confirmed closure states.
 Report umbrella acceptance separately, along with blocked items, their owners, and the remaining queue count.

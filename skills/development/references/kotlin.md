@@ -1,6 +1,6 @@
 # Kotlin
 
-## Declarations And Documentation
+## Declarations and documentation
 
 Document effective public and protected declarations with multiline KDoc.
 Account for enclosing `internal` and `private` scopes when determining visibility.
@@ -25,7 +25,7 @@ Keep qualified names when declarations, imports, aliases, same-package symbols, 
 Restrict syntax-only import rules to type references and leave expression receiver chains unchanged.
 Verify resolution beyond the current file before accepting import fixes from rules without compiler symbol information.
 
-## Expressions And Control Flow
+## Expressions and control flow
 
 Use expression bodies when return types, `Unit` behavior, nullability, and API semantics stay unchanged.
 Use callable or property references for simple delegation or access lambdas when types, overload selection, and receivers stay unchanged.
@@ -43,7 +43,7 @@ Use braces for every `if` and `else` branch.
 Use `=== null` and `!== null` for null checks when repository lint permits this style.
 Prefer `requireNotNull` for required arguments and `checkNotNull` for required state, preserving exception and return behavior.
 
-## Registered Components
+## Registered components
 
 Declare required dependency and configuration constructor parameters as non-null, without fallback defaults.
 Treat missing required registration values as startup failures.
@@ -51,7 +51,7 @@ Keep configuration values in configuration sources.
 Use `@ConfigurationProperties` and `application.yaml` for Spring Boot configuration binding when the project uses them.
 Represent optional behavior through explicit strategies when composition requires distinct behavior.
 
-## Strings And Paths
+## Strings and paths
 
 Use raw strings for regular expressions, JSON fixtures, and multiline code text.
 Use `trimIndent()` for multiline code text only when its result matches the intended indentation and newline data.
@@ -62,7 +62,7 @@ Use the imported `div` operator for child paths when it preserves `resolve` sema
 Preserve results, exceptions, filtering callbacks, options, and resource handling when replacing Java file operations.
 Keep Java methods when no Kotlin equivalent satisfies the contract.
 
-## Kotest Specs
+## Kotest specs
 
 Move reusable immutable declarations and functions from Spec superclass-constructor lambdas into a companion object when sharing preserves behavior.
 Keep per-test state local and preserve initialization order, parallel isolation, and captured values.
@@ -72,7 +72,7 @@ Expose injected dependencies through explicit parameters or appropriate extensio
 Keep stateful rule instances scoped to their required lifecycle instead of sharing them unconditionally.
 Allow one blank line between a local declaration and the following test block in a Kotest spec.
 
-## Kotest Assertions
+## Kotest assertions
 
 Use `assertSoftly(subject)` for consecutive assertions that share a subject, including service objects.
 Use `assertSoftly { ... }` for consecutive independent assertions without a common receiver.

@@ -4,7 +4,7 @@ description: Challenges a composed design with concrete counterexamples and evid
 tools: Read, Glob, Grep
 ---
 
-# Design Challenger
+# Design challenger
 
 Challenge the composed design against each requirement, interface, failure mode, test claim, and open question.
 Report unmet requirements and contradictions as blocking findings even when the design acknowledges them.

@@ -1,4 +1,4 @@
-# Claude Code Plugin Updates
+# Claude Code plugin updates
 
 Run `claude plugin marketplace update`.
 

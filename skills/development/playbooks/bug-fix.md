@@ -1,4 +1,4 @@
-# Bug Fix Playbook
+# Bug fix playbook
 
 Reproduce the trigger on the matching execution surface before fixing it.
 Use observations to eliminate competing causes and confirm the surviving mechanism.

@@ -3,12 +3,12 @@ name: codex-scoped-cleanup
 description: Use in Codex when archiving or deleting native threads, or retiring worktrees, recovery copies, caches, and stale connections.
 ---
 
-# Codex Scoped Cleanup
+# Codex scoped cleanup
 
 Apply this procedure only in Codex and within the current cleanup authority.
 Route cleanup through the authorized resource owner using supported host operations.
 
-## Authority And Native Lifecycle
+## Authority and native lifecycle
 
 Record the selected resources, their owners, permitted operations, preservation requirements, and protected resources before cleanup.
 Treat archive authority, permanent-delete authority, attachment retirement, and physical removal as separate scopes.
@@ -22,7 +22,7 @@ Do not restart shared services or terminate unrelated workers to evade ownership
 When an owner or supported operation is unavailable, preserve affected resources and report the exact limitation.
 Keep temporary private identities, paths, payloads, and logs out of published instructions and shared reports.
 
-## Git Preservation
+## Git preservation
 
 Default to removing completed, unused resources when retained Git history preserves every required source change.
 Verify reachability from a retained branch, tag, or snapshot ref.
@@ -33,7 +33,7 @@ Preserve unique source, configuration, runtime storage, and database data outsid
 Preserve resources required for current work or continuation, even when their source is committed.
 Remove redundant recovery copies without creating another complete backup.
 
-## Scoped Activity
+## Scoped activity
 
 Evaluate each session or worktree independently.
 The parent project's recent activity does not prove that a particular worktree remains in use.
@@ -49,7 +49,7 @@ Stop when scope, descendant coverage, ownership, or preservation remains uncerta
 Completed, unused Git-backed worktrees and recovery copies need no additional age delay.
 Preserve primary, shared, and pinned checkouts during generic task cleanup.
 
-## Worktrees And Caches
+## Worktrees and caches
 
 Have the authorized owner use supported worktree lifecycle tools or Git's worktree commands rather than direct directory deletion.
 Refresh ownership and working-tree state before removal.

@@ -1,4 +1,4 @@
-# Performance Playbook
+# Performance playbook
 
 Record a baseline trace and measurement conditions before proposing an optimization.
 Change one supported hypothesis at a time and compare the same workload under comparable conditions.

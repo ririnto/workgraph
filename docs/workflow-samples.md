@@ -1,4 +1,4 @@
-# Workflow Samples
+# Workflow samples
 
 Workgraph bundles two native Workflow delivery samples and one read-only agent-authored design workflow.
 All samples accept optional model selectors and otherwise use host configuration.
@@ -45,7 +45,7 @@ Workflow({
 The plugin discovers the bundled `.js` definitions in `workflows/`.
 The dispatching session owns the task branch, initial candidate inspection, and any required issue.
 
-## Agent Design
+## Agent design
 
 Request the bundled design graph through `/workgraph:workflow` when its specialist stages fit the task.
 The `workgraph:design-lead` plugin agent is an optional main-session coordinator that uses the same skill and source.
@@ -87,7 +87,7 @@ A failed or malformed specialist result blocks dependent phases and preserves su
 Verified blocking or major findings, inconclusive findings, and unmet requirements make `accepted` false.
 The workflow returns the candidate design, phase evidence, findings, blockers, and requested model inputs without performing implementation.
 
-## Dispatch Inputs
+## Dispatch inputs
 
 | Input | Contract |
 | --- | --- |
@@ -138,7 +138,7 @@ Publication and review receive the per-unit checks and the combined-candidate ch
 A fix round updates the same posted request, replaces only the repaired units' results by key, and reviews the posted candidate again.
 The scope, exploration, and sweep stages run with the built-in read-only Explore agent type, while review keeps the default agent and a read-only instruction.
 
-## Skip, Failure, And Recovery
+## Skip, failure, and recovery
 
 Each phase records `completed`, `skipped`, or `failed` with a reason.
 The run returns `complete` only when every required phase completed and review passed or all findings were refuted.
@@ -166,7 +166,7 @@ The design workflow accepts optional selectors by specialist role through `args.
 An omitted selector stays unset so the host can apply its current configuration.
 Every selector must be a nonempty string the host supports for agent calls.
 
-## Cache Reuse
+## Cache reuse
 
 Resume a run in the same session with the stored `scriptPath` and `resumeFromRunId`, and native continuation may reuse unchanged agent calls.
 Check the native run journal for actual cache hits and their relevance before reusing evidence.

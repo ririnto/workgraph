@@ -1,6 +1,6 @@
-# Workgraph In Claude Code
+# Workgraph in Claude Code
 
-## Install And Load
+## Install and load
 
 Use Node.js 18 or later for hook execution.
 Claude Code must support plugin command hooks and `additionalContext` for SessionStart and SubagentStart.
@@ -23,7 +23,7 @@ Check the loaded plugin version and actual source paths before evaluating change
 
 Workgraph changes no model or effort settings through installation.
 
-## Automatic Loading
+## Automatic loading
 
 SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Claude reference](../../skills/main-agent-contract/references/claude-code.md).
 SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Claude reference](../../skills/subagent-context/references/claude-code.md).
@@ -38,7 +38,7 @@ The [delivery design](../design.md#deliver-context) describes whitespace handlin
 
 The [Bash polling guard](../../README.md#bash-polling-guard) denies repeated literal `tail` and `sleep` calls through PreToolUse.
 
-## Manual Invocation
+## Manual invocation
 
 Use slash-prefixed, plugin-qualified skill names.
 The public mode entry remains `/workgraph:main-agent-contract`.
@@ -83,7 +83,7 @@ Use a fresh session and confirm its plugin version and source paths when evaluat
 Development directories load current files on reload or session startup without requiring a version change.
 The [Claude loading reference](https://code.claude.com/docs/en/plugins/loading#versions-and-updates) describes cache and update behavior.
 
-## Evidence Limits
+## Evidence limits
 
 The [verification map](../verification-map.md) distinguishes source delivery, installed activation, interactive invocation, and model behavior.
 Passing hook tests or plugin validation does not establish all four.
