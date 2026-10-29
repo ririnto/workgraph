@@ -156,7 +156,7 @@ Inspect the hook error notice if instructions fail to load.
 Use pnpm and the Node version range in `package.json` for development.
 Development tools require Node.js 24.15 or later within major version 24.
 This requirement is separate from the Node.js 18 minimum for hook execution.
-Install the pnpm version declared by `packageManager` before installing the pinned development tools.
+Install the pnpm version declared in `.tool-versions` before installing the pinned development tools.
 
 ```sh
 pnpm install --frozen-lockfile

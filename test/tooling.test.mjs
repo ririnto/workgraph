@@ -12,6 +12,34 @@ import { lint } from "markdownlint/sync";
 import sentencePerLine from "../rules/sentence-per-line.ts";
 import tableSeparators from "../rules/table-separators.ts";
 
+test("Git hooks invoke pnpm directly and propagate its status", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "workgraph-hooks-"));
+  try {
+    await writeFile(
+      path.join(directory, "pnpm"),
+      '#!/bin/sh\nprintf "%s\\n" "$@"\nexit "$HOOK_STATUS"\n',
+      { mode: 0o755 }
+    );
+    for (const hook of ["pre-commit", "pre-push"]) {
+      for (const status of [0, 17]) {
+        const result = spawnSync(
+          "/bin/sh",
+          [path.resolve(import.meta.dirname, "../.husky", hook)],
+          {
+            encoding: "utf-8",
+            env: { HOOK_STATUS: String(status), PATH: directory }
+          }
+        );
+        assert.ifError(result.error);
+        assert.equal(result.status, status, result.stderr);
+        assert.equal(result.stdout, `run\n${hook}\n`);
+      }
+    }
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
 test("Ultracite check and fix entry points preserve diagnostics and formatter convergence", async () => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tooling-"));
@@ -72,16 +100,12 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       FORCE_COLOR: "3",
       GITHUB_ACTIONS: "false"
     };
-    const configuredCheck = spawnSync(
-      "corepack",
-      ["pnpm", "run", "check:ultracite"],
-      {
-        cwd: directory,
-        encoding: "utf-8",
-        env: reporterEnvironment,
-        timeout: 60_000
-      }
-    );
+    const configuredCheck = spawnSync("pnpm", ["run", "check:ultracite"], {
+      cwd: directory,
+      encoding: "utf-8",
+      env: reporterEnvironment,
+      timeout: 60_000
+    });
     assert.ifError(configuredCheck.error);
     const configuredCheckOutput = stripVTControlCharacters(
       `${configuredCheck.stdout}\n${configuredCheck.stderr}`
@@ -109,16 +133,12 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
       path.join(directory, "style-only.ts"),
       "/**\n * Preserve this exported declaration.\n */\nexport const styleOnly = () => {\n  // explain\n\n  return 1;\n};\n"
     );
-    const configuredFix = spawnSync(
-      "corepack",
-      ["pnpm", "run", "fix:ultracite"],
-      {
-        cwd: directory,
-        encoding: "utf-8",
-        env: reporterEnvironment,
-        timeout: 60_000
-      }
-    );
+    const configuredFix = spawnSync("pnpm", ["run", "fix:ultracite"], {
+      cwd: directory,
+      encoding: "utf-8",
+      env: reporterEnvironment,
+      timeout: 60_000
+    });
     assert.ifError(configuredFix.error);
     const configuredFixOutput = stripVTControlCharacters(
       `${configuredFix.stdout}\n${configuredFix.stderr}`
