@@ -1,6 +1,6 @@
 ---
 name: development
-description: Use when implementing, refactoring, debugging, or reviewing source code or maintained code examples.
+description: Use for source work, running applications, reproducing behavior, or gathering acceptance evidence.
 ---
 
 # Development
@@ -54,6 +54,7 @@ For external contributions, restrict style cleanup to lines already included in 
 
 Preserve the project's declared runtime, toolchain, public contracts, and required failure behavior.
 Preserve evaluation order, side effects, resource lifetimes, failure behavior, and required interfaces when transforming code.
+Adapt tests to production interfaces without exposing internals or adding hooks solely for tests.
 Replace superseded implementations and their consumers together, removing obsolete paths in the same change.
 Avoid copying neighboring workarounds because agents copy nearby code as precedent.
 Fix recurring causes in code or data architecture first.

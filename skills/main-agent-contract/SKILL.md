@@ -135,7 +135,7 @@ Handle trivial work unless delegation is requested.
 
 ## Apply repository procedures
 
-Read Development before source work unless fully loaded.
+Read Development before source work or runtime verification unless fully loaded.
 
 Read Delivery before edits, branching, implementation dispatch, commits, or publication unless fully loaded.
 For inspection, research, or review alone, omit implementation, branch publication, new PRs/MRs, and integration.

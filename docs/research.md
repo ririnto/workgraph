@@ -280,7 +280,7 @@ Main and Worker inspect failures and partial effects before reasonable authorize
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
 
-Workgraph keeps a stable Main mode entry, focused development playbooks, two conditional principle skills, and host-specific user adapters.
+Workgraph keeps a stable Main mode entry, focused development playbooks, and host-specific user adapters.
 The README leads users to installation and invocation guidance rather than repeating role procedures.
 User adapters separate host setup from role policy, while Workgraph retains its contracts and evidence rules.
 The official skills and prompting documents above support the adapter and contract separation.
@@ -579,7 +579,7 @@ These controls calibrate the grader and are not additional solver successes.
 The graded comparison ties, so it gives no measured reason to expand Verification or add redundant rules.
 The proposed expansion remained unmerged at the time of the comparison.
 The authoring change requires grader calibration and explicit coverage reporting.
-The new native [case](../evals/verification-evidence/case.yaml) defines regression coverage but remains UNRUN.
+The native [case](../evals/verification-evidence/case.yaml) defines regression coverage.
 Neither provides evidence of runtime or model-adherence gains.
 No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
 

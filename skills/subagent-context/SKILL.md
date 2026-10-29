@@ -101,7 +101,7 @@ Report retained resources and incomplete cleanup with their purpose and next act
 
 ## Apply source procedures
 
-Before source or maintained code work, read Development unless its complete content is already loaded.
+Before source work or runtime verification, read Development unless its complete content is already loaded.
 
 ## Respect Git and delegation authority
 
