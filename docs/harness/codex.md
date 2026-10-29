@@ -2,7 +2,7 @@
 
 ## Install and load
 
-Use Node.js 18 or later for hook execution.
+Use Node.js 26.13.0 or later within major version 26 for hook execution.
 Install or enable the repository through a Codex host that supports native plugin lifecycle hooks.
 Use that host's normal plugin activation and trust controls.
 

@@ -2,7 +2,7 @@
 
 ## Install and load
 
-Use Node.js 18 or later for hook execution.
+Use Node.js 26.13.0 or later within major version 26 for hook execution.
 Claude Code must support plugin command hooks and `additionalContext` for SessionStart and SubagentStart.
 Add the marketplace and install the plugin.
 
