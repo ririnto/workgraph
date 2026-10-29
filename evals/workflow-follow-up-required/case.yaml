@@ -17,7 +17,7 @@ execution:
     Have one worker check whether C1, C2, or C3 lacks a required timeout.
     If that worker finds a missing timeout, have a follow-up worker use its actual findings to assess release impact.
     If no timeout is missing, do not dispatch the follow-up worker.
-    Input facts: C1 and C3 have required timeouts, while C2 has no required timeout.
+    Input facts: C1 and C3 each have their required timeout, while C2's required timeout is missing.
     A missing required timeout blocks release.
     Assess only these supplied facts.
     No project files or additional evidence exist.

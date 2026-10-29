@@ -37,7 +37,7 @@ execution:
     Report blockers, eligible deferrals, and the remaining action before integration.
     Preserve evidence, scope, acceptance criteria, owner, and next action in reported tracker records and proposed follow-up requirements.
     Keep the assessments and reconciliation concise.
-    Do not edit files, run Git commands, or publish anything.
+    Do not edit repository files, run Git commands, or publish anything.
 graders:
   - name: workflow-invoked
     type: tool_used
