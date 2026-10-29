@@ -109,7 +109,7 @@ Its [delivery reference](skills/workflow/references/delivery.md) maps Delivery o
 Codex uses native delegation rather than Claude Code Workflow.
 Workgraph bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
 Those samples use injectable prompt parts, optional per-phase model selectors, and explicit skip, failure, and bounded-recovery records.
-It also includes an [agent-authored design workflow](workflows/design.js) with runtime model inputs and independent verification.
+For read-only design work, the Workflow skill provides design and verification guidance without bundling a specialist-agent graph.
 All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
 
 ## Skill invocation
