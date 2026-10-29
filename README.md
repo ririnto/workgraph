@@ -50,7 +50,9 @@ The guard denies the third consecutive matching Bash call within the same host a
 Matches can mix `tail` and `sleep`.
 Further matching calls remain denied until a nonmatching Bash command resets the counter.
 Other tools leave the counter unchanged.
-The denial tells the agent to end the turn and await the completion callback.
+The denial directs agents to end the turn and await an available completion callback.
+For an existing command without a callback, it directs agents to use the host-native wait instead of polling.
+Codex's `write_stdin` can collect completion for an existing unified execution session.
 Installation changes no host enable settings or permission configuration.
 
 The guard recognizes literal leading `tail` and `sleep` commands with ordinary arguments and simple pipelines.

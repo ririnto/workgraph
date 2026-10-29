@@ -56,7 +56,7 @@ const assertDenied = (result) => {
       hookEventName: "PreToolUse",
       permissionDecision: "deny",
       permissionDecisionReason:
-        "Workgraph blocked a third consecutive tail or sleep command. End the turn and await the completion callback instead of polling."
+        "Workgraph blocked a third consecutive tail or sleep command. If a completion callback is available, end the turn and await it. Otherwise, use the host-native wait for the existing command instead of polling."
     }
   });
 };
