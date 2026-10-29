@@ -41,7 +41,7 @@ It informed reuse of existing tools, limited abstractions, and the smallest suff
 
 Lauren Tan, known as [@poteto](https://x.com/poteto), published a [recorded presentation](https://x.com/poteto/status/2102050467505430555) on September 21, 2026 UTC.
 We reviewed its automatic English captions and presentation screens.
-Her CLI and feature-map examples, correction priorities, and Dune ownership boundaries informed Verification and Development guidance.
+Her CLI and feature-map examples, correction priorities, and Dune ownership boundaries informed Development guidance.
 Workgraph adapts those ideas without redistributing her video, slides, transcript, pstack, or Dune implementation.
 The [research notes](docs/research.md#lauren-tan-on-verification-and-agent-environments) distinguish practitioner examples from Workgraph evidence.
 

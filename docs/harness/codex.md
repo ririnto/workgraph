@@ -45,11 +45,8 @@ $workgraph:main-agent-contract Fix the parser's escaped-quote bug and verify the
 | `$workgraph:subagent-context` | Load the Worker role for an existing bounded dispatch. |
 | `$workgraph:delivery` | Load Main's repository delivery procedure. |
 | `$workgraph:development` | Select the matching development playbook and language references. |
-| `$workgraph:principle-preserve-behavior` | Load guidance for behavior-preserving transformations. |
-| `$workgraph:principle-production-interfaces` | Load guidance for production interfaces, abstractions, and test design. |
 | `$workgraph:writing` | Load prose and Markdown guidance. |
 | `$workgraph:instruction-authoring` | Load agent-facing instruction design guidance. |
-| `$workgraph:verification` | Load runtime reproduction and evidence guidance. |
 | `$workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 | `$workgraph:codex-scoped-cleanup` | Load scoped Codex resource retirement and attachment guidance. |
 

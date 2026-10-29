@@ -18,7 +18,6 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow bounded assignments, evidence, and handbacks in one self-contained body. |
 | `skills/subagent-context/references/{claude-code,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
-| `skills/fix-queue-delivery/SKILL.md` | Assigned repository queue owners | Queue Main, issue owners, and the integration owner coordinate bounded fixes and confirm original acceptance before closure. |
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
 | `skills/delivery/references/{claude-code,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
@@ -27,12 +26,9 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/workflow/references/delivery.md` | Workflow delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
-| `skills/principle-preserve-behavior/SKILL.md` | Agents transforming code | Agents follow semantic, evaluation-order, and side-effect preservation guidance. |
-| `skills/principle-production-interfaces/SKILL.md` | Agents changing interfaces or tests | Agents follow production-interface, abstraction, and test-boundary guidance. |
 | `skills/writing/SKILL.md` | Agents doing prose or Markdown work | Agents follow concise prose, sentence boundaries, and table rules. |
 | `skills/instruction-authoring/SKILL.md` | Agents designing instructions | Agents follow prompt task contracts, source separation, and loading-boundary design. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review the complete selected store before reconciling authorized records and their index. |
-| `skills/verification/SKILL.md` | Agents reproducing behavior or assessing runtime outcomes | Agents reuse execution tools and connect feature context to observable evidence. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify native lifecycle authority, scoped activity, retained content, and Worktree Artifact removal. |
 | `docs/verification-map.md` | Maintainers | Maintainers connect Workgraph behavior to its current commands and evidence boundaries. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
@@ -58,7 +54,6 @@ Main Agent mode remains the stable public entry at `skills/main-agent-contract/S
 Its activation description identifies the mode without adding another public entry.
 Main and Worker select conditional skills by plain skill name when their stated task scope applies.
 Development's conditional loading keeps unrelated lifecycle and language guidance out of task context.
-The principle skills are conditional and remain user-invocable and model-invocable without lint enforcement.
 Writing owns prose, while Instruction Authoring owns the agent-facing prompt task contract and source or example separation.
 Workflow stays focused on its lower-level native operation without repeating the Main contract or Delivery checklist.
 Host adapters stay at user altitude and link to role references and sole policy owners.
@@ -68,8 +63,7 @@ Contributor guidance identifies these directories and forbids duplicate same-con
 
 Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, branch creation, implementation dispatch, commits, or publication.
 Main and Worker conditionally load Writing, Instruction Authoring, Development, and Memory Maintenance for tasks within those skills' scopes.
-Development and Instruction Authoring route behavioral work to the conditional Verification skill.
-Hooks inject only the selected role and host reference, leaving task skills, playbooks, principles, and language references conditional.
+Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating common role rules.
@@ -242,7 +236,6 @@ The [verification map](verification-map.md) connects maintained Workgraph behavi
 Use existing pnpm gates instead of adding a second verification CLI.
 Keep source delivery, installed host activation, interactive invocation, and model adherence as separate claims.
 
-The conditional Verification skill adds product-specific reproduction and runtime evidence selection.
 Development owns correction priorities and architecture boundaries, while Main and Delivery retain acceptance, review, and publication authority.
 Existing host tools handle event-triggered work within the authorized graph.
 This design adds no scheduler, telemetry service, or runtime dependency.

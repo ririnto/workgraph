@@ -56,7 +56,7 @@ It recommends a clear task, relevant context, roles, restrictions, and an explic
 | State the task, context, constraints, output, and completion criteria explicitly. | Instruction Authoring already requires these elements in agent-facing task contracts. |
 | Audit loaded instruction sources for conflicts and ambiguity. | Instruction Authoring already audits loading points and replaces conflicting consumers. |
 | Use concise and explicit output expectations. | Instruction Authoring owns agent-facing contracts, while Writing owns presentation. |
-| Scale checks to the change and keep initiative within scope. | Development, Verification, and the role contracts route checks and authority. |
+| Scale checks to the change and keep initiative within scope. | Development and the role contracts route checks and authority. |
 | Keep rules short and aligned with real tool schemas. | Role bodies and host references match native loading formats and tool contracts. |
 | Use examples where they clarify a decision boundary. | Instruction Authoring owns contrasting examples for decision boundaries. |
 | Avoid accumulating emphasis and repeated directives. | Writing's final pass already removes repetition while preserving requirements. |
@@ -280,7 +280,7 @@ Main and Worker inspect failures and partial effects before reasonable authorize
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
 
-Workgraph keeps a stable Main mode entry, focused development playbooks, two conditional principle skills, and host-specific user adapters.
+Workgraph keeps a stable Main mode entry, focused development playbooks, and host-specific user adapters.
 The README leads users to installation and invocation guidance rather than repeating role procedures.
 User adapters separate host setup from role policy, while Workgraph retains its contracts and evidence rules.
 The official skills and prompting documents above support the adapter and contract separation.
@@ -449,7 +449,7 @@ At 14:56–18:57, she prioritizes code structure, static analysis, rules and Bug
 At 26:43–30:38, Dune slides show execution boundaries, state ownership, discovered feature files, and checks before review.
 At 32:35–35:16, external reports and alerts trigger work using existing bot and cloud-agent tooling.
 
-These examples motivate Verification and Development's correction procedure.
+These examples motivate Development's verification and correction procedure.
 Workgraph reuses existing commands and adds a focused [maintainer verification map](verification-map.md).
 Consumer feature maps remain optional, local to the relevant project, and updated with affected behavior.
 Main already owns ready-node execution, bounded assignments, and shared-resource writers.
@@ -486,7 +486,7 @@ This practitioner report does not establish Workgraph effectiveness or authorize
 
 | Article lesson | Workgraph application |
 | --- | --- |
-| Runnable verification precedes review. | Development and Verification already require observable checks, commands, outcomes, and evidence limits. |
+| Runnable verification precedes review. | Development requires observable checks, commands, outcomes, and evidence limits. |
 | Review evaluates intent and system impact. | Delivery now supplies the complete candidate, project review instructions, acceptance, and affected real consumers. |
 | Findings need verification and disposition. | Delivery now distinguishes introduced defects, pre-existing issues, evidence-based rejection, fixes, and tracked deferrals. |
 | Review effort follows risk. | Delivery selects reviewer staffing and depth by task risk and explicit requirements. |
@@ -564,7 +564,7 @@ The papers do not establish the effectiveness of Workgraph's waiting instruction
 
 ### Harness2 verification evidence evaluation
 
-We compared the unchanged public [Verification skill](../skills/verification/SKILL.md) with an unmerged three-line expansion on a fixed synthetic evidence-attribution task.
+We compared the former public Verification skill with an unmerged three-line expansion on a fixed synthetic evidence-attribution task.
 The task had eight status-and-citation criteria and five semantic criteria across three trials.
 The third trial was configured to reverse record order, without separately recording runtime request payloads.
 GPT-6 Luna scored 13/13 on every trial for both variants.
@@ -577,9 +577,9 @@ A manually reviewed baseline positive control scored 13/13.
 A handwritten false-execution, all-pass negative scored 3/13, with all five semantic criteria false.
 These controls calibrate the grader and are not additional solver successes.
 The graded comparison ties, so it gives no measured reason to expand Verification or add redundant rules.
-The proposed expansion remains unmerged, and Verification behavior remains unchanged.
+The proposed expansion remained unmerged at the time of the comparison.
 The authoring change requires grader calibration and explicit coverage reporting.
-The new native [case](../evals/verification-evidence/case.yaml) defines regression coverage but remains UNRUN.
+The native [case](../evals/verification-evidence/case.yaml) defines regression coverage.
 Neither provides evidence of runtime or model-adherence gains.
 No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
 
@@ -824,7 +824,7 @@ Performance work needs baseline traces and comparable measurements.
 Verification checks the actual artifact rather than a proxy.
 Delivery checks that review verdicts still cover the current candidate.
 
-Main, Delivery, and Verification retain orchestration, publication authority, evidence freshness, and cleanup.
+Main and Delivery retain orchestration, publication authority, evidence freshness, and cleanup.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.
 
 ## pnpm and Git hook tooling
