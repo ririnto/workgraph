@@ -141,47 +141,23 @@ Its runtime delivers context through Claude Code hooks, and its instructions use
 
 ### Model effort and cost
 
-We reviewed nine exact models using official model, effort, pricing, host, and prompting documentation.
-The table compares seven models with standard API pricing and host guidance, separating API defaults from documented host recommendations.
-The inspected Codex catalog defaults, recorded below, can differ from those recommendations.
-Prices are standard API dollars per million input, cached input, and output tokens.
-Gemini has provider rather than benchmark comparisons.
-Its supported levels, defaults, model limits, pricing, and host observations are maintained in the [Gemini provider evidence](model-effort-evidence.md#gemini-38-flash-and-gemini-4-argon).
-The promotional Copilot rates do not describe subscription usage limits, fast-mode prices, or paid tool charges.
+The following tier and effort starting points combine workload evidence with design judgments.
+They depend on host support and assignment settings.
+The reviewed evidence does not establish Terra's effort performance.
 
-| Exact model | Supported effort | API default | Documented host guidance | Input / cached input / output |
-| --- | --- | --- | --- | --- |
-| [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna.md) | `none`, `low`, `medium`, `high`, `xhigh`, `max` | `medium` | The Codex guide starts at `high`. | $0.10 / $0.01 / $0.50 |
-| [GPT-6.1 Sol](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | The guide gives task-specific medium or xhigh starting points. | $2 / $0.10 / $10 |
-| [GPT-6 Astra](https://developers.openai.com/api/docs/models/gpt-6-astra.md) | `low`, `medium`, `high`, `xhigh`, `max` | The reviewed sources did not establish a default. | The Codex guide starts at `low`. | $10 / $1 / $50 |
-| [Claude Haiku 5.5](https://platform.claude.com/docs/en/models/haiku-5-5/overview), `claude-haiku-5-5`, October 7, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | Claude Code defaults to `medium`. | $0.10 / $0.01 / $0.50 up to 100K input tokens, then $0.50 / $0.05 / $2.50 |
-| [Claude Sonnet 5.5](https://platform.claude.com/docs/en/models/sonnet-5-5/overview.md), `claude-sonnet-5-5`, September 28, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `medium`. | $2 / $0.10 / $10 |
-| [Claude Opus 5.5](https://platform.claude.com/docs/en/models/opus-5-5/overview.md), `claude-opus-5-5`, September 22, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `medium` | Claude Code starts at `medium`. | $4 / $0.20 / $20 |
-| [Claude Fable 5.1](https://platform.claude.com/docs/en/models/fable-5-1/overview.md), `claude-fable-5-1`, September 1, 2026 | `low`, `medium`, `high`, `xhigh`, `max` | `high` | Claude Code starts at `high`. | $10 / $0.25 / $50 |
-
-The [Codex model guide](https://developers.openai.com/codex/models.md) supplies Astra and Luna starting settings.
-The [Claude Code model guide](https://code.claude.com/docs/en/model-config.md) supplies its host defaults, provider aliases, and minimum CLI version.
-Anthropic's [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort.md) supplies supported effort levels and API defaults.
-Google's [thinking reference](https://ai.google.dev/gemini-api/docs/thinking) supplies the Gemini thinking levels and defaults.
-The [Haiku launch announcement](https://www.anthropic.com/claude-haiku-5-5) records Sonnet's cache-read price reduction effective October 7, 2026.
-Keep previously published benchmark costs with their source dates rather than treating them as recalculated at the new price.
-Fable 5.1 and Opus 5.5 keep adaptive thinking on.
-Sonnet 5.5 accepts `between_tools` at `high` or below to remove up-front thinking, but rejects it at `xhigh` and `max`.
-Haiku 5.5 defaults to adaptive thinking and accepts `output_config.effort` on the API.
-Claude Code exposes the same five effort levels through its model and session controls.
-The API permits disabled thinking only through `high`, while Claude Code does not allow it for Haiku 5.5.
-Per-message effort changes are beta on the Claude API and Google Cloud for Haiku 5.5.
-Claude Code 2.1.293 and later supports Haiku 5.5.
-Claude Code subagent effort frontmatter overrides session effort unless `CLAUDE_CODE_EFFORT_LEVEL` is set, and subagents inherit session thinking configuration.
-The official Haiku 5.5 prompting guide warns that multi-turn `xhigh` responses may occasionally contain no visible text.
-Haiku 5.5 has a 1M token context window and 128K maximum output on the API.
-The model page lists availability on the Claude API, Bedrock, Google Cloud, Microsoft Foundry, and Claude Platform on AWS.
-Organization effort limits can cap the effective Claude Code level below the selected setting.
-These capabilities follow Anthropic's [thinking configuration table](https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting.md).
+| Tier | Workload and effort starting point |
+| --- | --- |
+| `haiku` | Low for extraction; xhigh for coding and review; medium or high for other analysis. |
+| `sonnet` | Medium or high for edits and review. |
+| `opus` | Medium or high for planning and complex reasoning. |
+| `fable` | High, xhigh, or max according to task difficulty when explicitly requested. |
+| `luna` | Low for extraction; xhigh or max for coding and review; medium or high for other analysis. |
+| `terra` | Medium or high for substantive coding and refactoring. |
+| `sol` | Low for extraction; medium or high for development, review, and analysis. |
+| `astra` | Follow explicit requests. |
 
 Broad external benchmarks supply the primary effort comparisons.
-The [detailed evidence record](model-effort-evidence.md) retains numerical effort comparisons for the seven benchmarked models, workload studies, measurement limits, and the Gemini provider evidence.
-No reviewed external benchmark covers the two Gemini models.
+The [detailed evidence record](model-effort-evidence.md) retains numerical effort comparisons, workload studies, and measurement limits.
 Independent review checks the available figures, methods, and verification limits.
 Source verification does not establish model performance outside the published workloads.
 
@@ -212,7 +188,7 @@ We read the supplied Haiku system card and visually inspected every capability e
 FrontierCode reports five runs per task in Claude Code and uses output tokens rather than reported Haiku costs.
 Max adds 0.6 percentage points over xhigh on Main while using about 80% more output tokens, estimated from the figure.
 The source supplies no uncertainty intervals for that coding comparison.
-The runtime's debugging, refactoring, and review choices extend that coding evidence as workload judgments, rather than separate measured rankings.
+The tier table extends that coding evidence to review as a workload judgment, rather than a separately measured ranking.
 The reviewed research, visual, computer-use, professional, and healthcare results show different effort gains and latency costs.
 Their limits prevent a single effort default for every Haiku workload.
 
@@ -230,20 +206,9 @@ Include workers, retries, and tool charges in total workflow cost.
 Effort names do not define equal compute across models or fixed cost multipliers.
 Local hook and Workflow checks test instruction delivery and tool execution, not model quality or these effort curves.
 
-Use `medium` for routine work and `high` for harder work as a labeled default and ceiling, not a measured efficiency optimum.
-No public effort comparison, numerical thinking budget, or gateway translation test establishes performance for either model.
-These provider labels do not equate to Claude or OpenAI effort levels.
-Native Claude Code effort translation, effective context, and current pricing remain unverified.
-The detailed model limits, Copilot pricing, and Claude Code 2.1.302 schema observations are maintained in the [model-effort evidence](model-effort-evidence.md#gemini-38-flash-and-gemini-4-argon).
-
 ### Host model selection
 
 Claude Code supports `fable`, `opus`, `sonnet`, and `haiku` aliases, as documented in its [model configuration](https://code.claude.com/docs/en/model-config.md).
-Provider routing, overrides, and allowlists can resolve an alias to another release.
-The exact Haiku 5.5 ID is `claude-haiku-5-5`, without a date suffix.
-The Haiku guidance assumes Haiku 5.5.
-Claude Code does not accept `max` in persistent `effortLevel` or `modelSettings` values.
-Use `max` per session, through an effort frontmatter override, or through `CLAUDE_CODE_EFFORT_LEVEL`.
 Use model identifiers supported by the active host and preserve explicitly required versions.
 Record requested settings and report resolved settings only when the host supplies them, otherwise mark them unknown.
 Follow the current tool contract for fork inheritance and override support.
@@ -313,14 +278,12 @@ Claude's installed binary also contains model-gated and style-gated prompt varia
 Their presence does not prove that every session receives them.
 The comparison establishes source overlap, not universal deployment behavior or model adherence.
 
-The inspected Codex catalog defaults Astra to low, Sol to low, and Luna to medium.
-Those defaults differ from API defaults and some documented task recommendations.
 Luna's bundled prompt also restricts tests unless the user requests testing or verification.
 Sol and Astra instead direct appropriate checks.
 Workgraph does not reproduce those changing host rules.
 
 The skills retain role ownership while honoring user communication and model-selection requirements.
-Runtime references use family names rather than pinned release identifiers.
+Runtime references resolve supported models and effort settings through the active host.
 Research records retain the measured releases so benchmark results keep their original meaning.
 They retain dependency routing, one writer per resource, delegated Git grants, publication privacy, and the shared-history restriction.
 They also retain independent review, blocker criteria, registered deferrals, evidence freshness, and cleanup ownership.
@@ -610,7 +573,6 @@ The rerun used maintained `core.judge.judge_one` and `core.judge.write` through 
 Public-only source and inputs were read-only mounts, with writable task-owned output, dropped capabilities, and no credential or socket mounts.
 The container had a non-root user, read-only root filesystem, resource limits, and a 900-second timeout.
 Network egress was not enforced, and model output was never executed.
-All requests used the maintained local gateway without changing provider configuration.
 The run establishes neither native activation, permission enforcement, broad model adherence, nor stock benchmark or recursive-sweep coverage.
 The maintained native evidence-assessment case remains unrun because the worktree isolation guard refused its evaluator invocation.
 
@@ -638,7 +600,7 @@ The repaired control states that each reviewer receives the complete materials, 
 Response bounds, error-sensitive process status, and working-directory environment checks also passed independent static re-verification.
 That rejected preflight is not a failed model request or part of the fourteen-request comparison.
 
-The run used maintained Harness2 judge and write functions through the external custom adapter and existing local gateway.
+The run used maintained Harness2 judge and write functions.
 The task-owned Linux container used a non-root user, read-only root and source mounts, writable output, and an empty temporary working directory.
 Dropped capabilities, resource limits, and a 1,200-second timeout bounded execution without mounting credentials, home, sockets, or the repository checkout.
 Network egress was not enforced, and model output was never executed.
@@ -647,7 +609,7 @@ The result establishes neither native activation, permission enforcement, stock 
 ## Language tooling and rule mappings
 
 Preserve a project's working lint and formatter choices before applying defaults to an unconfigured project.
-The Development skill selects Ruff, Ultracite with Oxlint and Oxfmt, ktlint, and golangci-lint for authorized setup.
+The Development skill selects compatible tools for authorized setup according to project requirements.
 Java retains its selected native tools, including Spotless with Palantir Java Format and Checkstyle.
 
 Workgraph's language references distinguish syntax-only tooling from compiler-backed checks.
@@ -752,7 +714,6 @@ No quoted example grants permission to change live models, ultracode, credential
 Main ownership, complete-candidate review, and normal Delivery integration boundaries remain required.
 
 The post's model split is not an official universal Workflow default or a measured performance ranking.
-Provider routing and model overrides can resolve aliases differently, so requested names do not prove resolved releases.
 Codex uses its configured model settings and cannot execute Claude's native Workflow.
 The post's throughput and cost claims are unverified here, and script-held results do not eliminate planning or worker costs.
 Schema validity does not establish factual correctness or replace an independent verifier.
