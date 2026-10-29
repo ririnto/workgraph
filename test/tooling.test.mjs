@@ -23,11 +23,17 @@ test("Git hooks invoke pnpm directly and propagate its status", async () => {
     for (const hook of ["pre-commit", "pre-push"]) {
       for (const status of [0, 17]) {
         const result = spawnSync(
-          "/bin/sh",
-          [path.resolve(import.meta.dirname, "../.husky", hook)],
+          "sh",
+          [
+            "-c",
+            'PATH=$1; export PATH; . "$2"',
+            "sh",
+            directory,
+            path.resolve(import.meta.dirname, "../.husky", hook)
+          ],
           {
             encoding: "utf-8",
-            env: { HOOK_STATUS: String(status), PATH: directory }
+            env: { ...process.env, HOOK_STATUS: String(status) }
           }
         );
         assert.ifError(result.error);
