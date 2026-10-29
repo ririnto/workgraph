@@ -92,9 +92,15 @@ Keep assertions that depend on coroutine work inside the group after that work c
 Await structured child work in the surrounding coroutine scope.
 Verify assertion-context propagation for the project's Kotest version when assertions cross coroutine dispatchers or context boundaries.
 Inline a single-use test value only when construction timing, side effects, readability, resource lifetime, and fixture isolation remain unchanged.
+Inline a service used only as the `assertSoftly` subject when its construction or expression can move safely.
 Preserve setup timing, evaluation order, resource lifetime, mock verification order, and fixture isolation.
 
 ## Automation
 
-For authorized lint automation, verify tool, runtime, and plugin version compatibility.
-Verify the consumer's lint command detects a representative violation before accepting an integration.
+For authorized Kotlin lint automation, prefer ktlint built-in rules.
+For that automation, use ktlint's supported custom-rule API when built-ins cannot express a safe requirement.
+Verify compatibility with the project's ktlint version before implementing custom rules or fixes.
+Check Kotlin, Gradle, JVM, ktlint engine, and plugin compatibility together before selecting versions.
+Stay within Kotlin's officially supported Gradle range even when a newer stable Gradle release exists.
+Attach custom rulesets to the consumer's actual ktlint runtime instead of relying on `buildSrc` visibility.
+Verify native consumer lint reports a disposable violation before accepting a ruleset integration.
