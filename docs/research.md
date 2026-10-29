@@ -840,7 +840,7 @@ Copied rules retain their upstream license and run through the repository's exis
 The original adoption moved dependency versions into the pnpm catalog and retained the patched `smol-toml` override.
 The locked markdownlint-cli2 release now declares that parser directly, so the superseded override has been removed.
 The selected [pnpm release](https://pnpm.io/installation) supports Node.js 24, which remains an official [LTS line](https://nodejs.org/en/about/previous-releases).
-The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.0.0) reads the manifest pin and installs the selected runtime.
+The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.1.1) installs the explicitly selected pnpm version and runtime.
 
 We checked Husky `9.1.7` in the npm registry and reviewed its official [setup](https://typicode.github.io/husky/get-started.html) and [hook documentation](https://typicode.github.io/husky/how-to.html).
 It requires Node.js 18 or later and supplies the Git dispatchers through the standard `prepare` lifecycle.
