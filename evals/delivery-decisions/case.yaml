@@ -1,8 +1,8 @@
 schema_version: "1.1"
 name: delivery-decisions
 description: Assess authorized delivery, current-unit blockers, recovery, true boundaries, and isolated parallel work.
+runs: 2
 execution:
-  runs: 1
   max_turns: 20
   timeout_seconds: 240
   allowed_tools:

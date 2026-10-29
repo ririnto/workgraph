@@ -1,8 +1,8 @@
 schema_version: "1.1"
 name: workflow-selection
 description: Verify an initial one-phase Workflow with expected reconciliation and cache-preserving continuation.
+runs: 2
 execution:
-  runs: 1
   max_turns: 25
   timeout_seconds: 480
   allowed_tools:
