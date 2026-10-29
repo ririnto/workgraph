@@ -1,8 +1,8 @@
 schema_version: "1.1"
 name: workflow-follow-up-required
 description: Verify that a required conditional Workflow follow-up uses its predecessor result.
+runs: 2
 execution:
-  runs: 1
   max_turns: 20
   timeout_seconds: 300
   allowed_tools:

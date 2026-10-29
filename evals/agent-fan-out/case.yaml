@@ -1,8 +1,8 @@
 schema_version: "1.1"
 name: agent-fan-out
 description: Verify direct Agent fan-out for independent assessments that end in one phase.
+runs: 2
 execution:
-  runs: 1
   max_turns: 20
   timeout_seconds: 360
   allowed_tools:

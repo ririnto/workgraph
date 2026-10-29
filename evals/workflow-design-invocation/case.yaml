@@ -1,8 +1,8 @@
 schema_version: "1.1"
 name: workflow-design-invocation
 description: Verify the bundled design Workflow dispatches bounded specialists and validates their real results.
+runs: 2
 execution:
-  runs: 2
   max_turns: 30
   timeout_seconds: 2400
   allowed_tools:
