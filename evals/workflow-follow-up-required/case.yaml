@@ -13,7 +13,7 @@ execution:
   prompt: |-
     Load Workgraph's Workflow skill unless its complete content is already present.
     Please orchestrate a read-only timeout assessment with delegated workers.
-    The follow-up release-impact assessment is a dependent agent stage whose dispatch is conditioned on the first worker's returned findings.
+    The follow-up dispatch decision must be made inside the same orchestration from the first worker's returned findings, not by Main separately after that worker returns.
     Have one worker check whether C1, C2, or C3 lacks a required timeout.
     If that worker finds a missing timeout, have a follow-up worker use its actual findings to assess release impact.
     If no timeout is missing, do not dispatch the follow-up worker.

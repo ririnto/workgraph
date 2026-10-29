@@ -17,8 +17,8 @@ execution:
     Both assessments end in one phase without any expected dependent follow-up.
     No worker needs another worker's result.
     A finding blocks release if its required timeout is absent.
-    Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
-    Batch B has B1 with a timeout, B2 without a timeout, and B3 with a timeout.
+    Batch A has A1 with no required timeout, A2 with its required timeout, and A3 with its required timeout.
+    Batch B has B1 with its required timeout, B2 with no required timeout, and B3 with its required timeout.
     Report only after both workers finish.
     Report the blocker IDs and explain the rule.
     Do not edit files, run Git commands, or publish anything.

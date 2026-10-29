@@ -17,7 +17,7 @@ execution:
     Each returns only keyed decisions, supporting evidence, and remaining requirements for that domain.
     Begin with a one-phase Workflow for the assessments because reconciliation is an expected follow-up phase.
     After accepting both actual results, append a phase with a third worker to reconcile the release decision.
-    Preserve the earlier prompts, options, labels, and arguments, and use supported same-session resume so valid completed calls can cache-hit.
+    Preserve the earlier prompts, options, labels, and arguments, and resume in the same session through the first run's returned scriptPath and resumeFromRunId so valid completed calls can cache-hit.
     Do not cancel valid running work to edit it, poll for progress, or add speculative work while only callbacks remain.
     Read returned results before deciding the next action.
     Use no more than these three workers and do not repeat complete-unit review for each domain or phase.
@@ -62,7 +62,7 @@ graders:
       Each assessment returns keyed domain decisions and evidence rather than repeating the whole source or every phase.
       Require the reconciliation to use both actual domain results, not an invented report.
       The first Workflow has one assessment phase because reconciliation is an expected follow-up, not a speculative phase.
-      The continuation resumes the first run in the same session through its returned run identity using a supported same-session resume form, either the returned scriptPath with resumeFromRunId or an edited inline script with the same resumeFromRunId, while preserving unchanged earlier call prompts, options, labels, and arguments.
+      The continuation uses the first run's returned scriptPath and same-session runId while preserving unchanged earlier call prompts, options, labels, and arguments.
       Require actual cache-hit evidence for completed valid assessments rather than repeated live assessment calls or a claimed cache hit.
       Main does not cancel valid running work for script edits or poll while only native callbacks remain.
       Main reads returned results before accepting them or starting the next action.
