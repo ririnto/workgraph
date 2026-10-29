@@ -19,6 +19,8 @@ execution:
     Explain what happens when the complete initial candidate is empty or nonempty.
     Contrast initial candidate inspection with the exposure scan before each push.
     If two independent reviewers are explicitly required, explain their coordination and evidence handoff.
+    Suppose two independent reviews were explicitly required and already completed one after another on the unchanged candidate, each with a complete result.
+    State whether to keep those results as they are or relabel them as parallel, and whether to rerun them only to change their timing.
     One reviewer identifies a candidate finding and another worker fixes it.
     Explain who verifies the finding and what they receive before it is reported as confirmed.
 
