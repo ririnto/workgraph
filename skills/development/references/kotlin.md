@@ -70,7 +70,6 @@ A `val` binding alone does not make its referenced object immutable or safe to s
 Treat `RuleProvider` factories as potentially eager, and do not hoist them based only on syntax.
 Expose injected dependencies through explicit parameters or appropriate extension functions.
 Keep stateful rule instances scoped to their required lifecycle instead of sharing them unconditionally.
-Allow one blank line between a local declaration and the following test block in a Kotest spec.
 
 ## Kotest assertions
 

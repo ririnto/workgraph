@@ -2,14 +2,13 @@
 
 ## Scope
 
-This record compares public evidence for nine exact models.
+This record compares public effort evidence for seven benchmarked models.
 No local test establishes model quality.
 The multi-task effort comparisons supply the main evidence.
 The smaller workload studies supply supporting evidence and limits.
-The two Gemini models carry provider documentation rather than benchmark comparisons, because no public effort sweep for them was found.
 These results describe the authors' tasks, harnesses, and settings.
 Use their methods and limits when choosing comparable local experiments.
-Read [the research notes](research.md#model-effort-and-cost) for supported controls, official defaults, host settings, and pricing.
+Read [the research notes](research.md#model-effort-and-cost) for workload guidance and measurement limits.
 The [Main contract](../skills/main-agent-contract/SKILL.md#models) honors user settings and selects supported controls by workload.
 Local behavior checks do not establish universal model-effort rankings.
 
@@ -180,7 +179,6 @@ The reported max setting increases time and cost without improving its mean pass
 Anthropic's [effort guide](https://platform.claude.com/docs/en/build-with-claude/effort) lists `low`, `medium`, `high`, `xhigh`, and `max`, with `medium` as the API default.
 The guide specifies `output_config.effort` for API requests and says disabled thinking is valid only through `high`.
 Claude Code supports the same five levels at `medium` by default and does not allow thinking to be disabled for this model.
-Its [model configuration](https://code.claude.com/docs/en/model-config) requires Claude Code 2.1.293 or later and identifies the API model as `claude-haiku-5-5`.
 The model has a 1M token context window, up to 128K output tokens, and API availability on the listed Claude and cloud platforms.
 The [Haiku 5.5 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-haiku-5-5) recommends evaluating effort on the target task and warns that multi-turn `xhigh` responses may occasionally have no visible text.
 
@@ -432,33 +430,3 @@ The author supplies neither quality grading nor cost for these calls.
 Low therefore still permits thinking on this request.
 
 The captured request supports a latency experiment, but it supplies no acceptance evidence for lowering effort.
-
-## Gemini 3.8 Flash and Gemini 4 Argon
-
-Google's [thinking reference](https://ai.google.dev/gemini-api/docs/thinking) lists `low`, `medium`, and `high` as the supported thinking levels for both models.
-The default is thinking on at `medium`, and both models use dynamic thinking that adjusts reasoning effort to request complexity.
-The reference documents no numerical thinking budget for either model.
-The [Gemini 3.8 Flash model page](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash) documents a 1,048,576-token input limit and a 65,536-token output limit, records a September 2026 update, and documents that the unsupported `minimal` level returns an error.
-The [Gemini 4 Argon model page](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon) documents one unified 1,048,576-token context window covering input, thinking, and output.
-Its synchronous output limit is 65,536 tokens, and background long decode can return up to 1,048,576 output tokens.
-The page records an October 2026 update and documents implicit caching as the model's only caching support.
-The reference bills thinking tokens as output tokens and reports their total through `total_thought_tokens`.
-
-The practical recommendation is `medium` for routine work and `high` for harder work, as the documented provider default and the highest supported level.
-That choice is a labeled default and ceiling, not a measured efficiency optimum.
-No numerical thinking budget, public effort sweep, or gateway translation test for these models was found, so their measured performance remains unverified.
-
-GitHub's [Copilot models-and-pricing documentation](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing) supplies these promotional Copilot display rates in United States dollars per million tokens.
-They are not direct Google API prices, and the table publishes no separate cache-write rate.
-
-| Model | Input | Cached input | Output | Promotional period |
-| --- | ---: | ---: | ---: | --- |
-| Gemini 3.8 Flash | $0.75 | $0.075 | $3.75 | Through December 31, 2026 |
-| Gemini 4 Argon | $2.00 | $0.10 | $10.00 | Until December 1, 2026 |
-
-The inspected Claude Code 2.1.302 configuration schema accepts per-model `effortLevel`, `maxEffortLevel`, and `autoCompactWindow` for arbitrary model identifiers.
-Passthrough `contextWindow` and `maxOutputTokens` fields do not configure native capacity in that version.
-Its compaction clamps the configured window to recognized model capacity and falls back to a 200,000-token capacity for unknown models.
-These observations describe one inspected host version and do not establish gateway behavior.
-No live gateway call, provider metadata query, or installed-host experiment was performed for these models.
-Native Gemini effort translation, effective context, and active pricing therefore remain unverified.

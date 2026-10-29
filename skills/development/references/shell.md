@@ -7,9 +7,6 @@ Default new portable scripts to POSIX `sh` unless the contract requires another 
 Use Bash-specific syntax only under a Bash shebang and its supported version.
 Quote expansions unless the shell syntax or required splitting calls for another form.
 Forward arguments with `"$@"`.
-Prefer `echo` to `printf` for plain text when the shell provides `echo`.
-Prefer `[ ]` to `[[ ]]` for tests.
-Use explicit `if`, `then`, and `fi` for conditional actions instead of compact `condition && action` chains.
 Preserve exit status and evaluation order when changing conditional forms.
 
 ## Handle failures

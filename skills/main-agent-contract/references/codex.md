@@ -24,25 +24,7 @@ Choose a higher tier directly when likely failure and retry costs outweigh lower
 Resolve each tier at call time using the host's model list and supported controls.
 For native Codex invocations, use the host-confirmed full model ID, never a bare alias or Claude-family name.
 
-| Tier alias | Difficulty | Effort guidance |
-| --- | --- | --- |
-| `luna` | Simple exploration and extraction | Use `low`. |
-| | Coding, debugging, refactoring, and code review | Use `xhigh`, or `max` for harder tasks. |
-| | Other clear analysis and agentic work | Use `medium`, or `high` for harder tasks. |
-| `terra` | Substantive coding and refactoring | Use `medium`, or `high` for harder tasks. |
-| `sol` | Simple queries, conversions, and extraction | Use `low`. |
-| | Ordinary development, review, and document analysis | Use `medium`. |
-| | Complex debugging, algorithms, and architecture | Use `high`. |
-| `astra` | Explicit request only | Follow the request. |
-
-Where the host provides equivalent tier aliases, map each alias to its corresponding tier.
-Verify that a response was produced at `xhigh` and `max` effort.
-Reserve Terra and Sol `xhigh` and `max` for explicit or configured choices under host rules.
-[Model Effort Evidence](../../../docs/model-effort-evidence.md) covers specific workloads, not universal optima.
-Some coding evidence favors higher `luna` efforts without establishing a universal optimum.
-The evidence does not establish the `terra` alias's model identity or effort performance.
-Do not pin a specific model version.
-If a requested or configured setting requires a version pin, report the incompatibility without substituting it.
-When these models or effort levels are unavailable, report the limitation and use a supported alternative only when permitted.
+Verify that each request returns a result.
+When requested settings are unavailable, report the limitation and substitute only when permitted.
 Use supported agent and tool controls, honoring explicit user and configuration choices.
 Report unavailable or substituted settings using host evidence.
