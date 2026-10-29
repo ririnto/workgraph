@@ -810,7 +810,7 @@ Use these APIs only when the declared Go version supports them and key or index 
 
 The official [setup-node version-file guidance](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file) supports selecting the development range from `package.json`.
 The workflow uses current [checkout](https://github.com/actions/checkout) and [setup-node](https://github.com/actions/setup-node) major releases.
-Separate dependency-free jobs exercise the declared hook runtime floor and macOS without claiming development-tool compatibility on Node.js 18.
+Separate dependency-free jobs exercise the declared hook runtime floor and macOS without installing development tools.
 These checks establish source validation and runtime evidence, while model adherence requires a separate behavioral run.
 
 ## Development lifecycle
@@ -839,11 +839,11 @@ Workgraph also maintains its Markdown sentence and table-separator rules.
 Copied rules retain their upstream license and run through the repository's existing lint owners.
 The original adoption moved dependency versions into the pnpm catalog and retained the patched `smol-toml` override.
 The locked markdownlint-cli2 release now declares that parser directly, so the superseded override has been removed.
-The selected [pnpm release](https://pnpm.io/installation) supports Node.js 24, which remains an official [LTS line](https://nodejs.org/en/about/previous-releases).
-The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.1.1) installs the explicitly selected pnpm version and runtime.
+The selected [pnpm release](https://pnpm.io/installation) supports Node.js 26.
+The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.1.1) installs the pnpm version declared in `package.json` and the selected runtime.
 
 We checked Husky `9.1.7` in the npm registry and reviewed its official [setup](https://typicode.github.io/husky/get-started.html) and [hook documentation](https://typicode.github.io/husky/how-to.html).
-It requires Node.js 18 or later and supplies the Git dispatchers through the standard `prepare` lifecycle.
+It supports Node.js 26 and supplies the Git dispatchers through the standard `prepare` lifecycle.
 Workgraph's two hooks call the corresponding pnpm scripts and retain the complete existing check gate.
 Actual commit and push operations in disposable repositories verify execution and intentional failure propagation.
 These local Git checks do not establish native plugin activation or provider behavior.

@@ -10,7 +10,7 @@ The hook runtime uses Node built-ins and needs no npm dependencies.
 
 ## Install
 
-Use Node.js 18 or later for hook execution.
+Use Node.js 26.13.0 or later within major version 26 for hook execution.
 Choose the adapter for your execution host.
 
 | Host | Setup and usage |
@@ -162,9 +162,8 @@ Inspect the hook error notice if instructions fail to load.
 ## Development
 
 Use pnpm and the Node version range in `package.json` for development.
-Development tools require Node.js 24.15 or later within major version 24.
-This requirement is separate from the Node.js 18 minimum for hook execution.
-Install the pnpm version declared in `.tool-versions` before installing the pinned development tools.
+Development tools require Node.js 26.13.0 or later within major version 26.
+Install the pnpm version declared in `package.json` before installing the pinned development tools.
 
 ```sh
 pnpm install --frozen-lockfile
