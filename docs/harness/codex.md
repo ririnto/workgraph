@@ -24,6 +24,9 @@ Reference fragments preserve raw file text.
 Source labels identify complete content already loaded, so agents need no startup retrieval for those files.
 The [delivery design](../design.md#deliver-context) describes message-envelope differences and failure behavior.
 
+The [Bash polling guard](../../README.md#bash-polling-guard) uses Codex's Bash PreToolUse interface, including unified execution commands.
+Native activation requires a host with local command hooks enabled.
+
 Codex uses its native delegation tools under the Main host reference.
 Claude Code's native Workflow is unavailable in Codex.
 

@@ -155,6 +155,11 @@ On a file or frontmatter error, it identifies the failing file without emitting 
 The [README](../README.md#hook-errors) lists exit codes and the effect on startup.
 This context-loading hook cannot enforce permissions.
 
+The separate `hooks/bash-polling-guard.mjs` command handles Bash `PreToolUse` events in both host configurations.
+The [runtime contract](../README.md#bash-polling-guard) defines matching, denial, shared session counters, state ownership, and failure behavior.
+Its deliberately restricted literal grammar excludes unsupported syntax instead of guessing shell semantics.
+The guard emits only a native denial decision and leaves execution and permission settings with the host.
+
 The host determines which delegated executions emit hook events.
 Do not assume that every orchestration system creates a Claude Code subagent.
 Dispatch prompts must carry the constraints needed by a receiver whose context is unknown.
@@ -249,6 +254,8 @@ It executes the registered shell commands from a path with spaces and an unrelat
 The Codex command test selects its hook configuration and skills directory through the relocated host descriptor.
 It checks Claude's inline limit with complete instructions, long plugin paths, and LF or CRLF line endings.
 Each test removes its disposable plugin copies.
+
+`hooks/bash-polling-guard.test.mjs` exercises both registered commands, matching and nonmatching syntax, session isolation, resets, concurrency, and state failures.
 
 The tests also check skill names, descriptions, and invocation metadata.
 Source checks scan `SKILL.md` bodies for instruction reference links that resolve outside the bundled skills tree.

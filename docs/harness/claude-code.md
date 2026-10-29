@@ -17,7 +17,7 @@ For development, load the checkout in a new session.
 claude --plugin-dir ./
 ```
 
-Use `/hooks` to confirm that the SessionStart and SubagentStart handlers are active.
+Use `/hooks` to confirm that the SessionStart, SubagentStart, and Bash PreToolUse handlers are active.
 Marketplace installations and development checkouts can contain different versions.
 Check the loaded plugin version and actual source paths before evaluating changed instructions.
 
@@ -35,6 +35,8 @@ The hook's skill fragment uses the native base-directory line and the skill body
 Its reference fragment uses native Read line numbering.
 Source labels identify complete content already loaded, so agents need no startup retrieval for those files.
 The [delivery design](../design.md#deliver-context) describes whitespace handling, envelope differences, inline limits, and failure behavior.
+
+The [Bash polling guard](../../README.md#bash-polling-guard) denies repeated literal `tail` and `sleep` calls through PreToolUse.
 
 ## Manual Invocation
 

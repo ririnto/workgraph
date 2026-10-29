@@ -231,7 +231,7 @@ test("configured Claude hooks load relocated skills and references with LF or CR
   );
   assert.deepEqual(
     new Set(Object.keys(config.hooks)),
-    new Set(["SessionStart", "SubagentStart"])
+    new Set(["SessionStart", "SubagentStart", "PreToolUse"])
   );
   for (const [event, name] of roles) {
     assert.equal(config.hooks[event].length, 1);
@@ -422,7 +422,7 @@ test("configured Codex hooks load complete relocated skill files without a conte
   const config = JSON.parse(readFileSync(selectedHooks, "utf-8"));
   assert.deepEqual(
     new Set(Object.keys(config.hooks)),
-    new Set(["SessionStart", "SubagentStart"])
+    new Set(["SessionStart", "SubagentStart", "PreToolUse"])
   );
   for (const [event] of roles) {
     assert.equal(config.hooks[event].length, 1);
