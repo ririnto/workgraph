@@ -64,7 +64,7 @@ Record requests and report resolved settings only when host-exposed.
 
 Dispatch inputs, ownership, authority, outputs, acceptance, cleanup, and recursive constraints.
 Give Git writers allowed commands, refs, ownership limits, and pre-action checks.
-Forbid destructive Git, require fast-forward-only syncs, and explain blocked skips.
+Permit user-requested force operations on working branches, forbid direct pushes to protected branches, require fast-forward-only syncs, and explain blocked skips.
 Assign one writer per file, worktree, ref, and shared record.
 Assign one owner and execution path per outcome.
 Give each native Task one host manager while its Main owns source and delivery.
