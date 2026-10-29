@@ -11,13 +11,16 @@ execution:
     - Read
     - Skill(workgraph:workflow)
   prompt: |-
-    Please orchestrate a read-only timeout assessment with subagents.
+    Load Workgraph's Workflow skill unless its complete content is already present.
+    Please orchestrate a read-only timeout assessment with delegated workers.
+    The follow-up release-impact assessment is a dependent agent stage whose dispatch is conditioned on the first worker's returned findings.
     Have one worker check whether C1, C2, or C3 lacks a required timeout.
     If that worker finds a missing timeout, have a follow-up worker use its actual findings to assess release impact.
     If no timeout is missing, do not dispatch the follow-up worker.
     Input facts: C1, C2, and C3 each have a required timeout.
     Assess only these supplied facts.
     No project files or additional evidence exist.
+    Read each returned result before deciding the next action, and report only completed outcomes.
     Report the blocker IDs and whether the follow-up was needed.
     Do not edit files, run Git commands, or publish anything.
 graders:
