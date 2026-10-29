@@ -26,8 +26,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/workflow/references/delivery.md` | Workflow delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
-| `skills/writing/SKILL.md` | Agents doing prose or Markdown work | Agents follow concise prose, sentence boundaries, and table rules. |
-| `skills/instruction-authoring/SKILL.md` | Agents designing instructions | Agents follow prompt task contracts, source separation, and loading-boundary design. |
+| `skills/writing/SKILL.md` | Agents doing prose or instruction work | Agents follow prose, prompt task contracts, source separation, and loading-boundary guidance. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review the complete selected store before reconciling authorized records and their index. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify native lifecycle authority, scoped activity, retained content, and Worktree Artifact removal. |
 | `docs/verification-map.md` | Maintainers | Maintainers connect Workgraph behavior to its current commands and evidence boundaries. |
@@ -54,7 +53,7 @@ Main Agent mode remains the stable public entry at `skills/main-agent-contract/S
 Its activation description identifies the mode without adding another public entry.
 Main and Worker select conditional skills by plain skill name when their stated task scope applies.
 Development's conditional loading keeps unrelated lifecycle and language guidance out of task context.
-Writing owns prose, while Instruction Authoring owns the agent-facing prompt task contract and source or example separation.
+Writing owns prose, the agent-facing prompt task contract, and source or example separation.
 Workflow stays focused on its lower-level native operation without repeating the Main contract or Delivery checklist.
 Host adapters stay at user altitude and link to role references and sole policy owners.
 Contributor guidance identifies these directories and forbids duplicate same-context operational rules.
@@ -62,7 +61,7 @@ Contributor guidance identifies these directories and forbids duplicate same-con
 ### Conditional loading
 
 Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, branch creation, implementation dispatch, commits, or publication.
-Main and Worker conditionally load Writing, Instruction Authoring, Development, and Memory Maintenance for tasks within those skills' scopes.
+Main and Worker conditionally load Writing, Development, and Memory Maintenance for tasks within those skills' scopes.
 Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
 Skip retrieving conditional files whose complete content is already loaded.
@@ -200,7 +199,7 @@ Claude Main selects direct Agent when one assignment completes the work without 
 It selects Workflow for dependent agent stages, required joins, or expected continuation.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
-Its [bundled design source](../workflows/design.js) supplies a discoverable native workflow.
+Its read-only design guidance keeps design, challenge, and verification within the actual authority and tool restrictions available to the session.
 The [authoring reference](../skills/workflow/references/authoring.md) covers native source and run-specific script copies.
 The plugin registers workflows by convention and supplies no replacement executor.
 Its delivery reference maps authorized engineering operations to node inputs and outputs while Main owns graph readiness.

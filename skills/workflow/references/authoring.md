@@ -15,6 +15,7 @@ Pass Main's per-stage model and effort selections, respecting overrides and pinn
 Keep scan stages read-only.
 Follow Main's [editor isolation policy](../../main-agent-contract/SKILL.md#assignments).
 Use a supported read-only `agentType` or existing host tool restrictions for scans, without inventing a `readOnly` option.
+Prompt instructions do not enforce tool restrictions, so verify that the available host controls enforce the required boundary before dispatch.
 Set `isolation: 'worktree'` through the native tool contract for edits.
 Return each edit's diff, checks, and worktree ownership to Main before integration and cleanup.
 When explicit approval is required, end the proposal run before any edit and start edits only after approval.

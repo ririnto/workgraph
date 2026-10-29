@@ -38,7 +38,7 @@ Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 
 Write maintained instructions and documentation in concise English.
 Follow the active role's request-origin communication policy for conversations and handbacks.
-Instruction Authoring owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
+Writing owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
 
 When drafting, editing, or reviewing prose, read Writing unless its complete content is already loaded.
 
@@ -91,7 +91,7 @@ Confirm the selected role and host reference appear without repository guidance 
 
 Follow the [evaluation reporting requirements](README.md#development) for repeated behavioral runs, individual outcomes, and limited smoke checks.
 
-For Workflow invocation changes, run `claude plugin eval ./ --case workflow-design-invocation --runs 2 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
+For Workflow invocation changes, run `claude plugin eval ./ --case delivery-completion-evidence --runs 2 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
 This behavioral check uses real agents and requires a host with Workflow enabled.
 Keep evaluation reports local and outside the repository with `--output-dir`.
 Inspect tool results because an attempted invocation alone does not prove successful execution.

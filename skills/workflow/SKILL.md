@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use in Claude Code main sessions for dependent stages, required joins, expected follow-up phases, or explicit Workflow requests.
+  Use in Claude Code main sessions for read-only design, dependent stages, required joins, expected follow-up phases, or explicit Workflow requests.
 argument-hint: "[goal]"
 ---
 
@@ -35,13 +35,7 @@ Resume authorized edit work only after that approval, without adding gates to wo
 
 ## Run Workflow
 
-When an assigned read-only design warrants the bundled specialist stages, read [the design source](../../workflows/design.js).
-Follow its validated phase and result contract only when the graph fits the scope, authority, and staffing limits.
-Pass the design task, requirements, constraints, optional repository-relative source paths, and runtime model selectors through structured `args`.
-Use supported selectors chosen under Main's model policy.
-Omit unspecified selectors and never add a fixed workflow default.
-Do not replace the specialist outputs with coordinator-authored design content.
-Call native Workflow with the registered plugin workflow name for bundled graphs.
+For bundled delivery graphs, read the applicable [simple](../../workflows/delivery-simple.js) or [complex](../../workflows/delivery-complex.js) source and call native Workflow with its registered plugin name.
 For other accepted graphs, author native source under the authoring reference and pass it as inline `script`.
 Use its returned `scriptPath` and same-session `resumeFromRunId` for an authorized continuation.
 Pass structured JSON through `args` when the script needs runtime inputs.
@@ -51,6 +45,23 @@ Stop only broken or unauthorized runs.
 Wait for completion before editing the script, then append phases and resume valid unchanged calls.
 
 If the native Workflow tool is unavailable, report that it did not run.
+
+## Read-only design
+
+For a design request, establish the task, requirements, constraints, and relevant sources before developing a candidate.
+Describe components, interfaces, data flow, decisions and alternatives, failure behavior, evidence, and assumptions.
+Map each requirement to the proposed design and propose representative regression and evaluation cases with observable outcomes.
+Distinguish repository evidence from inference and proposed checks from executed checks.
+Challenge the candidate against each requirement, interface, failure mode, test claim, and open question.
+Record contradictions and unmet requirements as blockers, including when the candidate acknowledges them.
+Verify findings independently of their finder and author when the accepted task requires independent verification.
+Record a disposition for every finding and an evidence-backed status for each requirement.
+Do not accept a design with missing required work, unverified findings, confirmed blocking or major findings, or unmet requirements.
+Report the candidate as incomplete when required independent verification is unavailable, rather than claiming it occurred.
+
+Keep read-only work within the session's authorization and tool restrictions.
+Use delegated stages only when the required host-enforced tool restrictions are verified in force for those calls, because a prompt cannot restrict tools.
+Otherwise work directly within the main session's authorized tools and report any unmet independence requirement.
 
 ## Verify results
 

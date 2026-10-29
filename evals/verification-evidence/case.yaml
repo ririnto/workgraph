@@ -7,9 +7,9 @@ execution:
   timeout_seconds: 240
   allowed_tools:
     - Skill(workgraph:development)
-    - Skill(workgraph:instruction-authoring)
+    - Skill(workgraph:writing)
   prompt: |-
-    Load Workgraph's Development and Instruction Authoring skills explicitly.
+    Load Workgraph's Development and Writing skills explicitly.
     This is a read-only assessment of supplied synthetic evidence.
     Do not run commands or edit files.
     Attribute results to supplied packets, not personal execution.

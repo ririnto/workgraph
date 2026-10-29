@@ -53,11 +53,9 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:main-agent-contract` | Load Main Agent mode in the main session. |
 | `/workgraph:subagent-context` | Load the Worker role for an existing bounded dispatch. |
 | `/workgraph:delivery` | Load Main's repository delivery procedure. |
-| `/workgraph:workflow` | Request native Claude Code Workflow, including the bundled agent-authored design graph. |
-| `claude --agent workgraph:design-lead` | Start the main-session design coordinator, which delegates to the Workflow skill. |
+| `/workgraph:workflow` | Request native Claude Code Workflow or load its design guidance. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
-| `/workgraph:writing` | Load prose and Markdown guidance. |
-| `/workgraph:instruction-authoring` | Load agent-facing instruction design guidance. |
+| `/workgraph:writing` | Load prose, Markdown, and instruction design guidance. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 
 Manual role invocation reads its Claude reference unless that complete content is already present.

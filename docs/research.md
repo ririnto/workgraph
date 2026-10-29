@@ -21,8 +21,8 @@ They support focused skills, useful examples, proportional checks, and independe
 The OpenAI guide warns that conflicting loaded instructions can stop authorized work.
 Anthropic recommends separating instructions from source material and using ordinary, direct language rather than aggressive tool triggers.
 
-Instruction Authoring applies those lessons to agent-facing contracts and instruction-management skills.
-Writing routes prompt contracts to Instruction Authoring and keeps human-facing presentation guidance separate.
+Writing applies those lessons to agent-facing contracts and instruction-management skills.
+Writing keeps agent-facing prompt contracts and human-facing presentation guidance distinct.
 Authors audit actual loading points, replace conflicting consumers, and evaluate decision boundaries instead of testing exact prose.
 The user's approved scope determines Git delivery authority, while host permissions and server protections remain unchanged.
 A guide's sample approval prompt does not require renewed approval for operations already authorized by the user.
@@ -53,12 +53,12 @@ It recommends a clear task, relevant context, roles, restrictions, and an explic
 
 | Source lesson | Workgraph mapping |
 | --- | --- |
-| State the task, context, constraints, output, and completion criteria explicitly. | Instruction Authoring already requires these elements in agent-facing task contracts. |
-| Audit loaded instruction sources for conflicts and ambiguity. | Instruction Authoring already audits loading points and replaces conflicting consumers. |
-| Use concise and explicit output expectations. | Instruction Authoring owns agent-facing contracts, while Writing owns presentation. |
+| State the task, context, constraints, output, and completion criteria explicitly. | Writing already requires these elements in agent-facing task contracts. |
+| Audit loaded instruction sources for conflicts and ambiguity. | Writing already audits loading points and replaces conflicting consumers. |
+| Use concise and explicit output expectations. | Writing owns agent-facing contracts and presentation. |
 | Scale checks to the change and keep initiative within scope. | Development and the role contracts route checks and authority. |
 | Keep rules short and aligned with real tool schemas. | Role bodies and host references match native loading formats and tool contracts. |
-| Use examples where they clarify a decision boundary. | Instruction Authoring owns contrasting examples for decision boundaries. |
+| Use examples where they clarify a decision boundary. | Writing owns contrasting examples for decision boundaries. |
 | Avoid accumulating emphasis and repeated directives. | Writing's final pass already removes repetition while preserving requirements. |
 
 Workgraph does not adopt the guides' voice-only output, confirm-before-mutation examples, fixed heading or second-person format rules, audio and API parameters, model defaults, or realtime preambles.
@@ -585,7 +585,7 @@ No native activation, generalization, stock JobBench, recursive sweep, or select
 
 ### Instruction boundary reinforcement rerun
 
-We compared Instruction Authoring and the shared plugin-update router before and after their auto-injection and host-neutrality changes.
+We compared instruction authoring guidance and the shared plugin-update router before and after their auto-injection and host-neutrality changes.
 The fixed synthetic task combined skill revision with a separate update plan for one project-declared host.
 Ten criteria separated literal filename exclusion from retrieval behavior, convention placement, procedure preservation, and host-specific update routing.
 The third trial reversed the draft rule order for both variants.

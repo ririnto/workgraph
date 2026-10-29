@@ -1,14 +1,13 @@
 # Workflow samples
 
-Workgraph bundles two native Workflow delivery samples and one read-only agent-authored design workflow.
-All samples accept optional model selectors and otherwise use host configuration.
-All three use the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
+Workgraph bundles two native Workflow delivery samples.
+Both accept optional model selectors and otherwise use host configuration.
+They use the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 
 | Variant | Source | Shape |
 | --- | --- | --- |
 | Simple task | [delivery-simple.js](../workflows/delivery-simple.js) | At most two scopes, exactly one work unit, and integration landing the unit branch. |
 | Complex task | [delivery-complex.js](../workflows/delivery-complex.js) | Up to four scopes, a plan-decided unit split with per-unit worktrees, and integration of the named unit branches. |
-| Agent design | [design.js](../workflows/design.js) | Parallel architecture and evidence work, followed by composition, challenge, and independent verification. |
 
 ## Launch
 
@@ -45,47 +44,10 @@ Workflow({
 The plugin discovers the bundled `.js` definitions in `workflows/`.
 The dispatching session owns the task branch, initial candidate inspection, and any required issue.
 
-## Agent design
+## Read-only design
 
-Request the bundled design graph through `/workgraph:workflow` when its specialist stages fit the task.
-The `workgraph:design-lead` plugin agent is an optional main-session coordinator that uses the same skill and source.
-The skill invokes the registered `workgraph:design` workflow.
-Run the skill again for a fresh design, or continue the same session with the returned `scriptPath` and run ID.
-
-| Phase | Specialist | Runtime model input | Completion evidence |
-| --- | --- | --- | --- |
-| Design | `workgraph:design-architect` and `workgraph:design-evidence` run in parallel. | `args.models.architecture` and `args.models.evidence`. | Both schema-valid architecture and evidence results cover every requirement. |
-| Compose | `workgraph:design-composer` consumes both Design results. | `args.models.compose`. | One design, decisions, implementation steps, requirement mapping, and test plan. |
-| Challenge | `workgraph:design-challenger` tests the composed design with counterexamples. | `args.models.challenge`. | Evidence-backed findings and substantive coverage, including when findings are empty. |
-| Verify | `workgraph:design-verifier` independently assesses findings and requirements. | `args.models.verify`. | One disposition per finding and evidence-backed status for every requirement. |
-| Acceptance | The workflow computes status from validated phase results. | No model call. | `complete` records phase completion, while `accepted` requires no unresolved blocker or requirement gap. |
-
-The task input requires a nonempty `args.task` string.
-Optional `requirements`, `constraints`, and `context` fields carry the design brief.
-Optional `sources` must contain unique canonical repository-relative paths.
-The `models` object accepts one host-supported selector per specialist role, with no workflow defaults.
-When a selector is omitted, the agent call leaves its model unset for host configuration.
-
-```js
-Workflow({
-  name: 'workgraph:design',
-  args: {
-    task: 'Design a reliable event-replay boundary.',
-    requirements: ['Retries must not duplicate effects.'],
-    models: {
-      architecture: '<runtime selector>',
-      evidence: '<runtime selector>',
-      compose: '<runtime selector>',
-      challenge: '<runtime selector>',
-      verify: '<runtime selector>'
-    }
-  }
-})
-```
-
-A failed or malformed specialist result blocks dependent phases and preserves successful sibling results.
-Verified blocking or major findings, inconclusive findings, and unmet requirements make `accepted` false.
-The workflow returns the candidate design, phase evidence, findings, blockers, and requested model inputs without performing implementation.
+For read-only design work, use the [Workflow skill](../skills/workflow/SKILL.md#read-only-design).
+It describes requirement coverage, challenge, independent verification, and the tool boundaries needed for delegation.
 
 ## Dispatch inputs
 
@@ -162,7 +124,6 @@ A confirmed finding outside one unambiguous owned unit blocks the round for repl
 ## Models
 
 Delivery samples accept optional selectors by phase through `args.models`, plus `args.models.verify` for finding verification.
-The design workflow accepts optional selectors by specialist role through `args.models`.
 An omitted selector stays unset so the host can apply its current configuration.
 Every selector must be a nonempty string the host supports for agent calls.
 
