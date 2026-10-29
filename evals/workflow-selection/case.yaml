@@ -62,7 +62,7 @@ graders:
       Each assessment returns keyed domain decisions and evidence rather than repeating the whole source or every phase.
       Require the reconciliation to use both actual domain results, not an invented report.
       The first Workflow has one assessment phase because reconciliation is an expected follow-up, not a speculative phase.
-      The continuation resumes the first run in the same session through its returned run identity, the returned scriptPath with resumeFromRunId or the supported edited inline script with the same resumeFromRunId where file access is denied, while preserving unchanged earlier call prompts, options, labels, and arguments.
+      The continuation uses the first run's returned scriptPath and same-session runId while preserving unchanged earlier call prompts, options, labels, and arguments.
       Require actual cache-hit evidence for completed valid assessments rather than repeated live assessment calls or a claimed cache hit.
       Main does not cancel valid running work for script edits or poll while only native callbacks remain.
       Main reads returned results before accepting them or starting the next action.

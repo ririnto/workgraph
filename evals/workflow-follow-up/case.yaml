@@ -11,7 +11,6 @@ execution:
     - Read
     - Skill(workgraph:workflow)
   prompt: |-
-    Load Workgraph's Workflow skill unless its complete content is already present.
     Please orchestrate a read-only timeout assessment with delegated workers.
     The follow-up dispatch decision must be made inside the same orchestration from the first worker's returned findings, not by Main separately after that worker returns.
     Have one worker check whether C1, C2, or C3 lacks a required timeout.
