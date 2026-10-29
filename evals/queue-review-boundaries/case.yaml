@@ -6,14 +6,12 @@ execution:
   max_turns: 20
   timeout_seconds: 240
   allowed_tools:
-    - Skill(workgraph:fix-queue-delivery)
     - Skill(workgraph:writing)
     - Skill(workgraph:delivery)
     - Skill(workgraph:development)
-    - Skill(workgraph:verification)
     - Read
   prompt: |-
-    Load Workgraph's Fix-Queue Delivery and Writing skills explicitly.
+    Load Workgraph's Delivery and Writing skills explicitly.
     Assess these synthetic situations without performing their simulated operations.
     Do not run commands, start reviewers, write tracker records, edit source, or create branches.
     Give each situation its next action, responsible role, and missing acceptance evidence.
@@ -45,7 +43,7 @@ graders:
     focus: trace
     criteria: |-
       Judge semantic decisions rather than fixed wording.
-      The trace loads Fix-Queue Delivery and Writing before assessing their behavior.
+      The trace loads Delivery and Writing before assessing their behavior.
       Queue Main selects work and receives results, issue owners write separate branches and open their own PRs, and the integration owner serializes shared merges.
       The queue respects two assigned concurrent owners rather than a fixed six-worker default.
       Only the relevant conflicting resource return blocks its item, while independent permitted work continues.

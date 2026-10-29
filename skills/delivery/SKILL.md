@@ -24,6 +24,23 @@ Complete authorized Git operations and required checks without repeated permissi
 Preserve explicit user gates, new-scope boundaries, and authorization limits for irreversible actions.
 Git delivery does not authorize deployment, credential handling, live assets, forks, or upstream destinations.
 
+### Deliver an assigned fix queue
+
+Use the assigned queue bounds, concurrency, acceptance, ownership, and publication limits.
+Check existing issues and PRs before assigning fixes, and prioritize correctness and safety within scope.
+Assign each issue or coherent batch an isolated workspace, branch, and named source, Git, integration, evidence, and cleanup owners.
+The issue owner runs checks, publishes its branch, opens its PR, and returns the result and evidence.
+The integration owner serializes merges and confirms acceptance before closure.
+Preserve each issue's original acceptance and exclusions, including any umbrella's separate acceptance.
+Skip ownership-blocked items and continue independent ready work within the assigned concurrency.
+Use nonclosing issue references until acceptance is confirmed.
+Serialize merges and let the branch owner resolve collisions unless ownership transfers.
+Refresh affected checks, acceptance evidence, and review coverage after collisions, while retaining unaffected valid evidence.
+Confirm each issue's original acceptance on the authorized base before closing it, then read back the tracker state.
+Inspect relevant base source or run the required behavioral check because a merge and ref readback alone do not establish acceptance.
+Confirm an umbrella's own acceptance separately from its children.
+Report merged items, acceptance evidence, closure states, blockers, owners, and remaining work.
+
 ### Select the base and working branches
 
 Use the user's specified base branch, otherwise retain the recorded base or use the current branch.
@@ -65,6 +82,10 @@ Inspect flagged content and remove exposed details before pushing the branch.
 
 ## Retain validation evidence
 
+Identify the target, trigger, input, and observable expected outcome before checking acceptance.
+Use existing commands and supported entry points, and collect runtime evidence when static checks cannot establish behavior.
+Record the command, setup, exit status, and raw result separately from interpretation.
+Retain failures and distinguish unverified behavior from passing evidence.
 Record concise validation summaries in authorized PR/MR descriptions or comments.
 Include commands, outcomes, coverage, and material limitations without uploading raw logs by default.
 Create local evidence only when a current check, failure investigation, or recovery needs files.

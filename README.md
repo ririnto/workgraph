@@ -1,7 +1,7 @@
 # Workgraph
 
 Workgraph supplies engineering coordination, writing, and development instructions for Claude Code and Codex.
-Its Main Agent mode routes work to focused skills, lifecycle playbooks, principles, and host references.
+Its Main Agent mode routes work to focused skills, lifecycle playbooks and host references.
 Native hooks load the selected Main or Worker role before execution.
 
 Workgraph supplies instructions and a narrow Bash polling guard.
@@ -34,7 +34,7 @@ Neither hook filters events with a matcher.
 Each output identifies the execution host, actual source paths, and complete content already loaded.
 All selected files load before context emission, so the injected role and host guidance need no additional reads.
 
-Hooks do not inject contributor instructions, research, task skills, playbooks, or principle skills.
+Hooks do not inject contributor instructions, research, task skills, or playbooks.
 Main and Worker keep their role contracts self-contained because they can load in separate sessions.
 Main host references add orchestration and model selection guidance for each host.
 Worker references own execution timing.
@@ -125,19 +125,14 @@ Conditional skills load only when their stated task scope matches and their comp
 | Host reference | Each role's `references/claude-code.md` or `references/codex.md` | The hook selects the active role and host together. |
 | Development router | [Development](skills/development/SKILL.md) | Source work selects the matching lifecycle playbook and language references. |
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
-| Behavior principle | [Preserve Behavior](skills/principle-preserve-behavior/SKILL.md) | Behavior-preserving transformations load semantic, evaluation-order, and side-effect guidance. |
-| Interface principle | [Production Interfaces](skills/principle-production-interfaces/SKILL.md) | Interface, abstraction, helper, or test-design decisions load production-contract guidance. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
-| Scoped procedure | [Fix-Queue Delivery](skills/fix-queue-delivery/SKILL.md) | Queue owners deliver an assigned repository queue with serialized integration and acceptance-based closure. |
 | Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main loads native Workflow procedures for the host reference's selection conditions. |
 | Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose and Markdown work loads writing guidance. |
 | Scoped procedure | [Instruction Authoring](skills/instruction-authoring/SKILL.md) | Instruction work loads task-contract design, source separation, and loading-boundary guidance. |
-| Scoped procedure | [Verification](skills/verification/SKILL.md) | Behavior changes, performance claims, and reproductions load runtime evidence guidance. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads the bundled lifecycle and attachment procedures. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
-The principle skills own existing engineering constraints rather than adding lint enforcement.
 Writing owns prose, while Instruction Authoring owns agent-facing prompt contracts and example separation.
 Consumer links and required resources stay bundled, without another plugin dependency or required online research.
 
@@ -147,7 +142,6 @@ The host adapters list invocation forms and host-specific availability.
 
 ### Application verification
 
-The conditional [Verification skill](skills/verification/SKILL.md) owns runtime reproduction and acceptance evidence selection.
 The maintainer [verification map](docs/verification-map.md) connects Workgraph behavior to existing checks and their limits.
 Passing source or hook checks does not establish installed activation, interactive invocation, or model adherence.
 

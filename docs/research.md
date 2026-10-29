@@ -486,7 +486,7 @@ This practitioner report does not establish Workgraph effectiveness or authorize
 
 | Article lesson | Workgraph application |
 | --- | --- |
-| Runnable verification precedes review. | Development and Verification already require observable checks, commands, outcomes, and evidence limits. |
+| Runnable verification precedes review. | Development requires observable checks, commands, outcomes, and evidence limits. |
 | Review evaluates intent and system impact. | Delivery now supplies the complete candidate, project review instructions, acceptance, and affected real consumers. |
 | Findings need verification and disposition. | Delivery now distinguishes introduced defects, pre-existing issues, evidence-based rejection, fixes, and tracked deferrals. |
 | Review effort follows risk. | Delivery selects reviewer staffing and depth by task risk and explicit requirements. |
@@ -564,7 +564,7 @@ The papers do not establish the effectiveness of Workgraph's waiting instruction
 
 ### Harness2 verification evidence evaluation
 
-We compared the unchanged public [Verification skill](../skills/verification/SKILL.md) with an unmerged three-line expansion on a fixed synthetic evidence-attribution task.
+We compared the unchanged public Verification skill with an unmerged three-line expansion on a fixed synthetic evidence-attribution task.
 The task had eight status-and-citation criteria and five semantic criteria across three trials.
 The third trial was configured to reverse record order, without separately recording runtime request payloads.
 GPT-6 Luna scored 13/13 on every trial for both variants.
@@ -577,7 +577,7 @@ A manually reviewed baseline positive control scored 13/13.
 A handwritten false-execution, all-pass negative scored 3/13, with all five semantic criteria false.
 These controls calibrate the grader and are not additional solver successes.
 The graded comparison ties, so it gives no measured reason to expand Verification or add redundant rules.
-The proposed expansion remains unmerged, and Verification behavior remains unchanged.
+The proposed expansion remained unmerged at the time of the comparison.
 The authoring change requires grader calibration and explicit coverage reporting.
 The new native [case](../evals/verification-evidence/case.yaml) defines regression coverage but remains UNRUN.
 Neither provides evidence of runtime or model-adherence gains.
@@ -824,7 +824,7 @@ Performance work needs baseline traces and comparable measurements.
 Verification checks the actual artifact rather than a proxy.
 Delivery checks that review verdicts still cover the current candidate.
 
-Main, Delivery, and Verification retain orchestration, publication authority, evidence freshness, and cleanup.
+Main and Delivery retain orchestration, publication authority, evidence freshness, and cleanup.
 Source and hook checks establish bundled instruction delivery, not universal model adherence.
 
 ## pnpm and Git hook tooling

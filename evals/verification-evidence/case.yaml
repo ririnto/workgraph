@@ -6,10 +6,10 @@ execution:
   max_turns: 20
   timeout_seconds: 240
   allowed_tools:
-    - Skill(workgraph:verification)
+    - Skill(workgraph:development)
     - Skill(workgraph:instruction-authoring)
   prompt: |-
-    Load Workgraph's Verification and Instruction Authoring skills explicitly.
+    Load Workgraph's Development and Instruction Authoring skills explicitly.
     This is a read-only assessment of supplied synthetic evidence.
     Do not run commands or edit files.
     Attribute results to supplied packets, not personal execution.
@@ -41,7 +41,7 @@ execution:
     Comparison record:
     The fixed synthetic evidence-attribution task had eight status-and-citation criteria and five semantic criteria.
     It ran three trials, with record order reversed in the third trial.
-    It compared unchanged public Verification guidance with an unmerged three-line expansion.
+    It compared the former public Verification guidance with an unmerged three-line expansion.
     GPT-6 Luna scored 13/13 on every trial for both variants.
     GPT-6.1 Sol independently judged responses using maintained Harness2 `core.judge.judge_one` and `core.judge.write` tools.
     A custom score adapter ran in hardened Linux containers.
@@ -52,7 +52,9 @@ execution:
     These controls calibrate the grader and are not additional solver successes.
     All 20 HTTP attempts comprised 12 solver attempts, with six successes and six failures, and eight valid judge attempts.
     No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
-    Recommend whether to change Verification guidance and state what remains ungraded or unverified.
+    Assess whether the comparison justified the expansion and state what remains ungraded or unverified.
+    Address native activation, generalization, runtime gains, and model adherence.
+    Explain how an explicit requirement affects the decision.
 graders:
   - name: required-skills-loaded
     type: tool_used
@@ -72,7 +74,7 @@ graders:
       Packet G tests a different input and does not establish the requested target's behavior.
       Packet H is reusable because its matching inputs and relevant conditions remain unchanged.
       The graded Luna comparison is a baseline-candidate tie at 13/13 on all three trials.
-      The result does not support a measured improvement or redundant Verification expansion.
+      The result does not support a measured improvement or the proposed expansion.
       Failed Haiku requests and excluded candidate trials remain separate from graded behavior.
       The report identifies failed Haiku trials as ungraded and Haiku candidate trials as excluded without requests.
       Positive and negative controls are grader calibration, not extra solver successes.

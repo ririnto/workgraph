@@ -20,7 +20,6 @@ Keep orchestration and model guidance in Main Agent references.
 Add no orchestration or model guidance in Worker references.
 
 Keep lifecycle procedures in `skills/development/playbooks/`, with Development selecting only the matching playbook and language references.
-Keep behavior and interface constraints in `skills/principle-preserve-behavior/` and `skills/principle-production-interfaces/` as conditional skills.
 Keep Workflow focused on its lower-level operation without repeating the Main contract or the Delivery checklist.
 Do not duplicate an operational rule, procedure, or checklist across sources that load in the same context.
 Link the sole owner instead, and keep each conditional procedure at its stated scope and read trigger.

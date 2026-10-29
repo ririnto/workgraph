@@ -56,11 +56,8 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:workflow` | Request native Claude Code Workflow, including the bundled agent-authored design graph. |
 | `claude --agent workgraph:design-lead` | Start the main-session design coordinator, which delegates to the Workflow skill. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
-| `/workgraph:principle-preserve-behavior` | Load guidance for behavior-preserving transformations. |
-| `/workgraph:principle-production-interfaces` | Load guidance for production interfaces, abstractions, and test design. |
 | `/workgraph:writing` | Load prose and Markdown guidance. |
 | `/workgraph:instruction-authoring` | Load agent-facing instruction design guidance. |
-| `/workgraph:verification` | Load runtime reproduction and evidence guidance. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 
 Manual role invocation reads its Claude reference unless that complete content is already present.

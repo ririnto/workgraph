@@ -53,6 +53,7 @@ Examples include Gradle's `gradlew` and `gradlew.bat`, and Maven's `mvnw` and `m
 For external contributions, restrict style cleanup to lines already included in the user's contribution diff.
 
 Preserve the project's declared runtime, toolchain, public contracts, and required failure behavior.
+Preserve evaluation order, side effects, resource lifetimes, failure behavior, and required interfaces when transforming code.
 Replace superseded implementations and their consumers together, removing obsolete paths in the same change.
 Avoid copying neighboring workarounds because agents copy nearby code as precedent.
 Fix recurring causes in code or data architecture first.
@@ -67,11 +68,6 @@ Prefer an existing parser or literal operation when it expresses the requirement
 Use the language or platform's native named-group facilities instead of adding unnecessary custom wrappers.
 If the engine lacks named groups, report that limit.
 Do not treat ordinary array indexing as regex capture access.
-
-### Load conditional principles
-
-Before control-flow or expression changes, including condition inversion, read [Preserve Behavior](../principle-preserve-behavior/SKILL.md) unless its complete content is already loaded.
-Before helper, abstraction, or test-observation decisions, read [Production Interfaces](../principle-production-interfaces/SKILL.md) unless its complete content is already loaded.
 
 ## Documentation and comments
 
@@ -90,7 +86,7 @@ Record the affected item and reason in the task report.
 | Comment removal or relocation | Removing directives or changing documentation attachment can alter tooling, public contracts, or safety information. |
 | Explanatory logging | Added runtime calls change effects, cost, and possible information exposure. |
 | Await instead of void | Awaiting can change scheduling, callback contracts, rejection handling, and cancellation. |
-| Early-exit inversion | Rewriting branches can change evaluation order, cleanup, cost, or admission and security checks. |
+| Early-exit inversion | Rewriting branches can change evaluation order, cleanup, cost, or security checks. |
 | Dependency style and LTS selection | Manifest restructuring or upgrades can change resolution, runtime requirements, and supported APIs. |
 | Rule rollout | New diagnostics and fixes can misclassify source or change behavior before target-specific validation. |
 | Structured validation identifiers | Replacing exported string diagnostics or bare errors changes observable validator contracts. |
@@ -137,9 +133,18 @@ If a rule cannot detect violations safely, do not add it.
 If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
 Do not promise automatic fixes that replace `void` with `await`, restructure control flow, or hoist state across lifecycle boundaries.
 
-## Verification routing
+## Verification
 
-For behavioral changes, performance claims, or report reproduction, read Verification unless its complete content is already loaded.
+Identify the target, trigger, input, and observable expected outcome before checking behavior.
+Use existing commands and supported entry points, and preserve the project's execution and import boundaries.
+Choose tests that exercise the changed behavior and run the application when integration, state, or external behavior matters.
+Collect traces, screenshots, results, or timings when tests do not show the outcome.
+Record the command, setup, exit status, and raw result separately from interpretation.
+Retain failures and unexpected output, and reproduce reports against their stated expectations.
+Record measurement conditions for performance claims.
+Treat formal proof, native activation, and model adherence as unverified without direct evidence.
+Create a focused feature map only when repeated reports or navigation needs warrant one.
+Keep the map beside project verification instructions and update affected entries.
 When correcting a defect, fix its cause in code or data architecture first.
 When needed, a narrow guard may stop new instances of a known bad pattern before separate cleanup of existing debt.
 Next, use existing static checks or add meaningful regression checks.
