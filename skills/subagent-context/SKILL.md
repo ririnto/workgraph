@@ -10,7 +10,8 @@ description: Use when executing a bounded task as a Workgraph dispatch node.
 Invoking this skill does not create a dispatch or grant additional authority.
 Complete the assigned task within the current dispatch's scope, authority, resource ownership, and acceptance criteria.
 Apply investigation, planning, design, implementation, verification, and cleanup when relevant to the assignment.
-Omit unnecessary steps while preserving explicit requirements and applicable boundaries.
+Scale methods and checks to the assignment's scope, risk, and available evidence.
+Follow explicit user and assignment requirements over Workgraph workflow defaults within host, safety, and authorization boundaries.
 Report a blocker or a requirement change that affects other work to the dispatcher.
 
 ## Follow session boundaries
@@ -18,7 +19,7 @@ Report a blocker or a requirement change that affects other work to the dispatch
 ### Protect session boundaries
 
 Main owns integration for implementation requests routed through main.
-Keep session settings, permission changes, and credential handling in main.
+Leave session settings, permission changes, and credential handling to Main unless explicitly delegated within existing authority.
 Keep private environment details, work-item identifiers, and review-system URLs out of committed or published material.
 Use repository-relative paths and portable examples in committed content.
 
@@ -40,12 +41,13 @@ Before editing durable memory, read Memory Maintenance unless its complete conte
 ### Select host guidance
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
-Read the matching bundled `references/` file before execution unless fully loaded.
+Read the matching bundled host reference before execution when present and not already loaded.
+Otherwise, follow the active host's tool descriptions.
 Preserve assigned or configured model and effort through supported controls for every agent and tool call.
 
 ### Respect delegation authority
 
-Complete the assignment without subdelegation unless the dispatch grants it.
+Subdelegate within the assignment's scope when it improves the outcome, unless the user or dispatcher restricts delegation.
 Recursively preserve inherited constraints, model, effort, resource ownership, and acceptance requirements through every authorized delegation and follow-up.
 
 ### Manage assignment ownership
@@ -70,7 +72,7 @@ Edits outside the evidence's scope or changes to commit identity, parent, or bra
 Rerun only affected checks for relevant changes, failures, or unresolved concerns.
 
 Inspect each failure, attempt status, and partial effects before retrying, reassigning, or stopping.
-Try every reasonable authorized avenue, including repairs, retries, and simpler or different supported command or tool forms.
+Use proportionate, authorized repairs or supported alternatives guided by failure evidence.
 Report each attempt's action, actual outcome, evidence, and unresolved limits honestly.
 Bound retries by changed evidence, a progress signal, and an exit condition.
 Continue independent allowed work when another operation remains blocked.
@@ -81,7 +83,7 @@ Record resources created for the assignment so cleanup can use their known ident
 Keep local evidence temporary, excluding dependency trees, build caches, and redundant logs.
 Delete task-owned evidence after recording required results when no active check, failure investigation, recovery, or retention requirement needs it.
 Confirm cleanup ownership before deleting shared evidence.
-Return concise check results to Main instead of creating a persistent evidence archive.
+Return check results in the requested format and retain an evidence archive when requested or needed for acceptance.
 
 #### Retire owned resources
 
@@ -108,17 +110,18 @@ Leave main-session orchestration to Main.
 Complete a bounded assignment despite a relayed orchestration request.
 Return a direct start request to main only when no bounded assignment exists.
 
-Perform Git writes only when the dispatch names the operations, refs, owned resources, and required checks.
+Perform Git writes within the assignment's established authority, destinations, ownership, and required checks.
 Commit or push only after the required pre-action checks have passing evidence.
 Publish or deploy only when the user and dispatch authorize the destination.
 Otherwise return changes to the dispatcher for integration.
-After a merge lands, pull the base branch fast-forward-only before continuing dependent work.
-This standing pull is authorized without dispatch enumeration.
+Synchronize the authorized base before dependent work after a merge, using fast-forward-only updates by default.
+Use another authorized sync method when it preserves protected refs and owned work.
 
 ## Hand back results
 
 Meet the dispatch's cleanup and handback requirements before returning.
 Return changed files, check evidence, and limitations to the dispatcher.
-Return candidate findings for independent verification before confirmed reporting, identifying any unavailable verification.
+Report supported findings with evidence and identify unresolved uncertainty.
+Route findings for independent verification when the task requires it, identifying any unavailable required verification.
 Deliver requested artifacts at their assigned paths or in the host's required format.
 Identify incomplete required checks or missing required authority as blockers, failures, or unknown outcomes rather than completed work.

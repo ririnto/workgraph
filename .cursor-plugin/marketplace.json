@@ -1,0 +1,12 @@
+{
+  "name": "workgraph",
+  "owner": {
+    "name": "ririnto"
+  },
+  "plugins": [
+    {
+      "name": "workgraph",
+      "source": "./"
+    }
+  ]
+}

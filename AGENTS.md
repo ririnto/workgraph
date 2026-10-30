@@ -79,13 +79,14 @@ Select the narrowest applicable read-only gate.
 - Use `pnpm run check:hooks` for changes confined to hook execution.
 - Use `pnpm run check:issue-forms` for issue form YAML changes.
 - Use `pnpm run check:plugin-version` for host manifest version checks.
+- Use `pnpm run check:skill-metadata` for skill frontmatter and invocation policy checks.
 - Use `pnpm run check:tooling-tests` for adopted lint rule behavior and control-flow equivalence.
 - Use `pnpm run check:validation-tests` for issue form and release version gate tests.
 - Use `pnpm run check` for mixed changes or repository-wide validation.
-  This covers Markdownlint, Ultracite, hooks, issue forms, plugin versions, tooling tests, validation tests, and the production dependency audit.
+  This covers Markdownlint, Ultracite, hooks, issue forms, plugin versions, skill metadata, tooling tests, validation tests, and the production dependency audit.
 - The production dependency audit contacts the package registry.
 
-After plugin configuration changes, run `claude plugin validate ./` and `claude plugin validate .claude-plugin/plugin.json`.
+After plugin configuration changes, run `claude plugin validate --strict ./` and `claude plugin validate --strict .claude-plugin/plugin.json`.
 For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.
 Confirm the selected role and host reference appear without repository guidance or the other host's guidance.
 
@@ -107,7 +108,7 @@ Run formatting fixes only within the authorized change.
 
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit bodies and issue and pull request templates.
 
-Keep matching versions in both host plugin manifests using `yyyy.mm.dd.seq`.
+Keep matching versions in `plugin.json` and `.claude-plugin/plugin.json` using the date-based SemVer scheme in `README.md`.
 Include the matching plugin version bump in every plugin-source pull request.
 Follow the release procedure in `README.md`.
 Omit version fields from the marketplace and private package manifest.

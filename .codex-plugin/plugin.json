@@ -1,6 +1,0 @@
-{
-  "hooks": "./hooks/codex-hooks.json",
-  "name": "workgraph",
-  "skills": "./skills",
-  "version": "2026.10.30.04"
-}

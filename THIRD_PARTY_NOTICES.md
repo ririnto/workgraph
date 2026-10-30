@@ -155,6 +155,9 @@ Workgraph modifies the sentence and TSDoc copies while preserving their diagnost
 ## Research And Official Documentation
 
 The [research notes](docs/research.md) cite the papers and official documentation used for context, graph, and verification decisions.
+We consulted the [Agent Plugins specification](https://agent-plugins.org/specification) and official OpenAI, Anthropic, GitHub, and Cursor plugin guides.
+The [distribution review](docs/research.md#plugin-standards-and-distribution) maps those sources to packaging, validation, installation, and evaluation decisions.
+These sources inform the implementation without adding third-party plugin code or a runtime dependency.
 We consulted the official [golangci-lint documentation](https://golangci-lint.run/docs/) for Go linting and custom-linter guidance.
 The guidance uses its documented recommendations without redistributing golangci-lint code or claiming compatibility for a specific project.
 We consulted the Go project's [Go 1.23 release notes](https://go.dev/doc/go1.23) and [`maps.Values`](https://pkg.go.dev/maps#Values) and [`slices.Values`](https://pkg.go.dev/slices#Values) documentation.

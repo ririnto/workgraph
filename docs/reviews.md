@@ -2,21 +2,27 @@
 
 This policy applies only to contributors reviewing Workgraph pull requests.
 
-## Review the posted candidate
+## Select useful review coverage
 
-Workgraph PR owners run complete posted-candidate reviews with two independent general reviewers and a native Codex reviewer.
-Run these reviews concurrently after publication.
-Give every reviewer the complete current PR, acceptance criteria, affected consumers, and validation evidence.
+Choose review depth, staffing, timing, and tools from the change's risks and the user's explicit requirements.
+Prefer independent review for substantial instruction, runtime, or packaging changes.
+Add reviewers when their expertise addresses a concrete gap, rather than requiring a fixed reviewer count.
+Run independent reviews concurrently when they are ready and their work does not conflict.
+Reviews can precede or follow publication if they cover the complete candidate being delivered.
+Give reviewers that candidate, acceptance criteria, affected consumers, and validation evidence.
+Preserve required checks, repository protections, and explicit review requirements when adapting the process.
 
 ## Assign reviewer scope
 
-Keep the general reviewers on correctness, instruction ownership, portability, and safety.
-Assign Codex only built-in instruction and tool conflicts and compatibility with native Codex behavior.
-Require one consolidated read-only Codex report without duplicating the general reviews.
-Do not substitute a Claude-hosted model alias for the native Codex session.
+Cover correctness, instruction ownership, portability, and safety where the change affects them.
+Use host-specific review or execution evidence for changes whose behavior depends on that host.
+Report native behavior as unverified when the required host evidence is unavailable.
+Do not label a model alias in another host as a native Codex session.
+Honor requested alternative review methods within these evidence and authority boundaries.
 
 ## Verify and record findings
 
-Independently verify each candidate before acting or reporting it as confirmed.
-Record findings, dispositions, coverage limits, and actual review timing in a formal COMMENT review.
+Verify candidate findings against source, requirements, or checks before treating them as confirmed.
+Use independent verification when a finding's uncertainty or impact warrants it, or the task explicitly requires it.
+Record findings, dispositions, coverage limits, and actual review timing in the PR description, comment, or formal review.
 Preserve completed valid reviews without claiming retroactive coverage or concurrency.

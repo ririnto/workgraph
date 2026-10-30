@@ -23,6 +23,27 @@ Check the loaded plugin version and actual source paths before evaluating change
 
 Workgraph changes no model or effort settings through installation.
 
+## Inspect the loaded plugin
+
+Inspect an installed copy from the shell.
+
+```sh
+claude plugin details workgraph
+```
+
+Inspect a development checkout from its root.
+
+```sh
+claude --plugin-dir ./ plugin details workgraph
+```
+
+Check the discovered components and reported source before comparing instruction changes.
+The report estimates description tokens loaded each turn and skill-body tokens loaded on invocation.
+Those estimates exclude context emitted by Workgraph's startup hooks.
+Use `/context` in a fresh session to inspect actual context usage.
+Check actual triggering after shortening descriptions.
+The [cost and usage guide](https://code.claude.com/docs/en/plugins/measure) explains these estimates and their limits.
+
 ## Automatic loading
 
 SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Claude reference](../../skills/main-agent-contract/references/claude-code.md).
@@ -63,6 +84,36 @@ Invoking a skill does not create a dispatch, change the session's role, or grant
 The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.
 [Workflow](../../skills/workflow/SKILL.md) owns its selection, authoring, execution, and result-mapping procedure.
 Codex Scoped Cleanup does not authorize Codex resource operations when invoked in Claude Code.
+
+## Evaluate discovery and outcomes
+
+Use Claude Code 2.1.269 or later for native plugin evaluations.
+Use 2.1.305 or later for checks that require completed-call replay.
+The `triggering` cases exercise natural requests without naming the expected skill in the prompt.
+
+| Case | Expected behavior |
+| --- | --- |
+| [Writing request](../../evals/writing-natural-trigger/case.yaml) | Load Writing and preserve the supplied facts while revising prose. |
+| [Source correction](../../evals/development-natural-trigger/case.yaml) | Load Development and correct the supplied function without claiming execution. |
+| [Workflow near miss](../../evals/workflow-keyword-near-miss/case.yaml) | Explain GitHub Actions without invoking Workgraph's native Workflow procedure. |
+
+Activation graders accept successful Skill results or complete reads of the corresponding bundled skill.
+They reject mentions, attempted loads, and descriptions alone as evidence of loading.
+Outcome graders check the answer separately.
+Tool graders check that these read-only requests cause no file writes or shell commands.
+
+Run a focused regression check from a trusted checkout.
+These evaluations call real models and keep their reports outside the repository.
+
+```sh
+claude plugin eval ./ --tag triggering --runs 2 --ablation none --no-publish --output-dir ../workgraph-trigger-results
+```
+
+For a paired no-plugin comparison, omit `--ablation none`.
+Pin `--model` and `--judge-model` to supported identifiers when comparing versions.
+Use matching prompts, tool grants, inputs, and run counts.
+Inspect individual outcomes, failed requests, timing, and usage before claiming an improvement.
+The [native evaluation guide](https://code.claude.com/docs/en/plugin-evals) describes baseline comparisons, graders, and result files.
 
 ## Updates
 

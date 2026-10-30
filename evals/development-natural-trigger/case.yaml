@@ -1,0 +1,59 @@
+schema_version: "1.1"
+name: development-natural-trigger
+description: Check natural Development activation and a bounded source correction without execution claims.
+tags:
+  - triggering
+runs: 2
+execution:
+  max_turns: 16
+  timeout_seconds: 300
+  allowed_tools:
+    - Read
+    - Skill
+  prompt: |-
+    This Python helper leaks tags between calls when I omit the second argument.
+    Fix it while preserving in-place updates when I pass an existing list.
+    Return the corrected function and three small examples showing its behavior.
+    Work from the snippet below without editing files or running commands.
+
+    def add_tag(tag, tags=[]):
+        tags.append(tag)
+        return tags
+graders:
+  - name: development-loaded
+    type: llm
+    arm: with-only
+    focus: trace
+    criteria: |-
+      Require actual loading of the bundled Development skill before the final correction.
+      Accept a successful Skill result for workgraph:development or a complete Read of skills/development/SKILL.md from this plugin.
+      Accept complete Development content already supplied in the observed context.
+      Reject a mere mention, skill description, unsuccessful call, or unsupported claim that Development was loaded.
+      Do not require a particular loading tool when the complete skill is present.
+  - name: correction-and-contract
+    type: llm
+    focus: last_message
+    criteria: |-
+      Require valid Python that gives calls without a second argument independent lists.
+      Preserve appending the supplied tag and returning the resulting list.
+      When a list is explicitly supplied, mutate and return that same object, including when it is empty.
+      Reject truthiness-based replacement of a caller's empty list and copying every supplied list.
+      Require three examples that together demonstrate independent defaults and mutation of a supplied list.
+      Present example outputs as expected behavior, not results of commands the assistant executed.
+      Fail any claim that files were changed, tests ran, or execution verified the correction.
+      Judge equivalent correct implementations without requiring a particular sentinel or variable name.
+  - name: no-file-write
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: no-file-edit
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+  - name: no-shell-command
+    type: tool_used
+    tool: Bash
+    min: 0
+    max: 0

@@ -10,7 +10,8 @@ description: Use in the Workgraph main-session mode when orchestrating authorize
 Use only in main.
 Invocation changes no role or authority.
 Own authorized outcomes through investigation, planning, design, implementation, verification, delivery, cleanup, and handback.
-Omit unnecessary steps while preserving explicit requirements and applicable boundaries.
+Scale planning, delegation, review, and verification to the task's scope, risk, and available evidence.
+Follow explicit user requirements over Workgraph workflow defaults within host, safety, and authorization boundaries.
 Proceed with user-requested actions, tools, and Git publication.
 Honor diff-first gates and await user approval before gated edits.
 Block integration on own unmet acceptance and defer per Delivery.
@@ -28,7 +29,7 @@ Read Memory Maintenance before durable memory edits unless fully loaded.
 
 ### Protect session boundaries
 
-Main owns session settings, permission changes, and credential handling.
+Main owns session settings, permission changes, and credential handling unless explicitly delegated within existing authority.
 Keep private environment details, work-item identifiers, and review-system URLs out of commits and publications.
 Use repository-relative paths and portable examples in committed content.
 
@@ -48,12 +49,13 @@ Read Writing for prose or instructions unless fully loaded.
 ### Select host guidance
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
-Read the matching bundled `references/` file before dispatch unless fully loaded.
+Read the matching bundled host reference before dispatch when present and not already loaded.
+Otherwise, follow the active host's tool descriptions.
 
 ### Models
 
 Honor user, configuration, and assignment settings over defaults.
-Start native Tasks without model or effort overrides and preserve existing sessions.
+Preserve existing native Task settings unless the user or assignment requests supported changes.
 Preserve native Task hosts' dependencies.
 Select unpinned model and effort by task difficulty and boundedness through supported agent and tool controls.
 Preserve settings when a call has no selection control.
@@ -63,12 +65,15 @@ Record requests and report resolved settings only when host-exposed.
 ### Assignments
 
 Dispatch inputs, ownership, authority, outputs, acceptance, cleanup, and recursive constraints.
-Give Git writers allowed commands, refs, ownership limits, and pre-action checks.
-Permit user-requested force operations on working branches, forbid direct pushes to protected branches, require fast-forward-only syncs, and explain blocked skips.
+Give Git writers clear destinations, ownership limits, and applicable checks.
+Permit user-requested force operations on working branches with the destination and ownership established.
+Never push directly to protected branches.
+Use fast-forward-only base synchronization by default.
+Honor authorized alternatives that preserve protected refs, owned work, and required checks.
 Assign one writer per file, worktree, ref, and shared record.
-Assign one owner and execution path per outcome.
+Assign one accountable owner per outcome and coordinate any parallel execution paths.
 Give each native Task one host manager while its Main owns source and delivery.
-Run authorized ready outcomes concurrently.
+Run independent ready outcomes concurrently when that reduces delay or improves evidence.
 Isolate concurrent editors with supported tools and preserve their work until handback.
 Require only relevant predecessor results and conflicting ownership returns.
 Assess unexpected changes against the task and applicable safety boundaries before adopting them.
@@ -85,15 +90,17 @@ Compare relevant references and changes against the evidence's scope.
 Unrelated edits, commit identity, parents, or branch names alone do not invalidate evidence.
 Rerun affected checks for relevant changes, failures, or unresolved concerns.
 Inspect failures, attempt status, and partial effects before retries, reassignment, or stopping.
-Try all reasonable authorized repairs, retries, and supported alternatives.
+Use proportionate, authorized repairs or supported alternatives guided by failure evidence.
 Report each attempt, outcome, evidence, and limits honestly.
 Bound retries by new evidence, progress, and an exit condition.
 Reassess stalled work without waiving acceptance.
 
-#### Verify findings independently
+#### Validate findings
 
-Independently verify findings before reporting, excluding the finder and fixer.
-Label unsupported findings and unavailable or inconclusive verification unverified.
+Confirm findings against source, behavior, and relevant evidence.
+Use independent verification when required by the task or warranted by risk and uncertainty.
+When independence is required, exclude the finder and fixer from verification.
+Label unsupported findings and unavailable required verification unverified.
 
 ### Return owned resources
 
@@ -122,16 +129,16 @@ Join results and preserve unaffected work after failures or changes.
 ### Choose and verify graph tools
 
 Use Mermaid or LaTeX when useful.
-Verify diagrams and formulas with their renderer.
+Check diagrams and formulas with an available renderer when rendering affects acceptance.
 
 ### Select an execution path
 
 Choose only needed nodes.
-Report unavailable selected or delegation tools.
+Report unavailable tools when they affect the requested outcome or method.
 Preserve explicit tool choices.
-Proceed directly only when safe and the user's tool choice permits it.
-Delegate substantial ready outcomes unless the user selects direct work or permits fallback.
-Handle trivial work unless delegation is requested.
+Use a supported alternative within established authority when the requested outcome permits it.
+Delegate when parallel work, specialization, or independent assessment improves the outcome.
+Handle simple work directly unless the user requests delegation.
 
 ## Apply repository procedures
 

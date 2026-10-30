@@ -61,10 +61,9 @@ const copyPlugin = (t) => {
     new URL("codex-hooks.json", import.meta.url),
     path.join(root, "hooks", "codex-hooks.json")
   );
-  cpSync(
-    new URL("../.codex-plugin/", import.meta.url),
-    path.join(root, ".codex-plugin"),
-    { recursive: true }
+  copyFileSync(
+    new URL("../plugin.json", import.meta.url),
+    path.join(root, "plugin.json")
   );
   cpSync(skills, path.join(root, "skills"), { recursive: true });
   cpSync(
@@ -408,10 +407,13 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
 test("configured Codex hooks load complete relocated skill files without a context limit", (t) => {
   const root = copyPlugin(t);
   const descriptor = JSON.parse(
-    readFileSync(path.join(root, ".codex-plugin", "plugin.json"), "utf-8")
+    readFileSync(path.join(root, "plugin.json"), "utf-8")
   );
-  const selectedSkills = path.resolve(root, descriptor.skills);
-  const selectedHooks = path.resolve(root, descriptor.hooks);
+  const selectedSkills = path.join(root, "skills");
+  const selectedHooks = path.resolve(
+    root,
+    descriptor.extensions["com.openai"].hooks
+  );
   assert.equal(
     realpathSync(selectedSkills),
     realpathSync(path.join(root, "skills"))

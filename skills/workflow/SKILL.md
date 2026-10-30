@@ -7,19 +7,19 @@ argument-hint: "[goal]"
 
 # Workgraph Workflow
 
-Use this skill only in Claude Code, as identified by session metadata, loaded host guidance, or native tool descriptions.
-In Codex, report that native Workflow did not run.
-Stop this skill without substituting another execution method in that host.
+Run native Workflow only in Claude Code, as identified by session metadata, loaded host guidance, or native tool descriptions.
+When the host lacks native Workflow, report that limitation and use supported alternatives if they satisfy the authorized request.
+Do not describe another execution method as native Workflow.
 Only the main session starts native Workflow.
 Use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
 
 ## Prepare the run
 
 Honor explicit supported tool choices within the host's authority before applying default routing.
-Use direct Agent when one assignment completes the accepted work without a dependent agent stage or join.
-Use Workflow when actual later phases are expected, even if the first invocation contains only one phase.
+Prefer direct Agent when one assignment completes the accepted work without a dependent agent stage or join.
+Prefer Workflow when actual later phases are expected, even if the first invocation contains only one phase.
 Exclude speculative future tasks and display-only phases.
-Use Workflow for dependent agent stages or required joins within one outcome, not for steps within one Agent assignment.
+Use dependent agent stages or required joins within one outcome to guide default routing.
 Do not use Workflow to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
@@ -40,8 +40,8 @@ For other accepted graphs, author native source under the authoring reference an
 Use its returned `scriptPath` and same-session `resumeFromRunId` for an authorized continuation.
 Pass structured JSON through `args` when the script needs runtime inputs.
 
-Keep a valid Workflow running because cancellation loses in-progress agent results.
-Stop only broken or unauthorized runs.
+Keep useful authorized Workflow runs active because cancellation loses in-progress agent results.
+Stop when the user requests it, authorization changes, or the run cannot usefully complete the accepted task.
 Wait for completion before editing the script, then append phases and resume valid unchanged calls.
 
 If the native Workflow tool is unavailable, report that it did not run.
@@ -56,7 +56,8 @@ Challenge the candidate against each requirement, interface, failure mode, test 
 Record contradictions and unmet requirements as blockers, including when the candidate acknowledges them.
 Verify findings independently of their finder and author when the accepted task requires independent verification.
 Record a disposition for every finding and an evidence-backed status for each requirement.
-Do not accept a design with missing required work, unverified findings, confirmed blocking or major findings, or unmet requirements.
+Block acceptance when required work is missing, accepted requirements are unmet, or confirmed defects violate those requirements.
+Keep unresolved findings visible and assess their effect on acceptance instead of blocking on optional suggestions alone.
 Report the candidate as incomplete when required independent verification is unavailable, rather than claiming it occurred.
 
 Keep read-only work within the session's authorization and tool restrictions.

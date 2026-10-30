@@ -21,7 +21,7 @@ Route cleanup through the authorized resource owner and supported host operation
 Select model tier and effort from the concrete task's difficulty and boundedness, not its role or work kind.
 For ordinary tasks, choose the lowest sufficient tier.
 Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
-Select `astra` only when explicitly requested.
+Respect model exclusions or request-only choices when the user or project actually sets them.
 Resolve each tier at call time using the host's model list and supported controls.
 For native Codex invocations, use the host-confirmed full model ID, never a bare alias or Claude-family name.
 
