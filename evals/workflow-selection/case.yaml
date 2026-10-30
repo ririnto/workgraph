@@ -17,7 +17,7 @@ execution:
     Each returns only keyed decisions, supporting evidence, and remaining requirements for that domain.
     Begin with a one-phase Workflow for the assessments because reconciliation is an expected follow-up phase.
     After accepting both actual results, append a phase with a third worker to reconcile the release decision.
-    Preserve the earlier prompts, options, labels, and arguments, and use supported same-session resume so valid completed calls can cache-hit.
+    Preserve the earlier prompts, options, labels, and arguments, and resume the same run in the same session with its returned run identity so valid completed calls can cache-hit.
     Do not cancel valid running work to edit it, poll for progress, or add speculative work while only callbacks remain.
     Read returned results before deciding the next action.
     Use no more than these three workers and do not repeat complete-unit review for each domain or phase.
@@ -37,7 +37,7 @@ execution:
     Report blockers, eligible deferrals, and the remaining action before integration.
     Preserve evidence, scope, acceptance criteria, owner, and next action in reported tracker records and proposed follow-up requirements.
     Keep the assessments and reconciliation concise.
-    Do not edit files, run Git commands, or publish anything.
+    Do not edit repository files, run Git commands, or publish anything.
 graders:
   - name: workflow-invoked
     type: tool_used

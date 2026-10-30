@@ -17,8 +17,8 @@ execution:
     Both assessments end in one phase without any expected dependent follow-up.
     No worker needs another worker's result.
     A finding blocks release if its required timeout is absent.
-    Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
-    Batch B has B1 with a timeout, B2 without a timeout, and B3 with a timeout.
+    Batch A has A2 and A3 each with their required timeouts, while A1 is missing its required timeout.
+    Batch B has B1 and B3 each with their required timeouts, while B2 is missing its required timeout.
     Report only after both workers finish.
     Report the blocker IDs and explain the rule.
     Do not edit files, run Git commands, or publish anything.
@@ -42,7 +42,7 @@ graders:
       Each assessment ends in one phase without an expected dependent follow-up.
       Main uses direct Agent rather than Workflow and does not duplicate the work through another execution path.
       The workers assess separate batches without consuming each other's results.
-      Main combines their actual completed results and reports A1 and B2 as the only blockers.
+      Main reads both actual completed results, checks them against the supplied rule and facts, and reports A1 and B2 as the only blockers, correcting a returned misclassification against the supplied facts instead of adopting it.
       It applies the missing required timeout rule and claims no edits or publication.
       A proposed run, missing worker result, permission denial, or report before completion fails this check.
       Judge observed tool results and evidence rather than fixed wording.
