@@ -282,6 +282,8 @@ Each test removes its disposable plugin copies.
 
 The skill metadata gate parses names, descriptions, optional fields, and invocation controls through the existing YAML parser.
 It preserves host extensions while enforcing portable field types, character limits, directory identity, and nonempty bodies.
+Discovery follows linked skill directories within the plugin and validates metadata against each discovered directory name.
+The standalone gate rejects paths that resolve outside the plugin before reading their skill contents.
 Source checks scan `SKILL.md` bodies for instruction reference links that resolve outside the bundled skills tree.
 They do not scan host reference files or judge model behavior.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
@@ -333,7 +335,7 @@ It validates nonempty top-level `name` and `description` strings, a nonempty bod
 It also checks unique chooser names, field IDs, and labels, plus GitHub's field ID character rules.
 Local validation covers this repository's form subset and does not establish GitHub's live chooser recognition.
 The package gate, `test/validation/plugin-version.mjs`, checks the portable manifest, Claude descriptor, and host catalogs from its module location.
-It checks real calendar dates, positive sequences, shared metadata, bundled paths, and release parity.
+It checks the complete `yyyy.MM.dd.seq` string, real calendar dates, positive sequences, shared metadata, bundled paths, and release parity.
 `test/validation.test.mjs` exercises valid and invalid forms, YAML scalar semantics, file links, package paths, and release versions.
 `test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, and relocated execution.
 

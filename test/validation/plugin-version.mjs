@@ -12,7 +12,7 @@ import { isDeepStrictEqual } from "node:util";
 const pluginSchema =
   "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json";
 const versionPattern =
-  /^(?<year>[1-9]\d{3})\.(?<monthday>[1-9]\d{2,3})\.(?<sequence>[1-9]\d*)$/u;
+  /^(?<year>[1-9]\d{3})\.(?<month>\d{2})\.(?<day>\d{2})\.(?<sequence>0[1-9]|[1-9]\d+)$/u;
 const namePattern = /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/u;
 const metadataFields = [
   "name",
@@ -30,7 +30,7 @@ const isObject = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
 /**
- * Validate matching releases using numeric year, monthday, and sequence fields.
+ * Validate matching yyyy.MM.dd.seq releases with real dates and padded sequences.
  */
 export const validatePluginVersions = (portableVersion, claudeVersion) => {
   for (const [host, version] of [
@@ -41,14 +41,13 @@ export const validatePluginVersions = (portableVersion, claudeVersion) => {
       typeof version === "string" ? versionPattern.exec(version) : null;
     if (!match) {
       throw new Error(
-        `${host} plugin version must use year.monthday.sequence without leading zeros.`
+        `${host} plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10.`
       );
     }
     const year = Number(match.groups.year);
-    const monthday = Number(match.groups.monthday);
+    const month = Number(match.groups.month);
+    const day = Number(match.groups.day);
     const sequence = Number(match.groups.sequence);
-    const month = Math.floor(monthday / 100);
-    const day = monthday % 100;
     const date = new Date(Date.UTC(year, month - 1, day));
     if (
       !Number.isSafeInteger(sequence) ||

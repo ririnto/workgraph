@@ -226,12 +226,15 @@ Maintain one release number in the portable manifest and Claude descriptor.
 | `plugin.json` | `version` |
 | `.claude-plugin/plugin.json` | `version` |
 
-Use `year.monthday.sequence`, where `monthday` equals `month * 100 + day`.
-Write numeric components without leading zeros, preserving valid Semantic Versioning syntax.
-For example, October 30's fifth release is `2026.1030.5`, and January 8's first release is `2026.108.1`.
-Start the sequence at `1` on a new date.
+Use `yyyy.MM.dd.seq`, with a four-digit year and two-digit month and day.
+Write sequences `01` through `99` with two digits, then use `100` and higher without extra leading zeros.
+For example, October 30's sixth release is `2026.10.30.06`, and January 8's first release is `2026.01.08.01`.
+Start the sequence at `01` on a new date.
 Increment the sequence for another release that day.
 Update both fields together when publishing plugin changes.
+
+This calendar version is the project's release contract.
+The [Agent Plugins specification](https://agent-plugins.org/specification#54-metadata-fields) accepts version strings and recommends Semantic Versioning without requiring it.
 
 Claude Code reads the plugin manifest version before an optional marketplace entry version.
 Its marketplace-level version describes the catalog, not the plugin release.

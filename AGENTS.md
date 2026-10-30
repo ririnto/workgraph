@@ -108,7 +108,7 @@ Run formatting fixes only within the authorized change.
 
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit bodies and issue and pull request templates.
 
-Keep matching versions in `plugin.json` and `.claude-plugin/plugin.json` using the date-based SemVer scheme in `README.md`.
+Keep matching versions in `plugin.json` and `.claude-plugin/plugin.json` using the `yyyy.MM.dd.seq` scheme in `README.md`.
 Include the matching plugin version bump in every plugin-source pull request.
 Follow the release procedure in `README.md`.
 Omit version fields from the marketplace and private package manifest.

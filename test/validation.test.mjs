@@ -261,34 +261,47 @@ const copyPluginPackage = (t) => {
   return root;
 };
 
-test("release versions preserve calendar dates and numeric sequence ordering", () => {
+test("release versions enforce padded calendar dates and daily sequences", () => {
   for (const version of [
-    "2026.101.1",
-    "2026.1030.5",
-    "2024.229.99",
-    "2026.1231.100"
+    "2026.01.01.01",
+    "2026.10.30.06",
+    "2024.02.29.99",
+    "2000.02.29.01",
+    "2026.12.31.99",
+    "2026.12.31.100",
+    "2027.01.01.01",
+    "2026.10.30.9007199254740991"
   ]) {
     assert.doesNotThrow(() => validatePluginVersions(version, version));
   }
   for (const version of [
-    "2026.10.30.04",
-    "2026.0101.1",
-    "2026.1030.01",
-    "2026.1030.0",
-    "2026.1030.5-preview",
-    2026
+    "2026.1030.5",
+    "2026.1.01.01",
+    "2026.01.1.01",
+    "2026.10.30.1",
+    "2026.10.30.00",
+    "2026.10.30.001",
+    "2026.10.30.010",
+    "2026.10.30.06-preview",
+    "2026.10.30.06+build",
+    "2026.10.30.06\n",
+    2026,
+    null
   ]) {
     assert.throws(
       () => validatePluginVersions(version, version),
-      /Portable plugin version must use year\.monthday\.sequence without leading zeros/u
+      /Portable plugin version must use yyyy\.MM\.dd\.seq/u
     );
   }
   for (const version of [
-    "2026.229.1",
-    "2026.1301.1",
-    "2026.1232.1",
-    "2026.100.1",
-    "2026.1030.9007199254740992"
+    "2026.02.29.01",
+    "2100.02.29.01",
+    "2026.04.31.01",
+    "2026.13.01.01",
+    "2026.00.01.01",
+    "2026.12.32.01",
+    "2026.01.00.01",
+    "2026.10.30.9007199254740992"
   ]) {
     assert.throws(
       () => validatePluginVersions(version, version),
@@ -296,8 +309,12 @@ test("release versions preserve calendar dates and numeric sequence ordering", (
     );
   }
   assert.throws(
-    () => validatePluginVersions("2026.1030.5", "2026.1030.6"),
+    () => validatePluginVersions("2026.10.30.06", "2026.10.30.07"),
     /Portable and Claude plugin versions must match/u
+  );
+  assert.throws(
+    () => validatePluginVersions("2026.10.30.06", "2026.1030.5"),
+    /Claude plugin version must use yyyy\.MM\.dd\.seq/u
   );
 });
 
