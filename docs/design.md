@@ -13,6 +13,8 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `README.md` | Plugin users | Users find installation, task routing, invocation, errors, development, and release guidance here. |
 | `docs/harness/claude-code.md` | Claude Code users | Users follow this adapter for installation, loading formats, manual invocation, updates, and host evidence limits. |
 | `docs/harness/codex.md` | Codex users | Users follow this adapter for supported activation, loading formats, manual invocation, updates, and host evidence limits. |
+| `docs/harness/copilot.md` | Copilot users | Users follow this adapter for marketplace installation and shared skills across supported surfaces. |
+| `docs/harness/cursor.md` | Cursor users | Users follow this adapter for repository installation and shared skill invocation. |
 | `skills/main-agent-contract/SKILL.md` | Main agents | Main agents follow role authority, planning, dispatch, reporting, and conditional skill routing. |
 | `skills/main-agent-contract/references/{claude-code,codex}.md` | Main agents | Each reference supplies execution timing, orchestration, and model selection guidance for one host. |
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow bounded assignments, evidence, and handbacks in one self-contained body. |
@@ -27,7 +29,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
 | `skills/writing/SKILL.md` | Agents doing prose or instruction work | Agents follow prose, prompt task contracts, source separation, and loading-boundary guidance. |
-| `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review the complete selected store before reconciling authorized records and their index. |
+| `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify native lifecycle authority, scoped activity, retained content, and Worktree Artifact removal. |
 | `docs/verification-map.md` | Maintainers | Maintainers connect Workgraph behavior to its current commands and evidence boundaries. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
@@ -46,7 +48,8 @@ Keep that guidance at its conventional location without directing agents to retr
 Role bodies remain self-contained, while role-specific references supply only the selected host's applicable guidance.
 Each role owns its async submission and callback policy because their automatic contexts load independently.
 Host references retain required native completion mechanics without a second wait policy.
-Common role bodies select the active host reference without naming another host or its CLI.
+Common role bodies select an available host reference without naming another host or its CLI.
+Hosts without a dedicated reference use their native tool descriptions.
 Delivery routes plugin updates through project-declared host references instead of assuming both CLIs are installed.
 
 Main Agent mode remains the stable public entry at `skills/main-agent-contract/SKILL.md` under `/workgraph:main-agent-contract`.
@@ -57,6 +60,14 @@ Writing owns prose, the agent-facing prompt task contract, and source or example
 Workflow stays focused on its lower-level native operation without repeating the Main contract or Delivery checklist.
 Host adapters stay at user altitude and link to role references and sole policy owners.
 Contributor guidance identifies these directories and forbids duplicate same-context operational rules.
+
+### User-directed defaults
+
+Role and task skills provide recommended procedures within the user's scope, host permissions, and explicit acceptance requirements.
+Users can select supported alternatives for delegation, review staffing, delivery methods, and presentation without another approval ceremony.
+The owning skills distinguish these choices from actual access restrictions, conflicting writes, required checks, and security controls.
+Repository selection follows the requested scope without a fixed activity window or archive-status exclusion.
+The [Delivery skill](../skills/delivery/SKILL.md#confirm-repository-access) owns the operation-specific access check.
 
 ### Conditional loading
 
@@ -97,10 +108,27 @@ Keep host mechanics in the host's tool descriptions.
 Retain task procedures that the host does not supply.
 The [host comparison](research.md#host-instruction-comparison) records the reviewed version and evidence limits.
 
+## Package for each host
+
+Root `plugin.json` owns portable identity, metadata, version, and the Agent Plugins 1.0 schema declaration.
+Portable clients discover the shared `skills/` directory at its fixed location.
+The OpenAI extension selects the existing Codex hook configuration.
+Claude retains `.claude-plugin/plugin.json` and its conventional hook and workflow locations.
+The package gate checks shared metadata and release parity so the required Claude descriptor cannot drift.
+
+OpenAI uses `.agents/plugins/marketplace.json`, and Claude and Copilot share `.claude-plugin/marketplace.json`.
+Cursor uses `.cursor-plugin/marketplace.json`.
+Each catalog points to this repository's root plugin and leaves release versions to its manifest.
+Catalog discovery and plugin installation remain separate host operations.
+
+Copilot and Cursor consume shared skills without Workgraph's Claude or Codex lifecycle hooks.
+Their setup adapters explain manual role loading and native execution controls.
+The portable package adds no host-independent hook protocol or Workflow execution engine.
+
 ## Deliver context
 
 Claude Code loads `hooks/hooks.json` from the default plugin location and locates the injector through `CLAUDE_PLUGIN_ROOT`.
-Codex selects `hooks/codex-hooks.json` through `.codex-plugin/plugin.json` and uses `PLUGIN_ROOT`.
+Codex selects `hooks/codex-hooks.json` through `plugin.json`'s OpenAI extension and uses `PLUGIN_ROOT`.
 Both hosts run the same Node injector with an explicit host argument.
 The script resolves bundled paths against `import.meta.url`, independent of the working directory.
 It reports actual source paths after resolving symbolic links.
@@ -167,7 +195,7 @@ The main session starts ready independent nodes in parallel, serializes actual c
 Independent native Task Mains can change overlapping logical sources in separate native worktrees.
 Files, worktrees, refs, and shared records retain one actual writer, and unrelated ownership returns do not gate a successor.
 A per-Task host manager controls only the assigned native host, while the native Main retains source and complete delivery ownership.
-Native Task starts preserve existing session configuration without separate model or effort overrides.
+Native Task starts preserve existing settings unless the user or assignment requests supported changes.
 Pass actual predecessor results and evidence to successor nodes.
 Workgraph defines no scheduler, executor, or shared task store.
 
@@ -180,7 +208,7 @@ E = \lbrace (i,v), (t,v), (v,p)\rbrace.
 $$
 
 Main can run $i$ and $t$ in parallel when their writes do not conflict.
-Main starts $v$ after accepting both results and starts $p$ after passing checks and the required scan.
+Main starts $v$ after accepting both results and starts $p$ after passing checks and any required scan.
 This example does not prescribe the same nodes for other goals.
 
 The [Main contract](../skills/main-agent-contract/SKILL.md) owns node selection, dispatch, evidence acceptance, and reporting rules.
@@ -195,13 +223,16 @@ The host may relay the user's `/workgraph:workflow` invocation to a dispatched a
 That relay carries no Workflow launch authority.
 The dispatched agent should complete the assigned task within its authority instead of launching another Workflow or returning it unworked.
 
-Claude Main selects direct Agent when one assignment completes the work without dependent agent stages or joins.
-It selects Workflow for dependent agent stages, required joins, or expected continuation.
+Claude Main normally selects direct Agent when one assignment completes the work without dependent agent stages or joins.
+Workflow suits dependent agent stages, required joins, or expected continuation, while explicit supported user choices take precedence.
 The native Workflow tool description owns Workflow syntax, runtime behavior, notifications, and continuation.
 The [Workflow skill](../skills/workflow/SKILL.md) owns selection, authoring-reference loading, execution, and result acceptance.
 Its read-only design guidance keeps design, challenge, and verification within the actual authority and tool restrictions available to the session.
 The [authoring reference](../skills/workflow/references/authoring.md) covers native source and run-specific script copies.
 The plugin registers workflows by convention and supplies no replacement executor.
+The bundled delivery workflows are complete recipes with declared implementation, publication, and review phases.
+Choose or author a smaller graph when the requested outcome needs fewer phases.
+Skipping a recipe's required phase still leaves that recipe incomplete rather than proving the requested phase ran.
 Its delivery reference maps authorized engineering operations to node inputs and outputs while Main owns graph readiness.
 Worker and Codex contexts do not load Workflow procedures.
 Codex uses available native delegation tools, and its Main host reference owns tool routing.
@@ -214,8 +245,8 @@ These consumer rules preserve separately authorized source delivery without acti
 ## Support manual invocation
 
 Each role keeps its own procedures inline.
-Manual Main invocation reads the active host reference before dispatch unless its complete content is already loaded.
-Manual Worker invocation reads its active host reference unless its complete content is already loaded.
+Manual Main and Worker invocation read their matching host reference when present and not already loaded.
+Other hosts retain their native tool mechanics while using the same role contracts.
 Worker needs no other role's instructions.
 The host adapters list the manual invocation forms for each host.
 
@@ -243,13 +274,14 @@ This design adds no scheduler, telemetry service, or runtime dependency.
 It checks exact role content, loaded source paths, host reference selection, and exclusion of unrelated files.
 It covers invalid arguments, role and reference file errors, invalid frontmatter, and empty selected content.
 It executes the registered shell commands from a path with spaces and an unrelated working directory.
-The Codex command test selects its hook configuration and skills directory through the relocated host descriptor.
+The Codex command test selects its hook configuration through the relocated portable manifest and uses the standard skills directory.
 It checks Claude's inline limit with complete instructions, long plugin paths, and LF or CRLF line endings.
 Each test removes its disposable plugin copies.
 
 `hooks/bash-polling-guard.test.mjs` exercises both registered commands, matching and nonmatching syntax, session isolation, resets, concurrency, and state failures.
 
-The tests also check skill names, descriptions, and invocation metadata.
+The skill metadata gate parses names, descriptions, optional fields, and invocation controls through the existing YAML parser.
+It preserves host extensions while enforcing portable field types, character limits, directory identity, and nonempty bodies.
 Source checks scan `SKILL.md` bodies for instruction reference links that resolve outside the bundled skills tree.
 They do not scan host reference files or judge model behavior.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
@@ -261,7 +293,8 @@ Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover single and parallel independent Agent selection, bundled-source Workflow invocation, expected continuation, and both conditional follow-up outcomes.
 Additional cases check an idle background command and an Agent completion callback.
 The communication case checks a worker handoff and the requested language of the human report.
-The delivery-decision case covers scoped Git authority, current-unit gates, authorized recovery, true boundaries, and isolated parallel work.
+The delivery-decision case covers scoped Git authority, proportional review, current-unit gates, authorized recovery, true boundaries, and isolated parallel work.
+The user-directed-defaults case checks explicit procedural choices and repository scope without arbitrary age or archive filters.
 The Workflow-selection case uses keyed parser and documentation assessments with one necessary reconciliation rather than a domain-by-phase review matrix.
 These policy assessments do not perform Git delivery or establish installed activation.
 Completion graders inspect actual traces rather than relying on final claims.
@@ -294,16 +327,18 @@ Unfinished prose followed by a continuation on the next physical line also repor
 The heuristic cannot resolve every English abbreviation, proper name, fragment, or unlisted clause form.
 Other languages and Unicode sentence terminators remain outside its supported scope.
 
-Development validation gates live in `test/validation/`, with their Node tests in `test/validation.test.mjs`.
+Development validation gates live in `test/validation/`, with their Node tests in `test/`.
 The issue-form gate, `test/validation/issue-forms.mjs`, parses `.github/ISSUE_TEMPLATE/*.yaml` with markdownlint-cli2's public YAML parser.
 It validates nonempty top-level `name` and `description` strings, a nonempty body, and required textarea fields.
 It also checks unique chooser names, field IDs, and labels, plus GitHub's field ID character rules.
 Local validation covers this repository's form subset and does not establish GitHub's live chooser recognition.
-The version gate, `test/validation/plugin-version.mjs`, resolves both manifests from its module location and checks format, calendar dates, sequence, and parity.
-`test/validation.test.mjs` exercises valid and invalid forms, YAML scalar semantics, file links, and release versions.
+The package gate, `test/validation/plugin-version.mjs`, checks the portable manifest, Claude descriptor, and host catalogs from its module location.
+It checks real calendar dates, positive sequences, shared metadata, bundled paths, and release parity.
+`test/validation.test.mjs` exercises valid and invalid forms, YAML scalar semantics, file links, package paths, and release versions.
+`test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, and relocated execution.
 
 CI runs full development checks on Linux with the package's Node engine range.
 Separate macOS and Node.js 26 jobs run dependency-free hook tests without installing development tools.
 Those jobs verify hook runtime compatibility without installing development dependencies.
 Pull requests and main updates trigger the workflow without path filters, and its token receives read-only contents permission.
-Dependabot checks npm dependencies and GitHub Actions weekly.
+Dependabot checks npm dependencies and GitHub Actions daily.

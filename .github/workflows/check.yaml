@@ -1,6 +1,12 @@
 name: Check
 
 on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -19,6 +25,12 @@ jobs:
           cache: true
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
+      - name: Validate Claude plugin package
+        run: >-
+          npm exec --yes --package=@anthropic-ai/claude-code@2.1.305 -- claude plugin validate --strict ./
+      - name: Validate Claude plugin manifest
+        run: >-
+          npm exec --yes --package=@anthropic-ai/claude-code@2.1.305 -- claude plugin validate --strict .claude-plugin/plugin.json
   macos:
     name: macOS hooks
     runs-on: macos-latest

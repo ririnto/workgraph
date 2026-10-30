@@ -1,70 +1,69 @@
-# Workgraph in Codex
+# Workgraph in ChatGPT and Codex
 
-## Install and load
+## Install from the marketplace
 
-Use Node.js 26.13.0 or later within major version 26 for hook execution.
-Install or enable the repository through a Codex host that supports native plugin lifecycle hooks.
-Use that host's normal plugin activation and trust controls.
+Register the GitHub marketplace with Codex CLI:
 
-Codex selects `.codex-plugin/plugin.json`, which declares `hooks/codex-hooks.json` and the shared skills directory.
-The hook commands use `PLUGIN_ROOT` and set `additionalContextLimit: 0` to keep complete context inline.
-The inspected Codex source supports this configuration, while activation in the installed desktop host remains unverified.
-This adapter therefore supplies no unverified universal installation command.
-
-## Automatic loading
-
-SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Codex reference](../../skills/main-agent-contract/references/codex.md).
-SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Codex reference](../../skills/subagent-context/references/codex.md).
-Both references own execution timing.
-The Main reference also provides host-specific orchestration and model selection guidance.
-This user adapter does not replace them.
-
-The hook's native `<skill>` fragment includes the qualified name, source path, and complete skill file with YAML frontmatter.
-Reference fragments preserve raw file text.
-Source labels identify complete content already loaded, so agents need no startup retrieval for those files.
-The [delivery design](../design.md#deliver-context) describes message-envelope differences and failure behavior.
-
-The [Bash polling guard](../../README.md#bash-polling-guard) uses Codex's Bash PreToolUse interface, including unified execution commands.
-Native activation requires a host with local command hooks enabled.
-
-Codex uses its native delegation tools under the Main host reference.
-Claude Code's native Workflow is unavailable in Codex.
-
-## Manual invocation
-
-Use dollar-prefixed, plugin-qualified skill names in hosts supporting this invocation form.
-The public mode entry remains `$workgraph:main-agent-contract`.
-
-```text
-$workgraph:main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger within the authorized scope.
+```sh
+codex plugin marketplace add ririnto/workgraph
+codex plugin marketplace list
 ```
 
-| Invocation | Purpose |
+Open `/plugins` in Codex CLI, select the `workgraph` marketplace, and install `workgraph`.
+In the ChatGPT desktop app, open Plugins and choose the same marketplace.
+Start a new session after installation.
+
+For local development, run `codex plugin marketplace add .` from the Workgraph checkout.
+The repository catalog is `.agents/plugins/marketplace.json`.
+Its source path selects the complete plugin at the repository root.
+
+Workspace administrators can import a GitHub marketplace through their workspace plugin controls.
+See the official [plugin guide](https://learn.chatgpt.com/docs/plugins) for supported surfaces and workspace installation.
+
+## Choose a loading mode
+
+| Surface | Workgraph loading |
 | --- | --- |
-| `$workgraph:main-agent-contract` | Load Main Agent mode in the main session. |
-| `$workgraph:subagent-context` | Load the Worker role for an existing bounded dispatch. |
-| `$workgraph:delivery` | Load Main's repository delivery procedure. |
-| `$workgraph:development` | Select the matching development playbook and language references. |
-| `$workgraph:writing` | Load prose, Markdown, and instruction design guidance. |
-| `$workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
-| `$workgraph:codex-scoped-cleanup` | Load scoped Codex resource retirement and attachment guidance. |
+| Codex desktop with local plugin hooks enabled | SessionStart loads Main, and SubagentStart loads Worker. |
+| ChatGPT cloud | Invoke the role skill explicitly at the start of its task. |
+| Other supported skill clients | Use the client's skill picker or name the required Workgraph skill. |
 
-Manual role invocation reads its Codex reference unless that complete content is already present.
-Invoking a skill does not create a dispatch, change the session's role, or grant permissions.
-The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.
-The Workflow skill reports unavailability and stops when invoked in Codex.
+The portable `plugin.json` discovers the shared `skills/` directory.
+Its `extensions.com.openai.hooks` field selects `hooks/codex-hooks.json`.
+OpenAI's [packaging guide](https://developers.openai.com/plugins/build/plugins) defines this manifest and the separate hook support requirements.
 
-## Updates
+Hook execution requires Node.js 26.13.0 or later within major version 26.
+The commands use `PLUGIN_ROOT` and keep complete context inline through `additionalContextLimit: 0`.
+Their native skill fragments include source paths and complete skill files with frontmatter.
 
-Use the host's plugin update controls and start a new session after updating.
-Confirm the selected descriptor version and loaded source paths before evaluating changed instructions.
-Both host descriptors must retain the matching release number defined by [Version Updates](../../README.md#version-updates).
+Main receives its [Codex reference](../../skills/main-agent-contract/references/codex.md).
+Worker receives its [Codex reference](../../skills/subagent-context/references/codex.md).
+Those references own host-specific execution and delegation.
+The [Bash polling guard](../../README.md#bash-polling-guard) applies where the host runs its registered PreToolUse hook.
 
-## Evidence limits
+## Start a task
 
-The [verification map](../verification-map.md) distinguishes source delivery, installed activation, interactive invocation, and model behavior.
-Passing hook tests does not establish installed desktop activation or model adherence.
-A full-history fork can retain Main context before receiving Worker-only hook output.
-Requested model settings do not prove resolved settings unless the host reports them.
+In Codex clients supporting dollar-prefixed skill invocation:
 
-Return to the [Workgraph guide](../../README.md) for task routing, development setup, and release instructions.
+```text
+$workgraph:main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger.
+```
+
+In ChatGPT, select Workgraph from the `@` menu and ask it to use Main Agent Contract for the task.
+An existing bounded worker assignment uses [Subagent Context](../../skills/subagent-context/SKILL.md).
+Role invocation applies the role's instructions within the current host's tools and permissions.
+
+For a focused task, select [Development](../../skills/development/SKILL.md) or [Writing](../../skills/writing/SKILL.md) directly.
+The [skill map](../../README.md#skill-invocation) lists the remaining procedures and their triggers.
+
+## Update
+
+Refresh the registered marketplace:
+
+```sh
+codex plugin marketplace upgrade workgraph
+```
+
+Use the plugin browser to refresh the installed Workgraph copy, then start a new session.
+Check the installed version against [version updates](../../README.md#version-updates) when diagnosing stale instructions.
+The [verification map](../verification-map.md) describes package, hook, and behavior checks.

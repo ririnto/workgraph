@@ -1,0 +1,62 @@
+schema_version: "1.1"
+name: workflow-keyword-near-miss
+description: Reject orchestration triggered solely by the word workflow in a GitHub Actions explanation.
+tags:
+  - triggering
+runs: 2
+execution:
+  max_turns: 12
+  timeout_seconds: 240
+  allowed_tools:
+    - Read
+    - Skill
+  prompt: |-
+    A teammate asked what a GitHub Actions workflow means in this note.
+    Explain it in one short paragraph using only the information here.
+
+    Our workflow starts when a pull request is opened or updated.
+    It runs the test suite, then builds the package if the tests pass.
+    It does not deploy the package.
+graders:
+  - name: workflow-skill-not-invoked
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:workgraph:)?workflow"'
+    min: 0
+    max: 0
+  - name: no-native-workflow
+    type: tool_used
+    tool: Workflow
+    min: 0
+    max: 0
+  - name: no-delegation
+    type: tool_used
+    tool: Agent
+    min: 0
+    max: 0
+  - name: no-file-write
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: no-file-edit
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+  - name: no-shell-command
+    type: tool_used
+    tool: Bash
+    min: 0
+    max: 0
+  - name: github-actions-explanation
+    type: llm
+    focus: trace
+    criteria: |-
+      Require one short paragraph explaining the supplied GitHub Actions automation.
+      Preserve the pull-request opening or update trigger, testing before building, and building only after tests pass.
+      Preserve that this workflow does not deploy.
+      The answer must not confuse GitHub Actions with Claude Code's native Workflow orchestration.
+      Fail activation of the bundled Workflow skill through Skill or a complete Read of skills/workflow/SKILL.md.
+      Reading Writing for this explanation is allowed.
+      Fail claims that the assistant ran tests, built a package, or changed repository configuration.

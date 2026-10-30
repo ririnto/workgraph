@@ -3,10 +3,9 @@
   "author": {
     "name": "ririnto"
   },
-  "description": "Engineering coordination, writing, and development skills for Claude Code and Codex.",
+  "description": "Engineering coordination, writing, and development skills for coding agents.",
   "homepage": "https://github.com/ririnto/workgraph",
   "keywords": [
-    "claude-code",
     "engineering",
     "instructions",
     "hooks",
@@ -16,5 +15,5 @@
   "license": "MIT",
   "name": "workgraph",
   "repository": "https://github.com/ririnto/workgraph",
-  "version": "2026.10.30.04"
+  "version": "2026.1030.5"
 }

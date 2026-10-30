@@ -16,7 +16,8 @@ Read Writing unless its complete content is already loaded.
 
 ## Read existing context
 
-Before any memory change, read the complete index and every existing memory file in the selected store.
+Read the selected store's index and records relevant to the proposed change before editing.
+For whole-store reconciliation, review every record within that scope.
 Follow cross-links needed to interpret the proposed change within authorized read access.
 Do not infer facts from filenames or expand this review into unrelated transcripts, credentials, or private logs.
 If required context is unavailable, report the missing source and defer the affected memory change.
@@ -30,7 +31,7 @@ Keep still-valid preferences and do not restore obsolete instructions merely bec
 ## Reconcile and verify
 
 Make the smallest authorized update after reviewing existing context.
-Keep one durable fact per new record and preserve the store's required metadata.
+Prefer focused records while following the user's requested grouping and the store's required format and metadata.
 Keep facts in their owning records and synchronize concise index pointers and affected cross-links.
 Remove or merge content only when evidence establishes duplication or supersession within the write scope.
 Report necessary corrections outside that scope to their owner.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "workgraph",
-  "description": "Engineering coordination, writing, and development skills for Claude Code and Codex.",
+  "description": "Engineering coordination, writing, and development skills for coding agents.",
   "owner": {
     "name": "ririnto"
   },
@@ -9,7 +9,7 @@
     {
       "name": "workgraph",
       "source": "./",
-      "description": "Engineering coordination, writing, and development skills for Claude Code and Codex.",
+      "description": "Engineering coordination, writing, and development skills for coding agents.",
       "category": "development",
       "author": {
         "name": "ririnto"

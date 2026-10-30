@@ -1,8 +1,8 @@
 # Workgraph
 
-Workgraph supplies engineering coordination, writing, and development instructions for Claude Code and Codex.
+Workgraph supplies engineering coordination, writing, and development instructions for coding agents.
 Its Main Agent mode routes work to focused skills, lifecycle playbooks and host references.
-Native hooks load the selected Main or Worker role before execution.
+Claude Code and supported Codex runtimes can load the selected Main or Worker role through native hooks.
 
 Workgraph supplies instructions and a narrow Bash polling guard.
 The host controls execution, model settings, permissions, and completion notifications.
@@ -10,19 +10,27 @@ The hook runtime uses Node built-ins and needs no npm dependencies.
 
 ## Install
 
-Use Node.js 26.13.0 or later within major version 26 for hook execution.
+The portable package shares the same skills across ChatGPT, Codex, GitHub Copilot, and Cursor.
+Claude Code uses its dedicated manifest and the same skill files.
+Hook execution requires Node.js 26.13.0 or later within major version 26.
 Choose the adapter for your execution host.
 
 | Host | Setup and usage |
 | --- | --- |
 | Claude Code | Follow the [Claude Code adapter](docs/harness/claude-code.md) for installation, development loading, invocation, and updates. |
-| Codex | Follow the [Codex adapter](docs/harness/codex.md) for supported plugin activation, invocation, and evidence limits. |
+| ChatGPT / Codex | Follow the [OpenAI adapter](docs/harness/codex.md) for marketplace installation, manual invocation, and supported hook activation. |
+| GitHub Copilot | Follow the [Copilot adapter](docs/harness/copilot.md) for CLI marketplace installation and shared skill usage. |
+| Cursor | Follow the [Cursor adapter](docs/harness/cursor.md) for repository installation, invocation, and distribution options. |
 
 The adapters describe user-facing setup, not role policy.
 [Main and Worker host references](docs/design.md#separate-the-audiences) remain the injected execution adapters.
-Both host descriptors declare the same release version through [Version Updates](#version-updates).
+The portable manifest and Claude descriptor declare the same release version through [Version Updates](#version-updates).
 
 ## Automatic instructions
+
+The following events apply to the bundled Claude Code and Codex hook adapters.
+Enable and trust plugin hooks through the host's supported controls before relying on automatic loading.
+Use manual skill loading when the active host does not run these hooks.
 
 | Event | Recipient | Loaded sources |
 | --- | --- | --- |
@@ -98,10 +106,14 @@ Fix the parser's escaped-quote bug, verify the original trigger, and publish a P
 ```
 
 The stable `main-agent-contract` skill is the Main Agent mode entry, not a wrapper around another mode.
-Use the host adapter's [Claude Code](docs/harness/claude-code.md#manual-invocation) or [Codex](docs/harness/codex.md#manual-invocation) syntax to invoke it manually.
+Use your [host adapter](#install) to invoke it manually.
 The [Main contract](skills/main-agent-contract/SKILL.md) owns scope, authority, orchestration, evidence acceptance, and reporting.
 [Delivery](skills/delivery/SKILL.md) owns authorized repository publication, review, integration, and cleanup procedures.
 Invocation does not grant new permissions or replace explicit user gates.
+Workflow and writing procedures are defaults that adapt to explicit user requests, task risk, and supported host capabilities.
+Review staffing, delegation, and delivery methods need no fixed ceremony when the task does not require one.
+Repository scope follows the request without an activity threshold or archive-status exclusion.
+Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
 For Claude Code graph execution, [Workflow](skills/workflow/SKILL.md) adds native node mapping and result verification.
 Its [authoring reference](skills/workflow/references/authoring.md) supplies script-specific guidance.
@@ -135,7 +147,8 @@ Conditional skills load only when their stated task scope matches and their comp
 Writing owns prose, agent-facing prompt contracts, and example separation.
 Consumer links and required resources stay bundled, without another plugin dependency or required online research.
 
-Manual role loading also loads the active host reference unless its complete content is already present.
+Manual role loading reads a matching bundled host reference when present and not already loaded.
+Other hosts use their native tool descriptions with the shared role contract.
 Manual invocation changes neither the session's role nor its dispatch authority.
 The host adapters list invocation forms and host-specific availability.
 
@@ -160,6 +173,7 @@ Install the pnpm version declared in `package.json` before installing the pinned
 
 ```sh
 pnpm install --frozen-lockfile
+pnpm run check
 ```
 
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
@@ -205,33 +219,37 @@ Read [the research notes](docs/research.md) for source evidence and qualificatio
 
 ## Version updates
 
-Maintain one release number in both host descriptors.
+Maintain one release number in the portable manifest and Claude descriptor.
 
 | File | Field |
 | --- | --- |
+| `plugin.json` | `version` |
 | `.claude-plugin/plugin.json` | `version` |
-| `.codex-plugin/plugin.json` | `version` |
 
-Use `yyyy.mm.dd.seq`, with `01` for the first release of a day.
+Use `year.monthday.sequence`, where `monthday` equals `month * 100 + day`.
+Write numeric components without leading zeros, preserving valid Semantic Versioning syntax.
+For example, October 30's fifth release is `2026.1030.5`, and January 8's first release is `2026.108.1`.
+Start the sequence at `1` on a new date.
 Increment the sequence for another release that day.
 Update both fields together when publishing plugin changes.
 
 Claude Code reads the plugin manifest version before an optional marketplace entry version.
 Its marketplace-level version describes the catalog, not the plugin release.
-Workgraph omits both marketplace version fields because its plugin manifest supplies the release number.
+Workgraph's catalogs omit release versions because the selected plugin manifest supplies them.
 The private development package also needs no version.
 See the [Claude marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-entries) for these field definitions.
 
-Codex selects its own descriptor instead of the Claude descriptor.
-It does not inherit the Claude version when its selected descriptor omits one.
-Both declarations are required for an explicit matching release across hosts.
+OpenAI, Copilot, and Cursor read the portable root manifest.
+OpenAI hook settings live in its `extensions.com.openai` namespace.
+The obsolete `.codex-plugin/plugin.json` descriptor has been replaced with this canonical source.
+Use clients supporting Agent Plugins 1.0 for portable package installation.
 
-1. Set the same new release number in both host descriptors.
-2. Run the applicable checks from the auto-injected repository guidance, including both plugin validators.
-3. Inspect the complete diff and confirm both version fields match.
+1. Set the same new release number in the portable and Claude manifests.
+2. Run the applicable checks from the auto-injected repository guidance, including strict Claude validation.
+3. Inspect the complete diff and confirm metadata, versions, and marketplace paths match.
 4. Commit the changes and versions together.
 5. Push the authorized distribution branch and confirm the remote contains the commit.
 
 A working-branch push reaches installed users only when their marketplace source tracks that branch.
 Follow the authorized repository release process to update the distribution branch.
-Use the [Claude Code](docs/harness/claude-code.md#updates) or [Codex](docs/harness/codex.md#updates) adapter for installed-plugin updates and fresh-session checks.
+Use the matching [host adapter](#install) for installed-plugin updates and fresh-session checks.

@@ -5,6 +5,8 @@ description: Use when drafting, editing, or reviewing prose, Markdown, repositor
 
 # Writing
 
+Treat prose and presentation guidance as defaults when the user or target format does not specify another style.
+
 ## Reader first
 
 Lead with the answer, completed result, or next useful action.
@@ -28,8 +30,8 @@ Name the actor and use active voice when the actor matters.
 Use the factual actor, including a compiler or service, without inventing a human subject.
 Remove filler, empty emphasis, vague qualifiers, business jargon, and repetitive conclusions.
 Avoid rhetorical contrasts, staged reveals, fragments for emphasis, and invented terms.
-Vary sentence length without adding decorative punctuation or em dashes.
-Keep English instruction sentences to 20 words or fewer.
+Vary sentence length and choose punctuation that suits the requested tone.
+Prefer short instruction sentences, splitting dense instructions when their conditions remain clear.
 
 Keep each paragraph focused on one idea.
 Keep conditions and exceptions with the actions they qualify.
@@ -91,7 +93,7 @@ Run the target's applicable Markdown check without changing unrelated files.
 
 Identify the instruction's audience, loading point, required behavior, and acceptance evidence before editing.
 Keep repository conventions in the auto-injected repository guidance and task procedures in skills.
-Hosts load that guidance automatically, so never name it as a file for agents to read.
+Do not request another read when the host has already supplied the complete guidance.
 Keep host, model, and tool mechanics in their existing instruction sources.
 
 Remove rules that repeat instructions already present in the same loaded context.
@@ -140,7 +142,7 @@ Identify sources already loaded completely so agents do not retrieve them again.
 
 Keep role and host differences in files selected for that role and host.
 Lower-level files add their procedure without explaining or repeating the caller's contract.
-Use named branches or tags for maintained source links.
+Prefer maintained branches or tags for general source links, and use commit links when exact revision evidence matters.
 Remove replaced paths and update their consumers in the same change.
 
 ### Validate the result

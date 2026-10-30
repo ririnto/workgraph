@@ -10,6 +10,47 @@ Their results do not establish Workgraph performance or model adherence.
 Maintainers can use these sources when changing context boundaries, task dependencies, verification, or writing rules.
 See [the design](design.md) for delivery mechanics and [third-party notices](../THIRD_PARTY_NOTICES.md) for attribution.
 
+## Plugin standards and distribution
+
+The October 30, 2026 review compared the supplied skill and plugin guides against Workgraph's actual package and loading paths.
+Markdown endpoints were used when available, with extensionless official pages as fallbacks.
+
+| Sources | Adopted boundary |
+| --- | --- |
+| [Agent Skills](https://agentskills.io/llms-full.txt), [OpenAI skill authoring](https://learn.chatgpt.com/docs/build-skills), and [Claude skills](https://code.claude.com/docs/en/skills) | Validate portable metadata while retaining deliberate host extensions and conditional references. |
+| [Agent Plugins specification](https://agent-plugins.org/specification) | Make root `plugin.json` canonical and keep shared skills at their fixed discovery path. |
+| [ChatGPT plugins](https://learn.chatgpt.com/docs/plugins) and [OpenAI plugin authoring](https://developers.openai.com/plugins/build/plugins) | Put OpenAI settings under `extensions.com.openai` and publish its native marketplace catalog. |
+| [Claude overview](https://code.claude.com/docs/en/plugins/overview), [creation](https://code.claude.com/docs/en/plugins/create), and [components](https://code.claude.com/docs/en/plugins/components) | Preserve Claude's required descriptor, component directories, and namespaced skill invocation. |
+| [Claude dependencies](https://code.claude.com/docs/en/plugins/dependencies) and [publication](https://code.claude.com/docs/en/plugins/publish) | Keep bundled instructions self-contained and increment the manifest version for distributed changes. |
+| [Claude evaluations](https://code.claude.com/docs/en/plugin-evals) and [measurement](https://code.claude.com/docs/en/plugins/measure) | Check natural activation, keyword near misses, and outcomes separately, with optional paired baseline comparisons. |
+| [Claude CLI hints](https://code.claude.com/docs/en/plugins/cli-hints) | Reserve the documented hint protocol for official Anthropic marketplace listings. |
+| [Common workflows](https://code.claude.com/docs/en/common-workflows) and [native Workflow](https://code.claude.com/docs/en/workflows) | Preserve native execution, deterministic replay, permission boundaries, and explicit completion evidence. |
+| [Copilot plugins](https://docs.github.com/en/copilot/concepts/customizations/plugins) | Use portable skills and document the CLI's compatible marketplace installation route. |
+| [Cursor plugins](https://cursor.com/docs/plugins) and [plugin reference](https://cursor.com/docs/reference/plugins) | Use the portable manifest for skills and the documented catalog for repository discovery. |
+| [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Preserve Writing's direct prose while retaining factual software actors, meaningful qualifiers, and technical conditions. |
+
+The portable manifest replaces the former OpenAI-only descriptor.
+Claude retains its dedicated manifest because its documented package format uses that location.
+The package gate checks shared metadata, versions, catalog destinations, and contained paths across these actual consumers.
+The release scheme now uses three numeric SemVer components while preserving calendar dates and daily sequences.
+The [release instructions](../README.md#version-updates) define the format.
+
+Portable packaging standardizes shared skills and MCP configuration, not every host's execution tools or hooks.
+Workgraph's OpenAI extension explicitly selects Codex hooks instead of relying on Claude's default hook file.
+Hosts without matching native adapters use the shared role contracts and their own tool descriptions.
+The user adapters document installation, trust, invocation, and host-specific availability.
+
+The metadata gate uses the existing YAML parser rather than adding a runtime dependency or interpreting frontmatter during hook startup.
+It checks required fields, documented optional types, directory identity, character limits, and invocation policy.
+The standard's 500-line body guidance remains a recommendation rather than a rejection threshold.
+Host extension fields remain available for supported behavior such as Workflow's argument hint.
+
+The new triggering cases use ordinary requests without naming the desired skill.
+Activation graders inspect actual loaded content, while outcome graders assess factual preservation and source behavior.
+A GitHub Actions near miss checks that a shared keyword does not select Claude's native Workflow procedure.
+The maintained two-run minimum and individual-outcome reporting remain unchanged.
+Package checks, context measurements, native activation, and model outcomes remain separate evidence.
+
 ## Prompt and skill design
 
 ### Agent-facing prompt contracts
@@ -26,7 +67,12 @@ Writing keeps agent-facing prompt contracts and human-facing presentation guidan
 Authors audit actual loading points, replace conflicting consumers, and evaluate decision boundaries instead of testing exact prose.
 The user's approved scope determines Git delivery authority, while host permissions and server protections remain unchanged.
 A guide's sample approval prompt does not require renewed approval for operations already authorized by the user.
-The [Delivery skill](../skills/delivery/SKILL.md#confirm-repository-eligibility) owns repository eligibility checks.
+The [Delivery skill](../skills/delivery/SKILL.md#confirm-repository-access) owns operation-specific repository access checks.
+
+The maintainer requested recommended procedures that permit explicit supported alternatives, without arbitrary activity windows or archive-status exclusions.
+Role and task instructions now distinguish those defaults from actual permission, security, acceptance, and conflicting-write boundaries.
+Review staffing, independent finding verification, delegated exposure scans, and writing style follow the task's requirements and risk.
+The decision evaluations cover these choices without converting historical examples or model names into universal restrictions.
 
 These adaptations do not add SDK integrations, model configuration, settings changes, scheduling, or installed activation.
 The guides' model-specific observations require evaluation on the selected workload and do not establish Workgraph adherence.
@@ -150,11 +196,11 @@ The reviewed evidence does not establish Terra's effort performance.
 | `haiku` | Low for extraction; xhigh for coding and review; medium or high for other analysis. |
 | `sonnet` | Medium or high for edits and review. |
 | `opus` | Medium or high for planning and complex reasoning. |
-| `fable` | High, xhigh, or max according to task difficulty when explicitly requested. |
+| `fable` | High, xhigh, or max according to task difficulty and supported settings. |
 | `luna` | Low for extraction; xhigh or max for coding and review; medium or high for other analysis. |
 | `terra` | Medium or high for substantive coding and refactoring. |
 | `sol` | Low for extraction; medium or high for development, review, and analysis. |
-| `astra` | Follow explicit requests. |
+| `astra` | Follow task difficulty, supported settings, and explicit choices. |
 
 Broad external benchmarks supply the primary effort comparisons.
 The [detailed evidence record](model-effort-evidence.md) retains numerical effort comparisons, workload studies, and measurement limits.
@@ -385,7 +431,7 @@ We reviewed the abstract and retain its benchmark scope.
 [Agentless](https://arxiv.org/abs/2407.01489) uses localization, repair, and validation without an open-ended agent loop.
 Its abstract reports competitive results on SWE-bench Lite for the models and baseline systems tested at the time.
 The paper motivates a simple baseline, not a universal three-stage process.
-The role contract delegates ready, substantial outcomes without fixing a reviewer or worker count.
+The role contract delegates when parallel work, specialization, or independent assessment helps, without fixing a reviewer or worker count.
 
 [How we built our multi-agent research system](https://www.anthropic.com/engineering/multi-agent-research-system) describes scoped research delegation and compressed results.
 The authors discuss coordination cost and warn that coding work often offers less parallelism than research.
@@ -395,7 +441,7 @@ The article's research-task gains do not establish coding-task gains.
 [More Agents Is All You Need](https://arxiv.org/abs/2402.05120) reports gains from independent sampling and voting on reasoning benchmarks.
 Its token cost rises with agent count, and its setup does not test delegated coding workers.
 This supports testing independent fan-out as a simpler baseline, not assuming more agents improve every task.
-In Claude Code, Workgraph selects Workflow when an identified follow-up may depend on a prior result.
+In Claude Code, Workgraph recommends Workflow when an identified follow-up may depend on a prior result.
 The sources do not establish that this routing improves Workgraph outcomes.
 
 ## Verification and recovery
@@ -421,7 +467,7 @@ We retain those boundaries instead of adding a scheduler or copying Dune's frame
 
 Tan describes banning comments in Dune after agents used them to justify workarounds.
 Workgraph's [comment policy](../skills/development/SKILL.md#documentation-and-comments) permits declaration documentation and preserves required directives, licenses, existing suppressions, and documented safety invariants.
-Workgraph records risky transformations as policy text without adding explanatory logging or automatic rewrites.
+Workgraph treats such transformations as behavior-sensitive changes requiring task authority and targeted validation before automation.
 Her talk supplies no controlled Workgraph evaluation, proof of universal comment harm, or automatic-merge acceptance policy.
 Runtime observation does not establish formal correctness, and hook delivery does not establish model adherence.
 
@@ -698,8 +744,8 @@ It describes host permissions and separate runs for operator sign-off between st
 | Supplied requirement | Workgraph adoption |
 | --- | --- |
 | Opus 5.5 Main with ultracode. | Workgraph selects tiers by task difficulty and honors compatible user and configuration choices. |
-| Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Workflow passes selected settings into stages with separate edit worktrees. |
-| Independent verification before every reported finding. | Main excludes the finder and fixer from verification, and Workflow preserves per-candidate outcomes. |
+| Haiku 5.5 read-only scans and Sonnet 5.5 isolated edits. | Workflow passes task-appropriate settings into stages and uses worktrees when the assignment needs isolation. |
+| Independent verification before every reported finding. | Main selects verification by risk and requirements, excluding the finder and fixer when independence is required. |
 | Two rounds without fix progress. | Fix loops compare results and reassess stalled work without waiving acceptance. |
 | Deterministic decision routing. | Native script control flow handles deterministic choices without requiring another execution engine. |
 | Diff-first approval before edits. | Explicit consumer gates end proposal work before edits and require approval for the gated scope. |
@@ -716,7 +762,7 @@ Main ownership, complete-candidate review, and normal Delivery integration bound
 The post's model split is not an official universal Workflow default or a measured performance ranking.
 Codex uses its configured model settings and cannot execute Claude's native Workflow.
 The post's throughput and cost claims are unverified here, and script-held results do not eliminate planning or worker costs.
-Schema validity does not establish factual correctness or replace an independent verifier.
+Schema validity does not establish factual correctness or replace required independent verification.
 Native schema retries, stall restarts, inference sampling, and task retries remain separate from the no-progress fix-round count.
 Source checks establish instruction delivery, while native execution, installed activation, and model adherence require separate host evidence.
 

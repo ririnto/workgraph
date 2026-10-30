@@ -1,0 +1,59 @@
+schema_version: "1.1"
+name: writing-natural-trigger
+description: Check natural Writing activation and factual preservation during a customer-facing revision.
+tags:
+  - triggering
+runs: 2
+execution:
+  max_turns: 12
+  timeout_seconds: 240
+  allowed_tools:
+    - Read
+    - Skill
+  prompt: |-
+    Rewrite this release note for customers in clear English.
+    Keep every fact and limitation, and return only the revised note.
+
+    The release enables customers to leverage an enhanced search experience.
+    Search now supports filtering by exact filename and file type.
+    It still cannot search the text inside scanned PDFs.
+    Administrators must turn on the feature before members can use it.
+    We have not measured whether searches finish faster.
+graders:
+  - name: writing-loaded
+    type: llm
+    arm: with-only
+    focus: trace
+    criteria: |-
+      Require actual loading of the bundled Writing skill before the final revision.
+      Accept a successful Skill result for workgraph:writing or a complete Read of skills/writing/SKILL.md from this plugin.
+      Accept complete Writing content already supplied in the observed context.
+      Reject a mere mention, skill description, unsuccessful call, or unsupported claim that Writing was loaded.
+      Do not require a particular loading tool when the complete skill is present.
+  - name: facts-preserved
+    type: llm
+    focus: last_message
+    criteria: |-
+      Require a customer-facing English revision of the supplied release note.
+      Preserve both exact filename filtering and file type filtering.
+      Preserve the inability to search text inside scanned PDFs.
+      Preserve administrator activation as a prerequisite for members.
+      Preserve the absence of measured evidence that searches finish faster.
+      Fail invented performance gains, missing limitations, or a claim that activation already occurred.
+      The response contains only the revised note, with no work report or unrelated advice.
+      Judge clarity and factual meaning without requiring fixed wording.
+  - name: no-file-write
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: no-file-edit
+    type: tool_used
+    tool: Edit
+    min: 0
+    max: 0
+  - name: no-shell-command
+    type: tool_used
+    tool: Bash
+    min: 0
+    max: 0

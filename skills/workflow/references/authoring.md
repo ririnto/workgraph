@@ -16,7 +16,7 @@ Keep scan stages read-only.
 Follow Main's [editor isolation policy](../../main-agent-contract/SKILL.md#assignments).
 Use a supported read-only `agentType` or existing host tool restrictions for scans, without inventing a `readOnly` option.
 Prompt instructions do not enforce tool restrictions, so verify that the available host controls enforce the required boundary before dispatch.
-Set `isolation: 'worktree'` through the native tool contract for edits.
+Use native `isolation: 'worktree'` when the accepted ownership plan calls for isolated edits.
 Return each edit's diff, checks, and worktree ownership to Main before integration and cleanup.
 When explicit approval is required, end the proposal run before any edit and start edits only after approval.
 
@@ -33,9 +33,9 @@ Follow Delivery's [Review And Publish](../../delivery/SKILL.md#review-and-publis
 Use `pipeline()` by default when each item's later work depends only on that item's earlier result.
 Pipeline stages receive the previous result, original item, and item index.
 An awaited pipeline runs item chains independently and returns their results together.
-Use `parallel()` only when downstream work needs the complete result set.
+Use `parallel()` for independent calls or when downstream work needs the complete result set.
 A barrier is justified for cross-item deduplication, comparison, or a decision based on all results.
-Do not use a barrier merely to transform results between item-local stages.
+Avoid a barrier for item-local transformations unless the accepted design needs one.
 
 ## Author the script
 
@@ -49,6 +49,12 @@ Pass structured data through `args` as actual JSON values, not JSON-encoded stri
 The script runs as JavaScript and cannot access Node.js APIs, files, or external packages.
 Use only the standard JavaScript syntax and built-ins supported by the host runtime.
 Do not use TypeScript annotations or syntax.
+Do not use `import()` because the workflow runtime rejects module loading.
+Delegate library-dependent operations to agents.
+
+Keep script control flow deterministic for replay.
+Pass timestamps and precomputed random values through `args`.
+`Date.now()`, `Math.random()`, and no-argument `new Date()` throw inside workflow scripts.
 
 ### Validate calls and options
 
@@ -64,6 +70,13 @@ Set `opts.phase` explicitly inside concurrent stages to avoid global phase races
 
 ### Respect concurrency and budget
 
+Keep each `parallel()` or `pipeline()` input within the runtime's 4,096-item limit.
+Bound the complete run to 1,000 agents.
+Read the native concurrent-agent setting before sizing fan-out.
+The documented default is at most 16, and available CPUs can lower it.
+Partition larger workloads into separate runs while retaining every required input and result.
+Treat the host's workflow-size guideline as advice, allowing explicit task scale within the runtime limits.
+
 Choose another permitted family or limit fan-out items when a caller enforces a per-family concurrency cap.
 Workflow fan-out does not enforce that caller's family cap.
 For a multi-model assessment, exclude a model whose evaluation request actually fails and finish with the remaining authorized available models.
@@ -73,7 +86,7 @@ Preserve unmet acceptance when exclusions leave required coverage unverified.
 Without a token target, `budget.total` is `null` and `budget.remaining()` is `Infinity`.
 Serialization may display that `Infinity` as `null`, which does not mean zero.
 `budget.spent()` covers Main and Workflow agent calls across the turn.
-When a token target exists, treat it as a hard ceiling for further agent calls.
+Apply explicit user budget limits and host-enforced ceilings before further agent calls.
 Keep retry limits independent of the token budget.
 
 ## Validate phases and results
@@ -85,10 +98,11 @@ Validate every required result before starting its dependent stage.
 A malformed JSON Schema can fail before the agent runs.
 A required name missing from a schema's `properties` may not fail as expected.
 Treat schema validation as a format check, not proof of acceptance.
-Validate finding identifiers and evidence before passing candidates to a verifier independent of the finder and fixer.
-Require a verification result for every candidate before synthesis or confirmed reporting.
+Validate finding identifiers and evidence before synthesis or confirmed reporting.
+When independent verification is required, pass candidates to a verifier independent of the finder and fixer.
+Require its result for every candidate covered by that acceptance requirement.
 Retain confirmed, refuted, and unverified outcomes separately, including missing or inconclusive verifier results.
-Do not replace independent verification with schema validation, majority votes, or the finder's self-check.
+Do not present schema validation, majority votes, or the finder's self-check as independent verification.
 
 ### Handle failed stages
 
@@ -144,6 +158,8 @@ Reassessment never waives blockers, required checks, or user approval.
 ## Resume conservatively
 
 Resume only in the same session, using the original `runId` and returned `scriptPath`.
+Use Claude Code 2.1.305 or later when acceptance requires preserving completed calls during replay.
+Earlier versions can rerun completed agents from multi-agent pipeline or parallel entries even when the script is unchanged.
 
 Before editing, consider cache hits for completed earlier phases and agent calls.
 Preserve their prompts, options, labels, and arguments when accepted inputs remain unchanged.
