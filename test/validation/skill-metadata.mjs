@@ -1,4 +1,10 @@
-import { existsSync, readdirSync, readFileSync, realpathSync } from "node:fs";
+import {
+  existsSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  statSync
+} from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -125,10 +131,31 @@ export const validateSkillContent = (
   return errors;
 };
 
+const bundledPath = (root, source) => {
+  const resolved = realpathSync(path.join(root, source));
+  const relative = path.relative(root, resolved);
+  if (
+    relative === ".." ||
+    relative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relative)
+  ) {
+    throw new Error(`${source}: path must resolve inside the plugin root.`);
+  }
+  return resolved;
+};
+
 const run = () => {
-  const root = fileURLToPath(new URL("../../", import.meta.url));
-  const skills = readdirSync(path.join(root, "skills"), { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
+  const root = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
+  const skillsRoot = bundledPath(root, "skills");
+  const skills = readdirSync(skillsRoot, { withFileTypes: true })
+    .filter(
+      (entry) =>
+        entry.isDirectory() ||
+        (entry.isSymbolicLink() &&
+          statSync(path.join(skillsRoot, entry.name), {
+            throwIfNoEntry: false
+          })?.isDirectory())
+    )
     .map((entry) => entry.name)
     .toSorted();
   const errors = [];
@@ -138,10 +165,17 @@ const run = () => {
   for (const directoryName of skills) {
     const source = path.join("skills", directoryName, "SKILL.md");
     try {
-      const content = readFileSync(path.join(root, source), "utf-8");
+      bundledPath(root, path.join("skills", directoryName));
+      const filename = bundledPath(root, source);
+      if (!statSync(filename).isFile()) {
+        throw new Error(`${source}: skill file must be readable.`);
+      }
+      const content = readFileSync(filename, "utf-8");
       errors.push(...validateSkillContent(content, directoryName, source));
-    } catch {
-      errors.push(`${source}: skill file must be readable.`);
+    } catch (error) {
+      errors.push(
+        error.code ? `${source}: skill file must be readable.` : error.message
+      );
     }
   }
   if (errors.length > 0) {
@@ -159,5 +193,10 @@ if (
   existsSync(process.argv[1]) &&
   realpathSync(import.meta.filename) === realpathSync(process.argv[1])
 ) {
-  run();
+  try {
+    run();
+  } catch (error) {
+    process.stderr.write(`${error.message}\n`);
+    process.exitCode = 1;
+  }
 }

@@ -32,7 +32,9 @@ Markdown endpoints were used when available, with extensionless official pages a
 The portable manifest replaces the former OpenAI-only descriptor.
 Claude retains its dedicated manifest because its documented package format uses that location.
 The package gate checks shared metadata, versions, catalog destinations, and contained paths across these actual consumers.
-The release scheme now uses three numeric SemVer components while preserving calendar dates and daily sequences.
+The maintainer's release contract is `yyyy.MM.dd.seq`, preserving separate calendar fields and daily sequences.
+The Agent Plugins specification recommends Semantic Versioning but requires clients to accept other version strings.
+Workgraph therefore retains its requested calendar format instead of imposing the recommendation as a mandatory gate.
 The [release instructions](../README.md#version-updates) define the format.
 
 Portable packaging standardizes shared skills and MCP configuration, not every host's execution tools or hooks.

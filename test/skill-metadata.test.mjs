@@ -20,6 +20,41 @@ const skillContent = (
   body = "Run the sample task.\n"
 ) => `---\n${fields}\n---\n${body}`;
 
+const metadataFixture = (t) => {
+  const temporary = mkdtempSync(
+    path.join(tmpdir(), "workgraph-skill-metadata-")
+  );
+  t.after(() => rmSync(temporary, { force: true, recursive: true }));
+  const root = path.join(temporary, "plugin");
+  const source = fileURLToPath(
+    new URL("validation/skill-metadata.mjs", import.meta.url)
+  );
+  const entrypoint = path.join(root, "test/validation/skill-metadata.mjs");
+  mkdirSync(path.dirname(entrypoint), { recursive: true });
+  cpSync(source, entrypoint);
+  symlinkSync(
+    fileURLToPath(new URL("../node_modules", import.meta.url)),
+    path.join(root, "node_modules")
+  );
+  return { entrypoint, root };
+};
+
+const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
+  const result = spawnSync(process.execPath, [filename], {
+    cwd: tmpdir(),
+    encoding: "utf-8",
+    killSignal: "SIGKILL",
+    timeout: 5000
+  });
+  assert.ifError(result.error);
+  assert.equal(result.status, diagnostic === "" ? 0 : 1, result.stderr);
+  assert.equal(result.stderr, diagnostic);
+  assert.equal(
+    result.stdout,
+    diagnostic === "" ? `Validated ${count} skill metadata files.\n` : ""
+  );
+};
+
 test("skill metadata accepts standard fields and host extensions", () => {
   const content = skillContent(`name: sample-skill
 description: >-
@@ -259,18 +294,7 @@ test("skill metadata rejects malformed frontmatter and empty bodies", () => {
 });
 
 test("skill metadata command resolves its own checkout", (t) => {
-  const root = mkdtempSync(path.join(tmpdir(), "workgraph-skill-metadata-"));
-  t.after(() => rmSync(root, { force: true, recursive: true }));
-  const source = fileURLToPath(
-    new URL("validation/skill-metadata.mjs", import.meta.url)
-  );
-  const entrypoint = path.join(root, "test/validation/skill-metadata.mjs");
-  mkdirSync(path.dirname(entrypoint), { recursive: true });
-  cpSync(source, entrypoint);
-  symlinkSync(
-    fileURLToPath(new URL("../node_modules", import.meta.url)),
-    path.join(root, "node_modules")
-  );
+  const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
   mkdirSync(directory, { recursive: true });
   const alias = path.join(root, "validate.mjs");
@@ -287,19 +311,71 @@ test("skill metadata command resolves its own checkout", (t) => {
       writeFileSync(path.join(directory, "SKILL.md"), content);
     }
     for (const filename of [entrypoint, alias]) {
-      const result = spawnSync(process.execPath, [filename], {
-        cwd: tmpdir(),
-        encoding: "utf-8",
-        killSignal: "SIGKILL",
-        timeout: 5000
-      });
-      assert.ifError(result.error);
-      assert.equal(result.status, diagnostic === "" ? 0 : 1, result.stderr);
-      assert.equal(result.stderr, diagnostic);
-      assert.equal(
-        result.stdout,
-        diagnostic === "" ? "Validated 1 skill metadata files.\n" : ""
-      );
+      assertMetadataCommand(filename, diagnostic);
     }
   }
+});
+
+test("skill metadata command validates internal links by their alias", (t) => {
+  const { entrypoint, root } = metadataFixture(t);
+  const directory = path.join(root, "bundled/reference");
+  mkdirSync(directory, { recursive: true });
+  mkdirSync(path.join(root, "skills/ordinary"), { recursive: true });
+  writeFileSync(
+    path.join(root, "skills/ordinary/SKILL.md"),
+    skillContent("name: ordinary\ndescription: Task.")
+  );
+  symlinkSync("../bundled/reference", path.join(root, "skills/sample-skill"));
+  writeFileSync(path.join(root, "bundled/notes.md"), "Supporting notes.\n");
+  symlinkSync("../bundled/notes.md", path.join(root, "skills/notes.md"));
+  for (const [content, diagnostic] of [
+    [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
+    [skillContent(), ""],
+    [
+      skillContent("name: reference\ndescription: Task."),
+      "skills/sample-skill/SKILL.md: name must match its parent directory.\n"
+    ]
+  ]) {
+    if (content !== null) {
+      writeFileSync(path.join(directory, "SKILL.md"), content);
+    }
+    assertMetadataCommand(entrypoint, diagnostic, 2);
+  }
+});
+
+test("skill metadata command rejects paths outside its plugin root", (t) => {
+  for (const source of [
+    "skills",
+    "skills/sample-skill",
+    "skills/sample-skill/SKILL.md"
+  ]) {
+    const { entrypoint, root } = metadataFixture(t);
+    const outside = path.join(root, "../plugin-sibling");
+    const target = path.join(outside, source);
+    mkdirSync(path.join(outside, "skills/sample-skill"), { recursive: true });
+    writeFileSync(
+      path.join(outside, "skills/sample-skill/SKILL.md"),
+      skillContent()
+    );
+    const alias = path.join(root, source);
+    mkdirSync(path.dirname(alias), { recursive: true });
+    symlinkSync(target, alias);
+    assertMetadataCommand(
+      entrypoint,
+      `${source}: path must resolve inside the plugin root.\n`
+    );
+  }
+});
+
+test("skill metadata command rejects unreadable linked skill files", (t) => {
+  const { entrypoint, root } = metadataFixture(t);
+  const directory = path.join(root, "skills/sample-skill");
+  mkdirSync(directory, { recursive: true });
+  symlinkSync("missing.md", path.join(directory, "SKILL.md"));
+  const diagnostic =
+    "skills/sample-skill/SKILL.md: skill file must be readable.\n";
+  assertMetadataCommand(entrypoint, diagnostic);
+  rmSync(path.join(directory, "SKILL.md"));
+  mkdirSync(path.join(directory, "SKILL.md"));
+  assertMetadataCommand(entrypoint, diagnostic);
 });
