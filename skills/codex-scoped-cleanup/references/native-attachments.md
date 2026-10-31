@@ -2,7 +2,7 @@
 
 ## Confirm supported removal
 
-Use the owner path in [Owner-mediated resource lifecycle](app-server.md) unless already loaded completely.
+Use the owner path established by [Codex Scoped Cleanup](../SKILL.md#establish-the-owner-path).
 Require the authorized resource owner to establish supported removal for the selected connection type.
 A tool that removes only PR connections does not establish Worktree connection removal support.
 Have the owner verify effects on connections, checkout files, Git refs, and archive contents before mutation.
@@ -29,8 +29,9 @@ Use `lexists` or `lstat` so a dangling symlink does not count as an absent check
 Skip recreated checkouts, changed payloads, or pending create and restore operations.
 Inspect every owner when multiple Threads reference the same worktree.
 An absent active path with a path-only payload is a dangling connection, independent of its creation age.
+Remove it only after verifying that the payload contains no recovery state.
 An absent archived path can still represent valuable recovery state.
-Confirm Git preservation and continued-use status before removing an archived connection.
+Confirm Git preservation, other required retained content, and no continued-use requirement before removing an archived connection.
 Keep any necessary reattach payload temporary until removal verification succeeds.
 Have the owner use a verified supported attach or restore operation for authorized recovery.
 

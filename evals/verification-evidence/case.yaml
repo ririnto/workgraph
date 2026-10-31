@@ -8,6 +8,7 @@ execution:
   allowed_tools:
     - Skill(workgraph:development)
     - Skill(workgraph:writing)
+    - Read
   prompt: |-
     Load Workgraph's Development and Writing skills explicitly.
     This is a read-only assessment of supplied synthetic evidence.
@@ -65,6 +66,7 @@ graders:
     focus: trace
     criteria: |-
       Inspect Skill tool results and require both named skills before the assessment.
+      The trace reads the complete Writing instruction-design reference before assessing the instruction change, unless that complete content was already supplied.
       Packet A is direct evidence for the exact target and current verifier.
       Packet B is a lint proxy and does not establish evidence-attribution behavior.
       Packet C is a failed matching run despite the contradictory all-green summary.

@@ -9,7 +9,7 @@ Complete authorized changes and relevant checks before returning a final result,
 Keep contributor conventions and validation commands here.
 Keep consumer behavior in `skills/` and the host adapters in `docs/harness/`.
 Keep consumer links and required resources inside this plugin.
-Keep role procedures self-contained in each role's `SKILL.md`.
+Keep always-required procedures in each skill's `SKILL.md`, with each role body self-contained.
 
 Keep host-specific execution timing in each role's references, and inject only the selected host's reference.
 Keep shared role and task procedures host-neutral.

@@ -44,6 +44,7 @@ graders:
     criteria: |-
       Judge semantic decisions rather than fixed wording.
       The trace loads Delivery and Writing before assessing their behavior.
+      The trace reads the complete Delivery fix-queues reference before queue assessment, unless that complete content was already supplied.
       Queue Main selects work and receives results, issue owners write separate branches and open their own PRs, and the integration owner serializes shared merges.
       The queue respects two assigned concurrent owners rather than a fixed six-worker default.
       Only the relevant conflicting resource return blocks its item, while independent permitted work continues.
