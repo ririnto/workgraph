@@ -42,7 +42,7 @@ Guidance alone authorizes no tooling or cross-project changes.
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JavaScript](references/javascript.md) |
 | Python | `.py` | [Python](references/python.md) |
 | Go | `.go` | [Go](references/go.md) |
-| Rust | `.rs` | [Rust](references/rust.md) |
+| Rust | `.rs`, Cargo manifests, Rust toolchain and lint configuration | [Rust](references/rust.md) |
 | Shell | Scripts and maintained commands | [Shell](references/shell.md) |
 
 ## Shared code style

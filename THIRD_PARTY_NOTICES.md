@@ -173,6 +173,11 @@ Workgraph modifies the sentence and TSDoc copies while preserving their diagnost
 
 ## Research And Official Documentation
 
+We consulted the [Google Rust Style Guide](https://google.github.io/styleguide/rustguide.html) for portable ownership, API design, module organization, and formatting guidance.
+Workgraph's Rust reference adapts those decisions while keeping Chromium and Fuchsia rules scoped to their codebases.
+The Rust project's [rustfmt configuration reference](https://github.com/rust-lang/rustfmt/blob/master/Configurations.md), [Clippy usage guide](https://doc.rust-lang.org/clippy/usage.html), and Cargo [test](https://doc.rust-lang.org/cargo/commands/cargo-test.html) and [feature](https://doc.rust-lang.org/cargo/reference/features.html) documentation informed the tooling checks.
+These independently written instructions redistribute no source examples or implementation code from those documents.
+
 The [research notes](docs/research.md) cite the papers and official documentation used for context, graph, and verification decisions.
 We consulted the [Agent Plugins specification](https://agent-plugins.org/specification) and official OpenAI, Anthropic, GitHub, and Cursor plugin guides.
 The [distribution review](docs/research.md#plugin-standards-and-distribution) maps those sources to packaging, validation, installation, and evaluation decisions.
