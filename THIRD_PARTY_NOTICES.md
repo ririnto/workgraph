@@ -98,6 +98,9 @@ Workgraph distributes its own instructions without bundling Codex source or a cl
 The [research notes](docs/research.md#codex-native-cleanup) distinguish reference-source effects from installed protocol and destructive-operation evidence.
 We also reviewed [Codex `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6) for native skill fragments and portable-plugin prompt truncation.
 The [native selection review](docs/research.md#native-skill-selection) records the version-specific compatibility boundary without bundling Codex code.
+We reviewed [Codex `0.166.0`](https://github.com/openai/codex/tree/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856) and the official App Server guide for subagent history, turn boundaries, and continuation.
+The [delegation review](docs/research.md#codex-delegation-context-and-turns) distinguishes those supported controls from instruction choices and synthetic behavioral coverage.
+The same release's catalog resolver, installation store, and refresh paths informed the [marketplace update guidance](docs/research.md#codex-marketplace-resolution-and-updates).
 
 ## Anthropic Guidance
 

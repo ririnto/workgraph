@@ -19,6 +19,16 @@ Then run `claude plugin update <plugin>@<marketplace>`.
 
 ## Codex
 
-Run `codex plugin marketplace upgrade <marketplace>`.
+Identify whether the configured marketplace uses a Git source or a local checkout, and record the installed plugin's version and enabled state.
+For a Git marketplace, run `codex plugin marketplace upgrade <marketplace>`.
+When the marketplace revision advances, this also refreshes its configured installed plugins while preserving their enabled state.
 
-Then run `codex plugin add <plugin>@<marketplace>`.
+For a local marketplace, update the authorized checkout and refresh the installed copy through a supported client control.
+Local installations use cached copies rather than live source files.
+For an already-enabled plugin, `codex plugin add <plugin>@<marketplace>` reinstalls that copy.
+This command enables the plugin, so use it for a disabled plugin only when the user authorizes enabling it.
+If the available client cannot refresh a disabled local installation while preserving its state, report that limitation without changing the state.
+
+Read back the installed version and enabled state after either path.
+Check the installed files when an unchanged version cannot distinguish old and new content.
+Opening the plugin browser alone does not establish that cached files refreshed.

@@ -53,6 +53,34 @@ A GitHub Actions near miss checks that a shared keyword does not select Claude's
 The maintained two-run minimum and individual-outcome reporting remain unchanged.
 Package checks, context measurements, native activation, and model outcomes remain separate evidence.
 
+### Codex marketplace resolution and updates
+
+The October 31, 2026 audit compared Codex `0.166.0` at [commit `6ff1e1c`](https://github.com/openai/codex/commit/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856) with [main `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6).
+The inspected resolver and the relevant installation and refresh functions agree on the behaviors below.
+The native [catalog resolver](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/marketplace.rs) searches `.agents/plugins/marketplace.json` before the Claude and Cursor catalog layouts.
+It explicitly resolves a local source of `.` or `./` to the marketplace root, so Workgraph's catalog selects the complete root plugin.
+The same source accepts `AVAILABLE` and `ON_INSTALL`, which control installation policy and authentication timing rather than hook trust.
+The [hook loader](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/loader.rs#L1223-L1275) uses an explicit hook path instead of falling back to the default hook file.
+Workgraph retains its portable manifest and OpenAI hook extension without another descriptor or catalog change.
+
+The [Git upgrade path](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/manager.rs#L3041-L3103) refreshes configured plugin caches for newly activated marketplace snapshots without changing their enabled flags.
+[Configured entries](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/marketplace_policy.rs#L298-L315) include disabled plugins.
+The [snapshot check](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/marketplace_upgrade.rs#L244-L257) can skip an unchanged revision, so command success alone does not prove cache replacement.
+The same manager rejects a named marketplace that is not configured as a Git source.
+
+Local installation also copies source into a cache, using the plugin manifest's declared version.
+The [store](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/store.rs#L293-L333) permits explicit reinstallation at the same version.
+However, [installation](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/manager.rs#L2318-L2374) also sets the user plugin's enabled flag to true.
+Workgraph's update guidance therefore preserves an existing disabled choice and separates Git upgrades from local reinstalls.
+
+A client exposing local [`plugin/list` with `forceRefetch`](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/app-server/src/request_processors/plugins.rs#L549-L591) can request cache refresh without enablement.
+That [refresh path](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/loader.rs#L709-L714) skips a matching installed version.
+Codex CLI `0.166.0` exposes no separate local refresh command that preserves disabled state.
+Its [plugin browser](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/tui/src/app/background_requests.rs#L1088-L1121) lists plugins without requesting that refresh.
+Its [JSON listing](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/cli/src/plugin_cmd.rs#L517-L552) reports the installed version and enabled state for readback.
+The [Codex adapter](harness/codex.md#update) and [Delivery update reference](../skills/delivery/references/plugin-updates.md#codex) apply these distinctions.
+The [update assessment](../evals/codex-plugin-updates/case.yaml) checks synthetic decisions without performing installation or establishing native cache behavior.
+
 ## Dated plugin comparisons
 
 The October 31, 2026 review checked each requested plugin's default branch, release target, publication date, relevant history, and current host documentation.
@@ -377,6 +405,26 @@ Delivery remains conditional and retains Workgraph's authorization, check reuse,
 Host adapters use current tool names and supported model settings.
 The current host's fork contract governs inheritance and overrides.
 These structural choices supply no model-performance evidence.
+
+### Codex delegation context and turns
+
+The October 31, 2026 review inspected Codex `0.166.0` at [release commit `6ff1e1c`](https://github.com/openai/codex/commit/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856).
+Its [agent schemas](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L610-L684) distinguish V1 `fork_context` from V2 `fork_turns`.
+V1 defaults to no inherited history, while V2 defaults to all history and documents only `all` and `none`.
+Neither inspected spawn schema supplies a recent-turn window or a worker `max_turns` control.
+The [V2 parser](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L201-L238) accepts positive numeric strings for legacy compatibility but maps them to full history.
+For example, `fork_turns: "3"` does not limit inheritance to three turns.
+The inspected schema and parser files match [October 31 main `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6).
+
+The official [App Server guide](https://learn.chatgpt.com/docs/app-server#core-primitives) defines a turn as a user request and the resulting agent work.
+Commands, tool calls, edits, and messages are items within that turn.
+The [V2 control descriptions](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L201-L341) distinguish a follow-up assignment, a message without a new turn, and waiting for an update.
+These interfaces do not establish a recommended numeric worker quota or unlimited execution.
+
+Main's [Codex reference](../skills/main-agent-contract/references/codex.md) selects history from the required context and sizes assignments around coherent outcomes.
+It preserves earlier requirements in focused briefs, existing settings and budgets, and incomplete acceptance when a real limit prevents continuation.
+The [delegation assessment](../evals/codex-delegation-context/case.yaml) covers these decisions through synthetic V1 and V2 interfaces without dispatching workers.
+Its own runner limit does not represent a worker control, and its results cannot establish native Codex dispatch or actual history transfer.
 
 ### Skill structure
 

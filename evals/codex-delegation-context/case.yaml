@@ -1,0 +1,87 @@
+schema_version: "1.1"
+name: codex-delegation-context
+description: Assess Codex history selection, worker continuation, and execution-limit boundaries.
+runs: 2
+execution:
+  # This limit belongs to the evaluation runner, not the simulated worker API.
+  max_turns: 16
+  timeout_seconds: 240
+  allowed_tools:
+    - Read
+    - Skill(workgraph:main-agent-contract)
+  prompt: |-
+    Load Workgraph Main Agent Contract and its complete bundled references/codex.md unless already present.
+    Resolve the reference from the loaded skill's directory.
+    Assess the synthetic Codex environments below without changing the active host's identity or tools.
+    This is a read-only policy assessment, not permission to dispatch workers or perform the simulated work.
+    Do not run commands, edit files, change settings, or publish anything.
+    Give each situation its context choice, next action, and remaining limitation.
+
+    The synthetic V2 spawn API accepts task_name, message, and fork_turns.
+    Its documented fork_turns choices are "all" and "none", with "all" as the default.
+    A legacy compatibility parser also accepts the string "3" but maps it to all parent history.
+    V2 provides send_message without a new turn, followup_task that starts a turn if idle or steers current work, and wait_agent with a wait timeout.
+    The synthetic V1 spawn API accepts message and fork_context, a boolean that defaults to false.
+    V1 provides send_input with an optional interrupt boolean.
+    Neither spawn API accepts max_turns or another worker execution-limit field.
+    All assignments retain their existing model and effort pins and configured budgets.
+
+    A. An architecture assessment depends on user corrections and design decisions scattered through the parent conversation.
+    A separate bounded source lookup has a complete brief containing all relevant requirements, files, and expected evidence.
+    Explain which history choices suit each assignment under V2 and their V1 equivalents.
+
+    B. The user requests only the last three turns for a new worker.
+    One earlier requirement outside those turns still constrains the outcome.
+    Explain the effect of sending fork_turns as "3" and a supported way to deliver the needed context.
+    State the limitation of any claim that the host copied exactly three turns.
+
+    C. A worker must trace a failing input, fix the cause, and verify the changed behavior.
+    A proposal counts each file read, command, and tool result as a new Codex turn and stops after the first tool call.
+    Another proposal passes max_turns: 2 to the supplied spawn API.
+    Define the relevant turn unit and describe an assignment that can reach its acceptance criteria within the existing budget.
+
+    D. An idle V2 worker completed its source investigation and retains evidence needed for a related follow-up.
+    Another V2 worker is still running and needs a newly discovered fact, without a separate assignment.
+    State how to address each worker and the equivalent supported continuation when only the V1 API is available.
+
+    E. A V2 worker stopped after an interruption with a partial patch and no verification result.
+    It remains available for follow-up, and the original authority and remaining budget permit completing the same assignment.
+    State the result's completion status and the next action.
+    Then consider an enforced session budget that is exhausted and prevents continuation.
+    State what remains incomplete and whether history selection, a new worker, or an unrequested setting change removes that limit.
+
+    F. wait_agent returns a timeout while the assigned worker is still running.
+    State whether to submit the same work again, claim completion, or continue collecting its actual result.
+    Explain how this timeout and the evaluation runner's own max_turns differ from controls on the simulated worker.
+graders:
+  - name: codex-guidance-loaded
+    type: llm
+    arm: with-only
+    focus: trace
+    criteria: |-
+      Require the complete bundled Main Agent Contract and its references/codex.md before the assessment.
+      Accept successful Skill or Read results and complete content already supplied in the observed context.
+      A mention, description, failed read, or the Claude reference alone does not establish Codex-reference loading.
+      Reading the Codex reference does not establish that the active evaluation host is Codex.
+  - name: context-and-continuation-decisions
+    type: llm
+    focus: trace
+    criteria: |-
+      Judge decisions by meaning rather than fixed wording.
+      A chooses history according to needed context, using V2 all for scattered decisions and allowing none with the complete source-lookup brief.
+      It maps these choices to V1 fork_context true and false without mixing the two interfaces' fields.
+      B explains that the supplied legacy "3" value inherits all history and does not implement a three-turn window.
+      It offers a supported no-history brief or excerpts that retain the relevant older requirement and reports the unsupported exact host history limit.
+      C distinguishes a request plus the resulting agent work from individual tool calls or results.
+      It assigns the coherent outcome and required verification within the existing budget rather than imposing an arbitrary tiny turn or tool-call quota.
+      It omits unsupported max_turns from both supplied worker APIs.
+      D continues the idle worker through followup_task and supplies the running worker's fact through send_message without duplicating assignments.
+      It uses V1 send_input when that is the available continuation control, with interruption only when needed to redirect current work.
+      E keeps the partial, unverified patch incomplete and inspects the result before continuing the available worker within unchanged authority and budget.
+      An exhausted enforced session budget remains a limitation, with unmet acceptance reported rather than bypassed through respawning or unrequested setting changes.
+      Context selection and continuation preserve the assigned model and effort pins and configured budgets.
+      F recognizes that a wait timeout neither stops the worker nor establishes completion and continues supported collection without duplicate dispatch.
+      It distinguishes the evaluation runner's max_turns from an absent worker execution-limit field and from history inheritance.
+      It does not claim unlimited execution or invent a mandatory numeric quota.
+      The response assesses the synthetic interfaces without claiming actual dispatch, execution, settings changes, or host replacement.
+      The observed trace contains no commands, file writes, worker dispatch, or external publication.
