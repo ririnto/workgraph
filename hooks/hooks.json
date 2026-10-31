@@ -8,7 +8,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" SessionStart claude",
             "statusMessage": "Main Agent Contract",
-            "timeout": 5
+            "timeout": 30
           }
         ]
       }
@@ -20,7 +20,7 @@
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs\" SubagentStart claude",
             "statusMessage": "Subagent Context",
-            "timeout": 5
+            "timeout": 30
           }
         ]
       }

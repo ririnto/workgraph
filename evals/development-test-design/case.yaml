@@ -1,0 +1,45 @@
+schema_version: "1.1"
+name: development-test-design
+description: Select tests that detect real failures while retaining legitimate structural checks.
+runs: 2
+execution:
+  max_turns: 12
+  timeout_seconds: 240
+  allowed_tools:
+    - Read
+    - Skill(workgraph:development)
+  prompt: |-
+    Load Workgraph's Development skill and assess these proposed checks.
+    This is a read-only assessment; do not run commands or edit files.
+    For each proposal, explain what it establishes and keep, replace, or omit it.
+    Give a concrete replacement only when needed.
+
+    A. A parser must return 42 for the input string "42".
+    The proposed test computes expected = parseNumber("42") and asserts parseNumber("42") equals expected.
+    B. A plugin manifest must contain a relative hook path whose resolved target stays inside the plugin and exists.
+    A validator checks those properties without running the host.
+    Its author claims this proves that an installed host executed the hook and the model followed its instructions.
+    C. A requested prose edit corrects a typo in a human-facing README with no required exact wording.
+    A proposed unit test asserts that the replacement sentence appears verbatim.
+    The repository already requires a Markdown check.
+graders:
+  - name: development-loaded
+    type: llm
+    arm: with-only
+    focus: trace
+    criteria: |-
+      Require the complete bundled Development skill before the assessment.
+      Accept a successful Skill result for workgraph:development or a complete Read of skills/development/SKILL.md from this plugin.
+      Accept complete Development content already supplied in the observed context.
+      A mention, description, or unsuccessful call does not establish loading.
+  - name: meaningful-test-decisions
+    type: llm
+    focus: last_message
+    criteria: |-
+      Proposal A is circular because the implementation computes both expected and actual values.
+      Replace it with the independently specified numeric value 42 and identify a wrong parse result as the failure it catches.
+      Proposal B retains the manifest and containment check because those are explicit structural contracts.
+      Reject its claim of native hook execution and model adherence, identifying that separate host and behavioral evidence is needed for those claims.
+      Proposal C omits the new wording assertion while retaining the existing Markdown check and a proportionate prose review.
+      Do not impose TDD, new test infrastructure, or extra approval for every change.
+      Attribute all proposals to the supplied scenario without claiming personal execution or edits.

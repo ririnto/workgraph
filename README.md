@@ -39,6 +39,8 @@ Use manual skill loading when the active host does not run these hooks.
 
 SessionStart covers startup, resume, clear, compact, and fork events supported by the host.
 Neither hook filters events with a matcher.
+Both context hooks have a 30-second timeout to allow Node startup under contention.
+The timeout is a ceiling, not an added delay.
 Each output identifies the execution host, actual source paths, and complete content already loaded.
 All selected files load before context emission, so the injected role and host guidance need no additional reads.
 

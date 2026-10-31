@@ -435,7 +435,7 @@ test("configured Codex hooks load complete relocated skill files without a conte
     const [hook] = entry.hooks;
     assert.equal(hook.type, "command");
     assert.equal(hook.async, undefined);
-    assert.equal(hook.timeout, 5);
+    assert.equal(hook.timeout, 30);
     assert.equal(hook.additionalContextLimit, 0);
     assert.ok(hook.command.endsWith(`${event} codex`));
     const result = runConfiguredHook(hook.command, {

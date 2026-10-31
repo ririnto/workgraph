@@ -15,7 +15,9 @@ Number steps when readers must perform actions in a required order.
 
 For direct human work, report state and remaining work when they affect a decision, action, or wait.
 For agent-origin messages, follow the active role's communication policy.
-Explain errors by naming the cause and the next useful fix.
+Report the observed failure and its effect.
+Give a cause and fix when evidence supports them.
+When the cause is uncertain, state that limit and the next useful diagnostic step.
 Offer a duration only when it helps the reader decide and known assumptions support it.
 
 Keep concise lists complete when omitted details would change an option, conclusion, or action.

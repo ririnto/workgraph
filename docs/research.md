@@ -53,6 +53,60 @@ A GitHub Actions near miss checks that a shared keyword does not select Claude's
 The maintained two-run minimum and individual-outcome reporting remain unchanged.
 Package checks, context measurements, native activation, and model outcomes remain separate evidence.
 
+## Dated plugin comparisons
+
+The October 31, 2026 review checked each requested plugin's default branch, release target, publication date, relevant history, and current host documentation.
+Dates below are UTC.
+Both default branches matched their latest published release commits at review time.
+The source commit date and release publication date are distinct evidence.
+
+| Plugin | Reviewed source | Commit date | Latest release publication |
+| --- | --- | --- | --- |
+| Superpowers | [`2ce8aa1`](https://github.com/obra/superpowers/commit/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b) | 2026-10-21 | [v7.0.1](https://github.com/obra/superpowers/releases/tag/v7.0.1), 2026-10-21 |
+| i-have-adhd | [`1ecea19`](https://github.com/ayghri/i-have-adhd/commit/1ecea1993b7fce257ffbd686c070948b5e07eda6) | 2026-10-11 | [v0.4.1](https://github.com/ayghri/i-have-adhd/releases/tag/v0.4.1), 2026-10-19 |
+
+### Hook timing and activation
+
+Superpowers [v6.1.0](https://github.com/obra/superpowers/releases/tag/v6.1.0), published June 30, removed its Codex startup hook intentionally.
+Its July 2 [v6.1.1 release](https://github.com/obra/superpowers/releases/tag/v6.1.1) then set an explicit empty hooks object to prevent fallback discovery of the Claude hook.
+This product choice does not establish that Codex lacks hooks.
+Workgraph retains its explicit OpenAI hook configuration and role-specific context delivery.
+The current [OpenAI packaging guide](https://developers.openai.com/plugins/build/plugins) supports this registration, while the [hooks reference](https://learn.chatgpt.com/docs/hooks) separately defines trust and runtime availability.
+The [Codex adapter](harness/codex.md#confirm-hook-activation) now distinguishes installation, registration, trust, and event execution.
+
+The August 18 i-have-adhd [timeout fix](https://github.com/ayghri/i-have-adhd/commit/43eeda8da59ed8eabc5b9df9335cdefc7ae21bda) reports a 6,549 ms Node cold start under concurrent hooks that exceeded its former five-second deadline.
+Workgraph increases its context-hook ceiling to 30 seconds to allow startup under contention.
+This adds headroom rather than a delay, and the independent polling-guard timeout remains unchanged.
+The upstream report is not a reproduction of missing Workgraph context or proof of startup performance on another host.
+The [Claude hooks reference](https://code.claude.com/docs/en/hooks) describes event timing and timeout handling.
+
+### Conditional references and compaction
+
+Superpowers v7.0.1 moved conditional procedures into references after reported skill truncation during compaction.
+Its [size test](https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/tests/skill-size/test-skill-size.sh) uses a 20,000-byte ceiling as its own guard.
+The current official [Claude skill lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) instead documents reattaching up to 5,000 tokens per invoked skill within a combined 25,000-token budget, newest first.
+Bytes, characters, and tokens are not interchangeable, and neither policy proves complete retention of all previously loaded skills.
+Workgraph keeps always-required guidance inline and genuinely conditional material in references, without adding an unsupported universal size gate.
+Native skill reattachment and Workgraph's startup-hook delivery remain separate mechanisms.
+The existing [hook delivery checks](design.md#deliver-context) cover their own output contract.
+
+### Tests and failure reports
+
+Superpowers' July 24 [v6.2.0 release](https://github.com/obra/superpowers/releases/tag/v6.2.0) introduced its revised [test-quality guidance](https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/test-driven-development/writing-good-tests.md).
+Development now names the real failure a new test detects and requires independently derived expectations.
+Structural checks still verify explicit structural contracts without claiming host execution or model adherence.
+The [test-design case](../evals/development-test-design/case.yaml) covers that distinction without requiring new tests for a simple prose edit.
+
+The i-have-adhd [evaluation report](https://github.com/ayghri/i-have-adhd/blob/1ecea1993b7fce257ffbd686c070948b5e07eda6/evals/RESULTS.md) records an August 2 run using Claude Code 2.1.220 and `claude-opus-4-8`, with three trials per case.
+Its partial-success case includes an unsupported authentication diagnosis, and the report proposes unconditional cause-first wording as a possible explanation.
+It does not establish that mechanism or measure current Workgraph behavior.
+Writing now separates the observed failure, supported cause, and next diagnostic when the cause remains uncertain.
+The [failure-reporting case](../evals/writing-failure-evidence/case.yaml) includes both unresolved and confirmed causes so caution does not erase available evidence.
+
+These adaptations retain user-directed style, proportional review, valid evidence reuse, and Claude-only native Workflow.
+They add no universal design-approval gate, fixed list length, mandatory skill-activation threshold, or repository activity filter.
+Native evaluation is needed before claiming improved instruction adherence.
+
 ## Prompt and skill design
 
 ### Agent-facing prompt contracts
