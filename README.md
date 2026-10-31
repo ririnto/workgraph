@@ -139,9 +139,20 @@ Conditional skills load only when their stated task scope matches and their comp
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
 | Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main loads native Workflow procedures for the host reference's selection conditions. |
-| Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose, Markdown, and instruction work load writing and task-contract guidance. |
+| Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose and Markdown work load writing guidance, with instruction design selected for agent-facing work. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
-| Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads the bundled lifecycle and attachment procedures. |
+| Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |
+
+Each skill body contains the procedures required whenever that skill is used.
+References hold detail selected by a task, host, language, or operation.
+
+| Conditional detail | Source | Read trigger |
+| --- | --- | --- |
+| Agent instructions | Writing's [instruction design](skills/writing/references/instruction-design.md) | Drafting, editing, or reviewing agent-facing prompts or instructions requires this reference. |
+| Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
+| Lint tools and rules | Development's [lint rule guidance](skills/development/references/lint-rules.md) | Selecting, developing, configuring, or assessing authorized lint tools, rules, or automatic fixes requires this reference. |
+| Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized installed update uses the requested host's section after merge and base update. |
+| Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
 Writing owns prose, agent-facing prompt contracts, and example separation.

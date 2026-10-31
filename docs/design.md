@@ -20,17 +20,20 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/subagent-context/SKILL.md` | Dispatched agents | Workers follow bounded assignments, evidence, and handbacks in one self-contained body. |
 | `skills/subagent-context/references/{claude-code,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
-| `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference routes post-merge updates through the project's declared host references. |
-| `skills/delivery/references/{claude-code,codex}.md` | Host plugin maintainers | Each reference supplies only its host's marketplace and plugin commands. |
+| `skills/delivery/references/fix-queues.md` | Main agents handling or assessing assigned queues | The reference owns queue concurrency, issue acceptance, integration ownership, and closure evidence. |
+| `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference includes post-merge marketplace and plugin commands in requested-host sections. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
 | `skills/workflow/references/authoring.md` | Workflow authors | Authors follow script construction, mapping, recovery, and bundled-source caller contracts. |
 | `workflows/` | Claude Main using Workflow | Native JavaScript workflow definitions use plugin discovery without another runner. |
 | `skills/workflow/references/delivery.md` | Workflow delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
-| `skills/writing/SKILL.md` | Agents doing prose or instruction work | Agents follow prose, prompt task contracts, source separation, and loading-boundary guidance. |
+| `skills/development/references/lint-rules.md` | Agents selecting, developing, configuring, or assessing authorized lint tools and rules | Agents follow rule selection, fixture, safe-fix, and rollout guidance. |
+| `skills/writing/SKILL.md` | Agents doing prose or instruction work | Agents follow prose defaults and select instruction design for agent-facing work. |
+| `skills/writing/references/instruction-design.md` | Agents drafting, editing, or reviewing agent instructions | Agents follow prompt task contracts, source separation, loading boundaries, and instruction validation. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
-| `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents verify native lifecycle authority, scoped activity, retained content, and Worktree Artifact removal. |
+| `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents follow the complete owner-mediated lifecycle, scoped activity, preservation, and result verification procedure. |
+| `skills/codex-scoped-cleanup/references/native-attachments.md` | Codex agents changing Worktree Artifact connections | Agents follow connection inventory, removal, and recovery guidance for the selected scope. |
 | `docs/verification-map.md` | Maintainers | Maintainers connect Workgraph behavior to its current commands and evidence boundaries. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
 | `docs/model-effort-evidence.md` | Maintainers | Maintainers compare external model benchmarks and workload limitations. |
@@ -46,16 +49,18 @@ Audience tables and adapters link to procedure owners rather than restating thei
 Auto-injected repository guidance defines contributor constraints for these boundaries.
 Keep that guidance at its conventional location without directing agents to retrieve it.
 Role bodies remain self-contained, while role-specific references supply only the selected host's applicable guidance.
+Every skill keeps its always-required procedures in its body and uses references for conditional detail.
 Each role owns its async submission and callback policy because their automatic contexts load independently.
 Host references retain required native completion mechanics without a second wait policy.
 Common role bodies select an available host reference without naming another host or its CLI.
 Hosts without a dedicated reference use their native tool descriptions.
-Delivery routes plugin updates through project-declared host references instead of assuming both CLIs are installed.
+Delivery's plugin-update reference selects the requested host's commands without assuming both CLIs are installed.
 
 Main Agent mode remains the stable public entry at `skills/main-agent-contract/SKILL.md` under `/workgraph:main-agent-contract`.
 Its activation description identifies the mode without adding another public entry.
 Main and Worker select conditional skills by plain skill name when their stated task scope applies.
 Development's conditional loading keeps unrelated lifecycle and language guidance out of task context.
+Lint authoring and assessment, assigned queue handling, and agent-instruction design each have a focused reference with an explicit read trigger.
 Writing owns prose, the agent-facing prompt task contract, and source or example separation.
 Workflow stays focused on its lower-level native operation without repeating the Main contract or Delivery checklist.
 Host adapters stay at user altitude and link to role references and sole policy owners.
@@ -99,8 +104,9 @@ Detailed model support, benchmarks, and workload reports remain in [maintainer r
 
 Both Codex role references select [Codex Scoped Cleanup](../skills/codex-scoped-cleanup/SKILL.md) before resource retirement.
 The skill routes cleanup through the authorized resource owner and supported host operations.
-Its owner-mediated lifecycle reference loads before cleanup inventory or lifecycle changes.
+Its owner-mediated lifecycle procedure is inline because every cleanup inventory or lifecycle change needs it.
 Attachment details load when Worktree Artifact connections require changes.
+The retained [transport research](research.md#codex-native-cleanup) is historical and supplies no cleanup interface or fallback authority.
 Claude references contain no cleanup-skill routing, and neither hook injects the conditional cleanup procedure.
 The bundled skill replaces the standalone user-level copy without repeating the common role cleanup contract.
 

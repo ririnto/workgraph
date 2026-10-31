@@ -108,26 +108,7 @@ Preserve existing integrity checks, including lockfile integrity fields and sign
 Use the project's existing formatters, checkers, and test frameworks for ordinary development changes.
 Preserve existing lint and formatter choices when adding guidance or filling configuration gaps.
 
-For authorized lint setup, select tools compatible with the project's language, runtime, and requirements.
-
-When lint automation is authorized, prefer built-in rules and supported configuration before custom rules.
-Use the Kotlin and Node.js tooling guidance in the matching language references.
-For other languages, use their existing standard tools.
-Verify tool-version support and edge cases before adding a custom rule.
-Make rules AST-aware and preserve literals, comments, and automatic semicolon insertion where applicable.
-
-### Validate lint rules
-
-Provide positive and negative fixtures covering intended matches and cases that must remain unchanged.
-Offer automatic fixes only when evaluation, side effects, and program behavior remain unchanged.
-Verify formatter idempotence and convergence between rule fixes and formatting.
-Stage separately authorized rules on representative source before enabling them across the project.
-Start with read-only checks and review their reports before any safe-fix rollout.
-Do not add suppressions, disable rules, or weaken checks to make a rollout pass.
-
-If a rule cannot detect violations safely, do not add it.
-If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
-Validate scheduling, control flow, and lifecycle effects before offering automatic fixes that change them.
+When selecting, developing, configuring, or assessing authorized lint tools, rules, or automatic fixes, read [lint rule guidance](references/lint-rules.md) unless its complete content is already loaded.
 
 ## Verification
 

@@ -14,7 +14,6 @@ Codex does not provide Claude Code's native Workflow tool.
 
 Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read Codex Scoped Cleanup.
 Skip this read when its complete content is already loaded.
-Route cleanup through the authorized resource owner and supported host operations.
 
 ## Model selection
 
@@ -27,5 +26,4 @@ For native Codex invocations, use the host-confirmed full model ID, never a bare
 
 Verify that each request returns a result.
 When requested settings are unavailable, report the limitation and substitute only when permitted.
-Use supported agent and tool controls, honoring explicit user and configuration choices.
 Report unavailable or substituted settings using host evidence.

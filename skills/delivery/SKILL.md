@@ -27,24 +27,7 @@ Git delivery does not authorize deployment, credential handling, live assets, fo
 
 ### Deliver an assigned fix queue
 
-Use the assigned queue bounds, concurrency, acceptance, ownership, and publication limits.
-Check existing issues and PRs before assigning fixes, and prioritize correctness and safety within scope.
-Map children to an umbrella when it defines a coherent actionable unit.
-Use isolated workspaces and branches when concurrent assignments could conflict.
-Name responsibility for source changes, publication, integration, evidence, and cleanup without requiring a different person for each role.
-Use an isolation method supported by the host and assignment.
-The issue owner runs checks, publishes its branch, opens its PR, and returns the result and evidence.
-The integration owner serializes merges and confirms acceptance before closure.
-Preserve each issue's original acceptance and exclusions, including any umbrella's separate acceptance.
-Skip ownership-blocked items and continue independent ready work within the assigned concurrency.
-Use nonclosing issue references until acceptance is confirmed.
-Serialize merges and let the branch owner resolve collisions unless ownership transfers.
-Refresh affected checks, acceptance evidence, and review coverage after collisions, while retaining unaffected valid evidence.
-Confirm each issue's original acceptance on the authorized base before closing it, then read back the tracker state.
-Inspect relevant base source or run the required behavioral check because a merge and ref readback alone do not establish acceptance.
-Confirm an umbrella's own acceptance separately from its children.
-Keep issues open when acceptance is unmet or unverified, and report remaining criteria and their next owners.
-Report merged items, acceptance evidence, closure states, blockers, owners, and remaining work.
+When handling or assessing an assigned fix queue, read [fix queue guidance](references/fix-queues.md) unless its complete content is already loaded.
 
 ### Select the base and working branches
 
@@ -162,7 +145,7 @@ Require only relevant resource returns, not unrelated global ownership returns.
 Finish delivery by reading back the named authorized base branch after normal merge.
 Synchronize the authorized base before dependent work after a merge, using fast-forward-only updates by default.
 Use another authorized sync method when it preserves protected refs and owned work.
-For an authorized plugin update, read `references/plugin-updates.md` after the plugin's merge and base update.
+For an authorized plugin update, read [plugin update guidance](references/plugin-updates.md) after the plugin's merge and base update unless its complete content is already loaded.
 Complete already-authorized task-owned cleanup without renewed stage approval.
 
 ### Retire owned resources
