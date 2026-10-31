@@ -12,33 +12,32 @@ See [the design](design.md) for delivery mechanics and [third-party notices](../
 
 ## Plugin standards and distribution
 
-The October 30, 2026 review compared the supplied skill and plugin guides against Workgraph's actual package and loading paths.
+The review compared the supplied skill and plugin guides against Workgraph's actual package and loading paths.
 Markdown endpoints were used when available, with extensionless official pages as fallbacks.
 
 | Sources | Adopted boundary |
 | --- | --- |
 | [Agent Skills](https://agentskills.io/llms-full.txt), [OpenAI skill authoring](https://learn.chatgpt.com/docs/build-skills), and [Claude skills](https://code.claude.com/docs/en/skills) | Validate portable metadata while retaining deliberate host extensions and conditional references. |
-| [Agent Plugins specification](https://agent-plugins.org/specification) | Make root `plugin.json` canonical and keep shared skills at their fixed discovery path. |
-| [ChatGPT plugins](https://learn.chatgpt.com/docs/plugins) and [OpenAI plugin authoring](https://developers.openai.com/plugins/build/plugins) | Put OpenAI settings under `extensions.com.openai` and publish its native marketplace catalog. |
+| [Agent Plugins specification](https://agent-plugins.org/specification) | Distinguish portable skills and MCP support from host-specific lifecycle capabilities. |
+| [ChatGPT plugins](https://learn.chatgpt.com/docs/plugins.md), [hooks](https://learn.chatgpt.com/docs/hooks.md), and [OpenAI plugin authoring](https://developers.openai.com/plugins/build/plugins) | Use native Codex hook registration while preserving the supported marketplace and execution boundaries. |
 | [Claude overview](https://code.claude.com/docs/en/plugins/overview), [creation](https://code.claude.com/docs/en/plugins/create), and [components](https://code.claude.com/docs/en/plugins/components) | Preserve Claude's required descriptor, component directories, and namespaced skill invocation. |
 | [Claude dependencies](https://code.claude.com/docs/en/plugins/dependencies) and [publication](https://code.claude.com/docs/en/plugins/publish) | Keep bundled instructions self-contained and increment the manifest version for distributed changes. |
 | [Claude evaluations](https://code.claude.com/docs/en/plugin-evals) and [measurement](https://code.claude.com/docs/en/plugins/measure) | Check natural activation, keyword near misses, and outcomes separately, with optional paired baseline comparisons. |
 | [Claude CLI hints](https://code.claude.com/docs/en/plugins/cli-hints) | Reserve the documented hint protocol for official Anthropic marketplace listings. |
 | [Common workflows](https://code.claude.com/docs/en/common-workflows) and [native Workflow](https://code.claude.com/docs/en/workflows) | Preserve native execution, deterministic replay, permission boundaries, and explicit completion evidence. |
 | [Copilot plugins](https://docs.github.com/en/copilot/concepts/customizations/plugins) | Use portable skills and document the CLI's compatible marketplace installation route. |
-| [Cursor plugins](https://cursor.com/docs/plugins) and [plugin reference](https://cursor.com/docs/reference/plugins) | Use the portable manifest for skills and the documented catalog for repository discovery. |
+| [Cursor plugins](https://cursor.com/docs/plugins) and [plugin reference](https://cursor.com/docs/reference/plugins) | Use the native Cursor manifest for shared skills and the documented catalog for repository discovery. |
 | [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Preserve Writing's direct prose while retaining factual software actors, meaningful qualifiers, and technical conditions. |
 
-The portable manifest replaces the former OpenAI-only descriptor.
-Claude retains its dedicated manifest because its documented package format uses that location.
-The package gate checks shared metadata, versions, catalog destinations, and contained paths across these actual consumers.
+Workgraph uses native Codex, Claude, Cursor, and OpenPlugin descriptors because the reviewed Codex portable loader omits hooks.
+They select one shared skills tree and explicit host-specific hook configurations.
+The package gate checks shared metadata, versions, catalog destinations, and contained paths across these consumers.
 The maintainer's release contract is `yyyy.MM.dd.seq`, preserving separate calendar fields and daily sequences.
-The Agent Plugins specification recommends Semantic Versioning but requires clients to accept other version strings.
-Workgraph therefore retains its requested calendar format instead of imposing the recommendation as a mandatory gate.
+Workgraph retains its requested calendar format across the native descriptors.
 The [release instructions](../README.md#version-updates) define the format.
 
 Portable packaging standardizes shared skills and MCP configuration, not every host's execution tools or hooks.
-Workgraph's OpenAI extension explicitly selects Codex hooks instead of relying on Claude's default hook file.
+Workgraph's native Codex manifest explicitly selects Codex hooks.
 Hosts without matching native adapters use the shared role contracts and their own tool descriptions.
 The user adapters document installation, trust, invocation, and host-specific availability.
 
@@ -55,66 +54,96 @@ Package checks, context measurements, native activation, and model outcomes rema
 
 ### Codex marketplace resolution and updates
 
-The October 31, 2026 audit compared Codex `0.166.0` at [commit `6ff1e1c`](https://github.com/openai/codex/commit/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856) with [main `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6).
+The audit compared the [Codex main branch](https://github.com/openai/codex/tree/main) as of 2026-10-31 with the [release tag `rust-v0.166.0`](https://github.com/openai/codex/tree/rust-v0.166.0).
+The source links below use that reviewed main branch.
 The inspected resolver and the relevant installation and refresh functions agree on the behaviors below.
-The native [catalog resolver](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/marketplace.rs) searches `.agents/plugins/marketplace.json` before the Claude and Cursor catalog layouts.
+The native [catalog resolver](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/marketplace.rs) searches `.agents/plugins/marketplace.json` before the Claude and Cursor catalog layouts.
 It explicitly resolves a local source of `.` or `./` to the marketplace root, so Workgraph's catalog selects the complete root plugin.
 The same source accepts `AVAILABLE` and `ON_INSTALL`, which control installation policy and authentication timing rather than hook trust.
-The [hook loader](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/loader.rs#L1223-L1275) uses an explicit hook path instead of falling back to the default hook file.
-Workgraph retains its portable manifest and OpenAI hook extension without another descriptor or catalog change.
+The [hook loader](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/loader.rs) uses an explicit hook path instead of falling back to the default hook file when its caller selects the native format.
+The [native discovery review](#codex-native-hook-discovery-and-trust) explains the caller gate that makes a portable extension alone insufficient.
 
-The [Git upgrade path](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/manager.rs#L3041-L3103) refreshes configured plugin caches for newly activated marketplace snapshots without changing their enabled flags.
-[Configured entries](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/marketplace_policy.rs#L298-L315) include disabled plugins.
-The [snapshot check](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/marketplace_upgrade.rs#L244-L257) can skip an unchanged revision, so command success alone does not prove cache replacement.
+The [Git upgrade path](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/manager.rs) refreshes configured plugin caches for newly activated marketplace snapshots without changing their enabled flags.
+[Configured entries](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/marketplace_policy.rs) include disabled plugins.
+The [snapshot check](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/marketplace_upgrade.rs) can skip an unchanged revision, so command success alone does not prove cache replacement.
 The same manager rejects a named marketplace that is not configured as a Git source.
 
 Local installation also copies source into a cache, using the plugin manifest's declared version.
-The [store](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/store.rs#L293-L333) permits explicit reinstallation at the same version.
-However, [installation](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/manager.rs#L2318-L2374) also sets the user plugin's enabled flag to true.
+The [store](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/store.rs) permits explicit reinstallation at the same version.
+However, [installation](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/manager.rs) also sets the user plugin's enabled flag to true.
 Workgraph's update guidance therefore preserves an existing disabled choice and separates Git upgrades from local reinstalls.
 
-A client exposing local [`plugin/list` with `forceRefetch`](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/app-server/src/request_processors/plugins.rs#L549-L591) can request cache refresh without enablement.
-That [refresh path](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core-plugins/src/loader.rs#L709-L714) skips a matching installed version.
+A client exposing local [`plugin/list` with `forceRefetch`](https://github.com/openai/codex/blob/main/codex-rs/app-server/src/request_processors/plugins.rs) can request cache refresh without enablement.
+That [refresh path](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/loader.rs) skips a matching installed version.
 Codex CLI `0.166.0` exposes no separate local refresh command that preserves disabled state.
-Its [plugin browser](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/tui/src/app/background_requests.rs#L1088-L1121) lists plugins without requesting that refresh.
-Its [JSON listing](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/cli/src/plugin_cmd.rs#L517-L552) reports the installed version and enabled state for readback.
+Its [plugin browser](https://github.com/openai/codex/blob/main/codex-rs/tui/src/app/background_requests.rs) lists plugins without requesting that refresh.
+Its [JSON listing](https://github.com/openai/codex/blob/main/codex-rs/cli/src/plugin_cmd.rs) reports the installed version and enabled state for readback.
 The [Codex adapter](harness/codex.md#update) and [Delivery update reference](../skills/delivery/references/plugin-updates.md#codex) apply these distinctions.
 The [update assessment](../evals/codex-plugin-updates/case.yaml) checks synthetic decisions without performing installation or establishing native cache behavior.
 
+### Codex native hook discovery and trust
+
+The investigation compared the supplied [hooks guide](https://learn.chatgpt.com/docs/hooks.md) and [plugins guide](https://learn.chatgpt.com/docs/plugins.md) with the Codex [main branch](https://github.com/openai/codex/tree/main) as of 2026-10-31 and the [release tag `rust-v0.166.0`](https://github.com/openai/codex/tree/rust-v0.166.0).
+The hooks guide documents native `.codex-plugin/plugin.json` registration and a separate trust review.
+The plugins guide excludes plugins from the Codex IDE extension and excludes plugin hooks from cloud-orchestrated Work, even when tool execution is local.
+
+The [manifest selector](https://github.com/openai/codex/blob/main/codex-rs/utils/plugins/src/plugin_namespace.rs) gives a recognized root `plugin.json` precedence over native descriptors.
+The [caller](https://github.com/openai/codex/blob/main/codex-rs/core-plugins/src/loader.rs) then returns empty hook sources for the AgentPlugin format without invoking `load_plugin_hooks`.
+The guard agrees between the 2026-10-31 main branch and the reviewed release tag.
+The [packaging guide](https://developers.openai.com/plugins/build/plugins) advertises the OpenAI hook extension, but that declaration does not make this caller reach it.
+This explains how the former package could expose skills while omitting every hook.
+Adding a native manifest beside that root would leave the precedence problem intact.
+Workgraph therefore removes the root manifest and selects its existing hook configuration through `.codex-plugin/plugin.json`.
+
+The [bundle fingerprint](https://github.com/openai/codex/blob/main/codex-rs/hooks/src/engine/plugin_fingerprint.rs) includes ordinary file paths and contents.
+The [execution-time trust check](https://github.com/openai/codex/blob/main/codex-rs/hooks/src/engine/plugin_trust.rs) compares that fingerprint as well as the declaration hash.
+Consequently, documentation or release-metadata changes can require renewed approval even when the hook command is unchanged.
+The Codex adapter keeps installed-copy readback, current trust, and observed event execution distinct.
+
+The native migration preserves the other clients' documented entry points.
+The [Copilot CLI reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference) and [VS Code authoring reference](https://code.visualstudio.com/docs/agents/reference/agent-plugin-reference) support `.plugin/plugin.json`, while the [Cursor reference](https://cursor.com/docs/reference/plugins) supports `.cursor-plugin/plugin.json`.
+VS Code, as of 2026-10-31 on its main branch, [checks OpenPlugin before Claude](https://github.com/microsoft/vscode/blob/main/src/vs/platform/agentPlugins/common/pluginParsers.ts) and [includes default hook paths before explicit paths](https://github.com/microsoft/vscode/blob/main/src/vs/platform/agentPlugins/common/pluginParsers.ts).
+Its [hook reader](https://github.com/microsoft/vscode/blob/main/src/vs/platform/agentPlugins/common/pluginParsers.ts) accepts the first readable JSON configuration.
+Workgraph moves Claude's configuration to an explicit path and leaves generic hook paths absent, so the native skills-only descriptors do not discover Claude instructions.
+Their shared empty hook file uses the versioned envelope documented by the [Copilot hooks reference](https://docs.github.com/en/copilot/reference/hooks-reference).
+The [Claude manifest reference](https://code.claude.com/docs/en/plugins/manifest-reference) supports its explicit hook path.
+
+Existing command probes establish complete emitted role context, not native discovery or delivery.
+The package gate now protects native selection and hook separation, while the command tests follow those native descriptors.
+Actual installed activation and model adherence still require target-host evidence.
+
 ## Dated plugin comparisons
 
-The October 31, 2026 review checked each requested plugin's default branch, release target, publication date, relevant history, and current host documentation.
-Dates below are UTC.
-Superpowers and i-have-adhd default branches matched their latest published release commits at review time.
-The source commit date and release publication date are distinct evidence.
+The comparison uses each requested plugin's main branch as of 2026-10-31, its latest published release tag, relevant history, and current host documentation.
+Superpowers and i-have-adhd main branches matched their latest published release tags at review time.
 
-| Plugin | Reviewed source | Commit date | Latest release publication |
-| --- | --- | --- | --- |
-| Superpowers | [`2ce8aa1`](https://github.com/obra/superpowers/commit/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b) | 2026-10-21 | [v7.0.1](https://github.com/obra/superpowers/releases/tag/v7.0.1), 2026-10-21 |
-| i-have-adhd | [`1ecea19`](https://github.com/ayghri/i-have-adhd/commit/1ecea1993b7fce257ffbd686c070948b5e07eda6) | 2026-10-11 | [v0.4.1](https://github.com/ayghri/i-have-adhd/releases/tag/v0.4.1), 2026-10-19 |
-| Ponytail | [`96608e0`](https://github.com/DietrichGebert/ponytail/commit/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846) | 2026-10-29 | [v5.3.3](https://github.com/DietrichGebert/ponytail/releases/tag/v5.3.3), 2026-10-29 |
-| pstack | [`4dd1d05`](https://github.com/cursor/plugins/commit/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe), package `0.15.36` | 2026-10-29 | No GitHub release returned by the releases API. |
+| Plugin | Main branch reviewed on 2026-10-31 | Latest release tag |
+| --- | --- | --- |
+| Superpowers | [main](https://github.com/obra/superpowers/tree/main) | [v7.0.1](https://github.com/obra/superpowers/releases/tag/v7.0.1) |
+| i-have-adhd | [main](https://github.com/ayghri/i-have-adhd/tree/main) | [v0.4.1](https://github.com/ayghri/i-have-adhd/releases/tag/v0.4.1) |
+| Ponytail | [main](https://github.com/DietrichGebert/ponytail/tree/main) | [v5.3.3](https://github.com/DietrichGebert/ponytail/releases/tag/v5.3.3) |
+| pstack | [main](https://github.com/cursor/plugins/tree/main/pstack), package `0.15.36` | No GitHub release returned by the releases API. |
 
 Ponytail's reviewed main is one documentation commit after its release target, with unchanged hook and skill code.
-Pstack's latest component change is [October 27](https://github.com/cursor/plugins/commit/c742dd61706fbacc1b95f1a20b7b988cf096ce6c), predating the monorepository's reviewed HEAD.
+Pstack's [component history on main](https://github.com/cursor/plugins/commits/main/pstack), reviewed on 2026-10-31, records its latest change on October 27, before the monorepository's latest change.
 Its package version is source metadata, not a separately dated GitHub release.
 
 ### Hook timing and activation
 
-Superpowers [v6.1.0](https://github.com/obra/superpowers/releases/tag/v6.1.0), published June 30, removed its Codex startup hook intentionally.
-Its July 2 [v6.1.1 release](https://github.com/obra/superpowers/releases/tag/v6.1.1) then set an explicit empty hooks object to prevent fallback discovery of the Claude hook.
+Superpowers [v6.1.0](https://github.com/obra/superpowers/releases/tag/v6.1.0) removed its Codex startup hook intentionally.
+Its [v6.1.1 release](https://github.com/obra/superpowers/releases/tag/v6.1.1) then set an explicit empty hooks object to prevent fallback discovery of the Claude hook.
 This product choice does not establish that Codex lacks hooks.
 Workgraph retains its explicit OpenAI hook configuration and role-specific context delivery.
-The current [OpenAI packaging guide](https://developers.openai.com/plugins/build/plugins) supports this registration, while the [hooks reference](https://learn.chatgpt.com/docs/hooks) separately defines trust and runtime availability.
+The [native discovery review](#codex-native-hook-discovery-and-trust) selects the hook-capable package path, while the [hooks reference](https://learn.chatgpt.com/docs/hooks.md) separately defines trust and runtime availability.
 The [Codex adapter](harness/codex.md#confirm-hook-activation) now distinguishes installation, registration, trust, and event execution.
 
-The August 18 i-have-adhd [timeout fix](https://github.com/ayghri/i-have-adhd/commit/43eeda8da59ed8eabc5b9df9335cdefc7ae21bda) reports a 6,549 ms Node cold start under concurrent hooks that exceeded its former five-second deadline.
+The i-have-adhd [hook history on main](https://github.com/ayghri/i-have-adhd/commits/main/hooks/hooks.json), reviewed on 2026-10-31, records an August 18 timeout fix reporting a 6,549 ms Node cold start under concurrent hooks that exceeded its former five-second deadline.
 Workgraph increases its context-hook ceiling to 30 seconds to allow startup under contention.
 This adds headroom rather than a delay, and the independent polling-guard timeout remains unchanged.
 The upstream report is not a reproduction of missing Workgraph context or proof of startup performance on another host.
 The [Claude hooks reference](https://code.claude.com/docs/en/hooks) describes event timing and timeout handling.
 
-Ponytail's October 18 [timeout fix](https://github.com/DietrichGebert/ponytail/commit/5a5a605fb1292a93095e9b8fcd5a7866f2fcc637) raised lifecycle deadlines from five to fifteen seconds after reports of slow Windows startup.
+Ponytail's [main branch history](https://github.com/DietrichGebert/ponytail/commits/main/), reviewed on 2026-10-31, records an October 18 timeout fix that raised lifecycle deadlines from five to fifteen seconds after reports of slow Windows startup.
 Workgraph's existing thirty-second context ceiling already accommodates that rationale without changing the polling guard.
 Ponytail's optional codebase map and persistent personal mode do not create corresponding Workgraph requirements.
 Workgraph retains canonical skill files rather than duplicating fallback instructions in its injector.
@@ -123,7 +152,7 @@ Pstack's current manifests declare no lifecycle hooks, and its dependency bootst
 ### Conditional references and compaction
 
 Superpowers v7.0.1 moved conditional procedures into references after reported skill truncation during compaction.
-Its [size test](https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/tests/skill-size/test-skill-size.sh) uses a 20,000-byte ceiling as its own guard.
+Its [size test](https://github.com/obra/superpowers/blob/main/tests/skill-size/test-skill-size.sh) uses a 20,000-byte ceiling as its own guard.
 The current official [Claude skill lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) instead documents reattaching up to 5,000 tokens per invoked skill within a combined 25,000-token budget, newest first.
 Bytes, characters, and tokens are not interchangeable, and neither policy proves complete retention of all previously loaded skills.
 Workgraph keeps always-required guidance inline and genuinely conditional material in references, without adding an unsupported universal size gate.
@@ -132,18 +161,19 @@ The existing [hook delivery checks](design.md#deliver-context) cover their own o
 
 ### Native skill selection
 
-We compared actual Workgraph hook output with Claude Code `2.1.305`, built October 20, and [Codex source `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6), committed October 31.
+We compared actual Workgraph hook output with Claude Code `2.1.305` and the [Codex main branch](https://github.com/openai/codex/tree/main) as of 2026-10-31.
 Claude's loaded skill fragment begins with its base directory and parsed body without YAML.
-Codex's [skill fragment](https://github.com/openai/codex/blob/67f0994b532b8740f14b5b738af7b7b2a915b1d6/codex-rs/ext/skills/src/fragments.rs) wraps the qualified name, source path, and full file in `<skill>`.
+Codex's [skill fragment](https://github.com/openai/codex/blob/main/codex-rs/ext/skills/src/fragments.rs) wraps the qualified name, source path, and full file in `<skill>`.
 Workgraph now starts each context with that native fragment and puts its provenance labels afterward.
 The comparison covers content formatting, not native invocation state, skill-scoped permissions, frontmatter hook registration, or message-role equivalence.
 The [delivery design](design.md#deliver-context) records those host-owned boundaries.
 
-The same Codex revision sets [an 8,000-byte main-prompt limit](https://github.com/openai/codex/blob/67f0994b532b8740f14b5b738af7b7b2a915b1d6/codex-rs/ext/skills/src/render.rs) for selected skill contents.
-Its [host loader](https://github.com/openai/codex/blob/67f0994b532b8740f14b5b738af7b7b2a915b1d6/codex-rs/ext/skills/src/host_prompt.rs) applies that limit to portable Agent Plugin skills, including their YAML, and warns while injecting the UTF-8-safe prefix.
-The recognized root `plugin.json` makes Workgraph part of that loading path.
+The reviewed Codex main branch sets [an 8,000-byte main-prompt limit](https://github.com/openai/codex/blob/main/codex-rs/ext/skills/src/render.rs) for selected skill contents.
+Its [host loader](https://github.com/openai/codex/blob/main/codex-rs/ext/skills/src/host_prompt.rs) applies that limit to portable Agent Plugin skills, including their YAML, and warns while injecting the UTF-8-safe prefix.
+That path applied to Workgraph's former recognized root `plugin.json`.
+The restored native Codex manifest selects a different loading path, while the existing complete-file budget remains a portability check.
 Explicit selection does not exempt the skill, and the separate catalog metadata budget does not increase its body limit.
-This source revision does not establish the user's installed or deployed Codex version.
+This dated branch review does not establish the user's installed or deployed Codex version.
 
 Delivery, Development, and Codex Scoped Cleanup previously exceeded that limit, so their final required instructions could be omitted on this path.
 They now keep required procedures inline through concise wording and removal of duplicated same-context rules.
@@ -153,8 +183,8 @@ Hook output remains complete and does not pass through that selected-skill rende
 
 ### Merge authority and native orchestration
 
-Pstack's [Babysit playbook](https://github.com/cursor/plugins/blob/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe/pstack/skills/poteto-mode/playbooks/babysit.md) distinguishes merge readiness from an explicit request to merge, land, or ship.
-Its [Shipping playbook](https://github.com/cursor/plugins/blob/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe/pstack/skills/poteto-mode/playbooks/shipping.md) checks actual merged state rather than treating queue enrollment as a completed merge.
+Pstack's [Babysit playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/babysit.md) distinguishes merge readiness from an explicit request to merge, land, or ship.
+Its [Shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/shipping.md) checks actual merged state rather than treating queue enrollment as a completed merge.
 Delivery adopts these distinctions, preserves prior scoped user authorization, and completes preparation without adding a mandatory confirmation ritual.
 The merge-authority clause predates the October 27 change and is not attributed to that commit.
 The [delivery decision case](../evals/delivery-decisions/case.yaml) covers publication-only requests, later scoped grants, and queued requests still awaiting integration.
@@ -165,12 +195,12 @@ The bundled Workflow samples integrate units into a candidate branch and end at 
 
 ### Tests and failure reports
 
-Superpowers' July 24 [v6.2.0 release](https://github.com/obra/superpowers/releases/tag/v6.2.0) introduced its revised [test-quality guidance](https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/test-driven-development/writing-good-tests.md).
+Superpowers' [v6.2.0 release](https://github.com/obra/superpowers/releases/tag/v6.2.0) introduced its revised [test-quality guidance](https://github.com/obra/superpowers/blob/main/skills/test-driven-development/writing-good-tests.md).
 Development now names the real failure a new test detects and requires independently derived expectations.
 Structural checks still verify explicit structural contracts without claiming host execution or model adherence.
 The [test-design case](../evals/development-test-design/case.yaml) covers that distinction without requiring new tests for a simple prose edit.
 
-The official public embed of the supplied [October 30 post](https://x.com/Im_IrushiK/status/2116182482152460479) exposes a truncated excerpt reporting 6,000 product lines and 115,000 test lines.
+The official public embed of the [supplied post](https://x.com/Im_IrushiK/status/2116182482152460479) exposes a truncated excerpt reporting 6,000 product lines and 115,000 test lines.
 Those figures are the author's report, not an independently inspected repository or evidence about every task performed by that model.
 The full post was unavailable through the reviewed public routes.
 Development addresses the general failure mode by requiring concrete needs for added abstractions, existing-check reuse, and an uncovered realistic failure for each added test.
@@ -183,7 +213,7 @@ Hook tests retain reference containment and exact emitted context while the exis
 Obsolete absence checks and a static workflow inventory check were removed while executed workflow coverage and Markdown link validation remain.
 The new byte-boundary regression detects native content loss that those existing checks did not cover.
 
-The i-have-adhd [evaluation report](https://github.com/ayghri/i-have-adhd/blob/1ecea1993b7fce257ffbd686c070948b5e07eda6/evals/RESULTS.md) records an August 2 run using Claude Code 2.1.220 and `claude-opus-4-8`, with three trials per case.
+The i-have-adhd [evaluation report](https://github.com/ayghri/i-have-adhd/blob/main/evals/RESULTS.md) records an August 2 run using Claude Code 2.1.220 and `claude-opus-4-8`, with three trials per case.
 Its partial-success case includes an unsupported authentication diagnosis, and the report proposes unconditional cause-first wording as a possible explanation.
 It does not establish that mechanism or measure current Workgraph behavior.
 Writing now separates the observed failure, supported cause, and next diagnostic when the cause remains uncertain.
@@ -222,15 +252,15 @@ Source validation, native behavior evidence, and installed activation remain sep
 
 ### Official prompt-engineering guides
 
-We fetched the official [Anthropic prompt-engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md) in full on October 20, 2026.
+We fetched the official [Anthropic prompt-engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md) in full.
 It is a hub page that links the separately cited best-practices guide, rather than replacing that guide.
 It recommends defining success criteria, running empirical tests, and drafting instructions before refining them, and notes that prompts do not fix every failure.
 
-We fetched the official [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full on October 20, 2026, last modified the same day.
+We fetched the official [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full.
 It recommends explicit user priority over skill text, auditing loaded `AGENTS.md` and skill files for conflicts, concise explicit output expectations, and checks proportional to the change.
 It permits initiative only within the authorized scope and treats its model-specific observations as hypotheses for the selected model and workload.
 
-We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) in full, with a footer date of August 17, 2026.
+We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) in full.
 The `.md` URL returned 404 with `Accept: text/markdown`, while a direct fetch with the default `Accept` header returned the complete document.
 The [extensionless page](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide) was also read.
 Its reusable lessons are auditing instructions for conflicts and ambiguity, short focused rules, alignment with real tool schemas, examples where needed, and avoiding accumulated emphasis.
@@ -408,17 +438,17 @@ These structural choices supply no model-performance evidence.
 
 ### Codex delegation context and turns
 
-The October 31, 2026 review inspected Codex `0.166.0` at [release commit `6ff1e1c`](https://github.com/openai/codex/commit/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856).
-Its [agent schemas](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L610-L684) distinguish V1 `fork_context` from V2 `fork_turns`.
+The review inspected the [Codex main branch](https://github.com/openai/codex/tree/main) as of 2026-10-31 and compared it with the [release tag `rust-v0.166.0`](https://github.com/openai/codex/tree/rust-v0.166.0).
+Its [agent schemas](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/multi_agents_spec.rs) distinguish V1 `fork_context` from V2 `fork_turns`.
 V1 defaults to no inherited history, while V2 defaults to all history and documents only `all` and `none`.
 Neither inspected spawn schema supplies a recent-turn window or a worker `max_turns` control.
-The [V2 parser](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs#L201-L238) accepts positive numeric strings for legacy compatibility but maps them to full history.
+The [V2 parser](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/multi_agents_v2/spawn.rs) accepts positive numeric strings for legacy compatibility but maps them to full history.
 For example, `fork_turns: "3"` does not limit inheritance to three turns.
-The inspected schema and parser files match [October 31 main `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6).
+The inspected schema and parser files agree between the 2026-10-31 main branch and that release tag.
 
 The official [App Server guide](https://learn.chatgpt.com/docs/app-server#core-primitives) defines a turn as a user request and the resulting agent work.
 Commands, tool calls, edits, and messages are items within that turn.
-The [V2 control descriptions](https://github.com/openai/codex/blob/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856/codex-rs/core/src/tools/handlers/multi_agents_spec.rs#L201-L341) distinguish a follow-up assignment, a message without a new turn, and waiting for an update.
+The [V2 control descriptions](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/multi_agents_spec.rs) distinguish a follow-up assignment, a message without a new turn, and waiting for an update.
 These interfaces do not establish a recommended numeric worker quota or unlimited execution.
 
 Main's [Codex reference](../skills/main-agent-contract/references/codex.md) selects history from the required context and sizes assignments around coherent outcomes.
@@ -610,7 +640,7 @@ The sources do not establish that this routing improves Workgraph outcomes.
 
 ### Lauren Tan on verification and agent environments
 
-We reviewed Lauren Tan's [recorded presentation](https://x.com/poteto/status/2102050467505430555), published on September 21, 2026 UTC.
+We reviewed Lauren Tan's [recorded presentation](https://x.com/poteto/status/2102050467505430555).
 The approximately 38-minute recording and its automatic English captions describe practitioner experience at Cursor and Grok Bot.
 The post names 2,500 production PRs, while the opening slide and captions name 2,000.
 We retain that discrepancy without treating either count as measured Workgraph evidence.
@@ -651,7 +681,7 @@ Workgraph does not implement transactions, automatic compensation, or durable re
 
 ### Bounded feedback and review evidence
 
-We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md), published October 15, 2026.
+We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md).
 Addy Osmani, Morgan Westlee Lunt, and Qing Wang describe Anthropic's layered review process and its operational results.
 This practitioner report does not establish Workgraph effectiveness or authorize a review product, provider, or approval policy.
 
@@ -846,7 +876,7 @@ Workgraph bundles language guidance only and does not install consumer rules, pl
 
 ### Rust guidance and checks
 
-The October 31, 2026 review used the [Google Rust Style Guide](https://google.github.io/styleguide/rustguide.html) to extend Development's existing [Rust reference](../skills/development/references/rust.md).
+The review used the [Google Rust Style Guide](https://google.github.io/styleguide/rustguide.html) to extend Development's existing [Rust reference](../skills/development/references/rust.md).
 The reference now covers Cargo and Rust configuration changes as well as `.rs` files.
 Its portable guidance favors explicit ownership, readable imports, domain types, standard traits, and documented failure and safety contracts.
 Google's Chromium build and concurrency restrictions and Fuchsia mutex choice remain scoped to those codebases.
@@ -917,7 +947,7 @@ They do not establish compatibility for a particular repository or replace indep
 
 ### Native Workflow stage adoption
 
-We read the complete original [mirku post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
+We read the complete original [mirku post](https://x.com/mirku21/status/2111200540772221418).
 We also read the complete official [Workflow documentation](https://code.claude.com/docs/en/workflows.md).
 The post combines a Claude model split, isolated edits, independent verification, bounded fixes, deterministic decision routing, and an explicit approval gate.
 The official documentation supports native scripts, cross-checking, isolated migration edits, and two consecutive no-progress fix rounds.

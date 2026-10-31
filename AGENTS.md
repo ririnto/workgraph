@@ -108,7 +108,9 @@ Run formatting fixes only within the authorized change.
 
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit bodies and issue and pull request templates.
 
-Keep matching versions in `plugin.json` and `.claude-plugin/plugin.json` using the `yyyy.MM.dd.seq` scheme in `README.md`.
+Keep matching versions in the Codex, Claude, Cursor, and OpenPlugin manifests using the `yyyy.MM.dd.seq` scheme in `README.md`.
+Keep root `plugin.json` absent so the reviewed Codex loader reaches its native hook configuration.
+Keep each host's hook configuration explicit and omit conventionally discovered hook files to preserve manual activation in skills-only clients.
 Include the matching plugin version bump in every plugin-source pull request.
 Follow the release procedure in `README.md`.
 Omit version fields from the marketplace and private package manifest.

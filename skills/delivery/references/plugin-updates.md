@@ -32,3 +32,5 @@ If the available client cannot refresh a disabled local installation while prese
 Read back the installed version and enabled state after either path.
 Check the installed files when an unchanged version cannot distinguish old and new content.
 Opening the plugin browser alone does not establish that cached files refreshed.
+For plugins with Codex hooks, follow [hook activation verification](../../../docs/harness/codex.md#confirm-hook-activation) after refreshing the installed copy.
+Keep installation, current trust, and the observed lifecycle result distinct in the completion report.

@@ -30,21 +30,21 @@ We reviewed its [branch-finishing skill](https://github.com/obra/superpowers/blo
 Workgraph uses its own context documents and execution rules.
 We reviewed the [using-superpowers skill](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md) and [Codex tool reference](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/references/codex-tools.md) on its `main` branch.
 We used their host adapters to review tool names and model allowlists, retaining the current host's fork rules where they differ.
-On October 31, 2026, we reviewed release v7.0.1 at [commit `2ce8aa1`](https://github.com/obra/superpowers/commit/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b).
+We reviewed the [main branch](https://github.com/obra/superpowers/tree/main) as of 2026-10-31, when it matched release tag [v7.0.1](https://github.com/obra/superpowers/tree/v7.0.1).
 Its test-quality guidance informed Development's independently written guidance on meaningful failures, expected results, and structural evidence.
-The [dated comparison](docs/research.md#dated-plugin-comparisons) records release timing, hook history, and current host limits.
+The [dated comparison](docs/research.md#dated-plugin-comparisons) records branch observations, release tags, hook history, and current host limits.
 
 ## Ponytail
 
 We studied [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) on its `main` branch.
 The project uses the MIT license and credits Dietrich Gebert, copyright 2026.
 It informed reuse of existing tools, limited abstractions, and the smallest sufficient implementation.
-On October 31, 2026, we compared [main `96608e0`](https://github.com/DietrichGebert/ponytail/commit/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846) with release v5.3.3 and its earlier lifecycle-timeout fix.
+We compared the [main branch](https://github.com/DietrichGebert/ponytail/tree/main) as of 2026-10-31 with release tag [v5.3.3](https://github.com/DietrichGebert/ponytail/tree/v5.3.3) and its earlier lifecycle-timeout fix.
 The [dated comparison](docs/research.md#dated-plugin-comparisons) records the source and release distinction without importing its hooks or fallback instructions.
 
 ## Lauren Tan
 
-Lauren Tan, known as [@poteto](https://x.com/poteto), published a [recorded presentation](https://x.com/poteto/status/2102050467505430555) on September 21, 2026 UTC.
+Lauren Tan, known as [@poteto](https://x.com/poteto), published a [recorded presentation](https://x.com/poteto/status/2102050467505430555).
 We reviewed its automatic English captions and presentation screens.
 Her CLI and feature-map examples, correction priorities, and Dune ownership boundaries informed Development guidance.
 Workgraph adapts those ideas without redistributing her video, slides, transcript, pstack, or Dune implementation.
@@ -58,13 +58,13 @@ We also inspected the installed pstack `0.15.29` mode, leaf principle skills, wo
 They informed Workgraph's mode entry, focused lifecycle playbooks, conditional principles, user host adapters, and guide-first README structure.
 This restructure uses pstack's organization without copying its text, adopting its policies, or adding a dependency.
 The [research notes](docs/research.md#skill-structure) record the structure evidence and its limits.
-On October 31, 2026, we reviewed package `0.15.36` at [source `4dd1d05`](https://github.com/cursor/plugins/commit/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe).
+We reviewed package `0.15.36` on the [main branch](https://github.com/cursor/plugins/tree/main/pstack) as of 2026-10-31.
 Its Babysit and Shipping playbooks informed explicit merge authority and distinguishing queued requests from completed integration.
 Workgraph uses independently written policy and retains its own review, evidence-reuse, and native execution contracts.
 
 ## Irushi on test growth
 
-We reviewed the official public embed excerpt of [Irushi's October 30, 2026 post](https://x.com/Im_IrushiK/status/2116182482152460479).
+We reviewed the official public embed excerpt of [Irushi's post](https://x.com/Im_IrushiK/status/2116182482152460479).
 Its reported test growth prompted a review of proportional design and redundant verification.
 The [research notes](docs/research.md#tests-and-failure-reports) distinguish that report from inspected code and measured model behavior.
 
@@ -96,11 +96,15 @@ Its lifecycle, inventory, owner guards, attachment APIs, and control transport i
 We also consulted the [official app-server guide](https://learn.chatgpt.com/docs/app-server) for protocol initialization and schema generation.
 Workgraph distributes its own instructions without bundling Codex source or a cleanup client.
 The [research notes](docs/research.md#codex-native-cleanup) distinguish reference-source effects from installed protocol and destructive-operation evidence.
-We also reviewed [Codex `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6) for native skill fragments and portable-plugin prompt truncation.
+We also reviewed the [Codex main branch](https://github.com/openai/codex/tree/main) as of 2026-10-31 for native skill fragments and portable-plugin prompt truncation.
 The [native selection review](docs/research.md#native-skill-selection) records the version-specific compatibility boundary without bundling Codex code.
-We reviewed [Codex `0.166.0`](https://github.com/openai/codex/tree/6ff1e1ca3b30fc8b914720681fcf5fe62e95f856) and the official App Server guide for subagent history, turn boundaries, and continuation.
+We compared that main branch with the [Codex release tag `rust-v0.166.0`](https://github.com/openai/codex/tree/rust-v0.166.0) and the official App Server guide for subagent history, turn boundaries, and continuation.
 The [delegation review](docs/research.md#codex-delegation-context-and-turns) distinguishes those supported controls from instruction choices and synthetic behavioral coverage.
-The same release's catalog resolver, installation store, and refresh paths informed the [marketplace update guidance](docs/research.md#codex-marketplace-resolution-and-updates).
+The reviewed main branch's catalog resolver, installation store, and refresh paths informed the [marketplace update guidance](docs/research.md#codex-marketplace-resolution-and-updates).
+Its complete manifest-selection, hook-loading, and bundle-trust paths informed the [native hook compatibility repair](docs/research.md#codex-native-hook-discovery-and-trust).
+We also reviewed the official [hooks](https://learn.chatgpt.com/docs/hooks.md) and [plugins](https://learn.chatgpt.com/docs/plugins.md) guides for supported surfaces and trust requirements.
+The MIT-licensed [VS Code plugin parser](https://github.com/microsoft/vscode/blob/main/src/vs/platform/agentPlugins/common/pluginParsers.ts), reviewed on its main branch as of 2026-10-31, informed manifest precedence and separation from default hook discovery.
+No upstream implementation code is bundled.
 
 ## Anthropic Guidance
 
@@ -108,12 +112,12 @@ We read the complete official [Claude prompting best-practices guide](https://pl
 Its explicit outcomes, contextual instructions, examples, source separation, and scoped tool guidance informed agent-facing instruction authoring.
 These adaptations retain model-specific evidence limits and do not redistribute the guide or configure host behavior.
 
-We read the complete original [mirku workflow post](https://x.com/mirku21/status/2111200540772221418), published October 16, 2026.
+We read the complete original [mirku workflow post](https://x.com/mirku21/status/2111200540772221418).
 Its role split, isolated edits, verification, fix-loop bound, and approval example informed the native Workflow stage guidance.
 The complete official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows.md) informed supported execution and permission boundaries.
 Workgraph adapts those decisions without redistributing the post or supplying another execution engine.
 
-We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md), published October 15, 2026.
+We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md).
 The article credits Addy Osmani, Morgan Westlee Lunt, and Qing Wang.
 Its layered review, verified findings, risk selection, and convergence lessons informed Workgraph's Delivery procedure and Main review staffing guidance.
 Workgraph adapts those workflow decisions without redistributing the article or activating Anthropic review products.
@@ -131,7 +135,7 @@ Its reported FrontierCode comparisons inform Haiku's coding effort choices, with
 
 ## xAI And Meta Prompting Guides
 
-We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) and the official [Meta prompting guide](https://dev.meta.ai/llama/docs/how-to-guides/prompting) in full on October 20, 2026.
+We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) and the official [Meta prompting guide](https://dev.meta.ai/llama/docs/how-to-guides/prompting) in full.
 We also fetched the official [Anthropic prompt-engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md) and the [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full for the same decisions.
 Their conflict audits, short focused rules, tool-schema alignment, example guidance, and emphasis limits informed the agent-facing instruction contracts.
 Workgraph adapts these lessons without redistributing their text or adopting their voice, audio, API, or format-specific guidance.
@@ -211,6 +215,6 @@ Workgraph does not bundle their code or adopt their runtime guarantees.
 The Writing skill also adapts communication guidance from [i-have-adhd](https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md) by Ayoub Ghriss.
 The source repository declares the MIT license and identifies 2026 copyright.
 This adaptation uses general communication guidance without redistributing the source skill verbatim.
-On October 31, 2026, we reviewed release v0.4.1 at [commit `1ecea19`](https://github.com/ayghri/i-have-adhd/commit/1ecea1993b7fce257ffbd686c070948b5e07eda6), including its earlier timeout fix and recorded evaluation.
+We reviewed the [main branch](https://github.com/ayghri/i-have-adhd/tree/main) as of 2026-10-31, when it matched release tag [v0.4.1](https://github.com/ayghri/i-have-adhd/tree/v0.4.1), including its earlier timeout fix and recorded evaluation.
 These sources informed Workgraph's context-hook startup allowance and evidence-qualified error reports.
 The [dated comparison](docs/research.md#dated-plugin-comparisons) distinguishes upstream observations from Workgraph validation.

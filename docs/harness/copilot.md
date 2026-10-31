@@ -15,7 +15,8 @@ If the installed plugin is disabled, run `copilot plugin enable workgraph`.
 
 These commands follow GitHub's [installation guide](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing).
 Copilot CLI discovers the repository's `.claude-plugin/marketplace.json` catalog.
-The plugin itself uses the canonical root `plugin.json` and standard `skills/` discovery.
+The plugin uses the OpenPlugin manifest at `.plugin/plugin.json` and the shared `skills/` directory.
+The [CLI plugin reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference) and [VS Code authoring reference](https://code.visualstudio.com/docs/agents/reference/agent-plugin-reference) document that format.
 
 ## Use the shared skills
 
@@ -32,8 +33,8 @@ Use [Development](../../skills/development/SKILL.md) for implementation and [Wri
 The [skill map](../../README.md#skill-invocation) lists the other task procedures.
 
 Workgraph uses manual role activation in Copilot.
-Its Claude and Codex hook configurations belong to those hosts.
-Copilot-specific hooks require the `com.github.copilot/` extension layout described in the [CLI reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-plugin-reference).
+Its manifest selects the empty `hooks/skills-only.json` configuration.
+The package omits conventionally discovered hook files, so clients do not pick up Claude's separate configuration.
 
 Project or personal skills with the same name can take precedence over plugin skills.
 Check the selected skill's source path if instructions differ from the installed Workgraph package.
