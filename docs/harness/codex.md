@@ -24,8 +24,8 @@ See the official [plugin guide](https://learn.chatgpt.com/docs/plugins) for supp
 
 | Surface | Workgraph loading |
 | --- | --- |
-| Codex desktop with local plugin hooks enabled | SessionStart loads Main, and SubagentStart loads Worker. |
-| ChatGPT cloud | Invoke the role skill explicitly at the start of its task. |
+| Local Codex or local-only Work with plugin hooks enabled and trusted | SessionStart loads Main, and SubagentStart loads Worker. |
+| Cloud orchestration, including threads whose tools execute locally | Invoke the role skill explicitly at the start of its task. |
 | Other supported skill clients | Use the client's skill picker or name the required Workgraph skill. |
 
 The portable `plugin.json` discovers the shared `skills/` directory.
@@ -40,6 +40,19 @@ Main receives its [Codex reference](../../skills/main-agent-contract/references/
 Worker receives its [Codex reference](../../skills/subagent-context/references/codex.md).
 Those references own host-specific execution and delegation.
 The [Bash polling guard](../../README.md#bash-polling-guard) applies where the host runs its registered PreToolUse hook.
+
+## Confirm hook activation
+
+In a supported local Codex session, open `/hooks` and check the Workgraph source.
+It should list SessionStart, SubagentStart, and Bash PreToolUse.
+Review and trust the current definitions through the host controls before relying on them.
+Installation alone does not grant hook trust, and changed definitions can require another review.
+The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks) describes trust, disabled hooks, managed policy, and cloud restrictions.
+
+Check the installed plugin version and source when the listing differs from this checkout.
+Start a fresh supported session and inspect hook results for failures or timeouts.
+A discovered handler proves registration, while a successful event result establishes execution for that event.
+Use the manual role entry below when the host cannot run local plugin hooks or its policy excludes them.
 
 ## Start a task
 

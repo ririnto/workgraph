@@ -115,6 +115,9 @@ When selecting, developing, configuring, or assessing authorized lint tools, rul
 Identify the target, trigger, input, and observable expected outcome before checking behavior.
 Use existing commands and supported entry points, and preserve the project's execution and import boundaries.
 Choose tests that exercise the changed behavior and run the application when integration, state, or external behavior matters.
+When adding tests, identify the realistic failure each test detects and derive expected results independently of the implementation under test.
+Prefer consumer-visible outcomes, keeping source-shape assertions for explicit structural contracts.
+A structural check establishes that contract, not execution or model adherence.
 Collect traces, screenshots, results, or timings when tests do not show the outcome.
 Record the command, setup, exit status, and raw result separately from interpretation.
 Retain failures and unexpected output, and reproduce reports against their stated expectations.

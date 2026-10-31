@@ -30,6 +30,9 @@ We reviewed its [branch-finishing skill](https://github.com/obra/superpowers/blo
 Workgraph uses its own context documents and execution rules.
 We reviewed the [using-superpowers skill](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/SKILL.md) and [Codex tool reference](https://github.com/obra/superpowers/blob/main/skills/using-superpowers/references/codex-tools.md) on its `main` branch.
 We used their host adapters to review tool names and model allowlists, retaining the current host's fork rules where they differ.
+On October 31, 2026, we reviewed release v7.0.1 at [commit `2ce8aa1`](https://github.com/obra/superpowers/commit/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b).
+Its test-quality guidance informed Development's independently written guidance on meaningful failures, expected results, and structural evidence.
+The [dated comparison](docs/research.md#dated-plugin-comparisons) records release timing, hook history, and current host limits.
 
 ## Ponytail
 
@@ -187,3 +190,6 @@ Workgraph does not bundle their code or adopt their runtime guarantees.
 The Writing skill also adapts communication guidance from [i-have-adhd](https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md) by Ayoub Ghriss.
 The source repository declares the MIT license and identifies 2026 copyright.
 This adaptation uses general communication guidance without redistributing the source skill verbatim.
+On October 31, 2026, we reviewed release v0.4.1 at [commit `1ecea19`](https://github.com/ayghri/i-have-adhd/commit/1ecea1993b7fce257ffbd686c070948b5e07eda6), including its earlier timeout fix and recorded evaluation.
+These sources informed Workgraph's context-hook startup allowance and evidence-qualified error reports.
+The [dated comparison](docs/research.md#dated-plugin-comparisons) distinguishes upstream observations from Workgraph validation.
