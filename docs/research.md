@@ -844,6 +844,26 @@ Verify the target's supported combination instead of assuming the newest stable 
 Register custom rulesets with the consumer's ktlint runtime and prove native lint discovers them.
 Workgraph bundles language guidance only and does not install consumer rules, plugins, or hooks.
 
+### Rust guidance and checks
+
+The October 31, 2026 review used the [Google Rust Style Guide](https://google.github.io/styleguide/rustguide.html) to extend Development's existing [Rust reference](../skills/development/references/rust.md).
+The reference now covers Cargo and Rust configuration changes as well as `.rs` files.
+Its portable guidance favors explicit ownership, readable imports, domain types, standard traits, and documented failure and safety contracts.
+Google's Chromium build and concurrency restrictions and Fuchsia mutex choice remain scoped to those codebases.
+
+The [rustfmt configuration reference](https://github.com/rust-lang/rustfmt/blob/master/Configurations.md) distinguishes stable options from nightly options.
+At review time, `max_width` and `hex_literal_case` are marked stable, while `imports_granularity` and `format_macro_matchers` are marked unstable.
+The selected project's formatter version still determines support, so the minimal configuration sets only `max_width = 100` and leaves unsupported style decisions to review.
+
+The official [Clippy guide](https://doc.rust-lang.org/clippy/usage.html) documents default lints and warns that the complete restriction group contains conflicting rules.
+Its current warning-enforcement guidance uses `CARGO_BUILD_WARNINGS=deny` with Cargo 1.97 or later and documents `-- -D warnings` for earlier versions.
+Workgraph preserves existing CI enforcement and gives the latter as a broadly compatible workspace example.
+
+The Cargo [test reference](https://doc.rust-lang.org/cargo/commands/cargo-test.html) includes documentation tests by default, while explicit `--all-targets` expands to the other target kinds.
+The Rust reference therefore retains doctest coverage separately when target selection would omit it.
+Cargo's [feature guidance](https://doc.rust-lang.org/cargo/reference/features.html) describes mutually exclusive configurations, so `--all-features` is conditional on the project's supported matrix.
+These source decisions supply guidance rather than evidence that any consuming Rust project passes its checks.
+
 ## Codex native cleanup
 
 This section records historical, non-operational transport research.
