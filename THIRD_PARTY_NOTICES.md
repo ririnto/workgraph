@@ -39,6 +39,8 @@ The [dated comparison](docs/research.md#dated-plugin-comparisons) records releas
 We studied [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) on its `main` branch.
 The project uses the MIT license and credits Dietrich Gebert, copyright 2026.
 It informed reuse of existing tools, limited abstractions, and the smallest sufficient implementation.
+On October 31, 2026, we compared [main `96608e0`](https://github.com/DietrichGebert/ponytail/commit/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846) with release v5.3.3 and its earlier lifecycle-timeout fix.
+The [dated comparison](docs/research.md#dated-plugin-comparisons) records the source and release distinction without importing its hooks or fallback instructions.
 
 ## Lauren Tan
 
@@ -56,6 +58,15 @@ We also inspected the installed pstack `0.15.29` mode, leaf principle skills, wo
 They informed Workgraph's mode entry, focused lifecycle playbooks, conditional principles, user host adapters, and guide-first README structure.
 This restructure uses pstack's organization without copying its text, adopting its policies, or adding a dependency.
 The [research notes](docs/research.md#skill-structure) record the structure evidence and its limits.
+On October 31, 2026, we reviewed package `0.15.36` at [source `4dd1d05`](https://github.com/cursor/plugins/commit/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe).
+Its Babysit and Shipping playbooks informed explicit merge authority and distinguishing queued requests from completed integration.
+Workgraph uses independently written policy and retains its own review, evidence-reuse, and native execution contracts.
+
+## Irushi on test growth
+
+We reviewed the official public embed excerpt of [Irushi's October 30, 2026 post](https://x.com/Im_IrushiK/status/2116182482152460479).
+Its reported test growth prompted a review of proportional design and redundant verification.
+The [research notes](docs/research.md#tests-and-failure-reports) distinguish that report from inspected code and measured model behavior.
 
 ## Giver Architecture
 
@@ -85,6 +96,8 @@ Its lifecycle, inventory, owner guards, attachment APIs, and control transport i
 We also consulted the [official app-server guide](https://learn.chatgpt.com/docs/app-server) for protocol initialization and schema generation.
 Workgraph distributes its own instructions without bundling Codex source or a cleanup client.
 The [research notes](docs/research.md#codex-native-cleanup) distinguish reference-source effects from installed protocol and destructive-operation evidence.
+We also reviewed [Codex `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6) for native skill fragments and portable-plugin prompt truncation.
+The [native selection review](docs/research.md#native-skill-selection) records the version-specific compatibility boundary without bundling Codex code.
 
 ## Anthropic Guidance
 

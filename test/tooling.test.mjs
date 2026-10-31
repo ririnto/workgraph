@@ -1221,12 +1221,6 @@ test("delivery workflow samples stop planning when exploration fails", async () 
 });
 
 test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
-  for (const file of Object.values(samplePaths)) {
-    const text = readFileSync(file, "utf-8");
-    assert.ok(
-      text.indexOf("title: 'Publish'") < text.indexOf("title: 'Review'")
-    );
-  }
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.simple,

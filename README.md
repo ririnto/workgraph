@@ -42,6 +42,7 @@ Neither hook filters events with a matcher.
 Both context hooks have a 30-second timeout to allow Node startup under contention.
 The timeout is a ceiling, not an added delay.
 Each output identifies the execution host, actual source paths, and complete content already loaded.
+It starts with the host's native skill-content format, followed by source labels and the selected host reference.
 All selected files load before context emission, so the injected role and host guidance need no additional reads.
 
 Hooks do not inject contributor instructions, research, task skills, or playbooks.
@@ -111,6 +112,8 @@ The stable `main-agent-contract` skill is the Main Agent mode entry, not a wrapp
 Use your [host adapter](#install) to invoke it manually.
 The [Main contract](skills/main-agent-contract/SKILL.md) owns scope, authority, orchestration, evidence acceptance, and reporting.
 [Delivery](skills/delivery/SKILL.md) owns authorized repository publication, review, integration, and cleanup procedures.
+PR readiness completes a publication request without authorizing a merge into its target branch.
+User-requested merging, automatic merging, and merge-queue enrollment follow [Delivery's merge authority](skills/delivery/SKILL.md#establish-merge-authority).
 Invocation does not grant new permissions or replace explicit user gates.
 Workflow and writing procedures are defaults that adapt to explicit user requests, task risk, and supported host capabilities.
 Review staffing, delegation, and delivery methods need no fixed ceremony when the task does not require one.
@@ -153,7 +156,7 @@ References hold detail selected by a task, host, language, or operation.
 | Agent instructions | Writing's [instruction design](skills/writing/references/instruction-design.md) | Drafting, editing, or reviewing agent-facing prompts or instructions requires this reference. |
 | Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
 | Lint tools and rules | Development's [lint rule guidance](skills/development/references/lint-rules.md) | Selecting, developing, configuring, or assessing authorized lint tools, rules, or automatic fixes requires this reference. |
-| Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized installed update uses the requested host's section after merge and base update. |
+| Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update uses the requested host's section once the version reaches its authorized distribution source. |
 | Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.

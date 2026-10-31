@@ -21,7 +21,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/subagent-context/references/{claude-code,codex}.md` | Dispatched agents | Each reference supplies execution timing without Main orchestration or model guidance. |
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
 | `skills/delivery/references/fix-queues.md` | Main agents handling or assessing assigned queues | The reference owns queue concurrency, issue acceptance, integration ownership, and closure evidence. |
-| `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference includes post-merge marketplace and plugin commands in requested-host sections. |
+| `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference selects requested-host update commands once the version reaches its authorized distribution source. |
 | `skills/workflow/SKILL.md` | Claude Code main session | The skill adds native Workflow selection, execution, and result verification after the Main contract. |
 | `skills/workflow/references/authoring.md` | Workflow authors | Authors follow script construction, mapping, recovery, and bundled-source caller contracts. |
 | `workflows/` | Claude Main using Workflow | Native JavaScript workflow definitions use plugin discovery without another runner. |
@@ -76,7 +76,7 @@ The [Delivery skill](../skills/delivery/SKILL.md#confirm-repository-access) owns
 
 ### Conditional loading
 
-Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, branch creation, implementation dispatch, commits, or publication.
+Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, branch creation, implementation dispatch, commits, publication, or integration.
 Main and Worker conditionally load Writing, Development, and Memory Maintenance for tasks within those skills' scopes.
 Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
@@ -85,6 +85,7 @@ Workflow adds its operation to the Main session without repeating common role ru
 
 Main remains the entry point for complete authorized outcomes, including review, integration, readback, and cleanup.
 Delivery defines authorized Git operations and current-unit integration gates without enlarging host permissions.
+Its [merge authority](../skills/delivery/SKILL.md#establish-merge-authority) separates preparing and publishing a candidate from user-authorized integration into the target branch.
 The [Delivery skill](../skills/delivery/SKILL.md) owns its sequence, scan, review, deferral, integration, and cleanup procedures.
 The role contracts and their references own autonomy, recovery, evidence freshness, and resource cleanup.
 The [orchestration section](#compose-work-through-the-host) describes graph composition without restating those procedures.
@@ -151,8 +152,9 @@ Delimiter lines follow Codex's trimmed-line comparison.
 
 Claude delivery excludes frontmatter and consumes leading body whitespace, matching native Skill loading.
 It preserves trailing whitespace and separators within the body.
-Its Skill fragment starts with the native base-directory line.
+The context begins with its native Skill fragment and base-directory line.
 Codex delivery uses the native `<skill>` wrapper with the qualified plugin name, actual path, and complete file.
+That native fragment also starts the Codex context, before Workgraph's source labels.
 It accepts LF and CRLF line endings and preserves separators inside the body.
 Claude references follow native full-file Read normalization and line numbering, including a final empty line.
 Codex references preserve raw file text, as ordinary file-read stdout does.
@@ -170,6 +172,12 @@ Native Skill and Read message envelopes differ from hook envelopes, despite matc
 Codex delivers hook context as a developer message, while native Skill instructions use a user message.
 Claude wraps SessionStart context in a system reminder, while native Skill and Read use their tool and user messages.
 The hook cannot change those roles or fabricate native tool calls.
+It also cannot register a native invocation, install frontmatter hooks, or grant skill-scoped tool permissions.
+
+The reviewed Codex portable-plugin selection path truncates complete skill files after 8,000 UTF-8 bytes.
+Workgraph's skill gate checks that boundary, including frontmatter, so native selection retains each bundled skill's required body.
+The [source review](research.md#native-skill-selection) pins the implementation and distinguishes this limit from metadata budgets and hook delivery.
+Hook output always retains complete selected files.
 
 Claude Code spills fields over 10,000 characters to files without requesting a read.
 Keep each Claude context within that limit so the host delivers its complete instructions inline.
@@ -290,7 +298,7 @@ The skill metadata gate parses names, descriptions, optional fields, and invocat
 It preserves host extensions while enforcing portable field types, character limits, directory identity, and nonempty bodies.
 Discovery follows linked skill directories within the plugin and validates metadata against each discovered directory name.
 The standalone gate rejects paths that resolve outside the plugin before reading their skill contents.
-Source checks scan `SKILL.md` bodies for instruction reference links that resolve outside the bundled skills tree.
+Source checks scan complete `SKILL.md` files for instruction reference links that resolve outside the bundled skills tree.
 They do not scan host reference files or judge model behavior.
 They establish the source and delivery contract without exercising Claude Code's interactive slash-command menu.
 Plugin validation checks configuration rather than model behavior.
@@ -345,7 +353,7 @@ Local validation covers this repository's form subset and does not establish Git
 The package gate, `test/validation/plugin-version.mjs`, checks the portable manifest, Claude descriptor, and host catalogs from its module location.
 It checks the complete `yyyy.MM.dd.seq` string, real calendar dates, positive sequences, shared metadata, bundled paths, and release parity.
 `test/validation.test.mjs` exercises valid and invalid forms, YAML scalar semantics, file links, package paths, and release versions.
-`test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, and relocated execution.
+`test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, the complete-file UTF-8 prompt boundary, and relocated execution.
 
 CI runs full development checks on Linux with the package's Node engine range.
 Separate macOS and Node.js 26 jobs run dependency-free hook tests without installing development tools.

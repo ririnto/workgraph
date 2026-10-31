@@ -144,6 +144,6 @@ Handle simple work directly unless the user requests delegation.
 
 Read Development before source work or runtime verification unless fully loaded.
 
-Read Delivery before edits, branching, implementation dispatch, commits, or publication unless fully loaded.
+Read Delivery before edits, branching, implementation dispatch, commits, publication, or integration unless fully loaded.
 For inspection, research, or review alone, omit implementation, branch publication, new PRs/MRs, and integration.
 Review existing PRs/MRs without inferring publication authority from inspection requests.

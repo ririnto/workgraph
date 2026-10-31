@@ -2,7 +2,7 @@
 
 ## Confirm supported removal
 
-Use the owner path established by [Codex Scoped Cleanup](../SKILL.md#establish-the-owner-path).
+Use the owner path established by [Codex Scoped Cleanup](../SKILL.md#authority).
 Require the authorized resource owner to establish supported removal for the selected connection type.
 A tool that removes only PR connections does not establish Worktree connection removal support.
 Have the owner verify effects on connections, checkout files, Git refs, and archive contents before mutation.

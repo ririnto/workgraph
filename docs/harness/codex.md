@@ -34,7 +34,9 @@ OpenAI's [packaging guide](https://developers.openai.com/plugins/build/plugins) 
 
 Hook execution requires Node.js 26.13.0 or later within major version 26.
 The commands use `PLUGIN_ROOT` and keep complete context inline through `additionalContextLimit: 0`.
-Their native skill fragments include source paths and complete skill files with frontmatter.
+Each context starts with the native `<skill>` fragment containing the qualified name, source path, and complete skill file with frontmatter.
+Source labels and the selected host reference follow it.
+The host still delivers a hook message, so matching the skill text does not create a user invocation or grant its permissions.
 
 Main receives its [Codex reference](../../skills/main-agent-contract/references/codex.md).
 Worker receives its [Codex reference](../../skills/subagent-context/references/codex.md).
@@ -68,6 +70,10 @@ Role invocation applies the role's instructions within the current host's tools 
 
 For a focused task, select [Development](../../skills/development/SKILL.md) or [Writing](../../skills/writing/SKILL.md) directly.
 The [skill map](../../README.md#skill-invocation) lists the remaining procedures and their triggers.
+
+Workgraph keeps every complete `SKILL.md` within the 8,000-byte native selection limit found in the reviewed Codex implementation.
+The [source review](../research.md#native-skill-selection) identifies the revision and affected loading paths.
+This host compatibility check does not truncate hook output or move required instructions into extra reads.
 
 ## Update
 
