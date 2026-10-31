@@ -11,14 +11,14 @@ codex plugin marketplace list
 
 Open `/plugins` in Codex CLI, select the `workgraph` marketplace, and install `workgraph`.
 In the ChatGPT desktop app, open Plugins and choose the same marketplace.
-Start a new session after installation.
+Start a new session after installation and follow [Confirm hook activation](#confirm-hook-activation) before relying on automatic instructions.
 
 For local development, run `codex plugin marketplace add .` from the Workgraph checkout.
 The repository catalog is `.agents/plugins/marketplace.json`.
 Its source path selects the complete plugin at the repository root.
 
 Workspace administrators can import a GitHub marketplace through their workspace plugin controls.
-See the official [plugin guide](https://learn.chatgpt.com/docs/plugins) for supported surfaces and workspace installation.
+See the official [plugin guide](https://learn.chatgpt.com/docs/plugins.md) for supported surfaces and workspace installation.
 
 ## Choose a loading mode
 
@@ -26,11 +26,13 @@ See the official [plugin guide](https://learn.chatgpt.com/docs/plugins) for supp
 | --- | --- |
 | Local Codex or local-only Work with plugin hooks enabled and trusted | SessionStart loads Main, and SubagentStart loads Worker. |
 | Cloud orchestration, including threads whose tools execute locally | Invoke the role skill explicitly at the start of its task. |
+| Codex IDE extension | Plugins are unavailable on this surface, so use Codex CLI or the ChatGPT desktop app for plugin installation. |
 | Other supported skill clients | Use the client's skill picker or name the required Workgraph skill. |
 
-The portable `plugin.json` discovers the shared `skills/` directory.
-Its `extensions.com.openai.hooks` field selects `hooks/codex-hooks.json`.
-OpenAI's [packaging guide](https://developers.openai.com/plugins/build/plugins) defines this manifest and the separate hook support requirements.
+The native `.codex-plugin/plugin.json` selects the shared `skills/` directory and `hooks/codex-hooks.json`.
+The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks.md#plugin-bundled-hooks) documents this native hook registration.
+Root `plugin.json` is intentionally absent because Codex `0.166.0` and the reviewed main source skip hook discovery for its portable Agent Plugins format.
+See the [source review](../research.md#codex-native-hook-discovery-and-trust) for the difference between advertised extension support and the actual loader path.
 
 Hook execution requires Node.js 26.13.0 or later within major version 26.
 The commands use `PLUGIN_ROOT` and keep complete context inline through `additionalContextLimit: 0`.
@@ -45,15 +47,34 @@ The [Bash polling guard](../../README.md#bash-polling-guard) applies where the h
 
 ## Confirm hook activation
 
-In a supported local Codex session, open `/hooks` and check the Workgraph source.
-It should list SessionStart, SubagentStart, and Bash PreToolUse.
-Review and trust the current definitions through the host controls before relying on them.
-Installation alone does not grant hook trust, and changed definitions can require another review.
-The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks) describes trust, disabled hooks, managed policy, and cloud restrictions.
+First identify the client and installed copy:
 
-Check the installed plugin version and source when the listing differs from this checkout.
-Start a fresh supported session and inspect hook results for failures or timeouts.
-A discovered handler proves registration, while a successful event result establishes execution for that event.
+```sh
+codex --version
+codex plugin list --json
+```
+
+Check the installed version, enabled state, and marketplace identity, such as `workgraph@sinon` or `workgraph@workgraph`.
+A catalog entry listed as available is not an installed plugin.
+Release `2026.10.31.06` restores native Codex hook registration.
+An older cached portable package can expose skills while contributing no hooks.
+
+In a supported local Codex session, open `/hooks` and check that the Workgraph source lists SessionStart, SubagentStart, and Bash PreToolUse.
+Review and trust the current plugin through the host controls if you intend to run its hooks.
+Installation and enablement alone do not grant trust.
+Codex also checks plugin contents, so skill, documentation, or version changes can require renewed approval even when hook commands are unchanged.
+The error `plugin contents changed; hook approval required` occurs before the command runs.
+Preserve deliberately disabled hooks and managed policy.
+
+After approval, start a fresh supported session and inspect the actual hook event result for failures or timeouts.
+Main context should identify `workgraph:main-agent-contract` and `The active execution host is Codex.`.
+Check SubagentStart separately when verifying Worker delivery.
+A listed handler establishes registration, while a successful event and delivered context establish execution and injection for that event.
+Directly running the Node script checks its payload but does not establish any installed-host lifecycle result.
+
+If Workgraph is missing from `/hooks`, verify the installed native manifest and refreshed files first.
+If a registered command fails, inspect its error and confirm the supported Node executable is available in the host's environment.
+The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks.md) explains disabled hooks and managed policy.
 Use the manual role entry below when the host cannot run local plugin hooks or its policy excludes them.
 
 ## Start a task
@@ -71,8 +92,9 @@ Role invocation applies the role's instructions within the current host's tools 
 For a focused task, select [Development](../../skills/development/SKILL.md) or [Writing](../../skills/writing/SKILL.md) directly.
 The [skill map](../../README.md#skill-invocation) lists the remaining procedures and their triggers.
 
-Workgraph keeps every complete `SKILL.md` within the 8,000-byte native selection limit found in the reviewed Codex implementation.
-The [source review](../research.md#native-skill-selection) identifies the revision and affected loading paths.
+Workgraph retains an 8,000-byte complete-file portability budget derived from Codex's reviewed portable-plugin selection path.
+The current native package does not select that portable path.
+The [source review](../research.md#native-skill-selection) identifies the revision and this distinction.
 This host compatibility check does not truncate hook output or move required instructions into extra reads.
 
 ## Update
@@ -84,7 +106,11 @@ codex plugin marketplace upgrade workgraph
 ```
 
 When the repository revision advances, this also refreshes configured installed plugins while preserving their enabled or disabled state.
-Inspect Workgraph's installed version and state in `/plugins` or `codex plugin list --marketplace workgraph --json`, then start a new session.
+Inspect Workgraph's installed version and state in `/plugins` or `codex plugin list --marketplace workgraph --json`.
+
+If installed through Sinon, use `sinon` as the marketplace name.
+An unchanged marketplace snapshot can leave an external Workgraph copy stale even when its upstream source advances.
+For an already-enabled installation in that case, run `codex plugin add workgraph@sinon` and read back its installed version and state.
 
 For a local marketplace registered with `marketplace add .`, update that checkout first.
 Local installations use cached copies, so editing the checkout or opening `/plugins` alone does not establish an update.
@@ -100,6 +126,7 @@ Codex CLI 0.166.0 has no separate local refresh command that preserves disabled 
 Its `marketplace upgrade` command applies only to configured Git marketplaces.
 Verify the installed copy and state after refreshing it.
 Check the installed files when local edits retain the same manifest version.
+After either update path, follow [Confirm hook activation](#confirm-hook-activation) to review current trust and verify a fresh session's hook result.
 The [marketplace source review](../research.md#codex-marketplace-resolution-and-updates) records these version-specific behaviors.
 
 Check the installed version against [version updates](../../README.md#version-updates) when diagnosing stale instructions.

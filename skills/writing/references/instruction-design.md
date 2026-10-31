@@ -54,7 +54,10 @@ Identify sources already loaded completely so agents do not retrieve them again.
 
 Keep role and host differences in files selected for that role and host.
 Lower-level files add their procedure without explaining or repeating the caller's contract.
-Prefer maintained branches or tags for general source links, and use commit links when exact revision evidence matters.
+Prefer maintained branch links for source references, and use named release tags when a claim requires a specific released version.
+Do not pin source references to commit hashes.
+Name the branch and record its review date in `yyyy-MM-dd` form when describing branch-based evidence.
+Do not add review or basis dates to tags, releases, or other non-branch references.
 Remove replaced paths and update their consumers in the same change.
 
 ## Validate the result

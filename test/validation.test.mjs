@@ -241,13 +241,17 @@ test("relative link rule rejects missing files", async (t) => {
 const copyPluginPackage = (t) => {
   const root = copyValidation(t);
   for (const filename of [
-    "plugin.json",
+    ".codex-plugin/plugin.json",
     ".claude-plugin/plugin.json",
+    ".cursor-plugin/plugin.json",
+    ".plugin/plugin.json",
     ".claude-plugin/marketplace.json",
     ".agents/plugins/marketplace.json",
     ".cursor-plugin/marketplace.json",
     "package.json",
-    "hooks/codex-hooks.json"
+    "hooks/codex-hooks.json",
+    "hooks/claude-hooks.json",
+    "hooks/skills-only.json"
   ]) {
     const destination = path.join(root, filename);
     mkdirSync(path.dirname(destination), { recursive: true });
@@ -256,7 +260,7 @@ const copyPluginPackage = (t) => {
   mkdirSync(path.join(root, "skills/example"), { recursive: true });
   writeFileSync(
     path.join(root, "skills/example/SKILL.md"),
-    "---\nname: example\ndescription: Exercise portable skill discovery.\n---\n# Example\n"
+    "---\nname: example\ndescription: Exercise shared skill discovery.\n---\n# Example\n"
   );
   return root;
 };
@@ -272,7 +276,9 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     "2027.01.01.01",
     "2026.10.30.9007199254740991"
   ]) {
-    assert.doesNotThrow(() => validatePluginVersions(version, version));
+    assert.doesNotThrow(() =>
+      validatePluginVersions(version, version, version, version)
+    );
   }
   for (const version of [
     "2026.1030.5",
@@ -289,8 +295,8 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     null
   ]) {
     assert.throws(
-      () => validatePluginVersions(version, version),
-      /Portable plugin version must use yyyy\.MM\.dd\.seq/u
+      () => validatePluginVersions(version, version, version, version),
+      /Codex plugin version must use yyyy\.MM\.dd\.seq/u
     );
   }
   for (const version of [
@@ -304,57 +310,106 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     "2026.10.30.9007199254740992"
   ]) {
     assert.throws(
-      () => validatePluginVersions(version, version),
-      /Portable plugin version must contain a valid date and safe positive sequence/u
+      () => validatePluginVersions(version, version, version, version),
+      /Codex plugin version must contain a valid date and safe positive sequence/u
     );
   }
   assert.throws(
-    () => validatePluginVersions("2026.10.30.06", "2026.10.30.07"),
-    /Portable and Claude plugin versions must match/u
+    () =>
+      validatePluginVersions(
+        "2026.10.30.06",
+        "2026.10.30.07",
+        "2026.10.30.06",
+        "2026.10.30.06"
+      ),
+    /Native plugin versions must match across all hosts/u
   );
   assert.throws(
-    () => validatePluginVersions("2026.10.30.06", "2026.1030.5"),
+    () =>
+      validatePluginVersions(
+        "2026.10.30.06",
+        "2026.1030.5",
+        "2026.10.30.06",
+        "2026.10.30.06"
+      ),
     /Claude plugin version must use yyyy\.MM\.dd\.seq/u
   );
 });
 
 test("plugin command validates canonical identity, catalogs, and release metadata", async (t) => {
   const cases = [
-    ["plugin.json", {}, ""],
+    [".codex-plugin/plugin.json", {}, ""],
     [
-      "plugin.json",
-      { $schema: "https://example.com/plugin.json" },
-      "Portable manifest must declare the Agent Plugins 1.0 schema."
+      ".codex-plugin/plugin.json",
+      { $schema: "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json" },
+      "Codex native manifest must omit the schema field."
     ],
     [
-      "plugin.json",
-      { skills: "./skills" },
-      "Portable manifest must contain only Agent Plugins fields."
+      ".codex-plugin/plugin.json",
+      { extensions: { "com.openai": { hooks: "./hooks/codex-hooks.json" } } },
+      "Codex manifest must contain only supported native fields."
     ],
     [
-      "plugin.json",
+      ".codex-plugin/plugin.json",
       { name: "work--graph" },
-      "Portable manifest must contain a valid Agent Plugins name."
+      "Codex manifest must contain a valid plugin name."
     ],
     [
-      "plugin.json",
+      ".codex-plugin/plugin.json",
       { author: "ririnto" },
-      "Portable author must contain valid author metadata."
+      "Codex author must contain valid author metadata."
     ],
     [
-      "plugin.json",
-      { extensions: { "com.openai": { hooks: "../hooks.json" } } },
-      "OpenAI hooks must use a ./-prefixed package path without traversal."
+      ".codex-plugin/plugin.json",
+      { hooks: "../hooks.json" },
+      "Codex hooks must use a ./-prefixed package path without traversal."
     ],
     [
-      "plugin.json",
-      { extensions: { "com.openai": { hooks: "./skills" } } },
-      "OpenAI hooks must resolve to a file."
+      ".codex-plugin/plugin.json",
+      { hooks: "./skills" },
+      "Codex hooks must resolve to a file."
+    ],
+    [
+      ".codex-plugin/plugin.json",
+      { hooks: "./hooks/claude-hooks.json" },
+      "Codex hooks must select ./hooks/codex-hooks.json."
+    ],
+    [
+      ".codex-plugin/plugin.json",
+      { skills: "./hooks" },
+      "Codex skills must select the shared skills directory."
     ],
     [
       ".claude-plugin/plugin.json",
       { description: "Different plugin." },
-      "Portable and Claude description metadata must match."
+      "Codex and Claude description metadata must match."
+    ],
+    [
+      ".claude-plugin/plugin.json",
+      { skills: "../skills" },
+      "Claude skills must use a ./-prefixed package path without traversal."
+    ],
+    [
+      ".cursor-plugin/plugin.json",
+      { version: "2026.10.31.01" },
+      "Native plugin versions must match across all hosts."
+    ],
+    [
+      ".plugin/plugin.json",
+      { description: "Different plugin." },
+      "Codex and Copilot description metadata must match."
+    ],
+    [
+      ".cursor-plugin/plugin.json",
+      { hooks: "./hooks/claude-hooks.json" },
+      "Cursor hooks must select ./hooks/skills-only.json."
+    ],
+    [
+      "hooks/skills-only.json",
+      {
+        hooks: { sessionStart: [{ command: "node hooks/inject-context.mjs" }] }
+      },
+      "Skills-only hook configuration must contain no handlers."
     ],
     [
       ".claude-plugin/marketplace.json",
@@ -414,7 +469,7 @@ test("plugin command validates canonical identity, catalogs, and release metadat
     [
       "package.json",
       { name: "different-plugin" },
-      "Private package name must match the portable plugin."
+      "Private package name must match the native plugin."
     ],
     [
       "package.json",
@@ -434,7 +489,7 @@ test("plugin command validates canonical identity, catalogs, and release metadat
         assert.equal(
           result.stdout,
           diagnostic === ""
-            ? "Validated portable and Claude manifests, release versions, bundled paths, and three marketplace catalogs.\n"
+            ? "Validated four native manifests, release versions, bundled paths, and three marketplace catalogs.\n"
             : ""
         );
         assert.equal(
@@ -455,7 +510,9 @@ test("plugin command accepts reordered author metadata", (t) => {
     ["url", "https://github.com/ririnto"]
   ];
   for (const [filename, author] of [
-    ["plugin.json", Object.fromEntries(authorEntries)],
+    [".codex-plugin/plugin.json", Object.fromEntries(authorEntries)],
+    [".cursor-plugin/plugin.json", Object.fromEntries(authorEntries)],
+    [".plugin/plugin.json", Object.fromEntries(authorEntries)],
     [
       ".claude-plugin/plugin.json",
       Object.fromEntries(authorEntries.toReversed())
@@ -470,17 +527,34 @@ test("plugin command accepts reordered author metadata", (t) => {
   assert.equal(result.stderr, "");
 });
 
-test("plugin command rejects replaced manifests and escaping package symlinks", (t) => {
+test("plugin command rejects shadowing manifests and conventional hook discovery", (t) => {
   const root = copyPluginPackage(t);
-  mkdirSync(path.join(root, ".codex-plugin"));
-  writeFileSync(path.join(root, ".codex-plugin/plugin.json"), "{}");
-  const stale = runValidation(root, "plugin-version.mjs");
-  assert.equal(stale.status, 1);
-  assert.match(
-    stale.stderr,
-    /Remove the replaced Codex compatibility manifest/u
-  );
-  rmSync(path.join(root, ".codex-plugin"), { recursive: true });
+  for (const [filename, content] of [
+    [
+      "plugin.json",
+      {
+        $schema: "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+        extensions: { "com.openai": { hooks: "./hooks/codex-hooks.json" } },
+        name: "workgraph"
+      }
+    ],
+    ["hooks.json", { hooks: {} }],
+    ["hooks/hooks.json", { hooks: {} }]
+  ]) {
+    const file = path.join(root, filename);
+    writeFileSync(file, JSON.stringify(content));
+    const result = runValidation(root, "plugin-version.mjs");
+    assert.equal(result.status, 1);
+    assert.equal(
+      result.stderr,
+      `Plugin version validation failed: Remove ${filename}; native manifests must select the host-specific hooks.\n`
+    );
+    rmSync(file);
+  }
+});
+
+test("plugin command rejects escaping package symlinks", (t) => {
+  const root = copyPluginPackage(t);
   const outside = mkdtempSync(path.join(tmpdir(), "workgraph-outside-"));
   t.after(() => rmSync(outside, { force: true, recursive: true }));
   const outsideHooks = path.join(outside, "hooks.json");
@@ -492,7 +566,7 @@ test("plugin command rejects replaced manifests and escaping package symlinks", 
   assert.equal(escaped.status, 1);
   assert.match(
     escaped.stderr,
-    /OpenAI hooks must resolve inside the plugin root/u
+    /Codex hooks must resolve inside the plugin root/u
   );
 });
 

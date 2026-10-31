@@ -256,14 +256,14 @@ test("configured hooks run from relocated plugin paths without changing startup 
   mkdirSync(path.join(plugin, "hooks"), { recursive: true });
   copyFileSync(script, path.join(plugin, "hooks", "bash-polling-guard.mjs"));
   for (const host of ["claude", "codex"]) {
-    const config = JSON.parse(
+    const descriptor = JSON.parse(
       readFileSync(
-        new URL(
-          host === "claude" ? "hooks.json" : "codex-hooks.json",
-          import.meta.url
-        ),
+        new URL(`../.${host}-plugin/plugin.json`, import.meta.url),
         "utf-8"
       )
+    );
+    const config = JSON.parse(
+      readFileSync(new URL(`../${descriptor.hooks}`, import.meta.url), "utf-8")
     );
     assert.deepEqual(Object.keys(config.hooks), [
       "SessionStart",

@@ -1,5 +1,6 @@
 import {
   existsSync,
+  lstatSync,
   readFileSync,
   readdirSync,
   realpathSync,
@@ -9,8 +10,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 
-const pluginSchema =
-  "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json";
 const versionPattern =
   /^(?<year>[1-9]\d{3})\.(?<month>\d{2})\.(?<day>\d{2})\.(?<sequence>0[1-9]|[1-9]\d+)$/u;
 const namePattern = /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/u;
@@ -24,7 +23,7 @@ const metadataFields = [
   "license",
   "keywords"
 ];
-const portableFields = new Set(["$schema", ...metadataFields, "extensions"]);
+const nativeFields = new Set(["$schema", ...metadataFields, "skills", "hooks"]);
 
 const isObject = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
@@ -32,11 +31,19 @@ const isObject = (value) =>
 /**
  * Validate matching yyyy.MM.dd.seq releases with real dates and padded sequences.
  */
-export const validatePluginVersions = (portableVersion, claudeVersion) => {
-  for (const [host, version] of [
-    ["Portable", portableVersion],
-    ["Claude", claudeVersion]
-  ]) {
+export const validatePluginVersions = (
+  codexVersion,
+  claudeVersion,
+  cursorVersion,
+  copilotVersion
+) => {
+  const versions = [
+    ["Codex", codexVersion],
+    ["Claude", claudeVersion],
+    ["Cursor", cursorVersion],
+    ["Copilot", copilotVersion]
+  ];
+  for (const [host, version] of versions) {
     const match =
       typeof version === "string" ? versionPattern.exec(version) : null;
     if (!match) {
@@ -60,8 +67,8 @@ export const validatePluginVersions = (portableVersion, claudeVersion) => {
       );
     }
   }
-  if (portableVersion !== claudeVersion) {
-    throw new Error("Portable and Claude plugin versions must match.");
+  if (new Set(versions.map(([, version]) => version)).size !== 1) {
+    throw new Error("Native plugin versions must match across all hosts.");
   }
 };
 
@@ -130,15 +137,13 @@ const readManifest = (root, filename) => {
   return manifest;
 };
 
-const validatePortableManifest = (manifest) => {
-  if (manifest.$schema !== pluginSchema) {
-    throw new Error(
-      "Portable manifest must declare the Agent Plugins 1.0 schema."
-    );
+const validateNativeManifest = (manifest, host) => {
+  if (host !== "Claude" && Object.hasOwn(manifest, "$schema")) {
+    throw new Error(`${host} native manifest must omit the schema field.`);
   }
-  if (Object.keys(manifest).some((key) => !portableFields.has(key))) {
+  if (Object.keys(manifest).some((key) => !nativeFields.has(key))) {
     throw new Error(
-      "Portable manifest must contain only Agent Plugins fields."
+      `${host} manifest must contain only supported native fields.`
     );
   }
   if (
@@ -148,13 +153,11 @@ const validatePortableManifest = (manifest) => {
     manifest.name.includes("--") ||
     manifest.name.includes("..")
   ) {
-    throw new Error(
-      "Portable manifest must contain a valid Agent Plugins name."
-    );
+    throw new Error(`${host} manifest must contain a valid plugin name.`);
   }
   for (const field of ["description", "homepage", "repository", "license"]) {
     if (typeof manifest[field] !== "string" || !manifest[field].trim()) {
-      throw new Error(`Portable ${field} must be a nonempty string.`);
+      throw new Error(`${host} ${field} must be a nonempty string.`);
     }
   }
   if (
@@ -166,34 +169,22 @@ const validatePortableManifest = (manifest) => {
         !["name", "email", "url"].includes(key) || typeof value !== "string"
     )
   ) {
-    throw new Error("Portable author must contain valid author metadata.");
+    throw new Error(`${host} author must contain valid author metadata.`);
   }
   if (
     !Array.isArray(manifest.keywords) ||
     manifest.keywords.some((keyword) => typeof keyword !== "string")
   ) {
-    throw new Error("Portable keywords must be an array of strings.");
-  }
-  if (
-    !isObject(manifest.extensions) ||
-    Object.entries(manifest.extensions).some(
-      ([namespace, extension]) =>
-        !namespace.includes(".") || !isObject(extension)
-    ) ||
-    !isObject(manifest.extensions["com.openai"])
-  ) {
-    throw new Error(
-      "Portable extensions must contain the OpenAI configuration object."
-    );
+    throw new Error(`${host} keywords must be an array of strings.`);
   }
 };
 
-const validateMarketplace = (root, name, marketplace, portable) => {
+const validateMarketplace = (root, name, marketplace, codex) => {
   if (
-    marketplace.name !== portable.name ||
+    marketplace.name !== codex.name ||
     !Array.isArray(marketplace.plugins) ||
     marketplace.plugins.length !== 1 ||
-    marketplace.plugins[0]?.name !== portable.name
+    marketplace.plugins[0]?.name !== codex.name
   ) {
     throw new Error(
       `${name} must list Workgraph once under the matching marketplace name.`
@@ -211,7 +202,7 @@ const validateMarketplace = (root, name, marketplace, portable) => {
   if (bundledPath(root, source, `${name} source`, "directory") !== root) {
     throw new Error(`${name} source must select the canonical plugin root.`);
   }
-  if (!isOpenAI && marketplace.owner?.name !== portable.author.name) {
+  if (!isOpenAI && marketplace.owner?.name !== codex.author.name) {
     throw new Error(`${name} owner must match the plugin author.`);
   }
   if (
@@ -227,8 +218,23 @@ const validateMarketplace = (root, name, marketplace, portable) => {
 
 const run = () => {
   const root = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
-  const portable = readManifest(root, "plugin.json");
+  for (const filename of ["plugin.json", "hooks.json", "hooks/hooks.json"]) {
+    if (lstatSync(path.join(root, filename), { throwIfNoEntry: false })) {
+      throw new Error(
+        `Remove ${filename}; native manifests must select the host-specific hooks.`
+      );
+    }
+  }
+  const codex = readManifest(root, ".codex-plugin/plugin.json");
   const claude = readManifest(root, ".claude-plugin/plugin.json");
+  const cursor = readManifest(root, ".cursor-plugin/plugin.json");
+  const copilot = readManifest(root, ".plugin/plugin.json");
+  const manifests = [
+    ["Codex", codex, "codex-hooks.json"],
+    ["Claude", claude, "claude-hooks.json"],
+    ["Cursor", cursor, "skills-only.json"],
+    ["Copilot", copilot, "skills-only.json"]
+  ];
   const packageManifest = readManifest(root, "package.json");
   const marketplaces = [
     [
@@ -244,29 +250,53 @@ const run = () => {
       readManifest(root, ".cursor-plugin/marketplace.json")
     ]
   ];
-  validatePortableManifest(portable);
-  validatePluginVersions(portable.version, claude.version);
-  for (const field of metadataFields) {
-    if (!isDeepStrictEqual(portable[field], claude[field])) {
-      throw new Error(`Portable and Claude ${field} metadata must match.`);
+  validatePluginVersions(
+    codex.version,
+    claude.version,
+    cursor.version,
+    copilot.version
+  );
+  for (const [host, manifest, hookFile] of manifests) {
+    validateNativeManifest(manifest, host);
+    for (const field of metadataFields) {
+      if (!isDeepStrictEqual(codex[field], manifest[field])) {
+        throw new Error(`Codex and ${host} ${field} metadata must match.`);
+      }
+    }
+    if (
+      bundledPath(root, manifest.hooks, `${host} hooks`, "file") !==
+      path.join(root, "hooks", hookFile)
+    ) {
+      throw new Error(`${host} hooks must select ./hooks/${hookFile}.`);
+    }
+    if (
+      bundledPath(
+        root,
+        host === "Claude" ? (manifest.skills ?? "./skills/") : manifest.skills,
+        `${host} skills`,
+        "directory"
+      ) !== path.join(root, "skills")
+    ) {
+      throw new Error(
+        `${host} skills must select the shared skills directory.`
+      );
     }
   }
-  if (packageManifest.name !== portable.name) {
-    throw new Error("Private package name must match the portable plugin.");
+  if (packageManifest.name !== codex.name) {
+    throw new Error("Private package name must match the native plugin.");
   }
-  if (existsSync(path.join(root, ".codex-plugin/plugin.json"))) {
-    throw new Error("Remove the replaced Codex compatibility manifest.");
+  if (
+    !isDeepStrictEqual(readManifest(root, "hooks/skills-only.json"), {
+      hooks: {},
+      version: 1
+    })
+  ) {
+    throw new Error("Skills-only hook configuration must contain no handlers.");
   }
-  bundledPath(
-    root,
-    portable.extensions["com.openai"].hooks,
-    "OpenAI hooks",
-    "file"
-  );
   const skillsRoot = bundledPath(
     root,
     "./skills",
-    "Portable skills",
+    "Shared skills",
     "directory"
   );
   const skills = readdirSync(skillsRoot).filter((name) =>
@@ -274,18 +304,18 @@ const run = () => {
   );
   if (skills.length === 0) {
     throw new Error(
-      "Portable skills must contain an immediate child with SKILL.md."
+      "Shared skills must contain an immediate child with SKILL.md."
     );
   }
   for (const skill of skills) {
-    bundledPath(root, `./skills/${skill}/SKILL.md`, "Portable skill", "file");
+    bundledPath(root, `./skills/${skill}/SKILL.md`, "Shared skill", "file");
   }
   validateOmittedManifestVersions(marketplaces, packageManifest);
   for (const [name, marketplace] of marketplaces) {
-    validateMarketplace(root, name, marketplace, portable);
+    validateMarketplace(root, name, marketplace, codex);
   }
   process.stdout.write(
-    "Validated portable and Claude manifests, release versions, bundled paths, and three marketplace catalogs.\n"
+    "Validated four native manifests, release versions, bundled paths, and three marketplace catalogs.\n"
   );
 };
 

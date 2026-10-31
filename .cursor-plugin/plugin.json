@@ -1,15 +1,10 @@
 {
-  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "author": {
     "name": "ririnto"
   },
   "description": "Engineering coordination, writing, and development skills for coding agents.",
-  "extensions": {
-    "com.openai": {
-      "hooks": "./hooks/codex-hooks.json"
-    }
-  },
   "homepage": "https://github.com/ririnto/workgraph",
+  "hooks": "./hooks/skills-only.json",
   "keywords": [
     "engineering",
     "instructions",
@@ -20,5 +15,6 @@
   "license": "MIT",
   "name": "workgraph",
   "repository": "https://github.com/ririnto/workgraph",
-  "version": "2026.10.31.05"
+  "skills": "./skills/",
+  "version": "2026.10.31.06"
 }

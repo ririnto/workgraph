@@ -10,8 +10,8 @@ The hook runtime uses Node built-ins and needs no npm dependencies.
 
 ## Install
 
-The portable package shares the same skills across ChatGPT, Codex, GitHub Copilot, and Cursor.
-Claude Code uses its dedicated manifest and the same skill files.
+Native host manifests share the same skills across ChatGPT, Codex, Claude Code, GitHub Copilot, and Cursor.
+Codex and Claude Code select their own hook configurations explicitly.
 Hook execution requires Node.js 26.13.0 or later within major version 26.
 Choose the adapter for your execution host.
 
@@ -24,7 +24,7 @@ Choose the adapter for your execution host.
 
 The adapters describe user-facing setup, not role policy.
 [Main and Worker host references](docs/design.md#separate-the-audiences) remain the injected execution adapters.
-The portable manifest and Claude descriptor declare the same release version through [Version Updates](#version-updates).
+All host manifests declare the same release version through [Version Updates](#version-updates).
 
 ## Automatic instructions
 
@@ -180,6 +180,7 @@ Missing, unreadable, or empty instruction files exit with code 1 and produce no 
 Missing or unclosed skill frontmatter and empty skill bodies also exit with code 1.
 These failures do not prevent Claude Code from starting a session or subagent.
 Inspect the hook error notice if instructions fail to load.
+For missing Codex hooks or update-time trust errors, follow [Confirm hook activation](docs/harness/codex.md#confirm-hook-activation).
 
 ## Development
 
@@ -235,22 +236,23 @@ Read [the research notes](docs/research.md) for source evidence and qualificatio
 
 ## Version updates
 
-Maintain one release number in the portable manifest and Claude descriptor.
+Maintain one release number across all four native host manifests.
 
 | File | Field |
 | --- | --- |
-| `plugin.json` | `version` |
+| `.codex-plugin/plugin.json` | `version` |
 | `.claude-plugin/plugin.json` | `version` |
+| `.cursor-plugin/plugin.json` | `version` |
+| `.plugin/plugin.json` | `version` |
 
 Use `yyyy.MM.dd.seq`, with a four-digit year and two-digit month and day.
 Write sequences `01` through `99` with two digits, then use `100` and higher without extra leading zeros.
 For example, October 30's sixth release is `2026.10.30.06`, and January 8's first release is `2026.01.08.01`.
 Start the sequence at `01` on a new date.
 Increment the sequence for another release that day.
-Update both fields together when publishing plugin changes.
+Update all four fields together when publishing plugin changes.
 
 This calendar version is the project's release contract.
-The [Agent Plugins specification](https://agent-plugins.org/specification#54-metadata-fields) accepts version strings and recommends Semantic Versioning without requiring it.
 
 Claude Code reads the plugin manifest version before an optional marketplace entry version.
 Its marketplace-level version describes the catalog, not the plugin release.
@@ -258,12 +260,12 @@ Workgraph's catalogs omit release versions because the selected plugin manifest 
 The private development package also needs no version.
 See the [Claude marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-entries) for these field definitions.
 
-OpenAI, Copilot, and Cursor read the portable root manifest.
-OpenAI hook settings live in its `extensions.com.openai` namespace.
-The obsolete `.codex-plugin/plugin.json` descriptor has been replaced with this canonical source.
-Use clients supporting Agent Plugins 1.0 for portable package installation.
+Codex reads `.codex-plugin/plugin.json`, Claude Code reads its own descriptor, Cursor reads `.cursor-plugin/plugin.json`, and Copilot reads the OpenPlugin descriptor at `.plugin/plugin.json`.
+The shared `skills/` tree remains the only copy of the instructions.
+Root `plugin.json` is intentionally absent because the reviewed Codex loader prioritizes that portable manifest and skips its hooks.
+The [source review](docs/research.md#codex-native-hook-discovery-and-trust) records this compatibility requirement and the separate hook-trust boundary.
 
-1. Set the same new release number in the portable and Claude manifests.
+1. Set the same new release number in all four host manifests.
 2. Run the applicable checks from the auto-injected repository guidance, including strict Claude validation.
 3. Inspect the complete diff and confirm metadata, versions, and marketplace paths match.
 4. Commit the changes and versions together.

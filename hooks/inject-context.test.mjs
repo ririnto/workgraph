@@ -56,14 +56,16 @@ const copyPlugin = (t) => {
   t.after(() => rmSync(root, { force: true, recursive: true }));
   mkdirSync(path.join(root, "hooks"));
   copyFileSync(script, path.join(root, "hooks", "inject-context.mjs"));
-  copyFileSync(
-    new URL("codex-hooks.json", import.meta.url),
-    path.join(root, "hooks", "codex-hooks.json")
-  );
-  copyFileSync(
-    new URL("../plugin.json", import.meta.url),
-    path.join(root, "plugin.json")
-  );
+  for (const filename of [
+    ".claude-plugin/plugin.json",
+    ".codex-plugin/plugin.json",
+    "hooks/claude-hooks.json",
+    "hooks/codex-hooks.json"
+  ]) {
+    const destination = path.join(root, filename);
+    mkdirSync(path.dirname(destination), { recursive: true });
+    copyFileSync(new URL(`../${filename}`, import.meta.url), destination);
+  }
   cpSync(skills, path.join(root, "skills"), { recursive: true });
   return root;
 };
@@ -220,8 +222,11 @@ test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) =>
 
 test("configured Claude hooks load relocated skills and references with LF or CRLF", (t) => {
   const root = copyPlugin(t);
+  const descriptor = JSON.parse(
+    readFileSync(path.join(root, ".claude-plugin/plugin.json"), "utf-8")
+  );
   const config = JSON.parse(
-    readFileSync(new URL("hooks.json", import.meta.url), "utf-8")
+    readFileSync(path.resolve(root, descriptor.hooks), "utf-8")
   );
   assert.deepEqual(
     new Set(Object.keys(config.hooks)),
@@ -401,13 +406,10 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
 test("configured Codex hooks load complete relocated skill files without a context limit", (t) => {
   const root = copyPlugin(t);
   const descriptor = JSON.parse(
-    readFileSync(path.join(root, "plugin.json"), "utf-8")
+    readFileSync(path.join(root, ".codex-plugin/plugin.json"), "utf-8")
   );
-  const selectedSkills = path.join(root, "skills");
-  const selectedHooks = path.resolve(
-    root,
-    descriptor.extensions["com.openai"].hooks
-  );
+  const selectedSkills = path.resolve(root, descriptor.skills);
+  const selectedHooks = path.resolve(root, descriptor.hooks);
   assert.equal(
     realpathSync(selectedSkills),
     realpathSync(path.join(root, "skills"))

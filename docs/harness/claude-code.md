@@ -49,6 +49,7 @@ The [cost and usage guide](https://code.claude.com/docs/en/plugins/measure) expl
 SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Claude reference](../../skills/main-agent-contract/references/claude-code.md).
 SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Claude reference](../../skills/subagent-context/references/claude-code.md).
 Both references own execution timing.
+The Claude manifest selects `hooks/claude-hooks.json` explicitly.
 The Main reference also provides host-specific orchestration and model selection guidance.
 This user adapter does not replace them.
 

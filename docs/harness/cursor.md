@@ -12,7 +12,7 @@ git clone https://github.com/ririnto/workgraph.git ~/.cursor/plugins/local/workg
 Run Developer: Reload Window from Cursor's Command Palette.
 Open Customize and confirm that Workgraph's skills appear.
 
-Cursor loads the canonical root `plugin.json` as an Agent Plugin.
+Cursor loads its native `.cursor-plugin/plugin.json` manifest and the shared `skills/` directory.
 Its [local plugin guide](https://cursor.com/docs/plugins#test-plugins-locally) explains local import controls and marketplace precedence.
 Use the actual checkout inside the local plugin directory because Cursor rejects symlinks to repositories outside it.
 
@@ -25,8 +25,8 @@ Choose the intended access and installation mode.
 Team members can then open Customize, find Workgraph in the team marketplace, and select Install.
 Cursor's [marketplace guide](https://cursor.com/docs/plugins#add-a-team-marketplace) describes the required plan and administrator controls.
 
-The repository's `.cursor-plugin/marketplace.json` catalog points to the same portable plugin at `./`.
-The [plugin reference](https://cursor.com/docs/reference/plugins) defines that catalog format and portable package support.
+The repository's `.cursor-plugin/marketplace.json` catalog points to the same plugin root at `./`.
+The [plugin reference](https://cursor.com/docs/reference/plugins) defines that catalog and the native Cursor manifest.
 
 ## Start a task
 
@@ -42,6 +42,7 @@ An assigned worker uses [Subagent Context](../../skills/subagent-context/SKILL.m
 The roles follow native tool descriptions when no matching bundled host reference exists.
 
 Workgraph uses manual role activation in Cursor.
+Its manifest selects the empty `hooks/skills-only.json` configuration, and the package omits conventionally discovered hook files.
 The [skill map](../../README.md#skill-invocation) lists focused development, writing, and delivery procedures.
 
 ## Update

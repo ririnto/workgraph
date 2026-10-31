@@ -119,11 +119,16 @@ The [host comparison](research.md#host-instruction-comparison) records the revie
 
 ## Package for each host
 
-Root `plugin.json` owns portable identity, metadata, version, and the Agent Plugins 1.0 schema declaration.
-Portable clients discover the shared `skills/` directory at its fixed location.
-The OpenAI extension selects the existing Codex hook configuration.
-Claude retains `.claude-plugin/plugin.json` and its conventional hook and workflow locations.
-The package gate checks shared metadata and release parity so the required Claude descriptor cannot drift.
+Each supported host selects a native manifest and the same shared `skills/` tree.
+Codex uses `.codex-plugin/plugin.json`, Claude uses `.claude-plugin/plugin.json`, Cursor uses `.cursor-plugin/plugin.json`, and Copilot uses `.plugin/plugin.json`.
+The package gate checks metadata and release parity across all four descriptors.
+Root `plugin.json` stays absent because the reviewed Codex loader gives its portable format precedence and then skips hook discovery.
+The [source review](research.md#codex-native-hook-discovery-and-trust) records the complete selection path.
+
+Codex and Claude declare `hooks/codex-hooks.json` and `hooks/claude-hooks.json` respectively.
+Cursor and Copilot declare the shared empty `hooks/skills-only.json` configuration.
+The package omits `hooks.json` and `hooks/hooks.json` so clients that also inspect default locations cannot load another host's commands.
+The gate validates these boundaries alongside contained paths and shared skill discovery.
 
 OpenAI uses `.agents/plugins/marketplace.json`, and Claude and Copilot share `.claude-plugin/marketplace.json`.
 Cursor uses `.cursor-plugin/marketplace.json`.
@@ -132,12 +137,12 @@ Catalog discovery and plugin installation remain separate host operations.
 
 Copilot and Cursor consume shared skills without Workgraph's Claude or Codex lifecycle hooks.
 Their setup adapters explain manual role loading and native execution controls.
-The portable package adds no host-independent hook protocol or Workflow execution engine.
+The package adds no host-independent hook protocol or Workflow execution engine.
 
 ## Deliver context
 
-Claude Code loads `hooks/hooks.json` from the default plugin location and locates the injector through `CLAUDE_PLUGIN_ROOT`.
-Codex selects `hooks/codex-hooks.json` through `plugin.json`'s OpenAI extension and uses `PLUGIN_ROOT`.
+Claude Code selects `hooks/claude-hooks.json` through its native manifest and locates the injector through `CLAUDE_PLUGIN_ROOT`.
+Codex selects `hooks/codex-hooks.json` through its native manifest and uses `PLUGIN_ROOT`.
 Both hosts run the same Node injector with an explicit host argument.
 The script resolves bundled paths against `import.meta.url`, independent of the working directory.
 It reports actual source paths after resolving symbolic links.
@@ -177,8 +182,8 @@ The hook cannot change those roles or fabricate native tool calls.
 It also cannot register a native invocation, install frontmatter hooks, or grant skill-scoped tool permissions.
 
 The reviewed Codex portable-plugin selection path truncates complete skill files after 8,000 UTF-8 bytes.
-Workgraph's skill gate checks that boundary, including frontmatter, so native selection retains each bundled skill's required body.
-The [source review](research.md#native-skill-selection) pins the implementation and distinguishes this limit from metadata budgets and hook delivery.
+Workgraph retains that complete-file portability budget, including frontmatter, while its current native manifest selects a different loading path.
+The [source review](research.md#native-skill-selection) records the reviewed branch and date and distinguishes this limit from metadata budgets and hook delivery.
 Hook output always retains complete selected files.
 
 Claude Code spills fields over 10,000 characters to files without requesting a read.
@@ -290,7 +295,7 @@ This design adds no scheduler, telemetry service, or runtime dependency.
 It checks exact role content, loaded source paths, host reference selection, and exclusion of unrelated files.
 It covers invalid arguments, role and reference file errors, invalid frontmatter, and empty selected content.
 It executes the registered shell commands from a path with spaces and an unrelated working directory.
-The Codex command test selects its hook configuration through the relocated portable manifest and uses the standard skills directory.
+The configured-command tests select each host's hook configuration through its relocated native manifest and use the shared skills directory.
 It checks Claude's inline limit with complete instructions, long plugin paths, and LF or CRLF line endings.
 Each test removes its disposable plugin copies.
 
@@ -352,8 +357,9 @@ The issue-form gate, `test/validation/issue-forms.mjs`, parses `.github/ISSUE_TE
 It validates nonempty top-level `name` and `description` strings, a nonempty body, and required textarea fields.
 It also checks unique chooser names, field IDs, and labels, plus GitHub's field ID character rules.
 Local validation covers this repository's form subset and does not establish GitHub's live chooser recognition.
-The package gate, `test/validation/plugin-version.mjs`, checks the portable manifest, Claude descriptor, and host catalogs from its module location.
+The package gate, `test/validation/plugin-version.mjs`, checks all four native manifests and the host catalogs from its module location.
 It checks the complete `yyyy.MM.dd.seq` string, real calendar dates, positive sequences, shared metadata, bundled paths, and release parity.
+It rejects the root portable manifest and generic hook files that would shadow or cross native host boundaries.
 `test/validation.test.mjs` exercises valid and invalid forms, YAML scalar semantics, file links, package paths, and release versions.
 `test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, the complete-file UTF-8 prompt boundary, and relocated execution.
 
