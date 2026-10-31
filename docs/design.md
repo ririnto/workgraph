@@ -99,6 +99,8 @@ The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
 The Main contract honors user and configuration settings within host restrictions.
 Main host references provide tier and effort guidance based on task difficulty.
+Main's Codex reference owns context inheritance, assignment sizing, and continuation across the supported agent interfaces.
+It separates inherited conversation history, worker execution, and waiting from the evaluation runner's limits.
 Worker model selection stays in the dispatch, without a model-policy reference.
 Each role has separate host references because Main and Worker load at different execution stages.
 Detailed model support, benchmarks, and workload reports remain in [maintainer research](research.md#model-effort-and-cost).

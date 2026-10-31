@@ -77,12 +77,30 @@ This host compatibility check does not truncate hook output or move required ins
 
 ## Update
 
-Refresh the registered marketplace:
+For a Git marketplace registered from this repository, refresh its snapshot:
 
 ```sh
 codex plugin marketplace upgrade workgraph
 ```
 
-Use the plugin browser to refresh the installed Workgraph copy, then start a new session.
+When the repository revision advances, this also refreshes configured installed plugins while preserving their enabled or disabled state.
+Inspect Workgraph's installed version and state in `/plugins` or `codex plugin list --marketplace workgraph --json`, then start a new session.
+
+For a local marketplace registered with `marketplace add .`, update that checkout first.
+Local installations use cached copies, so editing the checkout or opening `/plugins` alone does not establish an update.
+If Workgraph is already enabled, reinstall the local copy:
+
+```sh
+codex plugin add workgraph@workgraph
+```
+
+The add command also enables a disabled plugin.
+To keep a local installation disabled, use a client refresh control that preserves that state, if available.
+Codex CLI 0.166.0 has no separate local refresh command that preserves disabled state.
+Its `marketplace upgrade` command applies only to configured Git marketplaces.
+Verify the installed copy and state after refreshing it.
+Check the installed files when local edits retain the same manifest version.
+The [marketplace source review](../research.md#codex-marketplace-resolution-and-updates) records these version-specific behaviors.
+
 Check the installed version against [version updates](../../README.md#version-updates) when diagnosing stale instructions.
 The [verification map](../verification-map.md) describes package, hook, and behavior checks.

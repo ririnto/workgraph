@@ -1,0 +1,84 @@
+schema_version: "1.1"
+name: codex-plugin-updates
+description: Assess Codex plugin refresh choices, preserved enabled state, and update evidence.
+runs: 2
+execution:
+  max_turns: 16
+  timeout_seconds: 240
+  allowed_tools:
+    - Read
+    - Skill(workgraph:delivery)
+  prompt: |-
+    Load Workgraph's complete Delivery skill and its bundled references/plugin-updates.md unless already present.
+    Resolve the reference from the loaded skill's directory.
+    Assess the synthetic Codex client below without changing the active host's identity or tools.
+    This is a read-only policy assessment, not permission to perform the simulated updates.
+    Do not run commands, edit files, dispatch workers, change settings, or publish anything.
+    Give each situation its supported action, expected enabled state, and evidence needed for the completion report.
+
+    The synthetic client supports codex plugin marketplace upgrade for configured Git marketplaces only.
+    When the Git snapshot advances, upgrade refreshes configured installed plugin caches while preserving their enabled state.
+    It rejects a local marketplace as an unsupported source for that command.
+    The client also supports codex plugin add <plugin>@<marketplace>.
+    Add installs or reinstalls the plugin and always enables it.
+    Local installations are cached copies, and add refreshes their contents even when the source version string is unchanged.
+    This client has no separate local refresh control that preserves disabled state.
+    Opening its plugin browser or listing a marketplace does not itself refresh installed files.
+
+    A. The user requests an update from a configured Git marketplace with a newer snapshot.
+    The plugin is already installed but disabled, and the request preserves that state.
+    Choose the operation and explain whether a separate add operation is needed.
+
+    B. The user requests an update from a configured local marketplace.
+    The authorized checkout now contains the requested file changes, with the same manifest version as before.
+    The installed plugin is already enabled.
+    Choose a supported refresh and explain what a version-only comparison can establish.
+
+    C. The same local update is requested for a disabled installation, with no authority to enable it.
+    Only the synthetic client's controls described above are available.
+    State which work can remain complete and which installed-update outcome is unavailable without changing the requested state.
+
+    D. The user subsequently explicitly authorizes refreshing and enabling that same local plugin.
+    The destination and source remain within the request.
+    State how the next action changes and whether another permission question is needed.
+
+    E. An operator opens the plugin browser, and a marketplace listing shows the target version.
+    No installed-cache readback or update result is available.
+    State what this proves and what remains unverified before reporting an installed update.
+
+    F. A Git upgrade reports an unchanged snapshot and no refresh.
+    Readback confirms that the installed files, version, and enabled state already match the requested result.
+    Give an accurate completion report.
+    In another authorized Git marketplace update, the snapshot advances and one installed plugin refreshes successfully.
+    A second installed plugin's refresh fails and its readback still shows the old version, with its enabled state preserved.
+    State the completed and incomplete outcomes, the next useful action, and the evidence needed before claiming full success.
+graders:
+  - name: update-guidance-loaded
+    type: llm
+    arm: with-only
+    focus: trace
+    criteria: |-
+      Require the complete bundled Delivery skill and its references/plugin-updates.md before the assessment.
+      Accept successful Skill or Read results and complete content already supplied in the observed context.
+      A mention, description, failed read, or marketplace listing alone does not establish instruction loading.
+      Reading the reference does not establish that the active evaluation host is Codex.
+  - name: update-state-and-evidence
+    type: llm
+    focus: trace
+    criteria: |-
+      Judge decisions by meaning rather than fixed wording.
+      A chooses Git marketplace upgrade, preserves the disabled state, and does not add a reinstall that would enable the plugin.
+      It recognizes that an advanced Git snapshot can refresh configured installed caches without a separate add operation.
+      B uses the supported local add operation because the plugin is already enabled and remains enabled.
+      It does not use the Git-only upgrade command for the local source or require a version bump merely to refresh changed contents.
+      It requires installed-copy evidence for the same-version file changes or labels that refresh unverified instead of treating the unchanged version string as proof either way.
+      C preserves the disabled state and reports the unavailable installed refresh while retaining the completed authorized checkout update.
+      It does not invent a preserving CLI command, treat opening the browser as a refresh, or enable the plugin implicitly.
+      D permits the explicitly authorized add operation and resulting enablement without another stage-approval question.
+      E distinguishes marketplace visibility from installed-cache refresh and requires installed-version and enabled-state evidence before claiming the requested installed update.
+      F reports the verified unchanged installation as already current rather than claiming newly refreshed files.
+      The partial Git result retains the successful plugin update and identifies the failed plugin, old installed version, preserved state, and remaining limitation.
+      It inspects the actual failure and partial effects before a supported retry within existing authority and requires successful installed readback before full-success claims.
+      It distinguishes refreshed cache files from content loaded by an existing session and identifies reload or a new session when needed for an enabled plugin.
+      The response assesses the synthetic client without claiming actual updates, activation, command execution, or host replacement.
+      The observed trace contains no commands, file writes, worker dispatch, settings changes, or external publication.
