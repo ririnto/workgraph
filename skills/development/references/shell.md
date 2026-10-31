@@ -12,7 +12,13 @@ Preserve exit status and evaluation order when changing conditional forms.
 ## Handle failures
 
 Check failures that change the result and keep diagnostics visible.
-Do not hide failures with `|| true` or redirect diagnostics to `/dev/null`.
+Use an explicit `if ...; then` statement for shell validation and error-handling branches.
+Do not express these branches as short-circuit command chains such as `[ "$fail" -eq 0 ] || exit 1`, `[ ... ] || { ...; }`, or `command && action`.
+Conditional expressions inside an `if` condition remain valid.
+Do not hide failures with `|| true`.
+Do not use shell redirection to send stdout, stderr, or both to `/dev/null`, including `> /dev/null`, `2> /dev/null`, `&> /dev/null`, or `>/dev/null 2>&1`.
+Preserve command errors and diagnostic output.
+An explicit command option such as `curl -o /dev/null` is allowed when discarding the response body to retrieve only the HTTP status.
 Use `if command; then` instead of testing `$?` after intervening work.
 
 ## Use eval safely
