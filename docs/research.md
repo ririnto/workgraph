@@ -57,13 +57,19 @@ Package checks, context measurements, native activation, and model outcomes rema
 
 The October 31, 2026 review checked each requested plugin's default branch, release target, publication date, relevant history, and current host documentation.
 Dates below are UTC.
-Both default branches matched their latest published release commits at review time.
+Superpowers and i-have-adhd default branches matched their latest published release commits at review time.
 The source commit date and release publication date are distinct evidence.
 
 | Plugin | Reviewed source | Commit date | Latest release publication |
 | --- | --- | --- | --- |
 | Superpowers | [`2ce8aa1`](https://github.com/obra/superpowers/commit/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b) | 2026-10-21 | [v7.0.1](https://github.com/obra/superpowers/releases/tag/v7.0.1), 2026-10-21 |
 | i-have-adhd | [`1ecea19`](https://github.com/ayghri/i-have-adhd/commit/1ecea1993b7fce257ffbd686c070948b5e07eda6) | 2026-10-11 | [v0.4.1](https://github.com/ayghri/i-have-adhd/releases/tag/v0.4.1), 2026-10-19 |
+| Ponytail | [`96608e0`](https://github.com/DietrichGebert/ponytail/commit/96608e078b2d5ea607c5c3b8b5a54d1c1fba6846) | 2026-10-29 | [v5.3.3](https://github.com/DietrichGebert/ponytail/releases/tag/v5.3.3), 2026-10-29 |
+| pstack | [`4dd1d05`](https://github.com/cursor/plugins/commit/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe), package `0.15.36` | 2026-10-29 | No GitHub release returned by the releases API. |
+
+Ponytail's reviewed main is one documentation commit after its release target, with unchanged hook and skill code.
+Pstack's latest component change is [October 27](https://github.com/cursor/plugins/commit/c742dd61706fbacc1b95f1a20b7b988cf096ce6c), predating the monorepository's reviewed HEAD.
+Its package version is source metadata, not a separately dated GitHub release.
 
 ### Hook timing and activation
 
@@ -80,6 +86,12 @@ This adds headroom rather than a delay, and the independent polling-guard timeou
 The upstream report is not a reproduction of missing Workgraph context or proof of startup performance on another host.
 The [Claude hooks reference](https://code.claude.com/docs/en/hooks) describes event timing and timeout handling.
 
+Ponytail's October 18 [timeout fix](https://github.com/DietrichGebert/ponytail/commit/5a5a605fb1292a93095e9b8fcd5a7866f2fcc637) raised lifecycle deadlines from five to fifteen seconds after reports of slow Windows startup.
+Workgraph's existing thirty-second context ceiling already accommodates that rationale without changing the polling guard.
+Ponytail's optional codebase map and persistent personal mode do not create corresponding Workgraph requirements.
+Workgraph retains canonical skill files rather than duplicating fallback instructions in its injector.
+Pstack's current manifests declare no lifecycle hooks, and its dependency bootstrap script is not a session-start hook.
+
 ### Conditional references and compaction
 
 Superpowers v7.0.1 moved conditional procedures into references after reported skill truncation during compaction.
@@ -90,12 +102,58 @@ Workgraph keeps always-required guidance inline and genuinely conditional materi
 Native skill reattachment and Workgraph's startup-hook delivery remain separate mechanisms.
 The existing [hook delivery checks](design.md#deliver-context) cover their own output contract.
 
+### Native skill selection
+
+We compared actual Workgraph hook output with Claude Code `2.1.305`, built October 20, and [Codex source `67f0994`](https://github.com/openai/codex/commit/67f0994b532b8740f14b5b738af7b7b2a915b1d6), committed October 31.
+Claude's loaded skill fragment begins with its base directory and parsed body without YAML.
+Codex's [skill fragment](https://github.com/openai/codex/blob/67f0994b532b8740f14b5b738af7b7b2a915b1d6/codex-rs/ext/skills/src/fragments.rs) wraps the qualified name, source path, and full file in `<skill>`.
+Workgraph now starts each context with that native fragment and puts its provenance labels afterward.
+The comparison covers content formatting, not native invocation state, skill-scoped permissions, frontmatter hook registration, or message-role equivalence.
+The [delivery design](design.md#deliver-context) records those host-owned boundaries.
+
+The same Codex revision sets [an 8,000-byte main-prompt limit](https://github.com/openai/codex/blob/67f0994b532b8740f14b5b738af7b7b2a915b1d6/codex-rs/ext/skills/src/render.rs) for selected skill contents.
+Its [host loader](https://github.com/openai/codex/blob/67f0994b532b8740f14b5b738af7b7b2a915b1d6/codex-rs/ext/skills/src/host_prompt.rs) applies that limit to portable Agent Plugin skills, including their YAML, and warns while injecting the UTF-8-safe prefix.
+The recognized root `plugin.json` makes Workgraph part of that loading path.
+Explicit selection does not exempt the skill, and the separate catalog metadata budget does not increase its body limit.
+This source revision does not establish the user's installed or deployed Codex version.
+
+Delivery, Development, and Codex Scoped Cleanup previously exceeded that limit, so their final required instructions could be omitted on this path.
+They now keep required procedures inline through concise wording and removal of duplicated same-context rules.
+The existing skill gate checks complete-file bytes, with exact-boundary, multibyte, BOM, and CRLF fixtures.
+This check protects a documented host implementation boundary rather than imposing a universal Agent Skills size rule.
+Hook output remains complete and does not pass through that selected-skill renderer.
+
+### Merge authority and native orchestration
+
+Pstack's [Babysit playbook](https://github.com/cursor/plugins/blob/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe/pstack/skills/poteto-mode/playbooks/babysit.md) distinguishes merge readiness from an explicit request to merge, land, or ship.
+Its [Shipping playbook](https://github.com/cursor/plugins/blob/4dd1d05818d19792e7cd6e818f1667f95f7e1dbe/pstack/skills/poteto-mode/playbooks/shipping.md) checks actual merged state rather than treating queue enrollment as a completed merge.
+Delivery adopts these distinctions, preserves prior scoped user authorization, and completes preparation without adding a mandatory confirmation ritual.
+The merge-authority clause predates the October 27 change and is not attributed to that commit.
+The [delivery decision case](../evals/delivery-decisions/case.yaml) covers publication-only requests, later scoped grants, and queued requests still awaiting integration.
+
+Pstack's October 27 change removed its orchestration CLI and state store in favor of native host capabilities.
+Workgraph already uses native delegation and Claude-only Workflow, so this review adds no execution layer or optional state machinery.
+The bundled Workflow samples integrate units into a candidate branch and end at publication and review, leaving target-branch merging to Delivery's authority rule.
+
 ### Tests and failure reports
 
 Superpowers' July 24 [v6.2.0 release](https://github.com/obra/superpowers/releases/tag/v6.2.0) introduced its revised [test-quality guidance](https://github.com/obra/superpowers/blob/2ce8aa15d05bd57213e6f746f953aafb7ded7a8b/skills/test-driven-development/writing-good-tests.md).
 Development now names the real failure a new test detects and requires independently derived expectations.
 Structural checks still verify explicit structural contracts without claiming host execution or model adherence.
 The [test-design case](../evals/development-test-design/case.yaml) covers that distinction without requiring new tests for a simple prose edit.
+
+The official public embed of the supplied [October 30 post](https://x.com/Im_IrushiK/status/2116182482152460479) exposes a truncated excerpt reporting 6,000 product lines and 115,000 test lines.
+Those figures are the author's report, not an independently inspected repository or evidence about every task performed by that model.
+The full post was unavailable through the reviewed public routes.
+Development addresses the general failure mode by requiring concrete needs for added abstractions, existing-check reuse, and an uncovered realistic failure for each added test.
+It stops optional verification growth after required gates and changed risks have sufficient evidence, without inventing a test-count, coverage, or code-ratio target.
+The test-design case now includes a passing, adequately checked change for which a generic framework and ratio-driven helper tests add no demonstrated coverage.
+
+Workgraph applies that guidance to its own checks.
+The Workflow tests retain actual phase execution and remove a duplicate source-spelling assertion about the same order.
+Hook tests retain reference containment and exact emitted context while the existing metadata validator owns YAML and invocation checks.
+Obsolete absence checks and a static workflow inventory check were removed while executed workflow coverage and Markdown link validation remain.
+The new byte-boundary regression detects native content loss that those existing checks did not cover.
 
 The i-have-adhd [evaluation report](https://github.com/ayghri/i-have-adhd/blob/1ecea1993b7fce257ffbd686c070948b5e07eda6/evals/RESULTS.md) records an August 2 run using Claude Code 2.1.220 and `claude-opus-4-8`, with three trials per case.
 Its partial-success case includes an unsupported authentication diagnosis, and the report proposes unconditional cause-first wording as a possible explanation.

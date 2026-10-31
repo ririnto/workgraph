@@ -2,7 +2,8 @@
 
 Use this reference when the task authorizes an installed plugin update.
 
-After merge and base update, update the authorized marketplace and installed plugin for the requested hosts.
+Once the requested version is available from the authorized distribution source, update the marketplace and installed plugin for the requested hosts.
+Any needed source merge follows Delivery's merge-authority rule before distribution.
 Refresh all configured marketplaces when the user requests that broader update.
 
 Run only the requested hosts' supported update commands.

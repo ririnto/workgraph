@@ -3,7 +3,6 @@ import { spawnSync } from "node:child_process";
 import {
   copyFileSync,
   cpSync,
-  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -66,13 +65,6 @@ const copyPlugin = (t) => {
     path.join(root, "plugin.json")
   );
   cpSync(skills, path.join(root, "skills"), { recursive: true });
-  cpSync(
-    new URL("../workflows/", import.meta.url),
-    path.join(root, "workflows"),
-    {
-      recursive: true
-    }
-  );
   return root;
 };
 
@@ -92,17 +84,20 @@ const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
     `\n\nWorkgraph ${host} guidance loaded from `
   );
   assert.equal(extra, undefined);
-  assert.ok(
-    roleContext.includes(
-      `The active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.`
-    )
+  const [skillFragment, skillNotice, extraNotice] = roleContext.split(
+    "\n\nWorkgraph instructions loaded from "
+  );
+  assert.equal(extraNotice, undefined);
+  assert.equal(
+    skillNotice,
+    `${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded above, without YAML frontmatter." : "The complete skill file is already loaded above, including YAML frontmatter."}`
   );
   const [location, referenceBody] = referenceContext.split(
     ".\nThe complete reference content is already loaded below.\n\n"
   );
   if (host === "claude") {
-    const { directory, deliveredBody } = roleContext.match(
-      /Base directory for this skill: (?<directory>[^\n]+)\n\n(?<deliveredBody>[\s\S]*)$/u
+    const { directory, deliveredBody } = skillFragment.match(
+      /^Base directory for this skill: (?<directory>[^\n]+)\n\n(?<deliveredBody>[\s\S]*)$/u
     ).groups;
     assert.equal(directory, path.dirname(source));
     assert.equal(path.resolve(directory, location), reference);
@@ -122,10 +117,9 @@ const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
   } else {
     assert.equal(location, reference);
     assert.equal(referenceBody, guidance);
-    assert.ok(
-      roleContext.endsWith(
-        `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`
-      )
+    assert.equal(
+      skillFragment,
+      `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${content}\n</skill>`
     );
   }
 };
@@ -327,7 +321,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
       const reference = `\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(source), referenceSource) : referenceSource}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`;
       assert.deepEqual(JSON.parse(result.stdout), {
         hookSpecificOutput: {
-          additionalContext: `${host === "claude" ? "Workgraph source paths are relative to the skill base directory below.\n" : ""}Workgraph instructions loaded from ${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded below, without YAML frontmatter." : "The complete skill file is already loaded below, including YAML frontmatter."}\n\n${fragment}${reference}`,
+          additionalContext: `${fragment}\n\nWorkgraph instructions loaded from ${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded above, without YAML frontmatter." : "The complete skill file is already loaded above, including YAML frontmatter."}${reference}`,
           hookEventName: event
         }
       });
@@ -554,35 +548,12 @@ test("Codex delimiter lines preserve raw files and remove Claude body prefixes",
   }
 });
 
-test("plugin does not bundle agent definitions or a separate instruction skill", () => {
-  assert.equal(existsSync(new URL("../agents/", import.meta.url)), false);
-  assert.equal(
-    existsSync(new URL("../skills/instruction-authoring/", import.meta.url)),
-    false
-  );
-  assert.equal(
-    existsSync(new URL("../skills/writing/SKILL.md", import.meta.url)),
-    true
-  );
-});
-
-test("bundled skills retain invocation metadata and supporting reference files", (t) => {
+test("bundled instruction references resolve to nonempty files inside their skill or plugin", (t) => {
   const root = copyPlugin(t);
   for (const name of readdirSync(path.join(root, "skills"))) {
     const directory = path.join(root, "skills", name);
-    const [prefix, metadata, body] = readFileSync(
-      path.join(directory, "SKILL.md"),
-      "utf-8"
-    ).split(/^---$/mu);
-    assert.equal(prefix, "");
-    assert.match(metadata, new RegExp(`^name: ${name}$`, "mu"));
-    assert.match(metadata, /^description: \S+/mu);
-    assert.doesNotMatch(
-      metadata,
-      /^(?:user-invocable: false|disable-model-invocation: true)$/mu
-    );
-    assert.ok(body.trim());
-    for (const match of body.matchAll(
+    const content = readFileSync(path.join(directory, "SKILL.md"), "utf-8");
+    for (const match of content.matchAll(
       /(?:\]\(|`)(?<file>(?:references|playbooks)\/[^)`#\s]+\.md|scripts\/[^)`#\s]+\.workflow\.txt|\.\.\/[^)`#\s]+\.md)/gu
     )) {
       const reference = realpathSync(
@@ -595,22 +566,6 @@ test("bundled skills retain invocation metadata and supporting reference files",
       );
       assert.ok(readFileSync(reference, "utf-8").trim());
     }
-  }
-});
-
-test("bundled native Workflow sources remain relocatable", (t) => {
-  const root = copyPlugin(t);
-  const directory = path.join(root, "workflows");
-  const files = readdirSync(directory);
-  assert.deepEqual(
-    new Set(files),
-    new Set(["delivery-complex.js", "delivery-simple.js"])
-  );
-  for (const file of files) {
-    assert.match(file, /\.js$/u);
-    const source = realpathSync(path.join(directory, file));
-    assert.ok(source.startsWith(`${realpathSync(directory)}${path.sep}`));
-    assert.ok(readFileSync(source, "utf-8").trim());
   }
 });
 

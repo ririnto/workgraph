@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import {
   existsSync,
   readdirSync,
@@ -87,12 +88,12 @@ const validateInvocation = (metadata, report) => {
 };
 
 /**
- * Validate portable skill metadata and Workgraph's invocation policy.
+ * Validate portable skill metadata and Workgraph's host invocation limits.
  * Preserve host extensions outside the checked fields.
  * @param {string} content Complete SKILL.md source.
  * @param {string} directoryName Name of the containing skill directory.
  * @param {string} source Diagnostic source label.
- * @returns {string[]} Frontmatter, field, and body diagnostics.
+ * @returns {string[]} Frontmatter, field, body, and host compatibility diagnostics.
  */
 export const validateSkillContent = (
   content,
@@ -101,6 +102,11 @@ export const validateSkillContent = (
 ) => {
   const errors = [];
   const report = (message) => errors.push(`${source}: ${message}`);
+  if (Buffer.byteLength(content, "utf-8") > 8000) {
+    report(
+      "complete file must fit Codex's 8000-byte portable skill prompt limit."
+    );
+  }
   const lines = content.replace(/^\uFEFF/u, "").split("\n");
   const closing = lines.findIndex(
     (line, index) => index > 0 && line.trim() === "---"

@@ -22,6 +22,9 @@ execution:
     C. A requested prose edit corrects a typo in a human-facing README with no required exact wording.
     A proposed unit test asserts that the replacement sentence appears verbatim.
     The repository already requires a Markdown check.
+    D. A small serializer change already has passing checks for its changed output and malformed-input boundary.
+    All required gates passed, and the reviewer identified no uncovered failure.
+    A proposal adds a generic test framework and a test for every private helper to reach a ten-to-one test-to-product line ratio.
 graders:
   - name: development-loaded
     type: llm
@@ -41,5 +44,7 @@ graders:
       Proposal B retains the manifest and containment check because those are explicit structural contracts.
       Reject its claim of native hook execution and model adherence, identifying that separate host and behavioral evidence is needed for those claims.
       Proposal C omits the new wording assertion while retaining the existing Markdown check and a proportionate prose review.
+      Proposal D rejects the invented ratio and speculative framework while retaining the existing evidence and required gates.
+      Additional verification is justified by a concrete remaining risk or requirement, not a target test count or line ratio.
       Do not impose TDD, new test infrastructure, or extra approval for every change.
       Attribute all proposals to the supplied scenario without claiming personal execution or edits.

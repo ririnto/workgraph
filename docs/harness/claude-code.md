@@ -52,9 +52,10 @@ Both references own execution timing.
 The Main reference also provides host-specific orchestration and model selection guidance.
 This user adapter does not replace them.
 
-The hook's skill fragment uses the native base-directory line and the skill body without YAML frontmatter.
+The hook context starts with the native base-directory line and the skill body without YAML frontmatter.
 Its reference fragment uses native Read line numbering.
-Source labels identify complete content already loaded, so agents need no startup retrieval for those files.
+Source labels follow the skill fragment and identify complete content already loaded, so agents need no startup retrieval for those files.
+This matches loaded instruction text while the host retains its hook message envelope, invocation records, and permissions.
 The [delivery design](../design.md#deliver-context) describes whitespace handling, envelope differences, inline limits, and failure behavior.
 
 The [Bash polling guard](../../README.md#bash-polling-guard) denies repeated literal `tail` and `sleep` calls through PreToolUse.

@@ -4,6 +4,8 @@ Workgraph bundles two native Workflow delivery samples.
 Both accept optional model selectors and otherwise use host configuration.
 They use the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 These are optional complete-delivery recipes with their own declared phases and review coverage.
+They integrate unit branches into the candidate working branch and finish with a reviewed PR or MR.
+They do not merge that request into its target branch, which follows [Delivery's separate merge authority](../skills/delivery/SKILL.md#establish-merge-authority).
 Choose a smaller graph or direct execution when the requested outcome does not need this process.
 Their scope counts and repair limits are sample-specific choices, not global Workgraph requirements.
 
@@ -107,6 +109,7 @@ The scope, exploration, and sweep stages run with the built-in read-only Explore
 
 Each phase records `completed`, `skipped`, or `failed` with a reason.
 The run returns `complete` only when every required phase completed and review passed or all findings were refuted.
+That result establishes the sample's publication and review outcome, not a merge into the target branch.
 Exploration may be explicitly skipped when the accepted task does not need it.
 A skipped required phase does not pass, so skipping implementation or publication returns `complete: false`.
 Integration is required after any completed implementation, so a skipped or failed integration blocks publication.

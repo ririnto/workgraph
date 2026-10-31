@@ -177,6 +177,25 @@ test("skill metadata counts and normalizes Unicode characters", () => {
   }
 });
 
+test("portable skill prompts fit Codex's complete-file byte budget", () => {
+  const source = skillContent();
+  const boundary = source + "x".repeat(8000 - source.length);
+  const unicodeBoundary = `${boundary.slice(0, -2)}é`;
+  for (const content of [boundary, unicodeBoundary]) {
+    assert.deepEqual(validateSkillContent(content, "sample-skill"), []);
+  }
+  for (const content of [
+    `${boundary}x`,
+    `${unicodeBoundary}x`,
+    `\uFEFF${boundary}`,
+    boundary.replaceAll("\n", "\r\n")
+  ]) {
+    assert.deepEqual(validateSkillContent(content, "sample-skill"), [
+      "<skill>: complete file must fit Codex's 8000-byte portable skill prompt limit."
+    ]);
+  }
+});
+
 test("skill metadata rejects invalid optional field types", () => {
   for (const [extra, diagnostic] of [
     ["compatibility: false", "compatibility must be a non-empty string."],

@@ -1,27 +1,25 @@
 ---
 name: development
-description: Use for source work, running applications, reproducing behavior, or gathering acceptance evidence.
+description: Use for source work, application runs, behavior reproduction, or acceptance evidence.
 ---
 
 # Development
 
-Apply the target repository's rules, lint configuration, and existing tools before these defaults.
-Follow explicit user choices within the task's authority, required checks, and supported host capabilities.
-Read only matching playbooks and language references unless their complete content is already loaded.
-For JavaScript or TypeScript, also read [shared JavaScript and TypeScript guidance](references/nodejs.md) unless already loaded completely.
+Apply repository rules, lint configuration, and existing tools before these defaults.
+Honor user choices within task authority, required checks, and host capabilities.
+Read matching playbooks and references, skipping complete content already loaded.
+For JavaScript or TypeScript, also read [shared Node guidance](references/nodejs.md).
 
 ## Development lifecycle
 
-Choose the lifecycle from the requested outcome before editing.
-Record the behavior contract, affected consumers, exclusions, and observable acceptance evidence.
-Scale exploration, implementation, and verification to the request.
-For a simple, bounded request, use minimal discovery and make the smallest direct change.
-Prefer the target's existing checks, adding focused verification when it resolves material uncertainty or required acceptance.
-Report any required check left unrun because of host constraints.
-Do not add optional review ceremony, speculative sweeps, or precautionary pauses for simple bounded work.
-Keep full rigor for irreversible, high-risk, or genuinely complex work while preserving mandatory safety, authority, and target gates.
-Inspect the affected implementation and stop discovery once evidence supports the smallest safe change.
-Select only the matching playbook and read it before applying its steps unless its complete content is already loaded.
+Record the behavior contract, affected consumers, exclusions, and acceptance evidence before editing.
+Scale discovery, implementation, and verification to the request.
+Inspect affected code and stop discovery when evidence supports the smallest safe change.
+For bounded work, avoid optional review ceremony, speculative sweeps, and precautionary pauses.
+Retain rigor for irreversible, high-risk, or complex work and all safety, authority, and project gates.
+Prefer existing checks, adding focused verification for material uncertainty or required acceptance.
+Report required checks blocked by the host.
+Read the matching playbook before use.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -30,11 +28,11 @@ Select only the matching playbook and read it before applying its steps unless i
 | Behavior-preserving structural change | [Refactoring](playbooks/refactoring.md) |
 | Performance investigation or optimization | [Performance](playbooks/performance.md) |
 
-Verify each coherent unit before building dependent work on it.
-Review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes before publication.
+Verify each coherent unit before dependent work.
+Before publication, review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes.
 Main and Delivery retain review, integration, and cleanup authority.
 
-Guidance alone does not authorize tooling changes or changes across consumer projects.
+Guidance alone authorizes no tooling or cross-project changes.
 
 | Language | Source | Reference |
 | --- | --- | --- |
@@ -45,88 +43,93 @@ Guidance alone does not authorize tooling changes or changes across consumer pro
 | Python | `.py` | [Python](references/python.md) |
 | Go | `.go` | [Go](references/go.md) |
 | Rust | `.rs` | [Rust](references/rust.md) |
-| Shell | Shell scripts and maintained shell commands | [Shell](references/shell.md) |
+| Shell | Scripts and maintained commands | [Shell](references/shell.md) |
 
 ## Shared code style
 
-Exclude externally maintained files and configurations from these code-style defaults.
-Examples include Gradle's `gradlew` and `gradlew.bat`, and Maven's `mvnw` and `mvnw.cmd`.
-For external contributions, keep style cleanup within the contribution diff unless the user authorizes broader cleanup.
+Exclude externally maintained files and configurations, such as Gradle and Maven wrappers, from style defaults.
+Limit external contribution style cleanup to the diff unless broader cleanup is authorized.
 
-Preserve the project's declared runtime, toolchain, public contracts, and required failure behavior.
-Preserve evaluation order, side effects, resource lifetimes, failure behavior, and required interfaces when transforming code.
-Adapt tests to production interfaces without exposing internals or adding hooks solely for tests.
-Replace superseded implementations and their consumers together, removing obsolete paths in the same change.
-Avoid copying neighboring workarounds because agents copy nearby code as precedent.
-Fix recurring causes in code or data architecture first.
-Use official SDK or framework properties directly when they satisfy the required behavior.
+Preserve the declared runtime, toolchain, public contracts, and required failure behavior.
+During transformations, preserve evaluation order, effects, resource lifetimes, and required interfaces.
+Adapt tests to production interfaces without exposing internals or adding test-only hooks.
+Replace superseded implementations with their consumers and remove obsolete paths together.
+Avoid copying nearby workarounds as precedent.
+Use official SDK or framework properties directly when they satisfy the requirement.
 Prefer immutable bindings and minimize mutable state.
+
+### Keep design proportional
+
+Prefer existing interfaces, direct data flow, and the smallest coherent required change.
+Add layers, helpers, options, dependencies, or fallbacks for concrete needs the existing design cannot handle simply.
+Avoid speculative extension points and parallel implementations for hypothetical needs.
+Reconsider data and ownership before adding complexity.
 
 ### Extract regex matches
 
-Prefer named regex capture groups, backreferences, and replacement references when the engine and existing interface support them.
-Use positional groups when the supported interface or explicit task requires them.
-Prefer an existing parser or literal operation when it expresses the requirement more clearly.
-Use the language or platform's native named-group facilities instead of adding unnecessary custom wrappers.
-Keep the engine's supported form when named groups are unavailable.
+Prefer native named regex captures, backreferences, and replacement references when the engine and interface support them.
+Use positional groups when the interface or task requires them, and supported forms when named groups are unavailable.
+Prefer an existing parser or literal operation when clearer, without unnecessary custom wrappers.
 Do not treat ordinary array indexing as regex capture access.
 
 ## Documentation and comments
 
-Follow the project's documentation and comment conventions.
-Preserve declaration attachment, directives, licenses, and safety invariants when changing documentation or comments.
-Remove obsolete workaround comments when changing affected code.
+Follow project documentation and comment conventions.
+Preserve declaration attachment, directives, licenses, and safety invariants.
+Remove obsolete workaround comments with affected code changes.
 
 ## Side-effect boundaries
 
-Treat the following changes as behavior-sensitive work rather than automatic style cleanup.
-Implement them when the task authorizes the change and targeted evidence covers preserved behavior or an accepted behavior change.
-Keep guidance as policy text when automation cannot preserve the relevant contract.
-Record material behavior changes and remaining uncertainty in the task report.
+Make these changes when authorized and targeted evidence covers preserved or accepted new behavior.
+Keep guidance as policy text when automation cannot preserve the contract.
+Report material behavior changes and remaining uncertainty.
 
 | Item | Validation concern |
 | --- | --- |
-| Comment removal or relocation | Removing directives or changing documentation attachment can alter tooling, public contracts, or safety information. |
-| Explanatory logging | Added runtime calls change effects, cost, and possible information exposure. |
-| Await instead of void | Awaiting can change scheduling, callback contracts, rejection handling, and cancellation. |
-| Early-exit inversion | Rewriting branches can change evaluation order, cleanup, cost, or security checks. |
-| Dependency style and LTS selection | Manifest restructuring or upgrades can change resolution, runtime requirements, and supported APIs. |
-| Rule rollout | New diagnostics and fixes can misclassify source or change behavior before target-specific validation. |
-| Structured validation identifiers | Replacing exported string diagnostics or bare errors changes observable validator contracts. |
-| | - Migrate affected consumers together when the task authorizes that change. |
+| Comment changes | Check directives, declaration attachment, tooling, public contracts, and safety information. |
+| Explanatory logging | Check runtime effects, cost, and information exposure. |
+| Await instead of void | Check scheduling, callback contracts, rejection handling, and cancellation. |
+| Early-exit inversion | Check evaluation order, cleanup, cost, and security checks. |
+| Dependency changes | Check resolution, runtime requirements, and supported APIs. |
+| Rule rollout | Validate target-specific classification and behavior. |
+| Structured validation identifiers | Preserve observable diagnostics and error contracts, migrating consumers together when authorized. |
 
 ## Dependency versions
 
-When selecting dependency versions, prefer officially supported LTS releases, or stable releases when no LTS line exists.
-Verify current support status and compatibility with the project's runtime, toolchain, and dependent APIs.
-Use existing native dependency catalogs and lockfiles, preserving compatible managed versions.
+Prefer officially supported LTS dependency releases, or stable releases when no LTS line exists.
+Verify current support and compatibility with the runtime, toolchain, and dependent APIs.
+Use native catalogs and lockfiles, preserving compatible managed versions.
 Avoid unrelated upgrades.
-Preserve existing integrity checks, including lockfile integrity fields and signature or checksum verification.
+Preserve integrity checks, including lockfile fields, signatures, and checksums.
 
 ## Automation
 
-Use the project's existing formatters, checkers, and test frameworks for ordinary development changes.
-Preserve existing lint and formatter choices when adding guidance or filling configuration gaps.
+Use existing formatters, checkers, and test frameworks for ordinary changes.
+Preserve lint and formatter choices when adding guidance or filling configuration gaps.
 
-When selecting, developing, configuring, or assessing authorized lint tools, rules, or automatic fixes, read [lint rule guidance](references/lint-rules.md) unless its complete content is already loaded.
+When selecting, developing, configuring, or assessing authorized lint tools, rules, or fixes, read [lint rule guidance](references/lint-rules.md).
 
 ## Verification
 
-Identify the target, trigger, input, and observable expected outcome before checking behavior.
-Use existing commands and supported entry points, and preserve the project's execution and import boundaries.
-Choose tests that exercise the changed behavior and run the application when integration, state, or external behavior matters.
-When adding tests, identify the realistic failure each test detects and derive expected results independently of the implementation under test.
-Prefer consumer-visible outcomes, keeping source-shape assertions for explicit structural contracts.
-A structural check establishes that contract, not execution or model adherence.
-Collect traces, screenshots, results, or timings when tests do not show the outcome.
-Record the command, setup, exit status, and raw result separately from interpretation.
-Retain failures and unexpected output, and reproduce reports against their stated expectations.
+Identify the target, trigger, input, and observable expected outcome.
+Use existing commands and supported entry points, preserving execution and import boundaries.
+Test changed behavior and run the application when integration, state, or external behavior matters.
+Extend the nearest meaningful check before adding a suite or helper.
+For each new test, identify an uncovered realistic failure and derive expected results independently of the implementation.
+Prefer consumer-visible outcomes, reserving source-shape assertions for explicit structural contracts.
+Structural checks do not prove execution or model adherence.
+Exercise real owned behavior, substituting external or nondeterministic boundaries only when controlled input is needed.
+Remove redundant checks when retained coverage detects their relevant failures.
+Do not invent test-count, code-size ratio, or coverage targets.
+Stop expanding verification when required gates and changed risks have sufficient evidence, unless a concrete failure or requirement warrants more.
+Collect traces, screenshots, results, or timings when tests do not show outcomes.
+Record commands, setup, exit status, and raw results separately from interpretation.
+Retain failures and unexpected output, reproducing reports against stated expectations.
 Record measurement conditions for performance claims.
-Treat formal proof, native activation, and model adherence as unverified without direct evidence.
-Create a focused feature map only when repeated reports or navigation needs warrant one.
-Keep the map beside project verification instructions and update affected entries.
-When correcting a defect, fix its cause in code or data architecture first.
-When needed, a narrow guard may stop new instances of a known bad pattern before separate cleanup of existing debt.
-Next, use existing static checks or add meaningful regression checks.
-Update rules or skills only when they prevent recurrence, pairing prevention with removal of existing offending patterns where feasible.
+Leave formal proof, native activation, and model adherence unverified without direct evidence.
+Create a focused feature map only for repeated reports or navigation needs, beside verification instructions, and update affected entries.
+Fix defect causes in code or data architecture first.
+A narrow guard may prevent new instances of a known bad pattern before separate debt cleanup.
+Use existing static checks or meaningful regression checks next.
+Update rules or skills to prevent recurrence, removing existing offending patterns where feasible.
 Change human-only guides last.
