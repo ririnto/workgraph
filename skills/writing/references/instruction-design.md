@@ -64,7 +64,8 @@ Remove replaced paths and update their consumers in the same change.
 
 For changed instruction behavior, identify the expected outcome and capture the command, setup, exit status, and raw result.
 Enforce structural requirements through existing validators when they can check the contract safely.
-Test representative success, boundary, and failure decisions through existing native evaluation cases.
+Test representative success, boundary, and failure decisions when warranted by the change and its risks.
+Use existing native evaluation cases when useful and available.
 Keep semantic judgment separate from lexical assertions about instruction wording.
 Calibrate semantic graders with known-good and known-bad responses before relying on their scores.
 Report failed requests, ungraded coverage, and grader controls separately from behavioral results.
