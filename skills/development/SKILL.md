@@ -7,7 +7,7 @@ description: Use for source work, application runs, behavior reproduction, or ac
 
 Apply repository rules, lint configuration, and existing tools before these defaults.
 Honor user choices within task authority, required checks, and host capabilities.
-Read matching playbooks and references, skipping complete content already loaded.
+Read matching playbooks and references before use, skipping complete content already loaded.
 For JavaScript or TypeScript, also read [shared Node guidance](references/nodejs.md).
 
 ## Development lifecycle
@@ -19,7 +19,6 @@ For bounded work, avoid optional review ceremony, speculative sweeps, and precau
 Retain rigor for irreversible, high-risk, or complex work and all safety, authority, and project gates.
 Prefer existing checks, adding focused verification for material uncertainty or required acceptance.
 Report required checks blocked by the host.
-Read the matching playbook before use.
 
 | Outcome | Playbook |
 | --- | --- |
