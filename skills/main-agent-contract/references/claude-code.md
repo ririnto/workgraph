@@ -14,5 +14,4 @@ Respect model exclusions or request-only choices when the user or project actual
 
 Resolve available models and effort settings through the host's supported controls.
 Verify that the selected settings are supported and that each request returns a result.
-When requested settings are unavailable, report the limitation and substitute only when permitted.
-Report unavailable or substituted settings using host evidence.
+Report unavailable or substituted settings using host evidence, and substitute only when permitted.

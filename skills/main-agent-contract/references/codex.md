@@ -57,5 +57,4 @@ Resolve each tier at call time using the host's model list and supported control
 For native Codex invocations, use the host-confirmed full model ID, never a bare alias or Claude-family name.
 
 Verify that each request returns a result.
-When requested settings are unavailable, report the limitation and substitute only when permitted.
-Report unavailable or substituted settings using host evidence.
+Report unavailable or substituted settings using host evidence, and substitute only when permitted.
