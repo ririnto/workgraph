@@ -32,7 +32,8 @@ Publish and review each authorized ready unit.
 Do setup only when an authorized operation needs it.
 Configure new CI only when needed.
 Run applicable checks directly when appropriate.
-Preserve existing CI unless changes are authorized; satisfy required CI, protections, and approvals.
+Preserve existing CI unless changes are authorized.
+Satisfy required CI, protections, and approvals.
 Git delivery does not authorize deployment, credentials, live assets, forks, or upstream destinations.
 For assigned queue work or assessment, read [fix queue guidance](references/fix-queues.md) unless fully loaded.
 
