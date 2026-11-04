@@ -105,7 +105,6 @@ Fix confirmed unit blockers to acceptance, required behavior, correctness, safet
 Keep fixes on the working branch and update its existing PR/MR.
 Reassess affected changes and interactions using prior findings and dispositions.
 Refresh full review when changed scope or invalidated evidence defeats earlier coverage.
-Apply Main's no-progress reassessment separately from productive fixes and runtime retries.
 Keep unresolved blockers explicit without waiving acceptance or required checks at review limits.
 
 ## Defer and integrate
