@@ -91,7 +91,7 @@ Keep retry limits independent of the token budget.
 
 ## Validate phases and results
 
-Treat `null`, missing fields, malformed values, and unsupported evidence as incomplete.
+Treat malformed result values as incomplete evidence.
 Do not filter required results by truthiness to turn failures into success.
 Distinguish a valid empty result, such as `{ findings: [] }`, from a failed or missing result.
 Validate every required result before starting its dependent stage.
