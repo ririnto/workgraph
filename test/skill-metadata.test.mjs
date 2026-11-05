@@ -36,10 +36,18 @@ const metadataFixture = (t) => {
     fileURLToPath(new URL("../node_modules", import.meta.url)),
     path.join(root, "node_modules")
   );
+  const claudeSkill = path.join(root, "claude-skills/claude-only");
+  mkdirSync(claudeSkill, { recursive: true });
+  writeFileSync(
+    path.join(claudeSkill, "SKILL.md"),
+    skillContent(
+      "name: claude-only\ndescription: Task.\ndisable-model-invocation: true"
+    )
+  );
   return { entrypoint, root };
 };
 
-const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
+const assertMetadataCommand = (filename, diagnostic = "", count = 2) => {
   const result = spawnSync(process.execPath, [filename], {
     cwd: tmpdir(),
     encoding: "utf-8",
@@ -402,7 +410,7 @@ test("skill metadata command validates internal links by their alias", (t) => {
     if (content !== null) {
       writeFileSync(path.join(directory, "SKILL.md"), content);
     }
-    assertMetadataCommand(entrypoint, diagnostic, 2);
+    assertMetadataCommand(entrypoint, diagnostic, 3);
   }
 });
 

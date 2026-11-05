@@ -16,5 +16,6 @@
   "license": "MIT",
   "name": "workgraph",
   "repository": "https://github.com/ririnto/workgraph",
-  "version": "2026.11.06.02"
+  "skills": "./claude-skills/",
+  "version": "2026.11.06.03"
 }

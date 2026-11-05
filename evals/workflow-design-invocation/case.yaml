@@ -8,7 +8,7 @@ execution:
   allowed_tools:
     - Read
   prompt: |-
-    Read the bundled `skills/workflow/SKILL.md` and its references unless their complete content is already present.
+    Read the bundled `claude-skills/workflow/SKILL.md` and its references unless their complete content is already present.
     The `Skill` tool refuses Workgraph skills, which is expected.
     Use its read-only design guidance.
     Derive its path from the session's loaded skill base directory when no path is known.
@@ -28,7 +28,7 @@ graders:
     focus: trace
     criteria: |-
       Judge the observed tool trace and final report together.
-      Require the complete bundled `skills/workflow/SKILL.md` and its references.
+      Require the complete bundled `claude-skills/workflow/SKILL.md` and its references.
       Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       Require the session to produce a substantive candidate addressing all three cache requirements and product constraints.
       Require architecture, interfaces or operations, decisions, failure behavior, and a requirement-to-design mapping.

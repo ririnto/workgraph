@@ -265,16 +265,16 @@ const run = () => {
     ) {
       throw new Error(`${host} hooks must select ./hooks/${hookFile}.`);
     }
+    const [skillsDirectory, skillsLabel] =
+      host === "Claude"
+        ? ["claude-skills", "Claude-only"]
+        : ["skills", "shared"];
     if (
-      bundledPath(
-        root,
-        host === "Claude" ? (manifest.skills ?? "./skills/") : manifest.skills,
-        `${host} skills`,
-        "directory"
-      ) !== path.join(root, "skills")
+      bundledPath(root, manifest.skills, `${host} skills`, "directory") !==
+      path.join(root, skillsDirectory)
     ) {
       throw new Error(
-        `${host} skills must select the shared skills directory.`
+        `${host} skills must select the ${skillsLabel} skills directory.`
       );
     }
   }

@@ -1012,12 +1012,14 @@ The Codex [skill parser](https://github.com/openai/codex/blob/rust-v0.166.0/code
 A Codex CLI `0.166.0` run in a temporary repository listed a repository skill without the policy file in the model's skill list and omitted a matching skill with this policy.
 Explicit `$name` selection still loaded the hidden skill.
 Plugin-qualified selection remains unconfirmed until an installed Workgraph release carries the per-skill files.
+Because explicit selection still loads a hidden skill, and the [policy model](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/skills/src/model.rs) treats `policy.products` as an allowlist of ChatGPT, Codex, and Atlas, no per-skill policy excludes Codex without naming unrelated products.
+The Claude Code-only Workflow skill therefore lives in `claude-skills/`, which only the Claude manifest's additive `skills` path selects.
 
 The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
 Invocation controls do not select a host or role, and `compatibility` is informational.
 The [Cursor skill directories](https://cursor.com/docs/skills.md#skill-directories) also include Claude-compatible locations.
 Consequently, hook-selected host references alone do not isolate directly invoked shared skill bodies.
-The shared Workflow entry point defers operational references until host and role admission.
+The Claude-only Workflow entry point defers operational references until host and role admission.
 This instruction boundary is not a host-enforced file-access restriction or proof of model adherence.
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.

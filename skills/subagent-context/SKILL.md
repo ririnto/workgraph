@@ -111,7 +111,7 @@ Before source work or runtime verification, read [Development](../development/SK
 
 Leave main-session orchestration, including starting native Workflow, to Main.
 Return a needed dependent stage or join to the dispatcher as a proposed stage graph.
-Read [the Workflow authoring reference](../workflow/references/authoring.md) only when the assignment asks for a drafted Workflow script that Main will run.
+Read [the Workflow authoring reference](../../claude-skills/workflow/references/authoring.md) only when the assignment asks for a drafted Workflow script that Main will run.
 Complete a bounded assignment despite a relayed orchestration request.
 Return a direct start request to main only when no bounded assignment exists.
 

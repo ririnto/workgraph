@@ -13,7 +13,7 @@ Use existing host capabilities without requiring another execution engine or cla
 
 Pass Main's per-stage model and effort selections, respecting overrides and pinned agent definitions.
 Keep scan stages read-only.
-Follow Main's [editor isolation policy](../../main-agent-contract/SKILL.md#assignments).
+Follow Main's [editor isolation policy](../../../skills/main-agent-contract/SKILL.md#assignments).
 Use a supported read-only `agentType` or existing host tool restrictions for scans, without inventing a `readOnly` option.
 Prompt instructions do not enforce tool restrictions, so verify that the available host controls enforce the required boundary before dispatch.
 Use native `isolation: 'worktree'` when the accepted ownership plan calls for isolated edits.
@@ -28,7 +28,7 @@ Keep deterministic routing and transformations in the script instead of assignin
 Pass each domain successor its key, relevant file references, accepted evidence, and unresolved requirements.
 Load only needed source for that assignment rather than reloading the whole source at every domain-stage cell.
 Join domains only for actual shared dependencies, integration, or acceptance decisions.
-Follow Delivery's [Review And Publish](../../delivery/SKILL.md#review-and-publish) procedure for independent delivery reviews.
+Follow Delivery's [Review And Publish](../../../skills/delivery/SKILL.md#review-and-publish) procedure for independent delivery reviews.
 
 Use `pipeline()` by default when each item's later work depends only on that item's earlier result.
 Pipeline stages receive the previous result, original item, and item index.

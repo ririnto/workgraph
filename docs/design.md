@@ -22,11 +22,11 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/delivery/SKILL.md` | Main agents doing repository changes or delivery | Main agents follow branch selection, publication, review, deferral, integration, and cleanup procedures. |
 | `skills/delivery/references/fix-queues.md` | Main agents handling or assessing assigned queues | The reference owns queue concurrency, issue acceptance, integration ownership, and closure evidence. |
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference selects requested-host update commands once the version reaches its authorized distribution source. |
-| `skills/workflow/SKILL.md` | Any invoker until host and role admission | The shared entry point checks Claude Code Main identity before loading restricted procedures. |
-| `skills/workflow/references/claude-code-main.md` | Admitted Claude Code Main Agent only | The procedure owns execution, read-only design, and result verification. |
-| `skills/workflow/references/authoring.md` | Admitted Claude Code Main Agent, or a Worker drafting a script for Main | The reference owns script construction, mapping, recovery, and bundled-source caller contracts. |
+| `claude-skills/workflow/SKILL.md` | Any Claude Code invoker until role admission | The Claude-only entry point checks Claude Code Main identity before loading restricted procedures. |
+| `claude-skills/workflow/references/claude-code-main.md` | Admitted Claude Code Main Agent only | The procedure owns execution, read-only design, and result verification. |
+| `claude-skills/workflow/references/authoring.md` | Admitted Claude Code Main Agent, or a Worker drafting a script for Main | The reference owns script construction, mapping, recovery, and bundled-source caller contracts. |
 | `workflows/` | Claude Main using Workflow | Native JavaScript workflow definitions use plugin discovery without another runner. |
-| `skills/workflow/references/delivery.md` | Admitted Claude Code Main Agent building delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
+| `claude-skills/workflow/references/delivery.md` | Admitted Claude Code Main Agent building delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
 | `skills/development/references/lint-rules.md` | Agents selecting, developing, configuring, or assessing authorized lint tools and rules | Agents follow rule selection, fixture, safe-fix, and rollout guidance. |
@@ -52,7 +52,7 @@ Auto-injected repository guidance defines contributor constraints for these boun
 Keep that guidance at its conventional location without directing agents to retrieve it.
 Role bodies remain self-contained, while role-specific references supply only the selected host's applicable guidance.
 Every skill keeps its always-required procedures in its body and uses references for conditional detail.
-The shared Workflow entry point contains admission and routing only, because direct invocation or subagent preloading can load a skill body outside the hook-selected context.
+The Claude-only Workflow entry point contains admission and routing only, because direct invocation or subagent preloading can load a skill body outside the hook-selected context.
 Its host-specific mechanics remain behind the admission boundary in conditional references.
 This is instruction-level routing, not host-enforced access control.
 Each role owns its async submission and callback policy because their automatic contexts load independently.
@@ -126,6 +126,7 @@ The [host comparison](research.md#host-instruction-comparison) records the revie
 ## Package for each host
 
 Each supported host selects a native manifest and the same shared `skills/` tree.
+The Claude manifest also adds `claude-skills/`, which holds the Claude Code-only Workflow skill so other hosts never discover it.
 Codex uses `.codex-plugin/plugin.json`, Claude uses `.claude-plugin/plugin.json`, Cursor uses `.cursor-plugin/plugin.json`, and Copilot uses `.plugin/plugin.json`.
 The package gate checks metadata and release parity across all four descriptors.
 Root `plugin.json` stays absent because the reviewed Codex loader gives its portable format precedence and then skips hook discovery.
@@ -245,10 +246,10 @@ The delivery skill's sequence and gates govern authorized repository delivery, a
 Workgraph contributor reviews follow the scoped policy in [docs/reviews.md](reviews.md).
 
 The [Claude Main reference](../skills/main-agent-contract/references/claude-code.md) is the sole owner of Workflow selection policy.
-The shared [Workflow entry point](../skills/workflow/SKILL.md) exposes only its host-and-role admission contract, including for direct invocation and subagent preloading.
+The Claude-only [Workflow entry point](../claude-skills/workflow/SKILL.md) exposes only its host-and-role admission contract, including for direct invocation and subagent preloading.
 Like every Workgraph skill, it blocks model invocation, so Main reads its linked `SKILL.md` and references directly while `/workgraph:workflow` remains the user form.
-Its [Claude Main procedure](../skills/workflow/references/claude-code-main.md) owns execution, design, result acceptance, and its own conditional reference loading.
-The [authoring reference](../skills/workflow/references/authoring.md) covers native source and run-specific script copies, while the [delivery reference](../skills/workflow/references/delivery.md) maps Delivery requirements to nodes.
+Its [Claude Main procedure](../claude-skills/workflow/references/claude-code-main.md) owns execution, design, result acceptance, and its own conditional reference loading.
+The [authoring reference](../claude-skills/workflow/references/authoring.md) covers native source and run-specific script copies, while the [delivery reference](../claude-skills/workflow/references/delivery.md) maps Delivery requirements to nodes.
 Worker reads the authoring reference only when its assignment asks for a drafted script, and no reference has a non-Claude caller.
 The shared Main and Worker bodies, Development, Writing, and Delivery contain no Workflow tool procedures.
 The Codex Main reference uses native delegation without loading the Claude reference.

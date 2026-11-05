@@ -9,11 +9,10 @@ After background Agent or Workflow dispatch and other ready work, end the turn w
 
 Neither the `ultracode` keyword nor its session setting forces Workflow use.
 Use Workflow only for work with expected follow-up phase expansion or genuinely multi-phase work, including required joins and follow-up phases conditional on predecessor results, even if the first invocation has one phase.
-Do not use Workflow for single-phase work with no expected follow-up phase.
-Use Agent for that single-phase work, including independent one-phase assignments.
+Use Agent instead of Workflow for single-phase work with no expected follow-up phase, including independent one-phase assignments.
 Exclude speculative future tasks and display-only phases.
 Only the Claude Code Main Agent may start Workflow.
-Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) unless fully loaded.
+Before an authorized Workflow run or design request, read [Workflow](../../../claude-skills/workflow/SKILL.md) unless fully loaded.
 Read linked Workgraph skills with Read because `Skill` refuses them.
 Native worktree tools are `EnterWorktree` and `isolation: "worktree"`.
 

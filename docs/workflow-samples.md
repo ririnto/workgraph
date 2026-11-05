@@ -55,7 +55,7 @@ The dispatching session owns the task branch, initial candidate inspection, and 
 
 ## Read-only design
 
-For read-only design work, use the [Workflow skill](../skills/workflow/SKILL.md), which admits only the Claude Code Main Agent before loading its read-only design procedure.
+For read-only design work, use the [Workflow skill](../claude-skills/workflow/SKILL.md), which admits only the Claude Code Main Agent before loading its read-only design procedure.
 That procedure describes requirement coverage, challenge, verification selected for the task, and the tool boundaries needed for delegation.
 
 ## Dispatch inputs
@@ -142,7 +142,7 @@ Every selector must be a nonempty string the host supports for agent calls.
 
 ## Cache reuse
 
-Follow the [Workflow authoring reference](../skills/workflow/references/authoring.md) for continuation and cache reuse.
+Follow the [Workflow authoring reference](../claude-skills/workflow/references/authoring.md) for continuation and cache reuse.
 A changed candidate, destination, owned path, finding set, or verification contract invalidates affected evidence and dependent decisions.
 Before resuming, check the live checkout, the named task and base branch refs, the toolchain configuration, and the posted request against what the recorded run used, because native cache keys carry none of that state.
 A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.

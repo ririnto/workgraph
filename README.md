@@ -120,7 +120,7 @@ Review staffing, delegation, and delivery methods need no fixed ceremony when th
 Repository scope follows the request without an activity threshold or archive-status exclusion.
 Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
-For Claude Code Main, [Workflow](skills/workflow/SKILL.md) admits the host and role before loading its [execution procedure](skills/workflow/references/claude-code-main.md).
+For Claude Code Main, [Workflow](claude-skills/workflow/SKILL.md) admits the host and role before loading its [execution procedure](claude-skills/workflow/references/claude-code-main.md).
 Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
 The conditional authoring and delivery references stay behind that admission boundary.
 Codex uses native delegation rather than Claude Code Workflow.
@@ -134,7 +134,8 @@ All workflow sources launch through the native Workflow interface, and Workgraph
 All skills remain user-invocable and block model invocation, following [pstack](https://github.com/cursor/plugins/tree/main/pstack)'s skill boundary.
 Roles and procedures link each bundled `SKILL.md`, so models read the linked file instead of invoking the skill.
 Users keep the explicit forms, such as `/workgraph:workflow` in Claude Code or `$workgraph:development` in Codex.
-Claude Code, Cursor, and Copilot read `disable-model-invocation: true`, and Codex reads each skill's `agents/openai.yaml` policy.
+Claude Code, Cursor, and Copilot read `disable-model-invocation: true`, and Codex reads each shared skill's `agents/openai.yaml` policy.
+The Workflow skill lives in `claude-skills/`, which only the Claude manifest adds to the shared `skills/` scan, so other hosts never load it.
 Hooks operate without skill invocation.
 Conditional skills load only when their stated task scope matches and their complete content is not already present.
 
@@ -146,7 +147,7 @@ Conditional skills load only when their stated task scope matches and their comp
 | Development router | [Development](skills/development/SKILL.md) | Source work selects the matching lifecycle playbook and language references. |
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
-| Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
+| Scoped procedure | [Workflow](claude-skills/workflow/SKILL.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
 | Scoped procedure | [Writing](skills/writing/SKILL.md) | Markdown, YAML, and agent instruction work load source conventions, with instruction design selected for agent-facing work. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |
@@ -268,7 +269,7 @@ The private development package also needs no version.
 See the [Claude marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-entries) for these field definitions.
 
 Codex reads `.codex-plugin/plugin.json`, Claude Code reads its own descriptor, Cursor reads `.cursor-plugin/plugin.json`, and Copilot reads the OpenPlugin descriptor at `.plugin/plugin.json`.
-The shared `skills/` tree remains the only copy of the instructions.
+The shared `skills/` tree and the Claude-only `claude-skills/` tree remain the only copies of the instructions.
 Root `plugin.json` is intentionally absent because the reviewed Codex loader prioritizes that portable manifest and skips its hooks.
 The [source review](docs/research.md#codex-native-hook-discovery-and-trust) records this compatibility requirement and the separate hook-trust boundary.
 

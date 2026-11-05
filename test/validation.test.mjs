@@ -189,6 +189,7 @@ const copyPluginPackage = (t) => {
     mkdirSync(path.dirname(destination), { recursive: true });
     cpSync(new URL(filename, repositoryRoot), destination);
   }
+  mkdirSync(path.join(root, "claude-skills"), { recursive: true });
   mkdirSync(path.join(root, "skills/example"), { recursive: true });
   writeFileSync(
     path.join(root, "skills/example/SKILL.md"),
@@ -336,6 +337,11 @@ test("plugin command validates canonical identity, catalogs, and release metadat
       ".claude-plugin/plugin.json",
       { description: "Different plugin." },
       "Codex and Claude description metadata must match."
+    ],
+    [
+      ".claude-plugin/plugin.json",
+      { skills: "./skills/" },
+      "Claude skills must select the Claude-only skills directory."
     ],
     [
       ".claude-plugin/plugin.json",

@@ -158,59 +158,75 @@ const bundledPath = (root, source) => {
 
 const run = () => {
   const root = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
-  const skillsRoot = bundledPath(root, "skills");
-  const skills = readdirSync(skillsRoot, { withFileTypes: true })
-    .filter(
-      (entry) =>
-        entry.isDirectory() ||
-        (entry.isSymbolicLink() &&
-          statSync(path.join(skillsRoot, entry.name), {
-            throwIfNoEntry: false
-          })?.isDirectory())
-    )
-    .map((entry) => entry.name)
-    .toSorted();
   const errors = [];
-  if (skills.length === 0) {
-    errors.push("skills: no skill directories were found.");
-  }
-  for (const directoryName of skills) {
-    const source = path.join("skills", directoryName, "SKILL.md");
-    try {
-      bundledPath(root, path.join("skills", directoryName));
-      const filename = bundledPath(root, source);
-      if (!statSync(filename).isFile()) {
-        throw new Error(`${source}: skill file must be readable.`);
-      }
-      const content = readFileSync(filename, "utf-8");
-      errors.push(...validateSkillContent(content, directoryName, source));
-    } catch (error) {
-      errors.push(
-        error.code ? `${source}: skill file must be readable.` : error.message
-      );
+  let count = 0;
+  for (const [skillsDirectory, requiresPolicy] of [
+    ["skills", true],
+    ["claude-skills", false]
+  ]) {
+    const skillsRoot = bundledPath(root, skillsDirectory);
+    const skills = readdirSync(skillsRoot, { withFileTypes: true })
+      .filter(
+        (entry) =>
+          entry.isDirectory() ||
+          (entry.isSymbolicLink() &&
+            statSync(path.join(skillsRoot, entry.name), {
+              throwIfNoEntry: false
+            })?.isDirectory())
+      )
+      .map((entry) => entry.name)
+      .toSorted();
+    if (skills.length === 0) {
+      errors.push(`${skillsDirectory}: no skill directories were found.`);
     }
-    const policySource = path.join(
-      "skills",
-      directoryName,
-      "agents/openai.yaml"
-    );
-    try {
-      const content = readFileSync(bundledPath(root, policySource), "utf-8");
+    count += skills.length;
+    for (const directoryName of skills) {
+      const source = path.join(skillsDirectory, directoryName, "SKILL.md");
       try {
-        if (yamlParser(content)?.policy?.allow_implicit_invocation !== false) {
+        bundledPath(root, path.join(skillsDirectory, directoryName));
+        const filename = bundledPath(root, source);
+        if (!statSync(filename).isFile()) {
+          throw new Error(`${source}: skill file must be readable.`);
+        }
+        const content = readFileSync(filename, "utf-8");
+        errors.push(...validateSkillContent(content, directoryName, source));
+      } catch (error) {
+        errors.push(
+          error.code ? `${source}: skill file must be readable.` : error.message
+        );
+      }
+      if (requiresPolicy) {
+        const policySource = path.join(
+          skillsDirectory,
+          directoryName,
+          "agents/openai.yaml"
+        );
+        try {
+          const content = readFileSync(
+            bundledPath(root, policySource),
+            "utf-8"
+          );
+          try {
+            if (
+              yamlParser(content)?.policy?.allow_implicit_invocation !== false
+            ) {
+              errors.push(
+                `${policySource}: policy.allow_implicit_invocation must be false.`
+              );
+            }
+          } catch {
+            errors.push(
+              `${policySource}: policy file must contain valid YAML.`
+            );
+          }
+        } catch (error) {
           errors.push(
-            `${policySource}: policy.allow_implicit_invocation must be false.`
+            error.code
+              ? `${policySource}: policy file must be readable.`
+              : error.message
           );
         }
-      } catch {
-        errors.push(`${policySource}: policy file must contain valid YAML.`);
       }
-    } catch (error) {
-      errors.push(
-        error.code
-          ? `${policySource}: policy file must be readable.`
-          : error.message
-      );
     }
   }
   if (errors.length > 0) {
@@ -219,7 +235,7 @@ const run = () => {
     }
     process.exitCode = 1;
   } else {
-    process.stdout.write(`Validated ${skills.length} skill metadata files.\n`);
+    process.stdout.write(`Validated ${count} skill metadata files.\n`);
   }
 };
 

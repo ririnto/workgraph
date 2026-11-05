@@ -57,6 +57,6 @@ graders:
       Preserve the pull-request opening or update trigger, testing before building, and building only after tests pass.
       Preserve that this workflow does not deploy.
       The answer must not confuse GitHub Actions with Claude Code's native Workflow orchestration.
-      Fail activation of the bundled Workflow skill through Skill or a complete Read of skills/workflow/SKILL.md.
+      Fail activation of the bundled Workflow skill through Skill or a complete Read of claude-skills/workflow/SKILL.md.
       Reading Writing for this explanation is allowed.
       Fail claims that the assistant ran tests, built a package, or changed repository configuration.
