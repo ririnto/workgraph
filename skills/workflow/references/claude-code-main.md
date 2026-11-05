@@ -7,8 +7,7 @@ Do not describe another execution method as native Workflow.
 Do not use Workflow to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
-Dispatch a `claude -p` Task Main or reviewer with `--disallowedTools Workflow` so the dispatched session cannot start native Workflow.
-Those sessions load Main's contract, so their brief must state that the session is a dispatch node and must read `subagent-context`.
+A dispatched `claude -p` Task Main or reviewer loads Main's contract, so its brief must state that the session is a dispatch node and must read `subagent-context`.
 Do not dispatch a Workgraph node as a fork, because forks keep the main tool pool including Workflow.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
