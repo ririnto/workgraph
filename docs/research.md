@@ -986,7 +986,8 @@ The native tool defines its API, permissions, model controls, and notification d
 The bundled Claude Main Workflow references add graph mapping, result acceptance, journal checks, and conservative same-run recovery.
 The upstream guide treats a typed `ultracode` keyword as a per-task workflow opt-in and the ultracode setting as letting Claude decide when a task warrants a workflow.
 The keyword does not start a workflow from a `-p` prompt, a scheduled prompt, or relayed text.
-Workgraph's maintainer policy is narrower: neither form forces Workflow, and single-phase work without a possible follow-up uses Agent.
+Workgraph's maintainer policy is narrower: neither form forces Workflow.
+Workflow is used only for expected follow-up phase expansion or genuinely multi-phase work, and not for single-phase work, which uses Agent when no follow-up phase is expected.
 That tool-selection policy belongs only to Main's Claude reference, rather than a shared role or task body.
 The subagent documentation explicitly removes Workflow from subagent tools.
 
