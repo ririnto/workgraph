@@ -8,7 +8,7 @@ Use supported callback and wait controls for pending host operations.
 
 These tool-selection rules apply only to the Claude Code Main Agent.
 Neither the `ultracode` keyword nor the ultracode session setting is a flag that forces Workflow use.
-Use Workflow only for work with expected follow-up phase expansion or genuinely multi-phase work, even if the first invocation has one phase.
+Use Workflow only for work with expected follow-up phase expansion or genuinely multi-phase work, including required joins and follow-up phases conditional on predecessor results, even if the first invocation has one phase.
 Do not use Workflow for single-phase work with no expected follow-up phase.
 Use Agent for that single-phase work, including independent one-phase assignments.
 Exclude speculative future tasks and display-only phases.

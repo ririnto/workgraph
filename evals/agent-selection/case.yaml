@@ -14,7 +14,7 @@ execution:
     ultracode
     Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
     Delegate one bounded read-only assessment that ends in one phase to a worker.
-    The assessment is complete in this phase, with no possible dependent follow-up.
+    The assessment is complete in this phase, with no expected follow-up phase.
     Give that worker both batches and report its result in Main.
     A finding blocks release if its required timeout is absent.
     Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
