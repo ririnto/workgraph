@@ -10,7 +10,7 @@ execution:
   prompt: |-
     Read the Workgraph workflow skill's `SKILL.md` and its references directly, then use its read-only design guidance.
     The `Skill` tool refuses this skill, which is expected.
-    Locate the files with a search ending in `skills/workflow/SKILL.md` when no path is known.
+    Derive its path from the session's loaded skill base directory when no path is known.
     Design a status endpoint that returns the exact current count of active users.
     One requirement is to return the exact current active-user count.
     Another is that no component may read, receive, compute, persist, or access any data from which that count can be derived.
