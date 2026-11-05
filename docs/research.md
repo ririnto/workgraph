@@ -1009,7 +1009,9 @@ The Codex [skill discovery loader](https://github.com/openai/codex/blob/rust-v0.
 The previous plugin-root `agents/openai.yaml` was outside that path and had no effect, so each skill now carries its own file.
 The [selection code](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/selection.rs) keeps explicit `$skill` selection for skills hidden from the model prompt.
 The Codex [skill parser](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/skills/src/parser.rs) ignores `disable-model-invocation`.
-No installed Codex session has yet confirmed hidden prompts or explicit plugin-qualified selection.
+A Codex CLI `0.166.0` run in a temporary repository listed a repository skill without the policy file in the model's skill list and omitted a matching skill with this policy.
+Explicit `$name` selection still loaded the hidden skill.
+Plugin-qualified selection remains unconfirmed until an installed Workgraph release carries the per-skill files.
 
 The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
 Invocation controls do not select a host or role, and `compatibility` is informational.
