@@ -7,9 +7,10 @@ execution:
   timeout_seconds: 240
   allowed_tools:
     - Read
-    - Skill(workgraph:development)
   prompt: |-
-    Load Workgraph's Development skill and assess these proposed checks.
+    Read the bundled `skills/development/SKILL.md` unless its complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
+    Assess these proposed checks.
     This is a read-only assessment; do not run commands or edit files.
     For each proposal, explain what it establishes and keep, replace, or omit it.
     Give a concrete replacement only when needed.
@@ -32,7 +33,7 @@ graders:
     focus: trace
     criteria: |-
       Require the complete bundled Development skill before the assessment.
-      Accept a successful Skill result for workgraph:development or a complete Read of skills/development/SKILL.md from this plugin.
+      Accept a complete Read of `skills/development/SKILL.md` from this plugin.
       Accept complete Development content already supplied in the observed context.
       A mention, description, or unsuccessful call does not establish loading.
   - name: meaningful-test-decisions

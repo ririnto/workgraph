@@ -26,7 +26,7 @@ graders:
     focus: trace
     criteria: |-
       Require actual loading of the bundled Development skill before the final correction.
-      Accept a successful Skill result for workgraph:development or a complete Read of skills/development/SKILL.md from this plugin.
+      Accept a complete Read of `skills/development/SKILL.md` from this plugin.
       Accept complete Development content already supplied in the observed context.
       Reject a mere mention, skill description, unsuccessful call, or unsupported claim that Development was loaded.
       Do not require a particular loading tool when the complete skill is present.

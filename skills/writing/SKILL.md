@@ -1,45 +1,13 @@
 ---
 name: writing
-description: Use when drafting, editing, or reviewing prose, Markdown, repository guidance, skills, prompts, or other agent instructions.
+description: Use when drafting, editing, or reviewing Markdown or YAML source, repository guidance, skills, prompts, or other agent instructions.
+disable-model-invocation: true
 ---
 
 # Writing
 
-Treat prose and presentation guidance as defaults when the user or target format does not specify another style.
-
-## Reader first
-
-Lead with the answer, completed result, or next useful action.
-Put commands, paths, and code beside the action they support.
-Number steps when readers must perform actions in a required order.
-
-For direct human work, report state and remaining work when they affect a decision, action, or wait.
-For agent-origin messages, follow the active role's communication policy.
-Report the observed failure and its effect.
-Give a cause and fix when evidence supports them.
-When the cause is uncertain, state that limit and the next useful diagnostic step.
-Offer a duration only when it helps the reader decide and known assumptions support it.
-
-Keep concise lists complete when omitted details would change an option, conclusion, or action.
-Use presentation limits to shape visible output, not analysis, source review, or evidence retention.
-Offer a next action only when an unresolved user dependency requires the reader to act.
-Remove tangents that do not help complete the requested task.
-
-## Direct prose
-
-Use direct verbs, familiar words, and one term per concept.
-Name the actor and use active voice when the actor matters.
-Use the factual actor, including a compiler or service, without inventing a human subject.
-Remove filler, empty emphasis, vague qualifiers, business jargon, and repetitive conclusions.
-Avoid rhetorical contrasts, staged reveals, fragments for emphasis, and invented terms.
-Vary sentence length and choose punctuation that suits the requested tone.
-Prefer short instruction sentences, splitting dense instructions when their conditions remain clear.
-
-Keep each paragraph focused on one idea.
-Keep conditions and exceptions with the actions they qualify.
-Preserve technical meaning, authority boundaries, required syntax, and exact quotations when removing repetition.
-Keep uncertainty when removing a hedge would invent confidence.
-Remove adverbs only when their removal preserves technical behavior and the claim's scope.
+Apply these source and instruction conventions when the user or target format does not specify another style.
+They cover Markdown and YAML source and agent-facing instructions, not general prose style.
 
 ## Markdown sentences
 
@@ -50,23 +18,19 @@ Do not replace sentence boundaries to fit several instructions onto one line.
 Do not reflow prose to a fixed column width.
 
 Preserve headings, code, metadata, links, and exact quotations in their required syntax.
-Use lists for parallel, sequential, or comparative items, without nesting unless the hierarchy is necessary.
-
-## Human-facing documents
-
-For human-facing documents, lead with the action or outcome and use clear headings, compact lists, and short paragraphs.
-Check the rendered document for readability after editing it.
 
 ## Agent-facing documents
 
 Write agent-facing prompts and instruction-management skills as explicit task contracts.
 Before drafting, editing, or reviewing agent-facing prompts or instructions, read [Instruction design](references/instruction-design.md) unless its complete content is already loaded.
-Agent-facing documents and prompts are exempt from the human-facing presentation rules and rendered-readability check.
+Prefer short instruction sentences, splitting dense instructions when their conditions remain clear.
+Keep conditions and exceptions with the actions they qualify.
+Preserve technical meaning, authority boundaries, required syntax, and exact quotations when removing repetition.
+Keep uncertainty when removing a hedge would invent confidence.
 Use LaTeX or Mermaid when notation or a diagram makes the instructions clearer.
 
 ## Tables
 
-Use tables for comparisons, mappings, or inputs and outputs.
 Keep labels and headers concise, without requiring sentence punctuation.
 Write explanatory cells as complete sentences with terminal punctuation.
 Keep each explanatory cell to one sentence.
@@ -85,6 +49,6 @@ Preserve literal or folded semantics and validate parsed values, including templ
 
 ## Final pass
 
-Read the changed prose for filler, repeated rules, sentence boundaries, and detached conditions.
+Read the changed source for repeated rules, sentence boundaries, and detached conditions.
 Check table explanations for complete sentences and their required terminal punctuation.
 Run the target's applicable Markdown check without changing unrelated files.

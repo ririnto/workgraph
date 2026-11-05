@@ -20,16 +20,19 @@ The [CLI plugin reference](https://docs.github.com/en/copilot/reference/copilot-
 
 ## Use the shared skills
 
-Ask Copilot to apply Workgraph's [Main Agent Contract](../../skills/main-agent-contract/SKILL.md) when starting an engineering task:
+Start an engineering task by invoking Workgraph's [Main Agent Contract](../../skills/main-agent-contract/SKILL.md) with its slash command:
 
 ```text
-Use Workgraph's Main Agent Contract to fix the parser's escaped-quote bug and verify the original trigger.
+/main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger.
 ```
+
+Workgraph skills set `disable-model-invocation: true`, so Copilot does not select them from a plain request.
+The [VS Code agent skills guide](https://code.visualstudio.com/docs/copilot/customization/agent-skills) documents this manual-only behavior.
 
 For an assigned worker task, select [Subagent Context](../../skills/subagent-context/SKILL.md).
 The role uses the active host's tool descriptions when no matching bundled host reference exists.
 
-Use [Development](../../skills/development/SKILL.md) for implementation and [Writing](../../skills/writing/SKILL.md) for prose or instructions.
+Use [Development](../../skills/development/SKILL.md) for implementation and [Writing](../../skills/writing/SKILL.md) for Markdown, YAML, or instructions.
 The [skill map](../../README.md#skill-invocation) lists the other task procedures.
 
 Workgraph uses manual role activation in Copilot.

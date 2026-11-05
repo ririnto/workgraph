@@ -7,12 +7,12 @@ Do not describe another execution method as native Workflow.
 Do not use Workflow to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
-A dispatched `claude -p` Task Main or reviewer loads Main's contract, so its brief must state that the session is a dispatch node and must read `subagent-context`.
+A dispatched `claude -p` Task Main or reviewer loads Main's contract, so its brief must state that the session is a dispatch node and must read [Subagent Context](../../subagent-context/SKILL.md).
 Do not dispatch a Workgraph node as a fork, because forks keep the main tool pool including Workflow.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 For ownership of each outcome, follow the [Main Agent Contract](../../main-agent-contract/SKILL.md#assignments).
-For authorized engineering-delivery graphs, read Delivery and [delivery mapping](delivery.md) unless their complete content is already loaded.
+For authorized engineering-delivery graphs, read [Delivery](../../delivery/SKILL.md) and [delivery mapping](delivery.md) unless their complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read [authoring](authoring.md) unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
 Follow the Main Agent Contract's model policy for agent settings.

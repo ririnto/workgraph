@@ -45,7 +45,7 @@ Inspect actual worker status and continue supported waiting without duplicate di
 
 ## Resource cleanup
 
-Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read Codex Scoped Cleanup.
+Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read [Codex Scoped Cleanup](../../codex-scoped-cleanup/SKILL.md).
 Skip this read when its complete content is already loaded.
 
 ## Model selection
@@ -59,3 +59,8 @@ For native Codex invocations, use the host-confirmed full model ID, never a bare
 
 Verify that each request returns a result.
 Report unavailable or substituted settings using host evidence, and substitute only when permitted.
+
+## Skill loading
+
+Workgraph skills disable implicit invocation, so read each linked `SKILL.md` from its bundled path.
+Users select them explicitly.

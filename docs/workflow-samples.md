@@ -1,7 +1,7 @@
 # Workflow samples
 
 Workgraph bundles two native Workflow delivery samples.
-Both accept optional model selectors and otherwise use host configuration.
+Both accept optional model and effort selectors and otherwise use host configuration.
 They use the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 These are optional complete-delivery recipes with their own declared phases and review coverage.
 They integrate unit branches into the candidate working branch and finish with a reviewed PR or MR.
@@ -64,6 +64,7 @@ That procedure describes requirement coverage, challenge, verification selected 
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
 | `models` | Optional object of per-phase model selector strings and a separate `verify` selector. |
+| `efforts` | Optional object of per-phase effort strings and a separate `verify` selector. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds. |
 
@@ -73,7 +74,7 @@ That procedure describes requirement coverage, challenge, verification selected 
 | --- | --- | --- |
 | Scope | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
 | Explore | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
-| Plan | The scopes and any exploration findings. | Work units with disjoint owned paths and instructions. |
+| Plan | The scopes and any exploration findings with evidence. | Work units with disjoint owned paths and instructions. |
 | Implement | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
 | Integrate | All accepted unit results after implementation completes. | Named unit branches merged, their resource states, and combined-candidate checks. |
 | Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
@@ -117,8 +118,8 @@ The run result retains the branch identity and state of every attempt, and a sup
 A retained resource never counts as passing evidence.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.
 A separate read-only agent verifies every `fix-required` finding before repair.
-The verifier uses `args.models.verify` when supplied, independently of `args.models.review`.
-Without a verifier selector, the agent call leaves its model unset for host configuration.
+The verifier uses `args.models.verify` and `args.efforts.verify` when supplied, independently of the review selectors.
+Without a verifier selector, the agent call leaves that setting unset for host configuration.
 It reports a confirmed, refuted, or unverified disposition with evidence for each finding.
 Missing, malformed, failed, or unverified dispositions block repairs and acceptance.
 Confirmed findings alone go to their owning units, bounded by `maxFixRounds`.
@@ -127,9 +128,10 @@ A fully refuted review can pass, and the result retains the review and dispositi
 A fix round replaces the repaired units' results by key, so unaffected unit evidence stays while combined-candidate evidence is regenerated.
 A confirmed finding outside one unambiguous owned unit blocks the round for replanning.
 
-## Models
+## Models and effort
 
-Delivery samples accept optional selectors by phase through `args.models`, plus `args.models.verify` for finding verification.
+Delivery samples accept optional selectors by phase through `args.models` and `args.efforts`, plus `verify` selectors for finding verification.
+Main supplies both selectors for each phase it runs, following the [Main Agent Contract](../skills/main-agent-contract/SKILL.md#models).
 An omitted selector stays unset so the host can apply its current configuration.
 Every selector must be a nonempty string the host supports for agent calls.
 

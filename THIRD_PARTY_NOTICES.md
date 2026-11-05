@@ -61,6 +61,9 @@ The [research notes](docs/research.md#skill-structure) record the structure evid
 We reviewed package `0.15.36` on the [main branch](https://github.com/cursor/plugins/tree/main/pstack) as of 2026-10-31.
 Its Babysit and Shipping playbooks informed explicit merge authority and distinguishing queued requests from completed integration.
 Workgraph uses independently written policy and retains its own review, evidence-reuse, and native execution contracts.
+The installed `0.15.36` package's `disable-model-invocation` frontmatter and Claude Code adapter informed Workgraph's model-invocation boundary and link-based skill reads.
+Lauren Tan's [Loops You Can Trust](https://x.com/poteto/article/2069824386283319343) and [pstack guide](https://x.com/poteto/article/2097732320606507506) articles and a [post on adversarial review](https://x.com/poteto/status/2117437607940681849) informed reproduction-backed findings and evidence retention in the delivery samples.
+Workgraph applies those ideas through its own contracts without copying pstack text.
 
 ## Irushi on test growth
 
@@ -160,7 +163,7 @@ We used [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) for 
 We read its complete skill and the `phrases.md`, `structures.md`, and `examples.md` references.
 The local skill identifies Hardik Pandya as its author and declares the MIT license.
 It informed direct verbs, specific subjects, and removal of filler.
-The bundled Writing skill adapts its prose guidance.
+The bundled Writing skill retains that guidance only for agent-facing instructions.
 The plugin does not redistribute the source skill or its reference files verbatim.
 
 ## Sinon Language Tooling
@@ -212,9 +215,9 @@ Workgraph does not bundle their code or adopt their runtime guarantees.
 
 ## Communication Guidance
 
-The Writing skill also adapts communication guidance from [i-have-adhd](https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md) by Ayoub Ghriss.
+Earlier Writing versions adapted communication guidance from [i-have-adhd](https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md) by Ayoub Ghriss.
 The source repository declares the MIT license and identifies 2026 copyright.
-This adaptation uses general communication guidance without redistributing the source skill verbatim.
+The current Writing skill no longer bundles that general communication guidance, and no version redistributed the source skill verbatim.
 We reviewed the [main branch](https://github.com/ayghri/i-have-adhd/tree/main) as of 2026-10-31, when it matched release tag [v0.4.1](https://github.com/ayghri/i-have-adhd/tree/v0.4.1), including its earlier timeout fix and recorded evaluation.
-These sources informed Workgraph's context-hook startup allowance and evidence-qualified error reports.
+These sources still inform Workgraph's context-hook startup allowance.
 The [dated comparison](docs/research.md#dated-plugin-comparisons) distinguishes upstream observations from Workgraph validation.

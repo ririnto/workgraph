@@ -216,8 +216,8 @@ The new byte-boundary regression detects native content loss that those existing
 The i-have-adhd [evaluation report](https://github.com/ayghri/i-have-adhd/blob/main/evals/RESULTS.md) records an August 2 run using Claude Code 2.1.220 and `claude-opus-4-8`, with three trials per case.
 Its partial-success case includes an unsupported authentication diagnosis, and the report proposes unconditional cause-first wording as a possible explanation.
 It does not establish that mechanism or measure current Workgraph behavior.
-Writing now separates the observed failure, supported cause, and next diagnostic when the cause remains uncertain.
-The [failure-reporting case](../evals/writing-failure-evidence/case.yaml) includes both unresolved and confirmed causes so caution does not erase available evidence.
+Earlier Writing versions separated the observed failure, supported cause, and next diagnostic when the cause remained uncertain.
+That general reporting guidance now belongs to a separate writing plugin, so Workgraph no longer bundles it or its failure-reporting case.
 
 These adaptations retain user-directed style, proportional review, valid evidence reuse, and Claude-only native Workflow.
 They add no universal design-approval gate, fixed list length, mandatory skill-activation threshold, or repository activity filter.
@@ -468,8 +468,8 @@ Main and Worker route prose, instruction design, and source work to bundled task
 Those skills retain their own procedures and conditional language references.
 Consumer references remain inside their owning plugin so installation and activation do not depend on another plugin.
 The hook names loaded source paths so the model can locate references and recognize content already present.
-All skills remain user-invocable, and only the workflow skill blocks model invocation.
-Its frontmatter sets `disable-model-invocation: true`, and guidance redirects model readers to its files directly.
+All skills remain user-invocable and block model invocation, following the installed pstack `0.15.36` boundary.
+Each frontmatter sets `disable-model-invocation: true`, and role bodies and references link the bundled `SKILL.md` files that models read directly.
 Claude defaults `user-invocable` to `true`, so Workgraph omits that redundant frontmatter field.
 Their bodies define role and scope boundaries independently of invocation metadata.
 Claude's installed Skill loader strips YAML, preserves trailing body whitespace, and prepends a base-directory line.
@@ -679,6 +679,25 @@ Workgraph uses existing checks and does not generate a verification framework fr
 Its abstract describes persistent memory, compensation, and independent validation.
 It motivates checking partial effects before retrying a write.
 Workgraph does not implement transactions, automatic compensation, or durable recovery.
+
+### Lauren Tan on loops and pstack
+
+We read Lauren Tan's articles [Coding is Dead, Long Live Engineering](https://x.com/poteto/article/2014823103239749881), [Loops You Can Trust](https://x.com/poteto/article/2069824386283319343), the pstack guide [part 1](https://x.com/poteto/article/2094457600259842065) and [part 2](https://x.com/poteto/article/2097732320606507506), and [Coding is dead, long live Coding](https://x.com/poteto/article/2103571281014861957).
+We also read the posts on [adversarial review](https://x.com/poteto/status/2117437607940681849) and [game development practice](https://x.com/poteto/status/2117043478140276847).
+These are practitioner reports, not controlled Workgraph evaluations.
+
+| Lesson | Workgraph application |
+| --- | --- |
+| Artifacts beat plausible explanations, and abstract review drifts into nitpicks. | Main prefers an executed reproduction for runtime findings, and the delivery verifier requests one when safe. |
+| Evidence should travel with the work it supports. | The delivery samples now pass exploration evidence to planning and return sweep evidence. |
+| Configured settings must reach every stage. | Main and Worker set model and effort for each dispatch, and the delivery samples accept per-stage effort. |
+| Encode recurring corrections in structure. | The skill metadata gate requires the invocation policy and each Codex policy file. |
+| pstack hides its skills from the model and reads them by path. | All Workgraph skills block model invocation and link their bundled files. |
+
+pstack already owns verification-skill creation, decision logs, design arenas, intent restatement, and formal verification.
+Workgraph adds none of them, and its narrowed Writing skill leaves general prose style to a separate writing plugin.
+Comment bans, path-encoded lint contexts, and size budgets apply to specific projects rather than to Workgraph's consumer defaults.
+The changes remain unverified for model adherence until behavioral evaluations cover them.
 
 ### Bounded feedback and review evidence
 
@@ -993,10 +1012,16 @@ That tool-selection policy belongs only to Main's Claude reference, rather than 
 The subagent documentation explicitly removes Workflow from subagent tools.
 That host filter covers Agent-tool subagents and Workflow `agent()` stages, while the same documentation exempts forks, which keep the main conversation's tool pool.
 Codex has no Workflow tool; its `--disable multi_agent --disable multi_agent_v2` launch form names the nearest native spawn tools, and whether disabling those features removes the spawn tools is unverified.
-The workflow skill sets `disable-model-invocation: true`, so the `Skill` tool refuses it, `/workgraph:workflow` stays the user form, and Main's Claude reference redirects model readers to its `SKILL.md` and references directly with the refusal stated as expected.
+Every Workgraph skill sets `disable-model-invocation: true`, so the `Skill` tool refuses it and `/workgraph:<name>` stays the user form.
+The [skills documentation](https://code.claude.com/docs/en/skills) states that a refused call also tells the model not to reproduce the steps another way.
+Roles therefore route model reads through bundled `SKILL.md` links, and each role's Claude reference names Read as the loading tool.
+The control also removes descriptions from the model catalog and prevents subagent `skills:` preloading, which Workgraph does not use.
 That control gates the Skill tool only and never the Workflow tool itself.
-The bundled `agents/openai.yaml` records `policy.allow_implicit_invocation: false` for the workflow skill's agent surface, but no reviewed Codex plugin, subagent, or configuration reference documents this file or key, so its effect is unverified.
-Codex's documented per-skill control is a `skills.config` entry with `enabled`, which disables a skill entirely rather than only implicit invocation.
+The Codex [skill discovery loader](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/loader/discovery.rs) reads `agents/openai.yaml` beside each `SKILL.md`, and its [metadata loader](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/loader/metadata.rs) reads `policy.allow_implicit_invocation`.
+The previous plugin-root `agents/openai.yaml` was outside that path and had no effect, so each skill now carries its own file.
+The [selection code](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/selection.rs) keeps explicit `$skill` selection for skills hidden from the model prompt.
+The Codex [skill parser](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/skills/src/parser.rs) ignores `disable-model-invocation`.
+No installed Codex session has yet confirmed hidden prompts or explicit plugin-qualified selection.
 
 The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
 Invocation controls do not select a host or role, and `compatibility` is informational.

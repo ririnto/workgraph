@@ -78,11 +78,11 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:delivery` | Load Main's repository delivery procedure. |
 | `/workgraph:workflow` | Request native Claude Code Workflow or load its design guidance. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
-| `/workgraph:writing` | Load prose, Markdown, and instruction design guidance. |
+| `/workgraph:writing` | Load Markdown, YAML, and instruction design guidance. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 
-The workflow skill blocks model invocation, so `/workgraph:workflow` stays its user form and Main reads its `SKILL.md` and references directly for authorized runs.
-Locate the files by a search ending in `skills/workflow/SKILL.md` when no path is known.
+Every Workgraph skill blocks model invocation, so these slash forms stay the user entries and models read the linked `SKILL.md` files directly.
+Locate a file by a search ending in `skills/<name>/SKILL.md` when no path is known.
 
 Manual role invocation reads its Claude reference unless that complete content is already present.
 Invoking a skill does not create a dispatch, change the session's role, or grant permissions.
@@ -99,7 +99,6 @@ The `triggering` cases exercise natural requests without naming the expected ski
 
 | Case | Expected behavior |
 | --- | --- |
-| [Writing request](../../evals/writing-natural-trigger/case.yaml) | Load Writing and preserve the supplied facts while revising prose. |
 | [Source correction](../../evals/development-natural-trigger/case.yaml) | Load Development and correct the supplied function without claiming execution. |
 | [Workflow near miss](../../evals/workflow-keyword-near-miss/case.yaml) | Explain GitHub Actions without invoking Workgraph's native Workflow procedure. |
 

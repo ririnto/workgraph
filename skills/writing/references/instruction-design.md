@@ -47,6 +47,7 @@ Put conditional detail in focused skills or references.
 Keep required supporting instructions in bundled skills or references.
 Use external instruction links as optional attribution, without requiring agents to retrieve them.
 Refer to conditional skills by their plain skill names and state when they apply.
+Link the bundled `SKILL.md` instead when the skill blocks model invocation.
 Link supporting reference files from their callers with triggers and resolvable bundled paths.
 Resolve active installed skill paths at invocation rather than keeping durable cache-version pointers.
 Read each selected file before applying its rules.

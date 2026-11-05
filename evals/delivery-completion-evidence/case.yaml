@@ -10,7 +10,8 @@ execution:
     - Read
   prompt: |-
     Use the planning-only run of the Workgraph delivery sample.
-    Read the complete workflow skill and its bundled workflows/delivery-simple.js source.
+    Read the bundled `skills/workflow/SKILL.md` and its `workflows/delivery-simple.js` source unless their complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
     Invoke the registered workgraph:delivery-simple workflow.
     Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.
     Keep scope separation, exploration, and planning enabled.
@@ -32,7 +33,8 @@ graders:
     focus: trace
     criteria: |-
       Judge the observed tool trace, Workflow results, and final report together.
-      Require the session to Read the workflow skill's `SKILL.md` and the complete maintained delivery-simple.js source.
+      Require the complete bundled `skills/workflow/SKILL.md` and maintained `workflows/delivery-simple.js` source.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       Require its first native Workflow call to use the registered workgraph:delivery-simple name.
       Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
       A freshly authored replacement graph or an inline script does not establish source consumption.

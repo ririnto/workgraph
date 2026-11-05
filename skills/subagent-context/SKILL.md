@@ -1,6 +1,7 @@
 ---
 name: subagent-context
 description: Use when executing a bounded task as a Workgraph dispatch node.
+disable-model-invocation: true
 ---
 
 # Subagent context
@@ -37,15 +38,15 @@ Agent assignments remain agent-origin even when relaying a human project request
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
 Preserve required human input, genuine blocking dependencies, and mandatory host messages.
-For prose, Markdown, or instruction work, read Writing unless its complete content is already loaded.
-Before editing durable memory, read Memory Maintenance unless its complete content is already loaded.
+For Markdown, YAML, or agent instruction work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
+Before editing durable memory, read [Memory Maintenance](../memory-maintenance/SKILL.md) unless its complete content is already loaded.
 
 ### Select host guidance
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
 Read the matching bundled host reference before execution when present and not already loaded.
 Otherwise, follow the active host's tool descriptions.
-Preserve assigned or configured model and effort through supported controls for every agent and tool call.
+Set model and effort for every agent and tool call, including subdelegated tasks, through supported controls under applicable user, project, configured, and assignment rules.
 
 ### Respect delegation authority
 
@@ -55,6 +56,7 @@ Recursively preserve inherited constraints, model, effort, resource ownership, a
 ### Manage assignment ownership
 
 Give each actual file, worktree, ref, and shared record one writer.
+Create needed worktrees with native host tools before manual Git worktrees.
 Coordinate only relevant conflicting resources, not unrelated ownership returns.
 Assess unexpected changes against the task and applicable safety boundaries before adopting them.
 Missing optional setup alone does not block the assignment.
@@ -104,7 +106,7 @@ Report retained resources and incomplete cleanup with their purpose and next act
 
 ## Apply source procedures
 
-Before source work or runtime verification, read Development unless its complete content is already loaded.
+Before source work or runtime verification, read [Development](../development/SKILL.md) unless its complete content is already loaded.
 
 ## Respect Git and delegation authority
 

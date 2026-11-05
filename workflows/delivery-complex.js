@@ -50,16 +50,18 @@ const settingsMap = (value, name) => {
 }
 const skipsInput = settingsMap(input.skips, 'args.skips')
 const modelsInput = settingsMap(input.models, 'args.models')
+const effortsInput = settingsMap(input.efforts, 'args.efforts')
 const partsInput = settingsMap(input.promptParts, 'args.promptParts')
-for (const map of [skipsInput, modelsInput, partsInput]) {
+for (const map of [skipsInput, modelsInput, effortsInput, partsInput]) {
   for (const key of Object.keys(map)) {
-    if (!phaseKeys.includes(key) && !(map === modelsInput && key === 'verify')) {
+    if (!phaseKeys.includes(key) && !([modelsInput, effortsInput].includes(map) && key === 'verify')) {
       throw new Error(`Unknown phase key ${key}; supported phases are ${phaseKeys.join(', ')}`)
     }
   }
 }
 const skipped = {}
 const models = {}
+const efforts = {}
 const promptParts = {}
 for (const key of phaseKeys) {
   const skip = skipsInput[key]
@@ -70,18 +72,27 @@ for (const key of phaseKeys) {
   if (model !== undefined && (typeof model !== 'string' || !model.trim())) {
     throw new Error(`Provide models.${key} as a nonempty model selector string`)
   }
+  const effort = effortsInput[key]
+  if (effort !== undefined && (typeof effort !== 'string' || !effort.trim())) {
+    throw new Error(`Provide efforts.${key} as a nonempty effort string`)
+  }
   const part = partsInput[key]
   if (part !== undefined && (typeof part !== 'string' || !part.trim())) {
     throw new Error(`Provide promptParts.${key} as a nonempty instruction string`)
   }
   skipped[key] = skip === true
   models[key] = model
+  efforts[key] = effort
   promptParts[key] = part ?? ''
 }
 if (modelsInput.verify !== undefined && (typeof modelsInput.verify !== 'string' || !modelsInput.verify.trim())) {
   throw new Error('Provide models.verify as a nonempty model selector string')
 }
 models.verify = modelsInput.verify
+if (effortsInput.verify !== undefined && (typeof effortsInput.verify !== 'string' || !effortsInput.verify.trim())) {
+  throw new Error('Provide efforts.verify as a nonempty effort string')
+}
+efforts.verify = effortsInput.verify
 let maxFixRounds = defaultFixRounds
 if (input.maxFixRounds !== undefined) {
   if (!Number.isSafeInteger(input.maxFixRounds) || input.maxFixRounds < 0 || input.maxFixRounds > 3) {
@@ -150,6 +161,7 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
   agentType: 'Explore',
   label: 'scope',
   ...(models.scope === undefined ? {} : { model: models.scope }),
+  ...(efforts.scope === undefined ? {} : { effort: efforts.scope }),
   phase: 'Scope',
   schema: {
     properties: {
@@ -222,6 +234,7 @@ if (phaseRecords.scope?.status !== 'completed') {
       agentType: 'Explore',
       label: `explore:${scope.key}`,
       ...(models.explore === undefined ? {} : { model: models.explore }),
+      ...(efforts.explore === undefined ? {} : { effort: efforts.explore }),
       phase: 'Explore',
       schema: {
         properties: {
@@ -248,7 +261,7 @@ if (phaseRecords.scope?.status !== 'completed') {
         Array.isArray(result?.risks) && result.risks.every(risk => typeof risk === 'string') &&
         typeof result?.evidence === 'string' && result.evidence.trim().length > 0
       if (shape) {
-        explorations.push({ key: item.key, risks: result.risks, summary: result.summary })
+        explorations.push({ evidence: result.evidence, key: item.key, risks: result.risks, summary: result.summary })
       } else {
         exploreFailures.push(`${item.key}: result is missing or malformed`)
       }
@@ -284,6 +297,7 @@ if (phaseRecords.explore?.status !== 'completed' && !(skipped.explore && phaseRe
   ), {
     label: 'plan',
     ...(models.plan === undefined ? {} : { model: models.plan }),
+    ...(efforts.plan === undefined ? {} : { effort: efforts.plan }),
     phase: 'Plan',
     schema: {
       properties: {
@@ -356,6 +370,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
       isolation: 'worktree',
       label: `implement:${unit.key}${roundLabel}`,
       ...(models.implement === undefined ? {} : { model: models.implement }),
+      ...(efforts.implement === undefined ? {} : { effort: efforts.implement }),
       phase: 'Implement',
       schema: {
         properties: {
@@ -472,6 +487,7 @@ const dispatchIntegration = async currentUnits => {
   ), {
     label: 'integrate',
     ...(models.integrate === undefined ? {} : { model: models.integrate }),
+    ...(efforts.integrate === undefined ? {} : { effort: efforts.integrate }),
     phase: 'Integrate',
     schema: {
       properties: {
@@ -597,6 +613,7 @@ const dispatchSweep = async candidate => {
     agentType: 'Explore',
     label: 'sweep',
     ...(models.sweep === undefined ? {} : { model: models.sweep }),
+    ...(efforts.sweep === undefined ? {} : { effort: efforts.sweep }),
     phase: 'Sweep',
     schema: {
       properties: {
@@ -632,7 +649,7 @@ const dispatchSweep = async candidate => {
   if (!shape) {
     return { reason: 'Sweep result is missing or malformed', status: 'failed' }
   }
-  return { exposures: result.exposures, reason: null, status: 'completed' }
+  return { evidence: result.evidence, exposures: result.exposures, reason: null, status: 'completed' }
 }
 const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   const attempt = await runAgent(compose(
@@ -655,6 +672,7 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   ), {
     label: 'publish',
     ...(models.publish === undefined ? {} : { model: models.publish }),
+    ...(efforts.publish === undefined ? {} : { effort: efforts.publish }),
     phase: 'Publish',
     schema: {
       properties: {
@@ -708,6 +726,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
   ), {
     label: 'review',
     ...(models.review === undefined ? {} : { model: models.review }),
+    ...(efforts.review === undefined ? {} : { effort: efforts.review }),
     phase: 'Review',
     schema: {
       properties: {
@@ -755,6 +774,7 @@ const verifyFindings = async (review, integration, publication, round) => {
   const findings = review.findings.map((finding, index) => ({ ...finding, id: `review-${round + 1}-finding-${index + 1}` }))
   const attempt = await runAgent(compose(
     'Independently verify each review finding against source and requirements. Do not fix or modify anything.',
+    'For runtime findings, execute a safe reproduction when available and report the command, expected result, and observed result; otherwise cite source or requirement evidence.',
     taskPart,
     basePart,
     issuePart,
@@ -763,7 +783,7 @@ const verifyFindings = async (review, integration, publication, round) => {
     'Return exactly one disposition per finding with its id, status confirmed, refuted, or unverified, and nonempty evidence.',
     readOnlyPart,
     promptParts.review
-  ), { label: `verify-findings:${round + 1}`, ...(models.verify === undefined ? {} : { model: models.verify }), phase: 'Verify', schema: {
+  ), { label: `verify-findings:${round + 1}`, ...(models.verify === undefined ? {} : { model: models.verify }), ...(efforts.verify === undefined ? {} : { effort: efforts.verify }), phase: 'Verify', schema: {
     properties: { dispositions: { items: { properties: { id: { type: 'string' }, status: { enum: ['confirmed', 'refuted', 'unverified'], type: 'string' }, evidence: { type: 'string' } }, required: ['id', 'status', 'evidence'], type: 'object' }, type: 'array' } },
     required: ['dispositions'], type: 'object'
   } })
@@ -934,6 +954,7 @@ const complete =
 return {
   complete,
   exposures: sweepState.exposures ?? [],
+  sweepEvidence: sweepState.evidence ?? null,
   fixRounds: { max: maxFixRounds, used: roundsUsed },
   phaseEvidence,
   publish: publishState.status === 'completed'

@@ -2,6 +2,7 @@
 name: memory-maintenance
 description: >-
   Use before creating, editing, merging, or deleting durable memory records or their index.
+disable-model-invocation: true
 ---
 
 # Memory maintenance
@@ -12,7 +13,7 @@ Apply the current role, assignment, and authorized memory write scope.
 This procedure grants no additional role or write authority.
 Identify the selected memory store, its index, record format, and current writer before changes.
 Preserve another owner's lease and use the host's supported memory mechanism.
-Read Writing unless its complete content is already loaded.
+Read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
 
 ## Read existing context
 

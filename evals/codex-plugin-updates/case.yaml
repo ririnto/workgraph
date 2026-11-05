@@ -7,9 +7,9 @@ execution:
   timeout_seconds: 240
   allowed_tools:
     - Read
-    - Skill(workgraph:delivery)
   prompt: |-
-    Load Workgraph's complete Delivery skill and its bundled references/plugin-updates.md unless already present.
+    Read the bundled `skills/delivery/SKILL.md` and its `references/plugin-updates.md` unless their complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
     Resolve the reference from the loaded skill's directory.
     Assess the synthetic Codex client below without changing the active host's identity or tools.
     This is a read-only policy assessment, not permission to perform the simulated updates.
@@ -59,7 +59,7 @@ graders:
     focus: trace
     criteria: |-
       Require the complete bundled Delivery skill and its references/plugin-updates.md before the assessment.
-      Accept successful Skill or Read results and complete content already supplied in the observed context.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       A mention, description, failed read, or marketplace listing alone does not establish instruction loading.
       Reading the reference does not establish that the active evaluation host is Codex.
   - name: update-state-and-evidence

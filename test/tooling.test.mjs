@@ -442,6 +442,8 @@ const runWorkflowSample = async (file, args, payloadFor) => {
     agent: (prompt, options) => {
       calls.push({
         agentType: options.agentType,
+        effort: options.effort,
+        effortProvided: Object.hasOwn(options, "effort"),
         isolation: options.isolation,
         label: options.label,
         model: options.model,
@@ -701,9 +703,12 @@ test("delivery workflow samples inherit host models and honor model overrides", 
           ].map((phase) => [phase, `custom-${phase}`])
         )
       ].map(async (models) => {
+        const efforts = Object.fromEntries(
+          Object.keys(models).map((phase) => [phase, `effort-${phase}`])
+        );
         const { calls } = await runWorkflowSample(
           file,
-          { candidateBranch: "task-branch", models, task: "t" },
+          { candidateBranch: "task-branch", efforts, models, task: "t" },
           dispatchTable({
             Explore: () => exploreResult,
             Implement: () => simpleImplement,
@@ -728,7 +733,14 @@ test("delivery workflow samples inherit host models and honor model overrides", 
             Sweep: models.sweep
           }
         );
+        assert.deepEqual(
+          Object.fromEntries(calls.map((call) => [call.phase, call.effort])),
+          Object.fromEntries(
+            calls.map((call) => [call.phase, efforts[call.phase.toLowerCase()]])
+          )
+        );
         for (const call of calls) {
+          assert.equal(call.effortProvided, call.effort !== undefined);
           assert.equal(call.modelProvided, call.model !== undefined);
         }
       })
@@ -1736,10 +1748,14 @@ test("delivery finding verification independently selects its model", async () =
         { review: "review-selector" },
         { review: "review-selector", verify: "verify-selector" }
       ].map(async (models) => {
+        const efforts = Object.fromEntries(
+          Object.keys(models).map((phase) => [phase, `effort-${phase}`])
+        );
         const { calls } = await runWorkflowSample(
           file,
           {
             candidateBranch: "task-branch",
+            efforts,
             issue: "#1",
             models,
             task: "t"
@@ -1757,6 +1773,10 @@ test("delivery finding verification independently selects its model", async () =
         );
         const review = calls.find(({ phase }) => phase === "Review");
         const verification = calls.find(({ phase }) => phase === "Verify");
+        assert.equal(review.effort, efforts.review);
+        assert.equal(review.effortProvided, efforts.review !== undefined);
+        assert.equal(verification.effort, efforts.verify);
+        assert.equal(verification.effortProvided, efforts.verify !== undefined);
         assert.equal(review.model, models.review);
         assert.equal(review.modelProvided, models.review !== undefined);
         assert.equal(verification.model, models.verify);
@@ -1778,6 +1798,16 @@ test("delivery samples validate the verification model selector", async () => {
             message: "Provide models.verify as a nonempty model selector string"
           }
         )
+      )
+    )
+  );
+  await Promise.all(
+    Object.values(samplePaths).map((file) =>
+      assert.rejects(
+        runWorkflowSample(file, { efforts: { verify: " " }, task: "t" }, () =>
+          assert.fail("Invalid effort selector dispatched an agent")
+        ),
+        { message: "Provide efforts.verify as a nonempty effort string" }
       )
     )
   );
@@ -1866,6 +1896,21 @@ test("delivery samples pass candidate, issue, request, and owned findings into p
         })
       );
       assert.equal(result.complete, true);
+      assert.equal(result.sweepEvidence, sweepResult.evidence);
+      assert.equal(
+        calls
+          .find(({ phase }) => phase === "Plan")
+          .prompt.split("\n\n")
+          .find((section) =>
+            section.startsWith("Scopes and exploration findings: ")
+          ),
+        `Scopes and exploration findings: ${JSON.stringify({
+          explorations: [
+            { evidence: "e", key: "s1", risks: ["r"], summary: "s" }
+          ],
+          scopes: scopeResult.scopes
+        })}`
+      );
       const owns = (text) =>
         calls
           .filter((call) => call.prompt.split("\n\n").includes(text))

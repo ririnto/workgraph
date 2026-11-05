@@ -1,6 +1,7 @@
 ---
 name: delivery
 description: Use in main for repository changes, branch publication, or integration.
+disable-model-invocation: true
 ---
 
 # Repository delivery
@@ -126,7 +127,7 @@ Main governs resource returns and base synchronization.
 Verify completed merge into the intended destination before claiming success.
 Report successful auto-merge or queue requests as enabled or queued, with remaining conditions, until the merge is observed.
 After completed merge, read back the named authorized base and synchronize before dependent work.
-For authorized installed-plugin updates, read [plugin update guidance](references/plugin-updates.md) before updating requested hosts unless fully loaded.
+Before authorized installed-plugin updates, read [plugin update guidance](references/plugin-updates.md) unless fully loaded.
 
 ### Retire owned resources
 

@@ -1,6 +1,7 @@
 ---
 name: development
 description: Use for source work, application runs, behavior reproduction, or acceptance evidence.
+disable-model-invocation: true
 ---
 
 # Development
@@ -62,6 +63,7 @@ Prefer immutable bindings and minimize mutable state.
 Prefer existing interfaces, direct data flow, and the smallest coherent required change.
 Add layers, helpers, options, dependencies, or fallbacks for concrete needs the existing design cannot handle simply.
 Avoid speculative extension points and parallel implementations for hypothetical needs.
+Do not implement or test handling for edge cases that cannot realistically occur.
 Reconsider data and ownership before adding complexity.
 
 ### Extract regex matches

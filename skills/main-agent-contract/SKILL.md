@@ -1,6 +1,7 @@
 ---
 name: main-agent-contract
 description: Use in the Workgraph main-session mode when orchestrating authorized outcomes, not as a dispatched node.
+disable-model-invocation: true
 ---
 
 # Main agent contract
@@ -23,7 +24,7 @@ Update outcomes for material scope changes.
 
 Read current contracts, knowledge, and handoffs.
 Verify authority, access, ownership, state, and completion where the task requires them.
-Read Memory Maintenance before durable memory edits unless fully loaded.
+Read [Memory Maintenance](../memory-maintenance/SKILL.md) before durable memory edits unless fully loaded.
 
 ## Rules
 
@@ -44,7 +45,7 @@ Classify origin by initiating sender, retaining agent origin for relayed human r
 Preserve origin and communication mode through recursive assignments and handoffs.
 
 Preserve required human input, genuine blockers, and host messages.
-Read Writing for prose or instructions unless fully loaded.
+Read [Writing](../writing/SKILL.md) for Markdown, YAML, or instructions unless fully loaded.
 
 ### Select host guidance
 
@@ -57,7 +58,7 @@ Otherwise, follow the active host's tool descriptions.
 Honor user, configuration, and assignment settings over defaults.
 Preserve existing native Task settings unless the user or assignment requests supported changes.
 Preserve native Task hosts' dependencies.
-Select unpinned model and effort by task difficulty and boundedness through supported agent and tool controls.
+Set model and effort for every dispatched task through supported controls, choosing unpinned settings by task difficulty and boundedness.
 Preserve settings when a call has no selection control.
 Report incompatible settings without dropping them.
 Record requests and report resolved settings only when host-exposed.
@@ -74,7 +75,7 @@ Assign one writer per file, worktree, ref, and shared record.
 Assign one accountable owner per outcome and coordinate any parallel execution paths.
 Give each native Task one host manager while its Main owns source and delivery.
 Run independent ready outcomes concurrently when that reduces delay or improves evidence.
-Isolate concurrent editors with supported tools and preserve their work until handback.
+Isolate concurrent editors with native worktree tools before manual Git worktrees, and preserve their work until handback.
 Require only relevant predecessor results and conflicting ownership returns.
 Assess unexpected changes against the task and applicable safety boundaries before adopting them.
 
@@ -97,7 +98,7 @@ Reassess stalled work without waiving acceptance.
 
 #### Validate findings
 
-Confirm findings against source, behavior, and relevant evidence.
+Confirm findings against source, behavior, and relevant evidence, preferring executed reproductions for runtime behavior.
 Use independent verification when required by the task or warranted by risk and uncertainty.
 When independence is required, exclude the finder and fixer from verification.
 Label unsupported findings and unavailable required verification unverified.
@@ -142,8 +143,8 @@ Handle simple work directly unless the user requests delegation.
 
 ## Apply repository procedures
 
-Read Development before source work or runtime verification unless fully loaded.
+Read [Development](../development/SKILL.md) before source work or runtime verification unless fully loaded.
 
-Read Delivery before edits, branching, implementation dispatch, commits, publication, or integration unless fully loaded.
+Read [Delivery](../delivery/SKILL.md) before edits, branching, implementation dispatch, commits, publication, or integration unless fully loaded.
 For inspection, research, or review alone, omit implementation, branch publication, new PRs/MRs, and integration.
 Review existing PRs/MRs without inferring publication authority from inspection requests.
