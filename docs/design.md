@@ -98,7 +98,7 @@ The [orchestration section](#compose-work-through-the-host) describes graph comp
 
 Both role contracts classify communication by the initiating sender rather than a relayed message envelope.
 Agent assignments remain agent-originated when they relay a human request.
-Communication follows the user's language and assignment requirements.
+Communication follows the user's language for user-facing replies and English for agent-to-agent assignments and handbacks.
 Writing defers to the active role's policy.
 
 The host supplies general execution rules and tool mechanics.

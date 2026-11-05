@@ -9,8 +9,7 @@ After background Agent or Workflow dispatch and other ready work, end the turn w
 
 Neither the `ultracode` keyword nor its session setting forces Workflow use.
 Use Workflow only for work with expected follow-up phase expansion or genuinely multi-phase work, including required joins and follow-up phases conditional on predecessor results, even if the first invocation has one phase.
-Do not use Workflow for single-phase work with no expected follow-up phase.
-Use Agent for that single-phase work, including independent one-phase assignments.
+Use Agent instead of Workflow for single-phase work with no expected follow-up phase, including independent one-phase assignments.
 Exclude speculative future tasks and display-only phases.
 Only the Claude Code Main Agent may start Workflow.
 Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) unless fully loaded.
@@ -23,4 +22,4 @@ For ordinary tasks, choose the lowest sufficient tier.
 Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
 
 Verify selected settings are supported and each request returns a result.
-Report unavailable or substituted settings using host evidence, and substitute only when permitted.
+Report unavailable or substituted settings using host evidence, substituting only when permitted.
