@@ -84,7 +84,8 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 Manual role invocation reads its Claude reference unless that complete content is already present.
 Invoking a skill does not create a dispatch, change the session's role, or grant permissions.
 The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.
-[Workflow](../../skills/workflow/SKILL.md) owns its selection, authoring, execution, and result-mapping procedure.
+Main's [Claude reference](../../skills/main-agent-contract/references/claude-code.md) owns tool selection.
+The shared [Workflow entry point](../../skills/workflow/SKILL.md) admits only Claude Code Main before loading its execution procedure.
 Codex Scoped Cleanup does not authorize Codex resource operations when invoked in Claude Code.
 
 ## Evaluate discovery and outcomes

@@ -66,6 +66,16 @@ Use no trailing commas in TypeScript.
 Use `.yaml` for maintained YAML files unless the consumer requires another exact filename.
 Use block sequences except for an explicit empty sequence.
 
+## Tests
+
+Keep defensive logic and tests proportional to the impact of a realistic failure.
+Do not implement or test against practically impossible failure modes.
+Trace every new or changed test to a real requirement, a concrete observed defect, or an explicit instruction, not a hypothetical scenario.
+Delete tests that exist only for speculative coverage, and remove unnecessary or duplicated tests.
+Assert strings only by exact equality, never by inclusion or non-inclusion.
+Do not keep or add tests that validate document or prompt prose.
+Investigate which parts of a heavy check are slow before applying realistic lightweighting that keeps its required coverage.
+
 ## Repository Reviews
 
 For Workgraph contributor pull-request reviews, follow the scoped policy in [docs/reviews.md](docs/reviews.md).

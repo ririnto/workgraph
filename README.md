@@ -120,13 +120,13 @@ Review staffing, delegation, and delivery methods need no fixed ceremony when th
 Repository scope follows the request without an activity threshold or archive-status exclusion.
 Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
-For Claude Code graph execution, [Workflow](skills/workflow/SKILL.md) adds native node mapping and result verification.
-Its [authoring reference](skills/workflow/references/authoring.md) supplies script-specific guidance.
-Its [delivery reference](skills/workflow/references/delivery.md) maps Delivery operations to node inputs and outputs without owning another delivery checklist.
+For Claude Code Main, [Workflow](skills/workflow/SKILL.md) admits the host and role before loading its [execution procedure](skills/workflow/references/claude-code-main.md).
+Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
+The conditional authoring and delivery references stay behind that admission boundary.
 Codex uses native delegation rather than Claude Code Workflow.
 Workgraph bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
 Those samples use injectable prompt parts, optional per-phase model selectors, and explicit skip, failure, and bounded-recovery records.
-For read-only design work, the Workflow skill provides design and verification guidance without bundling a specialist-agent graph.
+The admitted Claude Main procedure also covers read-only design without bundling a specialist-agent graph.
 All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
 
 ## Skill invocation

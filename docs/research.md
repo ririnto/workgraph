@@ -477,8 +477,8 @@ Codex's [versioned skill renderer](https://github.com/openai/codex/blob/rust-v0.
 The hooks match these instruction text fragments and identify already-loaded sources outside them.
 They cannot reproduce native message roles or tool-call envelopes.
 The [delivery design](design.md#deliver-context) records this boundary.
-Workflow's description states its activation boundary, and its body defines dependency gates without repeating Main's finding classifications.
-Its delivery reference maps node inputs and outputs for authorized engineering delivery.
+Workflow's shared body checks host and role admission before loading its Claude Main execution reference.
+That reference owns dependency gates and conditionally loads its authoring and delivery mappings without repeating Main's finding classifications.
 Main and Worker inspect failures and partial effects before reasonable authorized retries or alternative supported forms.
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
@@ -502,7 +502,7 @@ GitHub references use branches or tags so maintainers can inspect the current im
 | Notifications, no polling, fresh-context briefing, and checking delegated changes. | Installed Claude Code Agent tool descriptions provide these instructions in their foreground and background variants. | Retain resource ownership and acceptance criteria instead of repeating Agent usage. |
 | Reading an existing file before writing it. | Installed Claude Code Write tool descriptions require the read in both regular and lean variants. | Remove the repeated read-before-edit rule. |
 | Workflow opt-in, native authoring, journals, resume identifiers, cache invalidation, and later-call reruns. | Installed Claude Code Workflow descriptions and their native authoring reference define these mechanics. | Keep graph-specific acceptance and conservative append-only recovery guidance in the bundled Workflow reference. |
-| Native delegation without Claude Code Workflow. | Codex's [tool registration](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/spec_plan.rs) registers agent lifecycle and messaging tools. | Route Claude orchestration selection to Workflow and use native delegation in Codex. |
+| Native delegation without Claude Code Workflow. | Codex's [tool registration](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/spec_plan.rs) registers agent lifecycle and messaging tools. | Keep host-specific selection in Main's selected host reference. |
 | Peer messages cannot grant permission or bypass denied actions. | Installed Claude Code SendMessage descriptions and peer-message reminders define these restrictions. | Remove repeated permission-laundering warnings. |
 
 Native Workflow probes confirmed item-local pipeline progression, unawaited agents not starting, all-null early returns, and same-run append reuse.
@@ -983,7 +983,19 @@ Source checks establish instruction delivery, while native execution, installed 
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe host execution.
 Workgraph retains dependency selection, role ownership, evidence freshness, and delivery gates.
 The native tool defines its API, permissions, model controls, and notification delivery.
-The bundled Workflow reference adds graph mapping, result acceptance, journal checks, and conservative same-run recovery.
+The bundled Claude Main Workflow references add graph mapping, result acceptance, journal checks, and conservative same-run recovery.
+The upstream guide treats a typed `ultracode` keyword as a per-task workflow opt-in and the ultracode setting as letting Claude decide when a task warrants a workflow.
+The keyword does not start a workflow from a `-p` prompt, a scheduled prompt, or relayed text.
+Workgraph's maintainer policy is narrower: neither form forces Workflow, and single-phase work without a possible follow-up uses Agent.
+That tool-selection policy belongs only to Main's Claude reference, rather than a shared role or task body.
+The subagent documentation explicitly removes Workflow from subagent tools.
+
+The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
+Invocation controls do not select a host or role, and `compatibility` is informational.
+The [Cursor skill directories](https://cursor.com/docs/skills.md#skill-directories) also include Claude-compatible locations.
+Consequently, hook-selected host references alone do not isolate directly invoked shared skill bodies.
+The shared Workflow entry point defers operational references until host and role admission.
+This instruction boundary is not a host-enforced file-access restriction or proof of model adherence.
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
 Workgraph uses sentence-level source lines for all documents, including table explanations.

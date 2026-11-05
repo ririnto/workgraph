@@ -8,7 +8,6 @@ Inspect unreadable native-assignment failures and try a supported form that pres
 Use a plain read-only CLI context when it is an authorized, equivalent fallback.
 Let Main review the full posted diff when independent review remains blocked and an authorized fallback permits it.
 Use the host's supported wait controls to collect required results.
-Codex does not provide Claude Code's native Workflow tool.
 
 ## Subagent context
 
