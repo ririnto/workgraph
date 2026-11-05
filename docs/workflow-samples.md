@@ -118,6 +118,7 @@ That result establishes the sample's publication and review outcome, not a merge
 Exploration may be explicitly skipped when the accepted task does not need it.
 A skipped required phase does not pass, so skipping implementation or publication returns `complete: false`.
 Integration is required after any completed implementation, so a skipped or failed integration blocks publication.
+The run result returns the separated scopes, each explorer's summary, risks, and evidence, and the sweep evidence so Main can check predecessor results.
 The run result retains each branch identity reported by an implementation attempt and its recorded state, and superseded reported branches stay listed because the samples retire nothing.
 A retained resource never counts as passing evidence.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.

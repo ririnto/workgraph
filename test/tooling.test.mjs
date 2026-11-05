@@ -1897,6 +1897,9 @@ test("delivery samples pass candidate, issue, request, and owned findings into p
       );
       assert.equal(result.complete, true);
       assert.equal(result.sweepEvidence, sweepResult.evidence);
+      assert.deepEqual(result.explorations, [
+        { evidence: "e", key: "s1", risks: ["r"], summary: "s" }
+      ]);
       assert.equal(
         calls
           .find(({ phase }) => phase === "Plan")

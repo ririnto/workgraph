@@ -954,6 +954,7 @@ const complete =
   (phaseRecords.review.status !== 'completed' || (reviewState.verdict === 'pass' || reviewState.accepted === true))
 return {
   complete,
+  explorations,
   exposures: sweepState.exposures ?? [],
   sweepEvidence: sweepState.evidence ?? null,
   fixRounds: { max: maxFixRounds, used: roundsUsed },
@@ -965,6 +966,7 @@ return {
   integration: integrationState,
   review: reviewState,
   reviewHistory,
+  scopes,
   split,
   units: units.map(unit => ({
     branch: unitResults.find(result => result.key === unit.key)?.branch ?? null,
