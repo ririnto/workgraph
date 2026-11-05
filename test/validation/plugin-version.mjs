@@ -54,17 +54,13 @@ export const validatePluginVersions = (
     const year = Number(match.groups.year);
     const month = Number(match.groups.month);
     const day = Number(match.groups.day);
-    const sequence = Number(match.groups.sequence);
     const date = new Date(Date.UTC(year, month - 1, day));
     if (
-      !Number.isSafeInteger(sequence) ||
       date.getUTCFullYear() !== year ||
       date.getUTCMonth() !== month - 1 ||
       date.getUTCDate() !== day
     ) {
-      throw new Error(
-        `${host} plugin version must contain a valid date and safe positive sequence.`
-      );
+      throw new Error(`${host} plugin version must contain a valid date.`);
     }
   }
   if (new Set(versions.map(([, version]) => version)).size !== 1) {

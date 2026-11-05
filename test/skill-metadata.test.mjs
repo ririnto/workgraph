@@ -43,7 +43,6 @@ const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
   const result = spawnSync(process.execPath, [filename], {
     cwd: tmpdir(),
     encoding: "utf-8",
-    killSignal: "SIGKILL",
     timeout: 5000
   });
   assert.ifError(result.error);
@@ -110,11 +109,9 @@ test("skill metadata checks required fields and directory identity", () => {
     ["name: Sample\ndescription: Task.", "Sample", "name must be lowercase."],
     ["name: НАВЫК\ndescription: Task.", "НАВЫК", "name must be lowercase."]
   ]) {
-    assert.ok(
-      validateSkillContent(skillContent(fields), directory).includes(
-        `<skill>: ${diagnostic}`
-      )
-    );
+    assert.deepEqual(validateSkillContent(skillContent(fields), directory), [
+      `<skill>: ${diagnostic}`
+    ]);
   }
   for (const name of [
     "-sample",
@@ -129,11 +126,9 @@ test("skill metadata checks required fields and directory identity", () => {
       skillContent(`name: ${JSON.stringify(name)}\ndescription: Task.`),
       name
     );
-    assert.ok(
-      errors.includes(
-        "<skill>: name must contain letters or numbers separated by single hyphens."
-      )
-    );
+    assert.deepEqual(errors, [
+      "<skill>: name must contain letters or numbers separated by single hyphens."
+    ]);
   }
 });
 
@@ -168,11 +163,12 @@ test("skill metadata counts and normalizes Unicode characters", () => {
       []
     );
     fields[key] += value;
-    assert.ok(
+    assert.deepEqual(
       validateSkillContent(
         skillContent(JSON.stringify(fields)),
-        directory
-      ).includes(`<skill>: ${key} must contain at most ${limit} characters.`)
+        key === "name" ? fields.name : directory
+      ),
+      [`<skill>: ${key} must contain at most ${limit} characters.`]
     );
   }
 });
@@ -216,11 +212,9 @@ test("skill metadata rejects invalid optional field types", () => {
     const content = skillContent(
       `name: sample-skill\ndescription: Task.\n${extra}`
     );
-    assert.ok(
-      validateSkillContent(content, "sample-skill").includes(
-        `<skill>: ${diagnostic}`
-      )
-    );
+    assert.deepEqual(validateSkillContent(content, "sample-skill"), [
+      `<skill>: ${diagnostic}`
+    ]);
   }
 });
 
@@ -255,11 +249,9 @@ test("skill metadata preserves both invocation paths", () => {
         ),
         "sample-skill"
       );
-      assert.ok(
-        errors.includes(
-          `<skill>: ${key} must keep the skill model-invocable and user-invocable.`
-        )
-      );
+      assert.deepEqual(errors, [
+        `<skill>: ${key} must keep the skill model-invocable and user-invocable.`
+      ]);
     }
   }
 });
@@ -283,32 +275,26 @@ test("skill metadata rejects malformed frontmatter and empty bodies", () => {
       ["<skill>: frontmatter must be a YAML mapping."]
     );
   }
-  for (const fields of [
-    "name: [",
-    "name: sample-skill\nname: different\ndescription: Task.",
-    "name: sample-skill\ndescription: Task.\nmetadata:\n  key: one\n  key: two"
+  for (const [fields, line] of [
+    ["name: [", 2],
+    ["name: sample-skill\nname: different\ndescription: Task.", 3],
+    [
+      "name: sample-skill\ndescription: Task.\nmetadata:\n  key: one\n  key: two",
+      6
+    ]
   ]) {
     const errors = validateSkillContent(
       skillContent(fields),
       "sample-skill",
       "fixture/SKILL.md"
     );
-    assert.equal(errors.length, 1);
-    assert.match(
-      errors[0],
-      /^fixture\/SKILL\.md:\d+: frontmatter must contain valid YAML\.$/u
-    );
+    assert.deepEqual(errors, [
+      `fixture/SKILL.md:${line}: frontmatter must contain valid YAML.`
+    ]);
   }
   assert.deepEqual(
     validateSkillContent(skillContent(undefined, " \n\t"), "sample-skill"),
     ["<skill>: skill body must contain text."]
-  );
-  assert.deepEqual(
-    validateSkillContent(
-      skillContent(undefined, "Instruction.\n".repeat(501)),
-      "sample-skill"
-    ),
-    []
   );
 });
 

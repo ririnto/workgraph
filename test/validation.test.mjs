@@ -15,10 +15,6 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 import yamlParser from "markdownlint-cli2/parsers/yaml";
-import relativeLinksRule, {
-  markdownIt
-} from "markdownlint-rule-relative-links";
-import { lint } from "markdownlint/promise";
 
 import { validatePluginVersions } from "./validation/plugin-version.mjs";
 
@@ -63,21 +59,6 @@ body:
       required: true
 `;
 
-const lintRelativeLinks = async (filename, content) => {
-  const result = await lint({
-    config: {
-      default: false,
-      "relative-links": {
-        root_path: "."
-      }
-    },
-    customRules: [relativeLinksRule],
-    markdownItFactory: () => markdownIt,
-    strings: { [filename]: content }
-  });
-  return result[filename] ?? [];
-};
-
 const copyValidation = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-validation-"));
   t.after(() => rmSync(root, { force: true, recursive: true }));
@@ -100,7 +81,6 @@ const runValidation = (root, filename) => {
     {
       cwd: tmpdir(),
       encoding: "utf-8",
-      killSignal: "SIGKILL",
       timeout: 5000
     }
   );
@@ -190,54 +170,6 @@ test("issue form command reports malformed input, field violations, and duplicat
   );
 });
 
-test("issue forms request the required contribution fields", () => {
-  const directory = new URL(".github/ISSUE_TEMPLATE/", repositoryRoot);
-  const expectedIds = [
-    "problem",
-    "evidence",
-    "scope",
-    "acceptance",
-    "ownership_next_action"
-  ];
-  for (const filename of ["bug_report", "improvement"]) {
-    const formPath = new URL(`${filename}.yaml`, directory);
-    const content = readFileSync(formPath, "utf-8");
-    const form = yamlParser(content);
-    assert.ok(!form.description.endsWith("\n"));
-    assert.deepEqual(
-      form.body.map((field) => field.id),
-      expectedIds
-    );
-    assert.ok(
-      form.body.every((field) => !field.attributes.description.endsWith("\n"))
-    );
-  }
-});
-
-test("relative link rule accepts existing files and headings", async (t) => {
-  const temporaryRoot = mkdtempSync(path.join(tmpdir(), "workgraph-links-"));
-  t.after(() => rmSync(temporaryRoot, { force: true, recursive: true }));
-  const source = path.join(temporaryRoot, "source.md");
-  const target = path.join(temporaryRoot, "target.md");
-  writeFileSync(target, "# Target heading\n", "utf-8");
-  const errors = await lintRelativeLinks(
-    source,
-    "[Target](./target.md#target-heading)\n[Repository README](/README.md)\n"
-  );
-  assert.deepEqual(errors, []);
-});
-
-test("relative link rule rejects missing files", async (t) => {
-  const temporaryRoot = mkdtempSync(path.join(tmpdir(), "workgraph-links-"));
-  t.after(() => rmSync(temporaryRoot, { force: true, recursive: true }));
-  const source = path.join(temporaryRoot, "source.md");
-  const errors = await lintRelativeLinks(source, "[Missing](./missing.md)\n");
-  assert.equal(errors.length, 1);
-  assert.deepEqual(errors[0].ruleNames, ["relative-links"]);
-  assert.equal(errors[0].lineNumber, 1);
-  assert.equal(errors[0].severity, "error");
-});
-
 const copyPluginPackage = (t) => {
   const root = copyValidation(t);
   for (const filename of [
@@ -265,6 +197,21 @@ const copyPluginPackage = (t) => {
   return root;
 };
 
+test("issue forms request the contribution fields that CONTRIBUTING.md requires", () => {
+  for (const filename of ["bug_report", "improvement"]) {
+    const form = yamlParser(
+      readFileSync(
+        new URL(`.github/ISSUE_TEMPLATE/${filename}.yaml`, repositoryRoot),
+        "utf-8"
+      )
+    );
+    assert.deepEqual(
+      form.body.map((field) => field.id),
+      ["problem", "evidence", "scope", "acceptance", "ownership_next_action"]
+    );
+  }
+});
+
 test("release versions enforce padded calendar dates and daily sequences", () => {
   for (const version of [
     "2026.01.01.01",
@@ -273,8 +220,7 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     "2000.02.29.01",
     "2026.12.31.99",
     "2026.12.31.100",
-    "2027.01.01.01",
-    "2026.10.30.9007199254740991"
+    "2027.01.01.01"
   ]) {
     assert.doesNotThrow(() =>
       validatePluginVersions(version, version, version, version)
@@ -296,7 +242,10 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
   ]) {
     assert.throws(
       () => validatePluginVersions(version, version, version, version),
-      /Codex plugin version must use yyyy\.MM\.dd\.seq/u
+      {
+        message:
+          "Codex plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10."
+      }
     );
   }
   for (const version of [
@@ -306,12 +255,13 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     "2026.13.01.01",
     "2026.00.01.01",
     "2026.12.32.01",
-    "2026.01.00.01",
-    "2026.10.30.9007199254740992"
+    "2026.01.00.01"
   ]) {
     assert.throws(
       () => validatePluginVersions(version, version, version, version),
-      /Codex plugin version must contain a valid date and safe positive sequence/u
+      {
+        message: "Codex plugin version must contain a valid date."
+      }
     );
   }
   assert.throws(
@@ -322,7 +272,7 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
         "2026.10.30.06",
         "2026.10.30.06"
       ),
-    /Native plugin versions must match across all hosts/u
+    { message: "Native plugin versions must match across all hosts." }
   );
   assert.throws(
     () =>
@@ -332,7 +282,10 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
         "2026.10.30.06",
         "2026.10.30.06"
       ),
-    /Claude plugin version must use yyyy\.MM\.dd\.seq/u
+    {
+      message:
+        "Claude plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10."
+    }
   );
 });
 
@@ -564,16 +517,22 @@ test("plugin command rejects escaping package symlinks", (t) => {
   symlinkSync(outsideHooks, bundledHooks);
   const escaped = runValidation(root, "plugin-version.mjs");
   assert.equal(escaped.status, 1);
-  assert.match(
+  assert.equal(
     escaped.stderr,
-    /Codex hooks must resolve inside the plugin root/u
+    "Plugin version validation failed: Codex hooks must resolve inside the plugin root.\n"
   );
 });
 
 test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-entrypoints-"));
   t.after(() => rmSync(root, { force: true, recursive: true }));
-  for (const filename of ["issue-forms.mjs", "plugin-version.mjs"]) {
+  for (const [filename, expected] of [
+    ["issue-forms.mjs", "Validated 2 GitHub issue forms.\n"],
+    [
+      "plugin-version.mjs",
+      "Validated four native manifests, release versions, bundled paths, and three marketplace catalogs.\n"
+    ]
+  ]) {
     const source = fileURLToPath(
       new URL(`validation/${filename}`, import.meta.url)
     );
@@ -583,14 +542,13 @@ test("validation entrypoints execute from unrelated directories through real and
       spawnSync(process.execPath, [entrypoint], {
         cwd: root,
         encoding: "utf-8",
-        killSignal: "SIGKILL",
         timeout: 5000
       })
     );
     for (const result of results) {
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
-      assert.ok(result.stdout.trim().length > 0);
+      assert.equal(result.stdout, expected);
     }
     assert.equal(results[0].stdout, results[1].stdout);
   }

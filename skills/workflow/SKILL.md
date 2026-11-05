@@ -1,76 +1,17 @@
 ---
 name: workflow
 description: >-
-  Use in Claude Code main sessions for read-only design, dependent stages, required joins, expected follow-up phases, or explicit Workflow requests.
+  Use only as the Claude Code Main Agent for native Workflow runs with dependent or possible follow-up phases, or for read-only design.
 argument-hint: "[goal]"
 ---
 
 # Workgraph Workflow
 
-Run native Workflow only in Claude Code, as identified by session metadata, loaded host guidance, or native tool descriptions.
-When the host lacks native Workflow, report that limitation and use supported alternatives if they satisfy the authorized request.
-Do not describe another execution method as native Workflow.
-Only the main session starts native Workflow.
-Use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
+This skill is an entry point for the Claude Code Main Agent only.
+Invocation does not change the active host, role, or authority.
+Verify the active host and role from session metadata, loaded role guidance, or native tool descriptions before reading its procedure.
+If this is not the Claude Code Main Agent, do not load the procedure or its references.
+Complete an existing bounded assignment under its own contract, or report the host or role mismatch to the requester.
 
-## Prepare the run
-
-Honor explicit supported tool choices within the host's authority before applying default routing.
-Prefer direct Agent when one assignment completes the accepted work without a dependent agent stage or join.
-Prefer Workflow when actual later phases are expected, even if the first invocation contains only one phase.
-Exclude speculative future tasks and display-only phases.
-Use dependent agent stages or required joins within one outcome to guide default routing.
-Do not use Workflow to replace independent native Task controllers.
-Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
-Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
-If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
-Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
-For ownership of each outcome, follow the [Main Agent Contract](../main-agent-contract/SKILL.md#assignments).
-For authorized engineering-delivery graphs, read Delivery and `references/delivery.md` unless their complete content is already loaded.
-Before authoring or editing a Workflow script, or resuming a run, read `references/authoring.md` unless its complete content is already loaded.
-The native Workflow tool description remains authoritative when its API differs from bundled guidance.
-Follow the Main Agent Contract's model policy for agent settings.
-Separate proposal and edit runs when a user requires diff-first approval because native Workflow cannot request mid-run sign-off.
-Resume authorized edit work only after that approval, without adding gates to work already authorized.
-
-## Run Workflow
-
-For bundled delivery graphs, read the applicable [simple](../../workflows/delivery-simple.js) or [complex](../../workflows/delivery-complex.js) source and call native Workflow with its registered plugin name.
-For other accepted graphs, author native source under the authoring reference and pass it as inline `script`.
-Use its returned `scriptPath` and same-session `resumeFromRunId` for an authorized continuation.
-Pass structured JSON through `args` when the script needs runtime inputs.
-
-Keep useful authorized Workflow runs active because cancellation loses in-progress agent results.
-Stop when the user requests it, authorization changes, or the run cannot usefully complete the accepted task.
-Wait for completion before editing the script, then append phases and resume valid unchanged calls.
-
-If the native Workflow tool is unavailable, report that it did not run.
-
-## Read-only design
-
-For a design request, establish the task, requirements, constraints, and relevant sources before developing a candidate.
-Describe components, interfaces, data flow, decisions and alternatives, failure behavior, evidence, and assumptions.
-Map each requirement to the proposed design and propose representative regression and evaluation cases with observable outcomes.
-Distinguish repository evidence from inference and proposed checks from executed checks.
-Challenge the candidate against each requirement, interface, failure mode, test claim, and open question.
-Record contradictions and unmet requirements as blockers, including when the candidate acknowledges them.
-Verify findings independently of their finder and author when the accepted task requires independent verification.
-Record a disposition for every finding and an evidence-backed status for each requirement.
-Block acceptance when required work is missing, accepted requirements are unmet, or confirmed defects violate those requirements.
-Keep unresolved findings visible and assess their effect on acceptance instead of blocking on optional suggestions alone.
-Report the candidate as incomplete when required independent verification is unavailable, rather than claiming it occurred.
-
-Keep read-only work within the session's authorization and tool restrictions.
-Use delegated stages only when the required host-enforced tool restrictions are verified in force for those calls, because a prompt cannot restrict tools.
-Otherwise work directly within the main session's authorized tools and report any unmet independence requirement.
-
-## Verify results
-
-Treat failed, missing, null, or unsupported results as incomplete rather than successful.
-Check returned evidence against acceptance criteria, including required predecessor data and phase outcomes.
-A changed setting, lifecycle observation, or missing optional setup alone does not invalidate a run.
-Assess current stage suitability without tracing changed-state authorship, origin, or history.
-Perform maintained setup only when the next authorized operation needs it.
-Preserve real required-gate, security, authority, and conflicting-write constraints.
-Inspect the journal when required result or completion evidence is missing or inconsistent.
-Report missing results, failed stages, skipped required work, or unverified checks.
+As the Claude Code Main Agent, use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
+Read [the execution procedure](references/claude-code-main.md) before proceeding, unless its complete content is already loaded.

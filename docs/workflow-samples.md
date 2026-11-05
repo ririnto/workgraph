@@ -51,8 +51,8 @@ The dispatching session owns the task branch, initial candidate inspection, and 
 
 ## Read-only design
 
-For read-only design work, use the [Workflow skill](../skills/workflow/SKILL.md#read-only-design).
-It describes requirement coverage, challenge, verification selected for the task, and the tool boundaries needed for delegation.
+For read-only design work, use the [Workflow skill](../skills/workflow/SKILL.md), which admits only the Claude Code Main Agent before loading its read-only design procedure.
+That procedure describes requirement coverage, challenge, verification selected for the task, and the tool boundaries needed for delegation.
 
 ## Dispatch inputs
 
@@ -147,4 +147,4 @@ A later round inside the same recorded run can advance the candidate, so the liv
 Before publishing from a resumed run, confirm that the gating sweep ran live against the current candidate, or change its inputs so it re-runs.
 A cached result avoids repeated work but does not prove acceptance, so a resumed run still needs its phase evidence checked.
 Sibling agents with matching settings can share the host prompt-cache prefix, which affects cost and speed but not the recorded phase evidence.
-Inspect the run journal when a result is missing or unexpected, as the [authoring reference](../skills/workflow/references/authoring.md) describes.
+Inspect the run journal when a result is missing or unexpected, as the authoring reference behind the [Workflow skill](../skills/workflow/SKILL.md) admission describes.
