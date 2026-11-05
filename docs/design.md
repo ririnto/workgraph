@@ -24,7 +24,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference selects requested-host update commands once the version reaches its authorized distribution source. |
 | `skills/workflow/SKILL.md` | Any invoker until host and role admission | The shared entry point checks Claude Code Main identity before loading restricted procedures. |
 | `skills/workflow/references/claude-code-main.md` | Admitted Claude Code Main Agent only | The procedure owns execution, read-only design, and result verification. |
-| `skills/workflow/references/authoring.md` | Admitted Claude Code Main Agent only | The reference owns script construction, mapping, recovery, and bundled-source caller contracts. |
+| `skills/workflow/references/authoring.md` | Admitted Claude Code Main Agent, or a Worker drafting a script for Main | The reference owns script construction, mapping, recovery, and bundled-source caller contracts. |
 | `workflows/` | Claude Main using Workflow | Native JavaScript workflow definitions use plugin discovery without another runner. |
 | `skills/workflow/references/delivery.md` | Admitted Claude Code Main Agent building delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
@@ -35,6 +35,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents follow the complete owner-mediated lifecycle, scoped activity, preservation, and result verification procedure. |
 | `skills/codex-scoped-cleanup/references/native-attachments.md` | Codex agents changing Worktree Artifact connections | Agents follow connection inventory, removal, and recovery guidance for the selected scope. |
+| `skills/codex-scoped-cleanup/references/worktrees-caches.md` | Codex agents archiving, restoring, or removing worktrees or caches | Agents follow worktree archive and restore, removal, cache preservation, and physical-cleanup verification guidance. |
 | `docs/verification-map.md` | Maintainers | Maintainers connect Workgraph behavior to its current commands and evidence boundaries. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
 | `docs/model-effort-evidence.md` | Maintainers | Maintainers compare external model benchmarks and workload limitations. |
@@ -322,7 +323,6 @@ Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover single and parallel independent Agent selection, bundled-source Workflow invocation, expected continuation, and both conditional follow-up outcomes.
 Additional cases check an idle background command and an Agent completion callback.
 The communication case checks a worker handoff and the requested language of the human report.
-The failure-reporting case preserves partial success, distinguishes unresolved and confirmed causes, and rejects invented repairs.
 The test-design case checks independent expectations, legitimate structural contracts, and proportionate verification of prose changes.
 The delivery-decision case covers scoped Git authority, proportional review, current-unit gates, authorized recovery, true boundaries, and isolated parallel work.
 The user-directed-defaults case checks explicit procedural choices and repository scope without arbitrary age or archive filters.

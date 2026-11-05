@@ -30,7 +30,6 @@ Report required checks blocked by the host.
 
 Verify each coherent unit before dependent work.
 Before publication, review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes.
-Main and Delivery retain review, integration, and cleanup authority.
 
 Guidance alone authorizes no tooling or cross-project changes.
 
@@ -99,13 +98,11 @@ Report material behavior changes and remaining uncertainty.
 
 Prefer officially supported LTS dependency releases, or stable releases when no LTS line exists.
 Verify current support and compatibility with the runtime, toolchain, and dependent APIs.
-Use native catalogs and lockfiles, preserving compatible managed versions.
-Avoid unrelated upgrades.
+Use native catalogs and lockfiles, preserving compatible managed versions and avoiding unrelated upgrades.
 Preserve integrity checks, including lockfile fields, signatures, and checksums.
 
 ## Automation
 
-Use existing formatters, checkers, and test frameworks for ordinary changes.
 Preserve lint and formatter choices when adding guidance or filling configuration gaps.
 
 When selecting, developing, configuring, or assessing authorized lint tools, rules, or fixes, read [lint rule guidance](references/lint-rules.md).
@@ -118,7 +115,6 @@ Test changed behavior and run the application when integration, state, or extern
 Extend the nearest meaningful check before adding a suite or helper.
 For each new test, identify an uncovered realistic failure and derive expected results independently of the implementation.
 Prefer consumer-visible outcomes, reserving source-shape assertions for explicit structural contracts.
-Structural checks do not prove execution or model adherence.
 Exercise real owned behavior, substituting external or nondeterministic boundaries only when controlled input is needed.
 Remove redundant checks when retained coverage detects their relevant failures.
 Do not invent test-count, code-size ratio, or coverage targets.
@@ -126,8 +122,10 @@ Stop expanding verification when required gates and changed risks have sufficien
 Collect traces, screenshots, results, or timings when tests do not show outcomes.
 Record commands, setup, exit status, and raw results separately from interpretation.
 Retain failures and unexpected output, reproducing reports against stated expectations.
-Record measurement conditions for performance claims.
-Leave formal proof, native activation, and model adherence unverified without direct evidence.
+Record measurement conditions for performance and duration claims.
+When hooks, tests, builds, or other checks delay work, or a bottleneck appears, report measured durations and slow parts to the user.
+Lighten or optimize them only on request, keeping required coverage.
+Leave execution, formal proof, native activation, and model adherence unverified without direct evidence.
 Create a focused feature map only for repeated reports or navigation needs, beside verification instructions, and update affected entries.
 Fix defect causes in code or data architecture first.
 A narrow guard may prevent new instances of a known bad pattern before separate debt cleanup.

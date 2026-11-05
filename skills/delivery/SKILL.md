@@ -74,12 +74,7 @@ Inspect flagged content and remove exposure before pushing.
 
 ## Retain validation evidence
 
-Define acceptance target, trigger, input, and observable outcome before checks.
-Use existing commands and supported entry points, with runtime evidence when static checks cannot establish behavior.
-Record commands, setup, exit status, and raw results apart from interpretation.
-Retain failures and label unverified behavior.
-Create evidence files only when checks, investigation, or recovery need them.
-Summarize commands, outcomes, coverage, and limits in authorized PR/MR text without raw logs by default.
+Summarize commands, outcomes, coverage, limits, and unverified behavior in authorized PR/MR text without raw logs by default.
 
 ## Review and publish
 

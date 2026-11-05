@@ -27,7 +27,7 @@ Markdown endpoints were used when available, with extensionless official pages a
 | [Common workflows](https://code.claude.com/docs/en/common-workflows) and [native Workflow](https://code.claude.com/docs/en/workflows) | Preserve native execution, deterministic replay, permission boundaries, and explicit completion evidence. |
 | [Copilot plugins](https://docs.github.com/en/copilot/concepts/customizations/plugins) | Use portable skills and document the CLI's compatible marketplace installation route. |
 | [Cursor plugins](https://cursor.com/docs/plugins) and [plugin reference](https://cursor.com/docs/reference/plugins) | Use the native Cursor manifest for shared skills and the documented catalog for repository discovery. |
-| [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Preserve Writing's direct prose while retaining factual software actors, meaningful qualifiers, and technical conditions. |
+| [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Keep human-facing prose style outside Workgraph's narrowed Writing scope. |
 
 Workgraph uses native Codex, Claude, Cursor, and OpenPlugin descriptors because the reviewed Codex portable loader omits hooks.
 They select one shared skills tree and explicit host-specific hook configurations.
@@ -273,7 +273,7 @@ It recommends a clear task, relevant context, roles, restrictions, and an explic
 | --- | --- |
 | State the task, context, constraints, output, and completion criteria explicitly. | Writing already requires these elements in agent-facing task contracts. |
 | Audit loaded instruction sources for conflicts and ambiguity. | Writing already audits loading points and replaces conflicting consumers. |
-| Use concise and explicit output expectations. | Writing owns agent-facing contracts and presentation. |
+| Use concise and explicit output expectations. | Writing owns agent-facing contracts and Markdown and YAML source conventions. |
 | Scale checks to the change and keep initiative within scope. | Development and the role contracts route checks and authority. |
 | Keep rules short and aligned with real tool schemas. | Role bodies and host references match native loading formats and tool contracts. |
 | Use examples where they clarify a decision boundary. | Writing owns contrasting examples for decision boundaries. |
@@ -754,20 +754,8 @@ Foreground timeout normally moves an unfinished command to the background when t
 The [background execution limit](https://code.claude.com/docs/en/tools-reference#time-limit-for-background-commands) is separate from that transition.
 An explicit background command's timeout can stop the command when its background deadline applies.
 Foreground timeout, background execution duration, and wait yield duration are separate controls.
-The [Monitor tool](https://code.claude.com/docs/en/tools-reference#monitor-tool) delivers command output or external events while the conversation continues.
-Main and Worker consider Monitor when available, without adding a watch timeout recommendation.
-Its watch deadline is separate from Bash's foreground timeout and Codex's wait yield duration.
-The installed tool uses a feature gate, so availability depends on the active host.
-Claude Code's [scheduled tasks](https://code.claude.com/docs/en/scheduled-tasks) support fixed loops through `/loop`.
-Dynamic loops use `ScheduleWakeup`.
-There is no global loop-interval setting, and scheduled prompts can wait until the current turn ends.
-The [goal check-in setting](https://code.claude.com/docs/en/env-vars) accepts `CLAUDE_CODE_GOAL_CHECKIN_MINUTES=4` in the installed runtime.
-That changes the first deferred-goal check-in from thirty minutes to four minutes.
-Later [goal check-ins](https://code.claude.com/docs/en/goal#background-work-defers-evaluation) back off to eight and sixteen minutes, with at most three idle deliveries between user prompts.
-This setting does not create a cron task or restart an exited process.
-The [cache lifetime](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#faq) normally lasts five minutes and refreshes when a request uses the cached content.
-Claude Code's [cache defaults](https://code.claude.com/docs/en/prompt-caching) vary by provider and request type.
-A `270000` ms interval does not prove cache reuse because queueing, model changes, or prefix changes can prevent it.
+The [Monitor tool](https://code.claude.com/docs/en/tools-reference#monitor-tool) can deliver command output or external events when the active host makes it available.
+The selected role reference defers pending operations to supported callback and wait controls.
 The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
 The official [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21277) records its removal in version 2.1.277.
 The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
@@ -1011,7 +999,7 @@ Workflow is used only for expected follow-up phase expansion or genuinely multi-
 That tool-selection policy belongs only to Main's Claude reference, rather than a shared role or task body.
 The subagent documentation explicitly removes Workflow from subagent tools.
 That host filter covers Agent-tool subagents and Workflow `agent()` stages, while the same documentation exempts forks, which keep the main conversation's tool pool.
-Codex has no Workflow tool; its `--disable multi_agent --disable multi_agent_v2` launch form names the nearest native spawn tools, and whether disabling those features removes the spawn tools is unverified.
+Codex has no Workflow tool.
 Every Workgraph skill sets `disable-model-invocation: true`, so the `Skill` tool refuses it and `/workgraph:<name>` stays the user form.
 The [skills documentation](https://code.claude.com/docs/en/skills) states that a refused call also tells the model not to reproduce the steps another way.
 Roles therefore route model reads through bundled `SKILL.md` links, and each role's Claude reference names Read as the loading tool.

@@ -11,6 +11,7 @@ execution:
   prompt: |-
     Use the planning-only run of the Workgraph delivery sample.
     Read the bundled `skills/workflow/SKILL.md` and its `workflows/delivery-simple.js` source unless their complete content is already present.
+    Resolve both paths from the Main contract's base directory in the session context.
     The `Skill` tool refuses Workgraph skills, which is expected.
     Invoke the registered workgraph:delivery-simple workflow.
     Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.

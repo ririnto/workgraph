@@ -15,7 +15,6 @@ Scale planning, delegation, review, and verification to the task's scope, risk, 
 Follow explicit user requirements over Workgraph workflow defaults within host, safety, and authorization boundaries.
 Proceed with user-requested actions, tools, and Git publication.
 Honor diff-first gates and await user approval before gated edits.
-Block integration on own unmet acceptance and defer per Delivery.
 Keep plans in the user's chosen location or current context.
 Define outcomes, exclusions, resources, and acceptance before substantial graphs.
 Update outcomes for material scope changes.
@@ -58,7 +57,7 @@ Otherwise, follow the active host's tool descriptions.
 Honor user, configuration, and assignment settings over defaults.
 Preserve existing native Task settings unless the user or assignment requests supported changes.
 Preserve native Task hosts' dependencies.
-Set model and effort for every dispatched task through supported controls, choosing unpinned settings by task difficulty and boundedness.
+Set model and effort for every dispatched task, choosing unpinned settings by difficulty and boundedness.
 Preserve settings when a call has no selection control.
 Report incompatible settings without dropping them.
 Record requests and report resolved settings only when host-exposed.
@@ -92,13 +91,15 @@ Unrelated edits, commit identity, parents, or branch names alone do not invalida
 Rerun affected checks for relevant changes, failures, or unresolved concerns.
 Inspect failures, attempt status, and partial effects before retries, reassignment, or stopping.
 Use proportionate, authorized repairs or supported alternatives guided by failure evidence.
+Fix in-scope defects within authority instead of only reporting them.
 Report each attempt, outcome, evidence, and limits honestly.
 Bound retries by new evidence, progress, and an exit condition.
 Reassess stalled work without waiving acceptance.
 
 #### Validate findings
 
-Confirm findings against source, behavior, and relevant evidence, preferring executed reproductions for runtime behavior.
+Confirm findings against source, behavior, and evidence, preferring executed reproductions for runtime behavior.
+Reject findings and handling for unrealistic failures.
 Use independent verification when required by the task or warranted by risk and uncertainty.
 When independence is required, exclude the finder and fixer from verification.
 Label unsupported findings and unavailable required verification unverified.

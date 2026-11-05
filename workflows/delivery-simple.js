@@ -402,7 +402,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
       `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
       'You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.',
       `Required starting reference: ${requiredStart}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
-      `Create a branch named for unit ${unit.key}, commit your changes there with a descriptive subject, and do not push.`,
+      `Create a branch named for unit ${unit.key} and commit your changes there with a descriptive subject.`,
       'Edit only files inside your owned paths, and report every changed file as a repository-relative path.',
       'Run the narrowest relevant checks and report each command with status passed, failed, or skipped.',
       'Report the branch you committed to, the verified starting reference, the changed files, and the checks.',
@@ -717,7 +717,7 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     })}`,
     `Review the posted candidate at ${publishState.url}, including its request description.`,
     'Inspect the change and the affected consumers beyond the changed lines.',
-    'Report concrete findings with file locations and failure scenarios, separating new defects from pre-existing issues.',
+    'Report concrete findings with file locations and realistic failure scenarios, separating new defects from pre-existing issues.',
     'Return verdict fix-required only for findings that block acceptance, correctness, safety, or required checks.',
     'Return an empty findings list with verdict pass when no actionable defect remains.',
     readOnlyPart,
@@ -773,6 +773,7 @@ const verifyFindings = async (review, integration, publication, round) => {
   const findings = review.findings.map((finding, index) => ({ ...finding, id: `review-${round + 1}-finding-${index + 1}` }))
   const attempt = await runAgent(compose(
     'Independently verify each review finding against source and requirements. Do not fix or modify anything.',
+    'Refute a finding whose failure scenario cannot realistically occur.',
     'For runtime findings, execute a safe reproduction when available and report the command, expected result, and observed result; otherwise cite source or requirement evidence.',
     taskPart,
     basePart,

@@ -8,6 +8,7 @@ Do not use Workflow to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
 A dispatched `claude -p` Task Main or reviewer loads Main's contract, so its brief must state that the session is a dispatch node and must read [Subagent Context](../../subagent-context/SKILL.md).
+Agent-tool subagents and Workflow stages lose the Workflow tool through the host subagent filter.
 Do not dispatch a Workgraph node as a fork, because forks keep the main tool pool including Workflow.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
@@ -38,7 +39,7 @@ For a design request, establish the task, requirements, constraints, and relevan
 Describe components, interfaces, data flow, decisions and alternatives, failure behavior, evidence, and assumptions.
 Map each requirement to the proposed design and propose representative regression and evaluation cases with observable outcomes.
 Distinguish repository evidence from inference and proposed checks from executed checks.
-Challenge the candidate against each requirement, interface, failure mode, test claim, and open question.
+Challenge the candidate against each requirement, interface, realistic failure mode, test claim, and open question.
 Record contradictions and unmet requirements as blockers, including when the candidate acknowledges them.
 Verify findings independently of their finder and author when the accepted task requires independent verification.
 Record a disposition for every finding and an evidence-backed status for each requirement.
@@ -52,7 +53,6 @@ Otherwise work directly within the main session's authorized tools and report an
 
 ## Verify results
 
-Treat failed, missing, null, or unsupported results as incomplete rather than successful.
 Check returned evidence against acceptance criteria, including required predecessor data and phase outcomes.
 A changed setting, lifecycle observation, or missing optional setup alone does not invalidate a run.
 Assess current stage suitability without tracing changed-state authorship, origin, or history.

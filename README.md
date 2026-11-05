@@ -159,8 +159,11 @@ References hold detail selected by a task, host, language, or operation.
 | Agent instructions | Writing's [instruction design](skills/writing/references/instruction-design.md) | Drafting, editing, or reviewing agent-facing prompts or instructions requires this reference. |
 | Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
 | Lint tools and rules | Development's [lint rule guidance](skills/development/references/lint-rules.md) | Selecting, developing, configuring, or assessing authorized lint tools, rules, or automatic fixes requires this reference. |
+| Go tooling | Go's [tooling guidance](skills/development/references/go-tooling.md) | Configuring or assessing Go workspaces, tool dependencies, or lint tooling requires this reference. |
+| Kotest | Kotlin's [Kotest guidance](skills/development/references/kotest.md) | Creating or changing Kotest specs or assertions requires this reference. |
 | Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update uses the requested host's section once the version reaches its authorized distribution source. |
 | Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
+| Worktrees and caches | Cleanup's [worktree and cache guidance](skills/codex-scoped-cleanup/references/worktrees-caches.md) | Archiving, restoring, or removing worktrees or caches requires this reference. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
 Writing owns Markdown and YAML source conventions, agent-facing prompt contracts, and example separation.

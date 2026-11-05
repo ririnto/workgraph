@@ -13,8 +13,8 @@ Do not use Workflow for single-phase work with no expected follow-up phase.
 Use Agent for that single-phase work, including independent one-phase assignments.
 Exclude speculative future tasks and display-only phases.
 Only the Claude Code Main Agent may start Workflow.
-Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) and its references unless loaded.
-Read linked Workgraph skills with Read because the `Skill` tool refuses them.
+Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) unless fully loaded.
+Read linked Workgraph skills with Read because `Skill` refuses them.
 Native worktree tools are `EnterWorktree` and `isolation: "worktree"`.
 
 ## Model selection

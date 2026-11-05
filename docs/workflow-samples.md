@@ -28,7 +28,9 @@ Workflow({
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
     candidateBranch: 'task/fix-parser',
-    issue: '#12'
+    issue: '#12',
+    models: { scope: '<model>', explore: '<model>', plan: '<model>', implement: '<model>', integrate: '<model>', sweep: '<model>', publish: '<model>', review: '<model>', verify: '<model>' },
+    efforts: { scope: '<effort>', explore: '<effort>', plan: '<effort>', implement: '<effort>', integrate: '<effort>', sweep: '<effort>', publish: '<effort>', review: '<effort>', verify: '<effort>' }
   }
 })
 ```
@@ -39,7 +41,9 @@ Workflow({
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
     candidateBranch: 'task/fix-parser',
-    issue: '#12'
+    issue: '#12',
+    models: { scope: '<model>', explore: '<model>', plan: '<model>', implement: '<model>', integrate: '<model>', sweep: '<model>', publish: '<model>', review: '<model>', verify: '<model>' },
+    efforts: { scope: '<effort>', explore: '<effort>', plan: '<effort>', implement: '<effort>', integrate: '<effort>', sweep: '<effort>', publish: '<effort>', review: '<effort>', verify: '<effort>' }
   },
   resumeFromRunId: '<run ID returned by the first run>',
   scriptPath: '<scriptPath returned by the first run>'
@@ -86,9 +90,9 @@ Each isolated worker verifies its worktree starts from the named task candidate 
 Implementation requires `args.candidateBranch` to name the task candidate, which stays distinct from the publication base branch.
 A missing candidate fails implementation before dispatch, so no editor edits from an unverified worktree start.
 A repair round carries the integrated task branch as its required starting reference.
-Unit ownership uses canonical repository-relative paths, so aliases, absolute paths, and escaping paths are rejected before dispatch, and every changed file must stay inside its unit.
+Unit ownership is normalized to canonical repository-relative paths, absolute and escaping paths are rejected before dispatch, and every reported changed file must normalize to a path inside its unit.
 Checks report explicit passed, failed, or skipped statuses, and a gate passes only when every required check passed.
-Every unit commits to a branch named for the unit, so each attempt retains its known branch identity even when its checks fail.
+Each implementation worker is instructed to commit to a branch named for its unit, so the result records a reported branch even when its checks fail, while a failed or missing worker result can leave the branch identity unknown.
 Integration receives the named candidate and each planned unit path.
 It checks the destination, resolved base, protections, and actual branch diffs before writing.
 Each unit is judged by its own changes since its merge base with the destination, because the destination advances as other units integrate.
@@ -114,7 +118,7 @@ That result establishes the sample's publication and review outcome, not a merge
 Exploration may be explicitly skipped when the accepted task does not need it.
 A skipped required phase does not pass, so skipping implementation or publication returns `complete: false`.
 Integration is required after any completed implementation, so a skipped or failed integration blocks publication.
-The run result retains the branch identity and state of every attempt, and a superseded branch stays listed because the samples retire nothing.
+The run result retains each branch identity reported by an implementation attempt and its recorded state, and superseded reported branches stay listed because the samples retire nothing.
 A retained resource never counts as passing evidence.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.
 A separate read-only agent verifies every `fix-required` finding before repair.
@@ -137,8 +141,7 @@ Every selector must be a nonempty string the host supports for agent calls.
 
 ## Cache reuse
 
-Resume a run in the same session with the stored `scriptPath` and `resumeFromRunId`, and native continuation may reuse unchanged agent calls.
-Check the native run journal for actual cache hits and their relevance before reusing evidence.
+Follow the [Workflow authoring reference](../skills/workflow/references/authoring.md) for continuation and cache reuse.
 A changed candidate, destination, owned path, finding set, or verification contract invalidates affected evidence and dependent decisions.
 Before resuming, check the live checkout, the named task and base branch refs, the toolchain configuration, and the posted request against what the recorded run used, because native cache keys carry none of that state.
 A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.
@@ -147,6 +150,3 @@ A repair round keeps the candidate branch name, so a repair sweep prompt can mat
 Continuation replays cached results without replaying their Git effects, so a cached sweep describes the candidate as it stood when that sweep first ran.
 A later round inside the same recorded run can advance the candidate, so the live branch can match the run's final state while an earlier cached sweep describes an earlier candidate.
 Before publishing from a resumed run, confirm that the gating sweep ran live against the current candidate, or change its inputs so it re-runs.
-A cached result avoids repeated work but does not prove acceptance, so a resumed run still needs its phase evidence checked.
-Sibling agents with matching settings can share the host prompt-cache prefix, which affects cost and speed but not the recorded phase evidence.
-Inspect the run journal when a result is missing or unexpected, as the authoring reference behind the [Workflow skill](../skills/workflow/SKILL.md) admission describes.
