@@ -990,6 +990,10 @@ Workgraph's maintainer policy is narrower: neither form forces Workflow.
 Workflow is used only for expected follow-up phase expansion or genuinely multi-phase work, and not for single-phase work, which uses Agent when no follow-up phase is expected.
 That tool-selection policy belongs only to Main's Claude reference, rather than a shared role or task body.
 The subagent documentation explicitly removes Workflow from subagent tools.
+That host filter covers Agent-tool subagents and Workflow `agent()` stages, but not forks, which keep the main pool.
+A `claude -p` session is a main session that keeps Workflow and loads Main's contract, so its launcher removes the tool with the verified `--disallowedTools Workflow` flag and its brief names the dispatch role.
+Codex has no Workflow tool; its `--disable multi_agent --disable multi_agent_v2` launch form names the nearest native spawn tools, and whether disabling those features removes the spawn tools is unverified.
+Skill-level `disable-model-invocation` only gates the Skill tool, so Workgraph does not use it for Workflow admission.
 
 The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
 Invocation controls do not select a host or role, and `compatibility` is informational.

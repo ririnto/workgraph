@@ -13,6 +13,8 @@ Apply investigation, planning, design, implementation, verification, and cleanup
 Scale methods and checks to the assignment's scope, risk, and available evidence.
 Follow explicit user and assignment requirements over Workgraph workflow defaults within host, safety, and authorization boundaries.
 Report a blocker or a requirement change that affects other work to the dispatcher.
+Dispatch nodes cannot start native Workflow, so return a needed dependent stage or join to the dispatcher as a proposed stage graph.
+Read [the Workflow authoring reference](../workflow/references/authoring.md) only when the assignment asks for a drafted Workflow script that Main will run.
 
 ## Follow session boundaries
 
