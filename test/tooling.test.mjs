@@ -1830,3 +1830,77 @@ test("delivery samples append each phase's prompt part as its final section", as
     })
   );
 });
+
+test("delivery samples pass candidate, issue, request, and owned findings into prompt sections", async () => {
+  const findings = [
+    { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
+    { detail: "second", file: "src/main.js", scenario: "second trigger" }
+  ];
+  await Promise.all(
+    Object.entries(samplePaths).map(async ([variant, file]) => {
+      const reviewed = variant === "simple" ? findings.slice(0, 1) : findings;
+      const { calls, result } = await runWorkflowSample(
+        file,
+        { candidateBranch: "task-branch", issue: "#1", task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement:
+            variant === "simple" ? () => simpleImplement : splitImplement,
+          Integrate: () =>
+            variant === "simple" ? integrateSingle : integrateResult,
+          Plan: () => (variant === "simple" ? singleUnits : splitUnits),
+          Publish: sequence(publishCreated, publishUpdated),
+          Review: sequence(
+            { evidence: "e", findings: reviewed, verdict: "fix-required" },
+            reviewPass
+          ),
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult,
+          Verify: () => ({
+            dispositions: reviewed.map((_finding, index) => ({
+              evidence: "Confirmed in source",
+              id: `review-1-finding-${index + 1}`,
+              status: "confirmed"
+            }))
+          })
+        })
+      );
+      assert.equal(result.complete, true);
+      const owns = (text) =>
+        calls
+          .filter((call) => call.prompt.split("\n\n").includes(text))
+          .map(({ label }) => label);
+      assert.deepEqual(
+        owns("Candidate branch: task-branch"),
+        calls
+          .filter(({ phase }) => phase === "Sweep" || phase === "Publish")
+          .map(({ label }) => label)
+      );
+      assert.deepEqual(
+        owns("Linked issue reference: #1"),
+        calls
+          .filter(({ phase }) =>
+            ["Publish", "Review", "Verify"].includes(phase)
+          )
+          .map(({ label }) => label)
+      );
+      const publishes = calls.filter(({ phase }) => phase === "Publish");
+      assert.deepEqual(
+        owns(
+          "Update the existing open request at https://example.invalid/pr/1 with the fixed change instead of creating another request."
+        ),
+        [publishes[1].label]
+      );
+      assert.deepEqual(
+        reviewed.map((finding, index) =>
+          owns(
+            `Fix these review findings inside your owned paths: ${JSON.stringify(
+              [{ ...finding, id: `review-1-finding-${index + 1}` }]
+            )}`
+          )
+        ),
+        reviewed.map((_finding, index) => [`implement:u${index + 1}:fix-1`])
+      );
+    })
+  );
+});
