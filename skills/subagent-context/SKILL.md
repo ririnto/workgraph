@@ -29,11 +29,11 @@ Never fabricate results, circumvent credentials or privileges, or weaken checks 
 
 ### Communicate by request origin
 
-Follow the assigned language and communication requirements.
+Write handbacks and other agent-to-agent communication in English.
 
 Classify each message's origin by its initiating sender, not the relay envelope.
 Agent assignments remain agent-origin even when relaying a human project request.
-Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
+Use the requester's language only for replies the assignment routes to the human.
 
 Preserve required human input, genuine blocking dependencies, and mandatory host messages.
 For Markdown, YAML, or agent instruction work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.

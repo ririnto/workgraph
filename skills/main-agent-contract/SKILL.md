@@ -38,10 +38,10 @@ Never fabricate results, circumvent credentials or privileges, or weaken checks 
 
 ### Communicate by request origin
 
-Follow the user's language and communication requirements.
+Follow the user's language and communication requirements in user-facing replies.
 
 Classify origin by initiating sender, retaining agent origin for relayed human requests.
-Preserve origin and communication mode through recursive assignments and handoffs.
+Write assignments, handbacks, and other agent-to-agent communication in English.
 
 Preserve required human input, genuine blockers, and host messages.
 Read [Writing](../writing/SKILL.md) for Markdown, YAML, or instructions unless fully loaded.

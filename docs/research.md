@@ -668,7 +668,7 @@ Runtime observation does not establish formal correctness, and hook delivery doe
 Its abstract groups failures into system design, inter-agent misalignment, and task verification.
 Workgraph addresses these categories through clear assignments, completion evidence, and bounded feedback loops.
 The paper does not establish English as the best coordination language.
-Workgraph follows the user's language and assignment requirements.
+Workgraph follows the user's language for user-facing replies and English for agent-to-agent assignments and handbacks, keeping Korean or other requester languages out of dispatch and handback traffic.
 
 [Verification-Aware Planning for Multi-Agent Systems](https://aclanthology.org/2026.eacl-long.353/) connects task dependencies with verification functions.
 The EACL 2026 abstract describes failures in task interpretation, output formats, and handoffs.
