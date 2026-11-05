@@ -81,6 +81,9 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:writing` | Load prose, Markdown, and instruction design guidance. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 
+The workflow skill blocks model invocation, so `/workgraph:workflow` stays its user form and Main reads its `SKILL.md` and references directly for authorized runs.
+Locate the files by a search ending in `skills/workflow/SKILL.md` when no path is known.
+
 Manual role invocation reads its Claude reference unless that complete content is already present.
 Invoking a skill does not create a dispatch, change the session's role, or grant permissions.
 The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.

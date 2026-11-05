@@ -218,17 +218,19 @@ test("skill metadata rejects invalid optional field types", () => {
   }
 });
 
-test("skill metadata preserves both invocation paths", () => {
-  for (const [key, accepted, rejected] of [
+test("skill metadata keeps model invocation boolean and user invocation on", () => {
+  for (const [key, accepted, rejected, diagnostic] of [
     [
       "disable-model-invocation",
-      ["false", "NO", "Off", "0", '"false"'],
-      ["true", "YES", "On", "1", "null", "[]"]
+      ["true", "false", "YES", "NO", "On", "Off", "1", "0", '"true"'],
+      ["null", "[]"],
+      "must be a boolean."
     ],
     [
       "user-invocable",
       ["true", "YES", "On", "1", '"true"'],
-      ["false", "NO", "Off", "0", "null", "[]"]
+      ["false", "NO", "Off", "0", "null", "[]"],
+      "must keep the skill user-invocable."
     ]
   ]) {
     for (const value of accepted) {
@@ -249,9 +251,7 @@ test("skill metadata preserves both invocation paths", () => {
         ),
         "sample-skill"
       );
-      assert.deepEqual(errors, [
-        `<skill>: ${key} must keep the skill model-invocable and user-invocable.`
-      ]);
+      assert.deepEqual(errors, [`<skill>: ${key} ${diagnostic}`]);
     }
   }
 });

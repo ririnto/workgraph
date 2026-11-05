@@ -7,8 +7,8 @@ execution:
   timeout_seconds: 360
   allowed_tools:
     - Agent
+    - Read
     - Skill(workgraph:main-agent-contract)
-    - Skill(workgraph:workflow)
   prompt: |-
     Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
     Please orchestrate a read-only assessment with subagents.

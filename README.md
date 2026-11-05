@@ -131,7 +131,8 @@ All workflow sources launch through the native Workflow interface, and Workgraph
 
 ## Skill invocation
 
-All skills remain user-invocable and model-invocable.
+All skills remain user-invocable.
+The workflow skill also blocks model invocation, so Claude Main reads its files directly before an authorized Workflow run and `/workgraph:workflow` stays the user form.
 Hooks operate without skill invocation.
 Conditional skills load only when their stated task scope matches and their complete content is not already present.
 
@@ -143,7 +144,7 @@ Conditional skills load only when their stated task scope matches and their comp
 | Development router | [Development](skills/development/SKILL.md) | Source work selects the matching lifecycle playbook and language references. |
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
-| Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main loads native Workflow procedures for the host reference's selection conditions. |
+| Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
 | Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose and Markdown work load writing guidance, with instruction design selected for agent-facing work. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |

@@ -468,7 +468,8 @@ Main and Worker route prose, instruction design, and source work to bundled task
 Those skills retain their own procedures and conditional language references.
 Consumer references remain inside their owning plugin so installation and activation do not depend on another plugin.
 The hook names loaded source paths so the model can locate references and recognize content already present.
-All skills remain user-invocable and model-invocable.
+All skills remain user-invocable, and only the workflow skill blocks model invocation.
+Its frontmatter sets `disable-model-invocation: true`, and guidance redirects model readers to its files directly.
 Claude defaults `user-invocable` to `true`, so Workgraph omits that redundant frontmatter field.
 Their bodies define role and scope boundaries independently of invocation metadata.
 Claude's installed Skill loader strips YAML, preserves trailing body whitespace, and prepends a base-directory line.
@@ -993,7 +994,10 @@ The subagent documentation explicitly removes Workflow from subagent tools.
 That host filter covers Agent-tool subagents and Workflow `agent()` stages, but not forks, which keep the main pool.
 A `claude -p` session is a main session that keeps Workflow and loads Main's contract, so its launcher removes the tool with the verified `--disallowedTools Workflow` flag and its brief names the dispatch role.
 Codex has no Workflow tool; its `--disable multi_agent --disable multi_agent_v2` launch form names the nearest native spawn tools, and whether disabling those features removes the spawn tools is unverified.
-Skill-level `disable-model-invocation` only gates the Skill tool, so Workgraph does not use it for Workflow admission.
+The workflow skill sets `disable-model-invocation: true`, so the `Skill` tool refuses it, `/workgraph:workflow` stays the user form, and Main's Claude reference redirects model readers to its `SKILL.md` and references directly with the refusal stated as expected.
+That control gates the Skill tool only and never the Workflow tool itself.
+The bundled `agents/openai.yaml` records `policy.allow_implicit_invocation: false` for the workflow skill's agent surface, but no reviewed Codex plugin, subagent, or configuration reference documents this file or key, so its effect is unverified.
+Codex's documented per-skill control is a `skills.config` entry with `enabled`, which disables a skill entirely rather than only implicit invocation.
 
 The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
 Invocation controls do not select a host or role, and `compatibility` is informational.

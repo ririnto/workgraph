@@ -244,6 +244,7 @@ Workgraph contributor reviews follow the scoped policy in [docs/reviews.md](revi
 
 The [Claude Main reference](../skills/main-agent-contract/references/claude-code.md) is the sole owner of Workflow selection policy.
 The shared [Workflow entry point](../skills/workflow/SKILL.md) exposes only its host-and-role admission contract, including for direct invocation and subagent preloading.
+Its frontmatter blocks model invocation, so Main reads its `SKILL.md` and references directly while `/workgraph:workflow` remains the user form.
 Its [Claude Main procedure](../skills/workflow/references/claude-code-main.md) owns execution, design, result acceptance, and conditional reference loading.
 The [authoring reference](../skills/workflow/references/authoring.md) covers native source and run-specific script copies, while the [delivery reference](../skills/workflow/references/delivery.md) maps Delivery requirements to nodes.
 These references have no Worker or non-Claude caller.

@@ -8,7 +8,6 @@ execution:
   allowed_tools:
     - Workflow
     - Read
-    - Skill(workgraph:workflow)
   prompt: |-
     Use the planning-only run of the Workgraph delivery sample.
     Read the complete workflow skill and its bundled workflows/delivery-simple.js source.
@@ -33,7 +32,7 @@ graders:
     focus: trace
     criteria: |-
       Judge the observed tool trace, Workflow results, and final report together.
-      Require the session to use Skill(workgraph:workflow) and read the complete maintained delivery-simple.js source.
+      Require the session to Read the workflow skill's `SKILL.md` and the complete maintained delivery-simple.js source.
       Require its first native Workflow call to use the registered workgraph:delivery-simple name.
       Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
       A freshly authored replacement graph or an inline script does not establish source consumption.
