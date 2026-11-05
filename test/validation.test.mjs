@@ -14,6 +14,8 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
+import yamlParser from "markdownlint-cli2/parsers/yaml";
+
 import { validatePluginVersions } from "./validation/plugin-version.mjs";
 
 const repositoryRoot = new URL("../", import.meta.url);
@@ -194,6 +196,21 @@ const copyPluginPackage = (t) => {
   );
   return root;
 };
+
+test("issue forms request the contribution fields that CONTRIBUTING.md requires", () => {
+  for (const filename of ["bug_report", "improvement"]) {
+    const form = yamlParser(
+      readFileSync(
+        new URL(`.github/ISSUE_TEMPLATE/${filename}.yaml`, repositoryRoot),
+        "utf-8"
+      )
+    );
+    assert.deepEqual(
+      form.body.map((field) => field.id),
+      ["problem", "evidence", "scope", "acceptance", "ownership_next_action"]
+    );
+  }
+});
 
 test("release versions enforce padded calendar dates and daily sequences", () => {
   for (const version of [

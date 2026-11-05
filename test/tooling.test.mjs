@@ -439,14 +439,15 @@ const sequence = (...payloads) => {
 const runWorkflowSample = async (file, args, payloadFor) => {
   const calls = [];
   const environment = {
-    agent: (_prompt, options) => {
+    agent: (prompt, options) => {
       calls.push({
         agentType: options.agentType,
         isolation: options.isolation,
         label: options.label,
         model: options.model,
         modelProvided: Object.hasOwn(options, "model"),
-        phase: options.phase
+        phase: options.phase,
+        prompt
       });
       try {
         const payload = payloadFor(options);
@@ -1779,5 +1780,53 @@ test("delivery samples validate the verification model selector", async () => {
         )
       )
     )
+  );
+});
+
+test("delivery samples append each phase's prompt part as its final section", async () => {
+  const promptParts = {
+    explore: "explore part",
+    implement: "implement part",
+    integrate: "integrate part",
+    plan: "plan part",
+    publish: "publish part",
+    review: "review part",
+    scope: "scope part",
+    sweep: "sweep part"
+  };
+  await Promise.all(
+    Object.values(samplePaths).map(async (file) => {
+      const { calls } = await runWorkflowSample(
+        file,
+        { candidateBranch: "task-branch", promptParts, task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: () => simpleImplement,
+          Integrate: () => integrateSingle,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => reviewFix,
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.deepEqual(
+        calls.map(({ phase, prompt }) => [phase, prompt.split("\n\n").at(-1)]),
+        calls.map(({ phase }) => [
+          phase,
+          promptParts[phase === "Verify" ? "review" : phase.toLowerCase()]
+        ])
+      );
+      await assert.rejects(
+        runWorkflowSample(
+          file,
+          { promptParts: { review: " " }, task: "t" },
+          () => assert.fail("Invalid prompt part dispatched an agent")
+        ),
+        {
+          message: "Provide promptParts.review as a nonempty instruction string"
+        }
+      );
+    })
   );
 });

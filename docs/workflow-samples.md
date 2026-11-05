@@ -51,8 +51,8 @@ The dispatching session owns the task branch, initial candidate inspection, and 
 
 ## Read-only design
 
-For read-only design work, use the [Workflow execution procedure](../skills/workflow/references/claude-code-main.md#read-only-design).
-It describes requirement coverage, challenge, verification selected for the task, and the tool boundaries needed for delegation.
+For read-only design work, use the [Workflow skill](../skills/workflow/SKILL.md), which admits only the Claude Code Main Agent before loading its read-only design procedure.
+That procedure describes requirement coverage, challenge, verification selected for the task, and the tool boundaries needed for delegation.
 
 ## Dispatch inputs
 
