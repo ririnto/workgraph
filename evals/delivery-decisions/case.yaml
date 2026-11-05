@@ -6,9 +6,11 @@ execution:
   max_turns: 20
   timeout_seconds: 240
   allowed_tools:
-    - Skill(workgraph:delivery)
+    - Read
   prompt: |-
-    Load Workgraph's Repository Delivery skill and assess these synthetic situations using its instructions and your Main contract.
+    Read the bundled `skills/delivery/SKILL.md` unless its complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
+    Assess these synthetic situations using its instructions and your Main contract.
     This is a read-only policy assessment, not authority to perform the simulated operations.
     Do not edit files, run commands, publish anything, or start workers.
     Give each situation its next action, any real blocker, and any missing evidence.
@@ -117,9 +119,13 @@ execution:
     State whether the earlier approval covers them.
 graders:
   - name: delivery-loaded
-    type: tool_used
-    tool: Skill
-    min: 1
+    type: llm
+    arm: with-only
+    focus: trace
+    criteria: |-
+      Require the complete bundled Delivery instructions before the assessment.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
+      Reject mere skill mentions, descriptions, failed reads, or unsupported claims of loading.
   - name: scoped-authority-and-integration
     type: llm
     focus: trace

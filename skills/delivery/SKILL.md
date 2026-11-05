@@ -1,6 +1,7 @@
 ---
 name: delivery
 description: Use in main for repository changes, branch publication, or integration.
+disable-model-invocation: true
 ---
 
 # Repository delivery
@@ -73,12 +74,7 @@ Inspect flagged content and remove exposure before pushing.
 
 ## Retain validation evidence
 
-Define acceptance target, trigger, input, and observable outcome before checks.
-Use existing commands and supported entry points, with runtime evidence when static checks cannot establish behavior.
-Record commands, setup, exit status, and raw results apart from interpretation.
-Retain failures and label unverified behavior.
-Create evidence files only when checks, investigation, or recovery need them.
-Summarize commands, outcomes, coverage, and limits in authorized PR/MR text without raw logs by default.
+Summarize commands, outcomes, coverage, limits, and unverified behavior in authorized PR/MR text without raw logs by default.
 
 ## Review and publish
 
@@ -126,7 +122,7 @@ Main governs resource returns and base synchronization.
 Verify completed merge into the intended destination before claiming success.
 Report successful auto-merge or queue requests as enabled or queued, with remaining conditions, until the merge is observed.
 After completed merge, read back the named authorized base and synchronize before dependent work.
-For authorized installed-plugin updates, read [plugin update guidance](references/plugin-updates.md) before updating requested hosts unless fully loaded.
+Before authorized installed-plugin updates, read [plugin update guidance](references/plugin-updates.md) unless fully loaded.
 
 ### Retire owned resources
 

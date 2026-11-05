@@ -27,7 +27,7 @@ Link the sole owner instead, and keep each conditional procedure at its stated s
 Identify each loaded source by its actual file path and state which complete content is already present.
 Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
 Load every selected file before emitting context, without requiring model retrieval during hook startup.
-Keep all skills user-invocable, and keep skills model-invocable unless a host control enforces their admission boundary.
+Keep all skills user-invocable, block their model invocation through each host's supported control, and route model reads through bundled `SKILL.md` links.
 
 Use `README.md` for installation and runtime behavior.
 Read `docs/design.md` when changing instruction boundaries or hook delivery.
@@ -40,7 +40,7 @@ Write maintained instructions and documentation in concise English.
 Follow the active role's request-origin communication policy for conversations and handbacks.
 Writing owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
 
-When drafting, editing, or reviewing prose, read Writing unless its complete content is already loaded.
+When drafting, editing, or reviewing Markdown, YAML, or agent instructions, read [Writing](skills/writing/SKILL.md) unless its complete content is already loaded.
 
 Apply Markdown lint to `.md` files.
 Ultracite's code rules do not apply to Markdown.
@@ -102,7 +102,7 @@ Confirm the selected role and host reference appear without repository guidance 
 
 Follow the [evaluation reporting requirements](README.md#development) for repeated behavioral runs, individual outcomes, and limited smoke checks.
 
-For Workflow invocation changes, run `claude plugin eval ./ --case delivery-completion-evidence --runs 2 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
+For Workflow invocation changes, run `PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 2 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
 This behavioral check uses real agents and requires a host with Workflow enabled.
 Keep evaluation reports local and outside the repository with `--output-dir`.
 Inspect tool results because an attempted invocation alone does not prove successful execution.

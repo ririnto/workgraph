@@ -1,6 +1,7 @@
 ---
 name: codex-scoped-cleanup
 description: Use in Codex to archive or delete native threads or retire worktrees, recovery copies, caches, and stale connections.
+disable-model-invocation: true
 ---
 
 # Codex scoped cleanup
@@ -77,13 +78,6 @@ Archive/delete can stop runtimes before persistent changes or a protected descen
 Use supported owner release for live workers and writer conflicts.
 Honor owner/writer errors without changing control paths or killing workers.
 
-Verify installed worktree archive/restore contracts separately from conversation archival.
-Use supported owner archiving for physical retirement needing recovery state.
-Archive can remove the checkout while retaining a Git snapshot.
-Preserve required ignored files separately if excluded.
-Restore may create a detached checkout with prior uncommitted changes in a snapshot commit.
-Verify restored content and associations without promising original staging.
-
 ## Recovery
 
 Record runtime teardown, archive moves, deletion, attachments, and checkout state separately.
@@ -102,15 +96,7 @@ Retain receipts until verification and required recovery finish.
 
 ## Worktrees and caches
 
-Use supported owner worktree tools or Git worktree commands, not direct directory deletion.
-Do not force removal past unique dirty or untracked content.
-Check exact scoped process arguments, working directories, open handles, and active containers.
-Remove only isolated, unused, reproducible cache or build leaves.
-Preserve active shared caches and dependencies needed by current executions.
-Verify quarantined caches' inode, owner, and device before deletion.
-Change owned directory permissions only within the selected cache.
-Child removal also requires write permission on its parent.
-Preserve hard-linked contents and permissions shared with other checkouts.
+Before archiving, restoring, or removing worktrees or caches, read [Worktree and cache cleanup](references/worktrees-caches.md) unless fully loaded.
 
 ## Thread Worktree Artifacts
 
@@ -119,7 +105,6 @@ For Worktree Artifact connection changes, read [Native Attachment Cleanup](refer
 ## Acceptance
 
 Obtain fresh owner lifecycle, attachment, and filesystem readbacks separately.
-Verify selected paths and quarantine directories are absent after physical cleanup.
 After verification, have the owner remove temporary payload copies, scripts, logs, and task-owned processes.
 Report attachment counts separately from physical disk-space changes.
 Measure reclaimed space by volume availability, not summed directory allocation.

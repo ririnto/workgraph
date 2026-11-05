@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 import { validateSkillContent } from "./validation/skill-metadata.mjs";
 
 const skillContent = (
-  fields = "name: sample-skill\ndescription: Use for the sample task.",
+  fields = "name: sample-skill\ndescription: Use for the sample task.\ndisable-model-invocation: true",
   body = "Run the sample task.\n"
 ) => `---\n${fields}\n---\n${body}`;
 
@@ -66,7 +66,7 @@ metadata:
   author: Sample maintainer
   version: "1.0"
 argument-hint: "[goal]"
-disable-model-invocation: false
+disable-model-invocation: true
 user-invocable: true`);
   assert.deepEqual(validateSkillContent(content, "sample-skill"), []);
   assert.deepEqual(
@@ -109,9 +109,13 @@ test("skill metadata checks required fields and directory identity", () => {
     ["name: Sample\ndescription: Task.", "Sample", "name must be lowercase."],
     ["name: НАВЫК\ndescription: Task.", "НАВЫК", "name must be lowercase."]
   ]) {
-    assert.deepEqual(validateSkillContent(skillContent(fields), directory), [
-      `<skill>: ${diagnostic}`
-    ]);
+    assert.deepEqual(
+      validateSkillContent(
+        skillContent(`${fields}\ndisable-model-invocation: true`),
+        directory
+      ),
+      [`<skill>: ${diagnostic}`]
+    );
   }
   for (const name of [
     "-sample",
@@ -123,7 +127,9 @@ test("skill metadata checks required fields and directory identity", () => {
     "sample😀"
   ]) {
     const errors = validateSkillContent(
-      skillContent(`name: ${JSON.stringify(name)}\ndescription: Task.`),
+      skillContent(
+        `name: ${JSON.stringify(name)}\ndescription: Task.\ndisable-model-invocation: true`
+      ),
       name
     );
     assert.deepEqual(errors, [
@@ -142,7 +148,9 @@ test("skill metadata counts and normalizes Unicode characters", () => {
   ]) {
     assert.deepEqual(
       validateSkillContent(
-        skillContent(`name: ${name}\ndescription: Task.`),
+        skillContent(
+          `name: ${name}\ndescription: Task.\ndisable-model-invocation: true`
+        ),
         directory
       ),
       []
@@ -155,6 +163,7 @@ test("skill metadata counts and normalizes Unicode characters", () => {
   ]) {
     const defaults = {
       description: "Use for the sample task.",
+      "disable-model-invocation": true,
       name: directory
     };
     const fields = { ...defaults, [key]: value.repeat(limit) };
@@ -210,7 +219,7 @@ test("skill metadata rejects invalid optional field types", () => {
     ]
   ]) {
     const content = skillContent(
-      `name: sample-skill\ndescription: Task.\n${extra}`
+      `name: sample-skill\ndescription: Task.\ndisable-model-invocation: true\n${extra}`
     );
     assert.deepEqual(validateSkillContent(content, "sample-skill"), [
       `<skill>: ${diagnostic}`
@@ -218,13 +227,13 @@ test("skill metadata rejects invalid optional field types", () => {
   }
 });
 
-test("skill metadata keeps model invocation boolean and user invocation on", () => {
+test("skill metadata blocks model invocation and keeps user invocation on", () => {
   for (const [key, accepted, rejected, diagnostic] of [
     [
       "disable-model-invocation",
-      ["true", "false", "YES", "NO", "On", "Off", "1", "0", '"true"'],
-      ["null", "[]"],
-      "must be a boolean."
+      ["true", "YES", "On", "1", '"true"'],
+      ["false", "NO", "Off", "0", "null", "[]"],
+      "must be true."
     ],
     [
       "user-invocable",
@@ -237,7 +246,7 @@ test("skill metadata keeps model invocation boolean and user invocation on", () 
       assert.deepEqual(
         validateSkillContent(
           skillContent(
-            `name: sample-skill\ndescription: Task.\n${key}: ${value}`
+            `name: sample-skill\ndescription: Task.\n${key === "user-invocable" ? "disable-model-invocation: true\n" : ""}${key}: ${value}`
           ),
           "sample-skill"
         ),
@@ -247,13 +256,20 @@ test("skill metadata keeps model invocation boolean and user invocation on", () 
     for (const value of rejected) {
       const errors = validateSkillContent(
         skillContent(
-          `name: sample-skill\ndescription: Task.\n${key}: ${value}`
+          `name: sample-skill\ndescription: Task.\n${key === "user-invocable" ? "disable-model-invocation: true\n" : ""}${key}: ${value}`
         ),
         "sample-skill"
       );
       assert.deepEqual(errors, [`<skill>: ${key} ${diagnostic}`]);
     }
   }
+  assert.deepEqual(
+    validateSkillContent(
+      skillContent("name: sample-skill\ndescription: Task."),
+      "sample-skill"
+    ),
+    ["<skill>: disable-model-invocation must be true."]
+  );
 });
 
 test("skill metadata rejects malformed frontmatter and empty bodies", () => {
@@ -301,14 +317,20 @@ test("skill metadata rejects malformed frontmatter and empty bodies", () => {
 test("skill metadata command resolves its own checkout", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
-  mkdirSync(directory, { recursive: true });
+  mkdirSync(path.join(directory, "agents"), { recursive: true });
+  writeFileSync(
+    path.join(directory, "agents/openai.yaml"),
+    "policy:\n  allow_implicit_invocation: false\n"
+  );
   const alias = path.join(root, "validate.mjs");
   symlinkSync(entrypoint, alias, "file");
   for (const [content, diagnostic] of [
     [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
     [skillContent(), ""],
     [
-      skillContent("name: different\ndescription: Task."),
+      skillContent(
+        "name: different\ndescription: Task.\ndisable-model-invocation: true"
+      ),
       "skills/sample-skill/SKILL.md: name must match its parent directory.\n"
     ]
   ]) {
@@ -321,14 +343,48 @@ test("skill metadata command resolves its own checkout", (t) => {
   }
 });
 
+test("skill metadata command requires a Codex invocation policy", (t) => {
+  const { entrypoint, root } = metadataFixture(t);
+  const directory = path.join(root, "skills/sample-skill");
+  mkdirSync(path.join(directory, "agents"), { recursive: true });
+  writeFileSync(path.join(directory, "SKILL.md"), skillContent());
+  const policy = path.join(directory, "agents/openai.yaml");
+  for (const [content, diagnostic] of [
+    [null, "policy file must be readable."],
+    ["policy: [", "policy file must contain valid YAML."],
+    ["policy: {}", "policy.allow_implicit_invocation must be false."],
+    [
+      "policy:\n  allow_implicit_invocation: true",
+      "policy.allow_implicit_invocation must be false."
+    ],
+    ["policy:\n  allow_implicit_invocation: false", ""]
+  ]) {
+    if (content !== null) {
+      writeFileSync(policy, content);
+    }
+    assertMetadataCommand(
+      entrypoint,
+      diagnostic && `skills/sample-skill/agents/openai.yaml: ${diagnostic}\n`
+    );
+  }
+});
+
 test("skill metadata command validates internal links by their alias", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "bundled/reference");
-  mkdirSync(directory, { recursive: true });
-  mkdirSync(path.join(root, "skills/ordinary"), { recursive: true });
+  mkdirSync(path.join(directory, "agents"), { recursive: true });
+  mkdirSync(path.join(root, "skills/ordinary/agents"), { recursive: true });
+  for (const skill of [directory, path.join(root, "skills/ordinary")]) {
+    writeFileSync(
+      path.join(skill, "agents/openai.yaml"),
+      "policy:\n  allow_implicit_invocation: false\n"
+    );
+  }
   writeFileSync(
     path.join(root, "skills/ordinary/SKILL.md"),
-    skillContent("name: ordinary\ndescription: Task.")
+    skillContent(
+      "name: ordinary\ndescription: Task.\ndisable-model-invocation: true"
+    )
   );
   symlinkSync("../bundled/reference", path.join(root, "skills/sample-skill"));
   writeFileSync(path.join(root, "bundled/notes.md"), "Supporting notes.\n");
@@ -337,7 +393,9 @@ test("skill metadata command validates internal links by their alias", (t) => {
     [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
     [skillContent(), ""],
     [
-      skillContent("name: reference\ndescription: Task."),
+      skillContent(
+        "name: reference\ndescription: Task.\ndisable-model-invocation: true"
+      ),
       "skills/sample-skill/SKILL.md: name must match its parent directory.\n"
     ]
   ]) {
@@ -362,12 +420,28 @@ test("skill metadata command rejects paths outside its plugin root", (t) => {
       path.join(outside, "skills/sample-skill/SKILL.md"),
       skillContent()
     );
+    mkdirSync(path.join(outside, "skills/sample-skill/agents"), {
+      recursive: true
+    });
+    writeFileSync(
+      path.join(outside, "skills/sample-skill/agents/openai.yaml"),
+      "policy:\n  allow_implicit_invocation: false\n"
+    );
     const alias = path.join(root, source);
     mkdirSync(path.dirname(alias), { recursive: true });
     symlinkSync(target, alias);
+    if (source.endsWith("SKILL.md")) {
+      mkdirSync(path.join(root, "skills/sample-skill/agents"), {
+        recursive: true
+      });
+      writeFileSync(
+        path.join(root, "skills/sample-skill/agents/openai.yaml"),
+        "policy:\n  allow_implicit_invocation: false\n"
+      );
+    }
     assertMetadataCommand(
       entrypoint,
-      `${source}: path must resolve inside the plugin root.\n`
+      `${source}: path must resolve inside the plugin root.\n${source === "skills/sample-skill" ? "skills/sample-skill/agents/openai.yaml: path must resolve inside the plugin root.\n" : ""}`
     );
   }
 });
@@ -375,7 +449,11 @@ test("skill metadata command rejects paths outside its plugin root", (t) => {
 test("skill metadata command rejects unreadable linked skill files", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
-  mkdirSync(directory, { recursive: true });
+  mkdirSync(path.join(directory, "agents"), { recursive: true });
+  writeFileSync(
+    path.join(directory, "agents/openai.yaml"),
+    "policy:\n  allow_implicit_invocation: false\n"
+  );
   symlinkSync("missing.md", path.join(directory, "SKILL.md"));
   const diagnostic =
     "skills/sample-skill/SKILL.md: skill file must be readable.\n";

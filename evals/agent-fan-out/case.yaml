@@ -8,9 +8,9 @@ execution:
   allowed_tools:
     - Agent
     - Read
-    - Skill(workgraph:main-agent-contract)
   prompt: |-
-    Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
+    Read the bundled `skills/main-agent-contract/SKILL.md` and its `references/claude-code.md` unless their complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
     Please orchestrate a read-only assessment with subagents.
     Give one worker batch A and another worker batch B through parallel host Agent calls.
     Combine their independent results in Main.
@@ -37,7 +37,8 @@ graders:
     type: llm
     focus: trace
     criteria: |-
-      Require Main's contract and selected Claude reference before delegation.
+      Require the complete bundled Main contract and selected Claude reference before delegation.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       Require two concurrent host Agent calls for the two independent batches.
       Each assessment ends in one phase without an expected dependent follow-up.
       Main uses direct Agent rather than Workflow and does not duplicate the work through another execution path.

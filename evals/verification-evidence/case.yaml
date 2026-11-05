@@ -6,11 +6,10 @@ execution:
   max_turns: 20
   timeout_seconds: 240
   allowed_tools:
-    - Skill(workgraph:development)
-    - Skill(workgraph:writing)
     - Read
   prompt: |-
-    Load Workgraph's Development and Writing skills explicitly.
+    Read the bundled `skills/development/SKILL.md` and `skills/writing/SKILL.md` unless their complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
     This is a read-only assessment of supplied synthetic evidence.
     Do not run commands or edit files.
     Attribute results to supplied packets, not personal execution.
@@ -58,14 +57,17 @@ execution:
     Explain how an explicit requirement affects the decision.
 graders:
   - name: required-skills-loaded
-    type: tool_used
-    tool: Skill
-    min: 2
+    type: llm
+    arm: with-only
+    focus: trace
+    criteria: |-
+      Require the complete bundled Development and Writing instructions before the assessment.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
+      Reject mere skill mentions, descriptions, failed reads, or unsupported claims of loading.
   - name: evidence-attribution-and-evaluation-decision
     type: llm
     focus: trace
     criteria: |-
-      Inspect Skill tool results and require both named skills before the assessment.
       The trace reads the complete Writing instruction-design reference before assessing the instruction change, unless that complete content was already supplied.
       Packet A is direct evidence for the exact target and current verifier.
       Packet B is a lint proxy and does not establish evidence-attribution behavior.

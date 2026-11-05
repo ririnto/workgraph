@@ -24,17 +24,18 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/delivery/references/plugin-updates.md` | Plugin maintainers | The reference selects requested-host update commands once the version reaches its authorized distribution source. |
 | `skills/workflow/SKILL.md` | Any invoker until host and role admission | The shared entry point checks Claude Code Main identity before loading restricted procedures. |
 | `skills/workflow/references/claude-code-main.md` | Admitted Claude Code Main Agent only | The procedure owns execution, read-only design, and result verification. |
-| `skills/workflow/references/authoring.md` | Admitted Claude Code Main Agent only | The reference owns script construction, mapping, recovery, and bundled-source caller contracts. |
+| `skills/workflow/references/authoring.md` | Admitted Claude Code Main Agent, or a Worker drafting a script for Main | The reference owns script construction, mapping, recovery, and bundled-source caller contracts. |
 | `workflows/` | Claude Main using Workflow | Native JavaScript workflow definitions use plugin discovery without another runner. |
 | `skills/workflow/references/delivery.md` | Admitted Claude Code Main Agent building delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
 | `skills/development/references/lint-rules.md` | Agents selecting, developing, configuring, or assessing authorized lint tools and rules | Agents follow rule selection, fixture, safe-fix, and rollout guidance. |
-| `skills/writing/SKILL.md` | Agents doing prose or instruction work | Agents follow prose defaults and select instruction design for agent-facing work. |
+| `skills/writing/SKILL.md` | Agents doing Markdown, YAML, or instruction work | Agents follow source conventions and select instruction design for agent-facing work. |
 | `skills/writing/references/instruction-design.md` | Agents drafting, editing, or reviewing agent instructions | Agents follow prompt task contracts, source separation, loading boundaries, and instruction validation. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents follow the complete owner-mediated lifecycle, scoped activity, preservation, and result verification procedure. |
 | `skills/codex-scoped-cleanup/references/native-attachments.md` | Codex agents changing Worktree Artifact connections | Agents follow connection inventory, removal, and recovery guidance for the selected scope. |
+| `skills/codex-scoped-cleanup/references/worktrees-caches.md` | Codex agents archiving, restoring, or removing worktrees or caches | Agents follow worktree archive and restore, removal, cache preservation, and physical-cleanup verification guidance. |
 | `docs/verification-map.md` | Maintainers | Maintainers connect Workgraph behavior to its current commands and evidence boundaries. |
 | `docs/research.md` | Maintainers | Maintainers connect external evidence to design choices and state its limits. |
 | `docs/model-effort-evidence.md` | Maintainers | Maintainers compare external model benchmarks and workload limitations. |
@@ -62,10 +63,11 @@ Delivery's plugin-update reference selects the requested host's commands without
 
 Main Agent mode remains the stable public entry at `skills/main-agent-contract/SKILL.md` under `/workgraph:main-agent-contract`.
 Its activation description identifies the mode without adding another public entry.
-Main and Worker select conditional skills by plain skill name when their stated task scope applies.
+Main and Worker read conditional skills through bundled `SKILL.md` links when their stated task scope applies, because every skill blocks model invocation.
 Development's conditional loading keeps unrelated lifecycle and language guidance out of task context.
 Lint authoring and assessment, assigned queue handling, and agent-instruction design each have a focused reference with an explicit read trigger.
-Writing owns prose, the agent-facing prompt task contract, and source or example separation.
+Writing owns Markdown and YAML source conventions, the agent-facing prompt task contract, and source or example separation.
+General human-facing prose style belongs to a separate writing plugin, not Workgraph.
 Workflow stays focused on its lower-level native operation without repeating the Main contract or Delivery checklist.
 Host adapters stay at user altitude and link to role references and sole policy owners.
 Contributor guidance identifies these directories and forbids duplicate same-context operational rules.
@@ -244,7 +246,7 @@ Workgraph contributor reviews follow the scoped policy in [docs/reviews.md](revi
 
 The [Claude Main reference](../skills/main-agent-contract/references/claude-code.md) is the sole owner of Workflow selection policy.
 The shared [Workflow entry point](../skills/workflow/SKILL.md) exposes only its host-and-role admission contract, including for direct invocation and subagent preloading.
-Its frontmatter blocks model invocation, so Main reads its `SKILL.md` and references directly while `/workgraph:workflow` remains the user form.
+Like every Workgraph skill, it blocks model invocation, so Main reads its linked `SKILL.md` and references directly while `/workgraph:workflow` remains the user form.
 Its [Claude Main procedure](../skills/workflow/references/claude-code-main.md) owns execution, design, result acceptance, and its own conditional reference loading.
 The [authoring reference](../skills/workflow/references/authoring.md) covers native source and run-specific script copies, while the [delivery reference](../skills/workflow/references/delivery.md) maps Delivery requirements to nodes.
 Worker reads the authoring reference only when its assignment asks for a drafted script, and no reference has a non-Claude caller.
@@ -321,7 +323,6 @@ Behavioral evaluation requires a host run with the changed plugin loaded.
 The maintained cases cover single and parallel independent Agent selection, bundled-source Workflow invocation, expected continuation, and both conditional follow-up outcomes.
 Additional cases check an idle background command and an Agent completion callback.
 The communication case checks a worker handoff and the requested language of the human report.
-The failure-reporting case preserves partial success, distinguishes unresolved and confirmed causes, and rejects invented repairs.
 The test-design case checks independent expectations, legitimate structural contracts, and proportionate verification of prose changes.
 The delivery-decision case covers scoped Git authority, proportional review, current-unit gates, authorized recovery, true boundaries, and isolated parallel work.
 The user-directed-defaults case checks explicit procedural choices and repository scope without arbitrary age or archive filters.
