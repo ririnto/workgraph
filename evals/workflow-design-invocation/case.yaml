@@ -7,9 +7,11 @@ execution:
   timeout_seconds: 1200
   allowed_tools:
     - Read
-    - Skill(workgraph:workflow)
   prompt: |-
-    Load Skill(workgraph:workflow) and use its read-only design guidance.
+    Read the bundled `skills/workflow/SKILL.md` and its references unless their complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
+    Use its read-only design guidance.
+    Derive its path from the session's loaded skill base directory when no path is known.
     Design a bounded in-memory LRU cache for a single-process request router.
     The capacity must never be exceeded, cache hits must refresh recency, and eviction order must be deterministic.
     The cache must not persist data or perform network operations.
@@ -26,7 +28,9 @@ graders:
     focus: trace
     criteria: |-
       Judge the observed tool trace and final report together.
-      Require the session to load Skill(workgraph:workflow) and produce a substantive candidate addressing all three cache requirements and product constraints.
+      Require the complete bundled `skills/workflow/SKILL.md` and its references.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
+      Require the session to produce a substantive candidate addressing all three cache requirements and product constraints.
       Require architecture, interfaces or operations, decisions, failure behavior, and a requirement-to-design mapping.
       Require representative regression and evaluation cases with observable outcomes and distinguish proposed checks from executed checks.
       Require the response to report that independent verification is unavailable and the design is incomplete rather than accepted.

@@ -4,11 +4,8 @@
 
 Complete authorized work under native Codex execution rules and report results directly.
 Use available authorized host controls for independent and dependent assignments.
-Inspect unreadable native-assignment failures and try a supported form that preserves the required task scope.
-Use a plain read-only CLI context when it is an authorized, equivalent fallback.
 Let Main review the full posted diff when independent review remains blocked and an authorized fallback permits it.
 Use the host's supported wait controls to collect required results.
-Codex does not provide Claude Code's native Workflow tool.
 
 ## Subagent context
 
@@ -44,7 +41,7 @@ Inspect actual worker status and continue supported waiting without duplicate di
 
 ## Resource cleanup
 
-Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read Codex Scoped Cleanup.
+Before retiring sessions, worktrees, recovery copies, caches, or Worktree Artifact connections, read [Codex Scoped Cleanup](../../codex-scoped-cleanup/SKILL.md).
 Skip this read when its complete content is already loaded.
 
 ## Model selection
@@ -58,3 +55,8 @@ For native Codex invocations, use the host-confirmed full model ID, never a bare
 
 Verify that each request returns a result.
 Report unavailable or substituted settings using host evidence, and substitute only when permitted.
+
+## Skill loading
+
+Workgraph skills disable implicit invocation, so read each linked `SKILL.md` from its bundled path.
+Users select them explicitly.

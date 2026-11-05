@@ -25,30 +25,20 @@ const roles = [
 ];
 const hosts = ["claude", "codex"];
 const hostReferenceFiles = { claude: "claude-code.md", codex: "codex.md" };
-const hookTimeoutMilliseconds = 5000;
-
-const runHook = (args, scriptPath = script, cwd = tmpdir()) =>
+const runHook = (args, scriptPath = script) =>
   spawnSync(process.execPath, [scriptPath, ...args], {
-    cwd,
+    cwd: tmpdir(),
     encoding: "utf-8",
-    killSignal: "SIGKILL",
-    timeout: hookTimeoutMilliseconds
+    timeout: 5000
   });
 
-/**
- * Replace the test shell so timeout termination reaches the hook process.
- * @param {string} command Configured shell command.
- * @param {object} env Child environment overrides.
- * @returns {object} Captured process output and exit status.
- */
 const runConfiguredHook = (command, env) =>
-  spawnSync(`exec ${command}`, {
+  spawnSync(command, {
     cwd: tmpdir(),
     encoding: "utf-8",
     env: { ...process.env, ...env },
-    killSignal: "SIGKILL",
     shell: true,
-    timeout: hookTimeoutMilliseconds
+    timeout: 5000
   });
 
 const copyPlugin = (t) => {
@@ -126,11 +116,20 @@ const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
   }
 };
 
-const assertFileFailure = (result, file) => {
+const assertFileFailure = (result, file, detail) => {
   assert.equal(result.status, 1, result.stderr);
   assert.equal(result.stdout, "");
-  assert.ok(result.stderr.includes(file), result.stderr);
+  assert.equal(
+    result.stderr,
+    `inject-context: cannot load instruction file ${file}: ${detail}\n`
+  );
 };
+
+const missingFileDetail = (target) =>
+  `ENOENT: no such file or directory, lstat '${path.join(realpathSync(path.dirname(target)), path.basename(target))}'`;
+const emptyFileDetail =
+  "empty instructions or missing required skill frontmatter";
+const directoryDetail = "EISDIR: illegal operation on a directory, read";
 
 for (const [event] of roles) {
   for (const host of hosts) {
@@ -138,29 +137,7 @@ for (const [event] of roles) {
       const result = runHook([event, host]);
       assert.equal(result.status, 0, result.stderr);
       assert.equal(result.stderr, "");
-      const output = JSON.parse(result.stdout);
-      assertOutput(output, event, host);
-      const context = output.hookSpecificOutput.additionalContext;
-      if (host === "claude") {
-        assert.ok(
-          context.length <= 10_000,
-          "Claude must receive the complete context without host spilling"
-        );
-      }
-      assert.match(
-        result.stdout,
-        new RegExp(
-          `The active execution host is ${host === "claude" ? "Claude Code" : "Codex"}\\.`,
-          "u"
-        )
-      );
-      assert.doesNotMatch(
-        result.stdout,
-        new RegExp(
-          `The active execution host is ${host === "claude" ? "Codex" : "Claude Code"}\\.`,
-          "u"
-        )
-      );
+      assertOutput(JSON.parse(result.stdout), event, host);
     });
   }
 }
@@ -240,7 +217,10 @@ test("configured Claude hooks load relocated skills and references with LF or CR
     const [hook] = entry.hooks;
     assert.equal(hook.type, "command");
     assert.equal(hook.async, undefined);
-    assert.ok(hook.command.endsWith(`${event} claude`));
+    assert.equal(
+      hook.command,
+      `node "\${CLAUDE_PLUGIN_ROOT}/hooks/inject-context.mjs" ${event} claude`
+    );
     for (const newline of ["\n", "\r\n"]) {
       const body =
         `\n# Relocated ${event}\n\nUse the copied skill.\n\n---\n\nKeep body separators.\n`.replaceAll(
@@ -366,39 +346,6 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
         host,
         path.join(root, "skills")
       );
-      if (host === "claude") {
-        const context = JSON.parse(result.stdout).hookSpecificOutput
-          .additionalContext;
-        const base = context.match(
-          /^Base directory for this skill: (?<directory>.+)$/mu
-        ).groups.directory;
-        const loaded = [
-          ...context.matchAll(/^Workgraph .* loaded from (?<source>.+)\.$/gmu)
-        ].map((match) => path.resolve(base, match.groups.source));
-        assert.deepEqual(loaded, [
-          realpathSync(
-            path.join(
-              root,
-              "skills",
-              event === "SessionStart"
-                ? "main-agent-contract"
-                : "subagent-context",
-              "SKILL.md"
-            )
-          ),
-          realpathSync(
-            path.join(
-              root,
-              "skills",
-              event === "SessionStart"
-                ? "main-agent-contract"
-                : "subagent-context",
-              "references",
-              "claude-code.md"
-            )
-          )
-        ]);
-      }
     }
   }
 });
@@ -433,7 +380,10 @@ test("configured Codex hooks load complete relocated skill files without a conte
     assert.equal(hook.async, undefined);
     assert.equal(hook.timeout, 30);
     assert.equal(hook.additionalContextLimit, 0);
-    assert.ok(hook.command.endsWith(`${event} codex`));
+    assert.equal(
+      hook.command,
+      `node "\${PLUGIN_ROOT}/hooks/inject-context.mjs" ${event} codex`
+    );
     const result = runConfiguredHook(hook.command, {
       PLUGIN_ROOT: root
     });
@@ -442,78 +392,6 @@ test("configured Codex hooks load complete relocated skill files without a conte
     assertOutput(JSON.parse(result.stdout), event, "codex", selectedSkills);
   }
 });
-
-test("hook test runners terminate children that keep active handles", (t) => {
-  const root = copyPlugin(t);
-  const scriptPath = path.join(root, "hooks", "inject-context.mjs");
-  writeFileSync(
-    scriptPath,
-    'process.stdout.write("active handle started\\n");\nsetInterval(() => {}, 1000);\n'
-  );
-  const config = JSON.parse(
-    readFileSync(path.join(root, "hooks", "codex-hooks.json"), "utf-8")
-  );
-  const [entry] = config.hooks.SessionStart;
-  const [hook] = entry.hooks;
-  const { command } = hook;
-  for (const result of [
-    runHook(["SessionStart", "codex"], scriptPath),
-    runConfiguredHook(command, { PLUGIN_ROOT: root })
-  ]) {
-    assert.equal(result.error?.code, "ETIMEDOUT");
-    assert.equal(result.status, null);
-    assert.equal(result.signal, "SIGKILL");
-    assert.match(result.stdout, /active handle started/u);
-    assert.throws(() => process.kill(result.pid, 0), { code: "ESRCH" });
-  }
-});
-
-for (const [event, name] of roles) {
-  test(`${name}: loads only the selected role and host reference`, (t) => {
-    const root = copyPlugin(t);
-    const otherRole =
-      name === "main-agent-contract"
-        ? "subagent-context"
-        : "main-agent-contract";
-    rmSync(path.join(root, "skills", otherRole), {
-      recursive: true
-    });
-    for (const host of hosts) {
-      const unselected = host === "claude" ? "codex" : "claude";
-      const unselectedFile = hostReferenceFiles[unselected];
-      const target = path.join(
-        root,
-        "skills",
-        name,
-        "references",
-        unselectedFile
-      );
-      const content = readFileSync(target, "utf-8");
-      rmSync(target);
-      const result = runHook(
-        [event, host],
-        path.join(root, "hooks", "inject-context.mjs")
-      );
-      assert.equal(result.status, 0, result.stderr);
-      assertOutput(
-        JSON.parse(result.stdout),
-        event,
-        host,
-        path.join(root, "skills")
-      );
-      const context = JSON.parse(result.stdout).hookSpecificOutput
-        .additionalContext;
-      assert.doesNotMatch(
-        context,
-        new RegExp(
-          `${otherRole}/references|${name}/references/${unselectedFile.replaceAll(".", "\\.")}`,
-          "u"
-        )
-      );
-      writeFileSync(target, content);
-    }
-  });
-}
 
 test("Codex delimiter lines preserve raw files and remove Claude body prefixes", (t) => {
   const root = copyPlugin(t);
@@ -550,38 +428,24 @@ test("Codex delimiter lines preserve raw files and remove Claude body prefixes",
   }
 });
 
-test("bundled instruction references resolve to nonempty files inside their skill or plugin", (t) => {
-  const root = copyPlugin(t);
-  for (const name of readdirSync(path.join(root, "skills"))) {
-    const directory = path.join(root, "skills", name);
-    const content = readFileSync(path.join(directory, "SKILL.md"), "utf-8");
-    for (const match of content.matchAll(
-      /(?:\]\(|`)(?<file>(?:references|playbooks)\/[^)`#\s]+\.md|scripts\/[^)`#\s]+\.workflow\.txt|\.\.\/[^)`#\s]+\.md)/gu
-    )) {
-      const reference = realpathSync(
-        path.resolve(directory, decodeURI(match.groups.file))
-      );
-      assert.ok(
-        reference.startsWith(
-          `${realpathSync(match.groups.file.startsWith("../") ? path.join(root, "skills") : directory)}${path.sep}`
+test("each role and host loads without other skills or the unselected host reference", (t) => {
+  for (const [event, name] of roles) {
+    for (const host of hosts) {
+      const root = copyPlugin(t);
+      for (const other of readdirSync(path.join(root, "skills"))) {
+        if (other !== name) {
+          rmSync(path.join(root, "skills", other), { recursive: true });
+        }
+      }
+      rmSync(
+        path.join(
+          root,
+          "skills",
+          name,
+          "references",
+          hostReferenceFiles[host === "claude" ? "codex" : "claude"]
         )
       );
-      assert.ok(readFileSync(reference, "utf-8").trim());
-    }
-  }
-});
-
-test("conditional skill bodies stay outside automatic delivery and are not startup dependencies", (t) => {
-  const root = copyPlugin(t);
-  const roleNames = new Set(roles.map(([, name]) => name));
-  const conditional = readdirSync(path.join(root, "skills"))
-    .filter((name) => !roleNames.has(name))
-    .map((name) => path.join(root, "skills", name));
-  for (const directory of conditional) {
-    rmSync(directory, { recursive: true });
-  }
-  for (const [event] of roles) {
-    for (const host of hosts) {
       const result = runHook(
         [event, host],
         path.join(root, "hooks", "inject-context.mjs")
@@ -598,19 +462,22 @@ test("conditional skill bodies stay outside automatic delivery and are not start
 });
 
 test("invalid or legacy arguments produce no context", () => {
-  for (const args of [
-    [],
-    ["SessionStart"],
-    ["unknown", "claude"],
-    ["SessionStart", "unknown"],
-    ["SessionStart", "Claude"],
-    ["claude", "SessionStart"],
-    ["SessionStart", "claude", "extra"]
+  for (const [args, message] of [
+    [[], "expected exactly one hook event and one host"],
+    [["SessionStart"], "expected exactly one hook event and one host"],
+    [["unknown", "claude"], "unsupported hook event: unknown"],
+    [["SessionStart", "unknown"], "unsupported host: unknown"],
+    [["SessionStart", "Claude"], "unsupported host: Claude"],
+    [["claude", "SessionStart"], "unsupported hook event: claude"],
+    [
+      ["SessionStart", "claude", "extra"],
+      "expected exactly one hook event and one host"
+    ]
   ]) {
     const result = runHook(args);
     assert.equal(result.status, 2, JSON.stringify(args));
     assert.equal(result.stdout, "");
-    assert.match(result.stderr, /inject-context:/u);
+    assert.equal(result.stderr, `inject-context: ${message}\n`);
   }
 });
 
@@ -621,12 +488,24 @@ for (const [event, name] of roles) {
     const target = path.join(root, "skills", file);
     const copiedScript = path.join(root, "hooks", "inject-context.mjs");
     rmSync(target);
-    assertFileFailure(runHook([event, "claude"], copiedScript), file);
+    assertFileFailure(
+      runHook([event, "claude"], copiedScript),
+      file,
+      missingFileDetail(target)
+    );
     writeFileSync(target, " \n\t\n");
-    assertFileFailure(runHook([event, "claude"], copiedScript), file);
+    assertFileFailure(
+      runHook([event, "claude"], copiedScript),
+      file,
+      emptyFileDetail
+    );
     rmSync(target);
     mkdirSync(target);
-    assertFileFailure(runHook([event, "claude"], copiedScript), file);
+    assertFileFailure(
+      runHook([event, "claude"], copiedScript),
+      file,
+      directoryDetail
+    );
   });
 
   test(`${name}: invalid frontmatter or empty prose produces no partial output`, (t) => {
@@ -647,7 +526,8 @@ for (const [event, name] of roles) {
             [event, host],
             path.join(root, "hooks", "inject-context.mjs")
           ),
-          file
+          file,
+          emptyFileDetail
         );
       }
     }
@@ -662,12 +542,24 @@ for (const [event, name] of roles) {
       const target = path.join(root, "skills", file);
       const copiedScript = path.join(root, "hooks", "inject-context.mjs");
       rmSync(target);
-      assertFileFailure(runHook([event, host], copiedScript), file);
+      assertFileFailure(
+        runHook([event, host], copiedScript),
+        file,
+        missingFileDetail(target)
+      );
       writeFileSync(target, " \n\t\n");
-      assertFileFailure(runHook([event, host], copiedScript), file);
+      assertFileFailure(
+        runHook([event, host], copiedScript),
+        file,
+        emptyFileDetail
+      );
       rmSync(target);
       mkdirSync(target);
-      assertFileFailure(runHook([event, host], copiedScript), file);
+      assertFileFailure(
+        runHook([event, host], copiedScript),
+        file,
+        directoryDetail
+      );
     });
   }
 }

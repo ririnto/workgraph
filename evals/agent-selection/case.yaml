@@ -8,12 +8,12 @@ execution:
   allowed_tools:
     - Agent
     - Read
-    - Skill(workgraph:main-agent-contract)
-    - Skill(workgraph:workflow)
   prompt: |-
-    Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.
+    ultracode
+    Read the bundled `skills/main-agent-contract/SKILL.md` and its `references/claude-code.md` unless their complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
     Delegate one bounded read-only assessment that ends in one phase to a worker.
-    No dependent follow-up phase is expected.
+    The assessment is complete in this phase, with no expected follow-up phase.
     Give that worker both batches and report its result in Main.
     A finding blocks release if its required timeout is absent.
     Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
@@ -35,9 +35,10 @@ graders:
     type: llm
     focus: trace
     criteria: |-
-      Require Main's contract and selected Claude reference to be loaded before delegation.
+      Require the complete bundled Main contract and selected Claude reference to be loaded before delegation.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       Require one completed Agent assessment that receives both batches and applies the timeout rule.
-      The assessment ends in one phase without an expected follow-up, so Main uses direct Agent rather than Workflow.
+      The assessment is single-phase work with no expected follow-up phase, so Main uses direct Agent rather than Workflow despite the ultracode keyword.
       Main must use that worker's actual result to identify the blockers.
       An irrelevant Agent call, missing worker result, or report before completion fails this check.
       The final report identifies A1 and B2 as the only blockers.

@@ -70,18 +70,24 @@ const validateFields = (metadata, report) => {
 };
 
 const validateInvocation = (metadata, report) => {
-  for (const [key, allowed] of [
-    ["disable-model-invocation", [false, 0, "false", "no", "off", "0"]],
-    ["user-invocable", [true, 1, "true", "yes", "on", "1"]]
+  for (const [key, allowed, requirement] of [
+    [
+      "disable-model-invocation",
+      [true, 1, "true", "yes", "on", "1"],
+      "must be true."
+    ],
+    [
+      "user-invocable",
+      [true, 1, "true", "yes", "on", "1"],
+      "must keep the skill user-invocable."
+    ]
   ]) {
-    if (Object.hasOwn(metadata, key)) {
+    if (key === "disable-model-invocation" || Object.hasOwn(metadata, key)) {
       const value = metadata[key];
       const normalized =
         typeof value === "string" ? value.toLowerCase() : value;
       if (!allowed.includes(normalized)) {
-        report(
-          `${key} must keep the skill model-invocable and user-invocable.`
-        );
+        report(`${key} ${requirement}`);
       }
     }
   }
@@ -181,6 +187,29 @@ const run = () => {
     } catch (error) {
       errors.push(
         error.code ? `${source}: skill file must be readable.` : error.message
+      );
+    }
+    const policySource = path.join(
+      "skills",
+      directoryName,
+      "agents/openai.yaml"
+    );
+    try {
+      const content = readFileSync(bundledPath(root, policySource), "utf-8");
+      try {
+        if (yamlParser(content)?.policy?.allow_implicit_invocation !== false) {
+          errors.push(
+            `${policySource}: policy.allow_implicit_invocation must be false.`
+          );
+        }
+      } catch {
+        errors.push(`${policySource}: policy file must contain valid YAML.`);
+      }
+    } catch (error) {
+      errors.push(
+        error.code
+          ? `${policySource}: policy file must be readable.`
+          : error.message
       );
     }
   }

@@ -30,6 +30,9 @@ See the official [plugin guide](https://learn.chatgpt.com/docs/plugins.md) for s
 | Other supported skill clients | Use the client's skill picker or name the required Workgraph skill. |
 
 The native `.codex-plugin/plugin.json` selects the shared `skills/` directory and `hooks/codex-hooks.json`.
+Each skill's `agents/openai.yaml`, such as [the workflow policy](../../skills/workflow/agents/openai.yaml), sets `policy.allow_implicit_invocation: false`.
+Codex then hides Workgraph skills from the model prompt while explicit selection still loads them.
+Main and Worker read the linked bundled files instead, as the [source review](../research.md#claude-code-workflow-and-subagent-contracts) describes.
 The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks.md#plugin-bundled-hooks) documents this native hook registration.
 Root `plugin.json` is intentionally absent because Codex `0.166.0` and the reviewed main source skip hook discovery for its portable Agent Plugins format.
 See the [source review](../research.md#codex-native-hook-discovery-and-trust) for the difference between advertised extension support and the actual loader path.

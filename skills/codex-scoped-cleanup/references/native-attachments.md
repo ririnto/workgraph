@@ -37,5 +37,4 @@ Have the owner use a verified supported attach or restore operation for authoriz
 
 After removal, obtain a fresh supported owner listing.
 Verify that selected tuples are absent and protected tuples remain unchanged.
-Check partial effects after an error and retry only with changed evidence and a bounded stopping condition.
 If removal is unsupported, report the exact remaining connections and limitation.

@@ -3,15 +3,24 @@
 ## Orchestration
 
 Use supported callback and wait controls for pending host operations.
-Read Workflow for phase selection and execution.
+After background Agent or Workflow dispatch and other ready work, end the turn with a short reply.
+
+### Select Agent or Workflow
+
+Neither the `ultracode` keyword nor its session setting forces Workflow use.
+Use Workflow only for work with expected follow-up phase expansion or genuinely multi-phase work, including required joins and follow-up phases conditional on predecessor results, even if the first invocation has one phase.
+Do not use Workflow for single-phase work with no expected follow-up phase.
+Use Agent for that single-phase work, including independent one-phase assignments.
+Exclude speculative future tasks and display-only phases.
+Only the Claude Code Main Agent may start Workflow.
+Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) unless fully loaded.
+Read linked Workgraph skills with Read because `Skill` refuses them.
+Native worktree tools are `EnterWorktree` and `isolation: "worktree"`.
 
 ## Model selection
 
-Select model tier and effort from the concrete task's difficulty and boundedness, not its role or work kind.
 For ordinary tasks, choose the lowest sufficient tier.
 Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
-Respect model exclusions or request-only choices when the user or project actually sets them.
 
-Resolve available models and effort settings through the host's supported controls.
-Verify that the selected settings are supported and that each request returns a result.
+Verify selected settings are supported and each request returns a result.
 Report unavailable or substituted settings using host evidence, and substitute only when permitted.

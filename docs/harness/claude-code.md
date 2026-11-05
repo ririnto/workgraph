@@ -78,13 +78,17 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:delivery` | Load Main's repository delivery procedure. |
 | `/workgraph:workflow` | Request native Claude Code Workflow or load its design guidance. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
-| `/workgraph:writing` | Load prose, Markdown, and instruction design guidance. |
+| `/workgraph:writing` | Load Markdown, YAML, and instruction design guidance. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
+
+Every Workgraph skill blocks model invocation, so these slash forms stay the user entries and models read the linked `SKILL.md` files directly.
+Locate a file by a search ending in `skills/<name>/SKILL.md` when no path is known.
 
 Manual role invocation reads its Claude reference unless that complete content is already present.
 Invoking a skill does not create a dispatch, change the session's role, or grant permissions.
 The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.
-[Workflow](../../skills/workflow/SKILL.md) owns its selection, authoring, execution, and result-mapping procedure.
+Main's [Claude reference](../../skills/main-agent-contract/references/claude-code.md) owns tool selection.
+The shared [Workflow entry point](../../skills/workflow/SKILL.md) admits only Claude Code Main before loading its execution procedure.
 Codex Scoped Cleanup does not authorize Codex resource operations when invoked in Claude Code.
 
 ## Evaluate discovery and outcomes
@@ -95,7 +99,6 @@ The `triggering` cases exercise natural requests without naming the expected ski
 
 | Case | Expected behavior |
 | --- | --- |
-| [Writing request](../../evals/writing-natural-trigger/case.yaml) | Load Writing and preserve the supplied facts while revising prose. |
 | [Source correction](../../evals/development-natural-trigger/case.yaml) | Load Development and correct the supplied function without claiming execution. |
 | [Workflow near miss](../../evals/workflow-keyword-near-miss/case.yaml) | Explain GitHub Actions without invoking Workgraph's native Workflow procedure. |
 

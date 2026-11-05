@@ -8,9 +8,9 @@ execution:
   timeout_seconds: 240
   allowed_tools:
     - Read
-    - Skill(workgraph:main-agent-contract)
   prompt: |-
-    Load Workgraph Main Agent Contract and its complete bundled references/codex.md unless already present.
+    Read the bundled `skills/main-agent-contract/SKILL.md` and its `references/codex.md` unless their complete content is already present.
+    The `Skill` tool refuses Workgraph skills, which is expected.
     Resolve the reference from the loaded skill's directory.
     Assess the synthetic Codex environments below without changing the active host's identity or tools.
     This is a read-only policy assessment, not permission to dispatch workers or perform the simulated work.
@@ -60,7 +60,7 @@ graders:
     focus: trace
     criteria: |-
       Require the complete bundled Main Agent Contract and its references/codex.md before the assessment.
-      Accept successful Skill or Read results and complete content already supplied in the observed context.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       A mention, description, failed read, or the Claude reference alone does not establish Codex-reference loading.
       Reading the Codex reference does not establish that the active evaluation host is Codex.
   - name: context-and-continuation-decisions

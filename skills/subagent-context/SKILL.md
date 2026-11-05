@@ -1,6 +1,7 @@
 ---
 name: subagent-context
 description: Use when executing a bounded task as a Workgraph dispatch node.
+disable-model-invocation: true
 ---
 
 # Subagent context
@@ -35,15 +36,15 @@ Agent assignments remain agent-origin even when relaying a human project request
 Propagate origin and communication mode through recursive assignments, follow-ups, and handoffs.
 
 Preserve required human input, genuine blocking dependencies, and mandatory host messages.
-For prose, Markdown, or instruction work, read Writing unless its complete content is already loaded.
-Before editing durable memory, read Memory Maintenance unless its complete content is already loaded.
+For Markdown, YAML, or agent instruction work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
+Before editing durable memory, read [Memory Maintenance](../memory-maintenance/SKILL.md) unless its complete content is already loaded.
 
 ### Select host guidance
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
 Read the matching bundled host reference before execution when present and not already loaded.
 Otherwise, follow the active host's tool descriptions.
-Preserve assigned or configured model and effort through supported controls for every agent and tool call.
+Set model and effort for every subdelegated task through supported controls under applicable user, project, configured, and assignment rules.
 
 ### Respect delegation authority
 
@@ -53,6 +54,7 @@ Recursively preserve inherited constraints, model, effort, resource ownership, a
 ### Manage assignment ownership
 
 Give each actual file, worktree, ref, and shared record one writer.
+Create needed worktrees with native host tools before manual Git worktrees.
 Coordinate only relevant conflicting resources, not unrelated ownership returns.
 Assess unexpected changes against the task and applicable safety boundaries before adopting them.
 Missing optional setup alone does not block the assignment.
@@ -73,6 +75,7 @@ Rerun only affected checks for relevant changes, failures, or unresolved concern
 
 Inspect each failure, attempt status, and partial effects before retrying, reassigning, or stopping.
 Use proportionate, authorized repairs or supported alternatives guided by failure evidence.
+Fix in-scope defects within authority instead of only reporting them.
 Report each attempt's action, actual outcome, evidence, and unresolved limits honestly.
 Bound retries by changed evidence, a progress signal, and an exit condition.
 Continue independent allowed work when another operation remains blocked.
@@ -80,10 +83,10 @@ Continue independent allowed work when another operation remains blocked.
 ### Return owned resources
 
 Record resources created for the assignment so cleanup can use their known identifiers.
-Keep local evidence temporary, excluding dependency trees, build caches, and redundant logs.
-Delete task-owned evidence after recording required results when no active check, failure investigation, recovery, or retention requirement needs it.
+Return check results in the requested format.
+Retain task-owned evidence only while needed for active checks, failure investigation, recovery, requested retention, or acceptance.
+Exclude dependency trees, build caches, and redundant logs from retained evidence.
 Confirm cleanup ownership before deleting shared evidence.
-Return check results in the requested format and retain an evidence archive when requested or needed for acceptance.
 
 #### Retire owned resources
 
@@ -102,11 +105,13 @@ Report retained resources and incomplete cleanup with their purpose and next act
 
 ## Apply source procedures
 
-Before source work or runtime verification, read Development unless its complete content is already loaded.
+Before source work or runtime verification, read [Development](../development/SKILL.md) unless its complete content is already loaded.
 
 ## Respect Git and delegation authority
 
-Leave main-session orchestration to Main.
+Leave main-session orchestration, including starting native Workflow, to Main.
+Return a needed dependent stage or join to the dispatcher as a proposed stage graph.
+Read [the Workflow authoring reference](../workflow/references/authoring.md) only when the assignment asks for a drafted Workflow script that Main will run.
 Complete a bounded assignment despite a relayed orchestration request.
 Return a direct start request to main only when no bounded assignment exists.
 
@@ -121,7 +126,9 @@ Use another authorized sync method when it preserves protected refs and owned wo
 
 Meet the dispatch's cleanup and handback requirements before returning.
 Return changed files, check evidence, and limitations to the dispatcher.
-Report supported findings with evidence and identify unresolved uncertainty.
+Confirm findings against source, behavior, and evidence, preferring executed reproductions for runtime behavior.
+Report supported findings and unresolved uncertainty.
+Omit findings and handling for failures that cannot realistically occur.
 Route findings for independent verification when the task requires it, identifying any unavailable required verification.
 Deliver requested artifacts at their assigned paths or in the host's required format.
 Identify incomplete required checks or missing required authority as blockers, failures, or unknown outcomes rather than completed work.

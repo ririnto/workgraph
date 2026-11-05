@@ -1,0 +1,3 @@
+# Block implicit model invocation while keeping user invocation available.
+policy:
+  allow_implicit_invocation: false

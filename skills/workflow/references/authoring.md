@@ -91,7 +91,7 @@ Keep retry limits independent of the token budget.
 
 ## Validate phases and results
 
-Treat `null`, missing fields, malformed values, and unsupported evidence as incomplete.
+Treat malformed result values as incomplete evidence.
 Do not filter required results by truthiness to turn failures into success.
 Distinguish a valid empty result, such as `{ findings: [] }`, from a failed or missing result.
 Validate every required result before starting its dependent stage.
@@ -99,7 +99,7 @@ A malformed JSON Schema can fail before the agent runs.
 A required name missing from a schema's `properties` may not fail as expected.
 Treat schema validation as a format check, not proof of acceptance.
 Validate finding identifiers and evidence before synthesis or confirmed reporting.
-When independent verification is required, pass candidates to a verifier independent of the finder and fixer.
+Pass candidates to a separate verifier stage when the Main Agent Contract requires independent verification.
 Require its result for every candidate covered by that acceptance requirement.
 Retain confirmed, refuted, and unverified outcomes separately, including missing or inconclusive verifier results.
 Do not present schema validation, majority votes, or the finder's self-check as independent verification.
@@ -163,6 +163,5 @@ Earlier versions can rerun completed agents from multi-agent pipeline or paralle
 Before editing, consider cache hits for completed earlier phases and agent calls.
 Preserve their prompts, options, labels, and arguments when accepted inputs remain unchanged.
 Edit the stored script and pass `scriptPath` with `resumeFromRunId` to append needed stages and reuse valid completed calls.
-Preserve accepted evidence only while behavior, inputs, configuration, and toolchain remain relevant.
 Inspect actual native cache-hit evidence before claiming reuse.
 A cache hit avoids repeated work but does not prove acceptance.

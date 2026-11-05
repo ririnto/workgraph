@@ -8,12 +8,14 @@ execution:
   allowed_tools:
     - Workflow
     - Read
-    - Skill(workgraph:workflow)
   prompt: |-
     Use the planning-only run of the Workgraph delivery sample.
-    Read the complete workflow skill and its bundled workflows/delivery-simple.js source.
+    Read the bundled `skills/workflow/SKILL.md` and its `workflows/delivery-simple.js` source unless their complete content is already present.
+    Resolve both paths from the Main contract's base directory in the session context.
+    The `Skill` tool refuses Workgraph skills, which is expected.
     Invoke the registered workgraph:delivery-simple workflow.
     Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.
+    Name the absolute paths of `docs/workflow-samples.md` and `workflows/delivery-simple.js` in `args.task`, because stages can read those files but cannot search outside the working directory.
     Keep scope separation, exploration, and planning enabled.
     Because this request edits nothing and publishes nothing, skip implementation, integration, sweep, publication, and review through structured args.skips.
     Run exactly one native Workflow invocation.
@@ -33,14 +35,14 @@ graders:
     focus: trace
     criteria: |-
       Judge the observed tool trace, Workflow results, and final report together.
-      Require the session to use Skill(workgraph:workflow) and read the complete maintained delivery-simple.js source.
+      Require the complete bundled `skills/workflow/SKILL.md` and maintained `workflows/delivery-simple.js` source.
+      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       Require its first native Workflow call to use the registered workgraph:delivery-simple name.
       Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
       A freshly authored replacement graph or an inline script does not establish source consumption.
-      Require actual completed results from the scope phase and one explorer per returned scope.
-      Require each such result to match the schema that the maintained source declares.
+      Judge stage results only from the returned `scopes` and `explorations` fields, because stage prompts are not in the trace.
       Require the returned phase evidence to record Scope and Explore as completed.
-      Require the plan input to contain the actual returned scopes and each explorer's summary and risks.
+      Require one returned exploration per returned scope, each with a summary, risks, and evidence.
       Require the plan phase to run and its record to be completed or failed.
       Accept a failed plan record only with the source's own validation or agent-failure reason.
       Require every later phase record to be skipped with the nonempty reason that the source records for that outcome.

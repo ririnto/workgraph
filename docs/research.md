@@ -27,7 +27,7 @@ Markdown endpoints were used when available, with extensionless official pages a
 | [Common workflows](https://code.claude.com/docs/en/common-workflows) and [native Workflow](https://code.claude.com/docs/en/workflows) | Preserve native execution, deterministic replay, permission boundaries, and explicit completion evidence. |
 | [Copilot plugins](https://docs.github.com/en/copilot/concepts/customizations/plugins) | Use portable skills and document the CLI's compatible marketplace installation route. |
 | [Cursor plugins](https://cursor.com/docs/plugins) and [plugin reference](https://cursor.com/docs/reference/plugins) | Use the native Cursor manifest for shared skills and the documented catalog for repository discovery. |
-| [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Preserve Writing's direct prose while retaining factual software actors, meaningful qualifiers, and technical conditions. |
+| [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Keep human-facing prose style outside Workgraph's narrowed Writing scope. |
 
 Workgraph uses native Codex, Claude, Cursor, and OpenPlugin descriptors because the reviewed Codex portable loader omits hooks.
 They select one shared skills tree and explicit host-specific hook configurations.
@@ -216,8 +216,8 @@ The new byte-boundary regression detects native content loss that those existing
 The i-have-adhd [evaluation report](https://github.com/ayghri/i-have-adhd/blob/main/evals/RESULTS.md) records an August 2 run using Claude Code 2.1.220 and `claude-opus-4-8`, with three trials per case.
 Its partial-success case includes an unsupported authentication diagnosis, and the report proposes unconditional cause-first wording as a possible explanation.
 It does not establish that mechanism or measure current Workgraph behavior.
-Writing now separates the observed failure, supported cause, and next diagnostic when the cause remains uncertain.
-The [failure-reporting case](../evals/writing-failure-evidence/case.yaml) includes both unresolved and confirmed causes so caution does not erase available evidence.
+Earlier Writing versions separated the observed failure, supported cause, and next diagnostic when the cause remained uncertain.
+That general reporting guidance now belongs to a separate writing plugin, so Workgraph no longer bundles it or its failure-reporting case.
 
 These adaptations retain user-directed style, proportional review, valid evidence reuse, and Claude-only native Workflow.
 They add no universal design-approval gate, fixed list length, mandatory skill-activation threshold, or repository activity filter.
@@ -273,7 +273,7 @@ It recommends a clear task, relevant context, roles, restrictions, and an explic
 | --- | --- |
 | State the task, context, constraints, output, and completion criteria explicitly. | Writing already requires these elements in agent-facing task contracts. |
 | Audit loaded instruction sources for conflicts and ambiguity. | Writing already audits loading points and replaces conflicting consumers. |
-| Use concise and explicit output expectations. | Writing owns agent-facing contracts and presentation. |
+| Use concise and explicit output expectations. | Writing owns agent-facing contracts and Markdown and YAML source conventions. |
 | Scale checks to the change and keep initiative within scope. | Development and the role contracts route checks and authority. |
 | Keep rules short and aligned with real tool schemas. | Role bodies and host references match native loading formats and tool contracts. |
 | Use examples where they clarify a decision boundary. | Writing owns contrasting examples for decision boundaries. |
@@ -468,7 +468,8 @@ Main and Worker route prose, instruction design, and source work to bundled task
 Those skills retain their own procedures and conditional language references.
 Consumer references remain inside their owning plugin so installation and activation do not depend on another plugin.
 The hook names loaded source paths so the model can locate references and recognize content already present.
-All skills remain user-invocable and model-invocable.
+All skills remain user-invocable and block model invocation, following the installed pstack `0.15.36` boundary.
+Each frontmatter sets `disable-model-invocation: true`, and role bodies and references link the bundled `SKILL.md` files that models read directly.
 Claude defaults `user-invocable` to `true`, so Workgraph omits that redundant frontmatter field.
 Their bodies define role and scope boundaries independently of invocation metadata.
 Claude's installed Skill loader strips YAML, preserves trailing body whitespace, and prepends a base-directory line.
@@ -477,8 +478,8 @@ Codex's [versioned skill renderer](https://github.com/openai/codex/blob/rust-v0.
 The hooks match these instruction text fragments and identify already-loaded sources outside them.
 They cannot reproduce native message roles or tool-call envelopes.
 The [delivery design](design.md#deliver-context) records this boundary.
-Workflow's description states its activation boundary, and its body defines dependency gates without repeating Main's finding classifications.
-Its delivery reference maps node inputs and outputs for authorized engineering delivery.
+Workflow's shared body checks host and role admission before loading its Claude Main execution reference.
+That reference owns dependency gates and conditionally loads its authoring and delivery mappings without repeating Main's finding classifications.
 Main and Worker inspect failures and partial effects before reasonable authorized retries or alternative supported forms.
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
@@ -502,7 +503,7 @@ GitHub references use branches or tags so maintainers can inspect the current im
 | Notifications, no polling, fresh-context briefing, and checking delegated changes. | Installed Claude Code Agent tool descriptions provide these instructions in their foreground and background variants. | Retain resource ownership and acceptance criteria instead of repeating Agent usage. |
 | Reading an existing file before writing it. | Installed Claude Code Write tool descriptions require the read in both regular and lean variants. | Remove the repeated read-before-edit rule. |
 | Workflow opt-in, native authoring, journals, resume identifiers, cache invalidation, and later-call reruns. | Installed Claude Code Workflow descriptions and their native authoring reference define these mechanics. | Keep graph-specific acceptance and conservative append-only recovery guidance in the bundled Workflow reference. |
-| Native delegation without Claude Code Workflow. | Codex's [tool registration](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/spec_plan.rs) registers agent lifecycle and messaging tools. | Route Claude orchestration selection to Workflow and use native delegation in Codex. |
+| Native delegation without Claude Code Workflow. | Codex's [tool registration](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/spec_plan.rs) registers agent lifecycle and messaging tools. | Keep host-specific selection in Main's selected host reference. |
 | Peer messages cannot grant permission or bypass denied actions. | Installed Claude Code SendMessage descriptions and peer-message reminders define these restrictions. | Remove repeated permission-laundering warnings. |
 
 Native Workflow probes confirmed item-local pipeline progression, unawaited agents not starting, all-null early returns, and same-run append reuse.
@@ -679,6 +680,25 @@ Its abstract describes persistent memory, compensation, and independent validati
 It motivates checking partial effects before retrying a write.
 Workgraph does not implement transactions, automatic compensation, or durable recovery.
 
+### Lauren Tan on loops and pstack
+
+We read Lauren Tan's articles [Coding is Dead, Long Live Engineering](https://x.com/poteto/article/2014823103239749881), [Loops You Can Trust](https://x.com/poteto/article/2069824386283319343), the pstack guide [part 1](https://x.com/poteto/article/2094457600259842065) and [part 2](https://x.com/poteto/article/2097732320606507506), and [Coding is dead, long live Coding](https://x.com/poteto/article/2103571281014861957).
+We also read the posts on [adversarial review](https://x.com/poteto/status/2117437607940681849) and [game development practice](https://x.com/poteto/status/2117043478140276847).
+These are practitioner reports, not controlled Workgraph evaluations.
+
+| Lesson | Workgraph application |
+| --- | --- |
+| Artifacts beat plausible explanations, and abstract review drifts into nitpicks. | Main prefers an executed reproduction for runtime findings, and the delivery verifier requests one when safe. |
+| Evidence should travel with the work it supports. | The delivery samples now pass exploration evidence to planning and return sweep evidence. |
+| Configured settings must reach every stage. | Main and Worker set model and effort for each dispatch, and the delivery samples accept per-stage effort. |
+| Encode recurring corrections in structure. | The skill metadata gate requires the invocation policy and each Codex policy file. |
+| pstack hides its skills from the model and reads them by path. | All Workgraph skills block model invocation and link their bundled files. |
+
+pstack already owns verification-skill creation, decision logs, design arenas, intent restatement, and formal verification.
+Workgraph adds none of them, and its narrowed Writing skill leaves general prose style to a separate writing plugin.
+Comment bans, path-encoded lint contexts, and size budgets apply to specific projects rather than to Workgraph's consumer defaults.
+The changes remain unverified for model adherence until behavioral evaluations cover them.
+
 ### Bounded feedback and review evidence
 
 We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md).
@@ -734,20 +754,8 @@ Foreground timeout normally moves an unfinished command to the background when t
 The [background execution limit](https://code.claude.com/docs/en/tools-reference#time-limit-for-background-commands) is separate from that transition.
 An explicit background command's timeout can stop the command when its background deadline applies.
 Foreground timeout, background execution duration, and wait yield duration are separate controls.
-The [Monitor tool](https://code.claude.com/docs/en/tools-reference#monitor-tool) delivers command output or external events while the conversation continues.
-Main and Worker consider Monitor when available, without adding a watch timeout recommendation.
-Its watch deadline is separate from Bash's foreground timeout and Codex's wait yield duration.
-The installed tool uses a feature gate, so availability depends on the active host.
-Claude Code's [scheduled tasks](https://code.claude.com/docs/en/scheduled-tasks) support fixed loops through `/loop`.
-Dynamic loops use `ScheduleWakeup`.
-There is no global loop-interval setting, and scheduled prompts can wait until the current turn ends.
-The [goal check-in setting](https://code.claude.com/docs/en/env-vars) accepts `CLAUDE_CODE_GOAL_CHECKIN_MINUTES=4` in the installed runtime.
-That changes the first deferred-goal check-in from thirty minutes to four minutes.
-Later [goal check-ins](https://code.claude.com/docs/en/goal#background-work-defers-evaluation) back off to eight and sixteen minutes, with at most three idle deliveries between user prompts.
-This setting does not create a cron task or restart an exited process.
-The [cache lifetime](https://platform.claude.com/docs/en/build-with-claude/prompt-caching#faq) normally lasts five minutes and refreshes when a request uses the cached content.
-Claude Code's [cache defaults](https://code.claude.com/docs/en/prompt-caching) vary by provider and request type.
-A `270000` ms interval does not prove cache reuse because queueing, model changes, or prefix changes can prevent it.
+The [Monitor tool](https://code.claude.com/docs/en/tools-reference#monitor-tool) can deliver command output or external events when the active host makes it available.
+The selected role reference defers pending operations to supported callback and wait controls.
 The official [Claude Code tools reference](https://code.claude.com/docs/en/tools-reference) lists `TaskOutput` as deprecated.
 The official [changelog](https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md#21277) records its removal in version 2.1.277.
 The installed Claude Code 2.1.288 settings schema states that `TaskOutput` was removed and `taskOutputMaxChars` has no effect.
@@ -983,7 +991,34 @@ Source checks establish instruction delivery, while native execution, installed 
 The official [Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) describe host execution.
 Workgraph retains dependency selection, role ownership, evidence freshness, and delivery gates.
 The native tool defines its API, permissions, model controls, and notification delivery.
-The bundled Workflow reference adds graph mapping, result acceptance, journal checks, and conservative same-run recovery.
+The bundled Claude Main Workflow references add graph mapping, result acceptance, journal checks, and conservative same-run recovery.
+The upstream guide treats a typed `ultracode` keyword as a per-task workflow opt-in and the ultracode setting as letting Claude decide when a task warrants a workflow.
+The keyword does not start a workflow from a `-p` prompt, a scheduled prompt, or relayed text.
+Workgraph's maintainer policy is narrower: neither form forces Workflow.
+Workflow is used only for expected follow-up phase expansion or genuinely multi-phase work, and not for single-phase work, which uses Agent when no follow-up phase is expected.
+That tool-selection policy belongs only to Main's Claude reference, rather than a shared role or task body.
+The subagent documentation explicitly removes Workflow from subagent tools.
+That host filter covers Agent-tool subagents and Workflow `agent()` stages, while the same documentation exempts forks, which keep the main conversation's tool pool.
+Codex has no Workflow tool.
+Every Workgraph skill sets `disable-model-invocation: true`, so the `Skill` tool refuses it and `/workgraph:<name>` stays the user form.
+The [skills documentation](https://code.claude.com/docs/en/skills) states that a refused call also tells the model not to reproduce the steps another way.
+Roles therefore route model reads through bundled `SKILL.md` links, and each role's Claude reference names Read as the loading tool.
+The control also removes descriptions from the model catalog and prevents subagent `skills:` preloading, which Workgraph does not use.
+That control gates the Skill tool only and never the Workflow tool itself.
+The Codex [skill discovery loader](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/loader/discovery.rs) reads `agents/openai.yaml` beside each `SKILL.md`, and its [metadata loader](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/loader/metadata.rs) reads `policy.allow_implicit_invocation`.
+The previous plugin-root `agents/openai.yaml` was outside that path and had no effect, so each skill now carries its own file.
+The [selection code](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/selection.rs) keeps explicit `$skill` selection for skills hidden from the model prompt.
+The Codex [skill parser](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/skills/src/parser.rs) ignores `disable-model-invocation`.
+A Codex CLI `0.166.0` run in a temporary repository listed a repository skill without the policy file in the model's skill list and omitted a matching skill with this policy.
+Explicit `$name` selection still loaded the hidden skill.
+Plugin-qualified selection remains unconfirmed until an installed Workgraph release carries the per-skill files.
+
+The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
+Invocation controls do not select a host or role, and `compatibility` is informational.
+The [Cursor skill directories](https://cursor.com/docs/skills.md#skill-directories) also include Claude-compatible locations.
+Consequently, hook-selected host references alone do not isolate directly invoked shared skill bodies.
+The shared Workflow entry point defers operational references until host and role admission.
+This instruction boundary is not a host-enforced file-access restriction or proof of model adherence.
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.
 Workgraph uses sentence-level source lines for all documents, including table explanations.

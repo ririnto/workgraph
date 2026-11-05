@@ -120,18 +120,21 @@ Review staffing, delegation, and delivery methods need no fixed ceremony when th
 Repository scope follows the request without an activity threshold or archive-status exclusion.
 Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
-For Claude Code graph execution, [Workflow](skills/workflow/SKILL.md) adds native node mapping and result verification.
-Its [authoring reference](skills/workflow/references/authoring.md) supplies script-specific guidance.
-Its [delivery reference](skills/workflow/references/delivery.md) maps Delivery operations to node inputs and outputs without owning another delivery checklist.
+For Claude Code Main, [Workflow](skills/workflow/SKILL.md) admits the host and role before loading its [execution procedure](skills/workflow/references/claude-code-main.md).
+Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
+The conditional authoring and delivery references stay behind that admission boundary.
 Codex uses native delegation rather than Claude Code Workflow.
 Workgraph bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
-Those samples use injectable prompt parts, optional per-phase model selectors, and explicit skip, failure, and bounded-recovery records.
-For read-only design work, the Workflow skill provides design and verification guidance without bundling a specialist-agent graph.
+Those samples use injectable prompt parts, optional per-phase model and effort selectors, and explicit skip, failure, and bounded-recovery records.
+The admitted Claude Main procedure also covers read-only design without bundling a specialist-agent graph.
 All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
 
 ## Skill invocation
 
-All skills remain user-invocable and model-invocable.
+All skills remain user-invocable and block model invocation, following [pstack](https://github.com/cursor/plugins/tree/main/pstack)'s skill boundary.
+Roles and procedures link each bundled `SKILL.md`, so models read the linked file instead of invoking the skill.
+Users keep the explicit forms, such as `/workgraph:workflow` in Claude Code or `$workgraph:development` in Codex.
+Claude Code, Cursor, and Copilot read `disable-model-invocation: true`, and Codex reads each skill's `agents/openai.yaml` policy.
 Hooks operate without skill invocation.
 Conditional skills load only when their stated task scope matches and their complete content is not already present.
 
@@ -143,8 +146,8 @@ Conditional skills load only when their stated task scope matches and their comp
 | Development router | [Development](skills/development/SKILL.md) | Source work selects the matching lifecycle playbook and language references. |
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
-| Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main loads native Workflow procedures for the host reference's selection conditions. |
-| Scoped procedure | [Writing](skills/writing/SKILL.md) | Prose and Markdown work load writing guidance, with instruction design selected for agent-facing work. |
+| Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
+| Scoped procedure | [Writing](skills/writing/SKILL.md) | Markdown, YAML, and agent instruction work load source conventions, with instruction design selected for agent-facing work. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |
 
@@ -156,11 +159,15 @@ References hold detail selected by a task, host, language, or operation.
 | Agent instructions | Writing's [instruction design](skills/writing/references/instruction-design.md) | Drafting, editing, or reviewing agent-facing prompts or instructions requires this reference. |
 | Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
 | Lint tools and rules | Development's [lint rule guidance](skills/development/references/lint-rules.md) | Selecting, developing, configuring, or assessing authorized lint tools, rules, or automatic fixes requires this reference. |
+| Go tooling | Go's [tooling guidance](skills/development/references/go-tooling.md) | Configuring or assessing Go workspaces, tool dependencies, or lint tooling requires this reference. |
+| Kotest | Kotlin's [Kotest guidance](skills/development/references/kotest.md) | Creating or changing Kotest specs or assertions requires this reference. |
 | Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update uses the requested host's section once the version reaches its authorized distribution source. |
 | Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
+| Worktrees and caches | Cleanup's [worktree and cache guidance](skills/codex-scoped-cleanup/references/worktrees-caches.md) | Archiving, restoring, or removing worktrees or caches requires this reference. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
-Writing owns prose, agent-facing prompt contracts, and example separation.
+Writing owns Markdown and YAML source conventions, agent-facing prompt contracts, and example separation.
+General human-facing prose style is outside Workgraph's scope.
 Consumer links and required resources stay bundled, without another plugin dependency or required online research.
 
 Manual role loading reads a matching bundled host reference when present and not already loaded.
