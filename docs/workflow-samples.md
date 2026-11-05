@@ -147,4 +147,4 @@ A later round inside the same recorded run can advance the candidate, so the liv
 Before publishing from a resumed run, confirm that the gating sweep ran live against the current candidate, or change its inputs so it re-runs.
 A cached result avoids repeated work but does not prove acceptance, so a resumed run still needs its phase evidence checked.
 Sibling agents with matching settings can share the host prompt-cache prefix, which affects cost and speed but not the recorded phase evidence.
-Inspect the run journal when a result is missing or unexpected, as the [authoring reference](../skills/workflow/references/authoring.md) describes.
+Inspect the run journal when a result is missing or unexpected, as the authoring reference behind the [Workflow skill](../skills/workflow/SKILL.md) admission describes.
