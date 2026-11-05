@@ -992,7 +992,6 @@ Workflow is used only for expected follow-up phase expansion or genuinely multi-
 That tool-selection policy belongs only to Main's Claude reference, rather than a shared role or task body.
 The subagent documentation explicitly removes Workflow from subagent tools.
 That host filter covers Agent-tool subagents and Workflow `agent()` stages, while the same documentation exempts forks, which keep the main conversation's tool pool.
-A `claude -p` session is a main session that keeps Workflow and loads Main's contract, both observed directly on such a session, so its launcher removes the tool with the verified `--disallowedTools Workflow` flag and its brief names the dispatch role.
 Codex has no Workflow tool; its `--disable multi_agent --disable multi_agent_v2` launch form names the nearest native spawn tools, and whether disabling those features removes the spawn tools is unverified.
 The workflow skill sets `disable-model-invocation: true`, so the `Skill` tool refuses it, `/workgraph:workflow` stays the user form, and Main's Claude reference redirects model readers to its `SKILL.md` and references directly with the refusal stated as expected.
 That control gates the Skill tool only and never the Workflow tool itself.
