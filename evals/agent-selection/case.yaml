@@ -9,7 +9,6 @@ execution:
     - Agent
     - Read
     - Skill(workgraph:main-agent-contract)
-    - Skill(workgraph:workflow)
   prompt: |-
     ultracode
     Load Workgraph Main Agent Contract and its Claude reference unless their complete content is already present.

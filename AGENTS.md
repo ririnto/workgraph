@@ -27,7 +27,7 @@ Link the sole owner instead, and keep each conditional procedure at its stated s
 Identify each loaded source by its actual file path and state which complete content is already present.
 Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
 Load every selected file before emitting context, without requiring model retrieval during hook startup.
-Keep all skills model-invocable and user-invocable.
+Keep all skills user-invocable, and keep skills model-invocable unless a host control enforces their admission boundary.
 
 Use `README.md` for installation and runtime behavior.
 Read `docs/design.md` when changing instruction boundaries or hook delivery.

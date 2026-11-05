@@ -70,18 +70,24 @@ const validateFields = (metadata, report) => {
 };
 
 const validateInvocation = (metadata, report) => {
-  for (const [key, allowed] of [
-    ["disable-model-invocation", [false, 0, "false", "no", "off", "0"]],
-    ["user-invocable", [true, 1, "true", "yes", "on", "1"]]
+  for (const [key, allowed, requirement] of [
+    [
+      "disable-model-invocation",
+      [true, false, 1, 0, "true", "false", "yes", "no", "on", "off", "1", "0"],
+      "must be a boolean."
+    ],
+    [
+      "user-invocable",
+      [true, 1, "true", "yes", "on", "1"],
+      "must keep the skill user-invocable."
+    ]
   ]) {
     if (Object.hasOwn(metadata, key)) {
       const value = metadata[key];
       const normalized =
         typeof value === "string" ? value.toLowerCase() : value;
       if (!allowed.includes(normalized)) {
-        report(
-          `${key} must keep the skill model-invocable and user-invocable.`
-        );
+        report(`${key} ${requirement}`);
       }
     }
   }
