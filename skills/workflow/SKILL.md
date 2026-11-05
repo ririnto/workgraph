@@ -1,7 +1,7 @@
 ---
 name: workflow
 description: >-
-  Use only as the Claude Code Main Agent for native Workflow runs with dependent or possible follow-up phases, or for read-only design.
+  Claude Code only: use solely as the Claude Code Main Agent, never on other hosts or as a subagent, for native Workflow runs with dependent or possible follow-up phases, or for read-only design.
 argument-hint: "[goal]"
 ---
 
