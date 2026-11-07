@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 
 import yamlParser from "markdownlint-cli2/parsers/yaml";
 
+import { validateIssueFormContent } from "./validation/issue-forms.mjs";
 import { validatePluginVersions } from "./validation/plugin-version.mjs";
 
 const repositoryRoot = new URL("../", import.meta.url);
@@ -88,10 +89,7 @@ const runValidation = (root, filename) => {
   return result;
 };
 
-test("issue form command reports malformed input, field violations, and duplicate names", (t) => {
-  const root = copyValidation(t);
-  const directory = path.join(root, ".github/ISSUE_TEMPLATE");
-  mkdirSync(directory, { recursive: true });
+test("issue form validation reports malformed input and field violations", () => {
   for (const [content, diagnostics] of [
     [validIssueForm, []],
     ["name: [\n", ["bug_report.yaml:2: issue form must contain valid YAML."]],
@@ -138,24 +136,25 @@ test("issue form command reports malformed input, field violations, and duplicat
       ]
     ]
   ]) {
-    writeFileSync(path.join(directory, "bug_report.yaml"), content);
-    const result = runValidation(root, "issue-forms.mjs");
-    assert.equal(
-      result.status,
-      diagnostics.length === 0 ? 0 : 1,
-      result.stderr
-    );
-    assert.equal(
-      result.stdout,
-      diagnostics.length === 0 ? "Validated 1 GitHub issue forms.\n" : ""
-    );
-    assert.equal(
-      result.stderr,
+    assert.deepEqual(
+      validateIssueFormContent(content, "bug_report.yaml"),
       diagnostics
-        .map((message) => `.github/ISSUE_TEMPLATE/${message}\n`)
-        .join("")
     );
   }
+});
+
+test("issue form command reports invalid input and duplicate names from discovered files", (t) => {
+  const root = copyValidation(t);
+  const directory = path.join(root, ".github/ISSUE_TEMPLATE");
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(path.join(directory, "bug_report.yaml"), "name: [\n");
+  const malformed = runValidation(root, "issue-forms.mjs");
+  assert.equal(malformed.status, 1);
+  assert.equal(malformed.stdout, "");
+  assert.equal(
+    malformed.stderr,
+    ".github/ISSUE_TEMPLATE/bug_report.yaml:2: issue form must contain valid YAML.\n"
+  );
   writeFileSync(path.join(directory, "bug_report.yaml"), validIssueForm);
   writeFileSync(
     path.join(directory, "duplicate.yaml"),
@@ -550,6 +549,5 @@ test("validation entrypoints execute from unrelated directories through real and
       assert.equal(result.stderr, "");
       assert.equal(result.stdout, expected);
     }
-    assert.equal(results[0].stdout, results[1].stdout);
   }
 });

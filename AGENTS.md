@@ -68,13 +68,9 @@ Use block sequences except for an explicit empty sequence.
 
 ## Tests
 
-Keep defensive logic and tests proportional to the impact of a realistic failure.
-Do not implement or test against practically impossible failure modes.
-Trace every new or changed test to a real requirement, a concrete observed defect, or an explicit instruction, not a hypothetical scenario.
-Delete tests that exist only for speculative coverage, and remove unnecessary or duplicated tests.
+Follow Development's [verification guidance](skills/development/SKILL.md#verification) for test design, coverage, and evidence.
 Assert strings only by exact equality, never by inclusion or non-inclusion.
 Do not keep or add tests that validate document or prompt prose.
-Investigate which parts of a heavy check are slow before applying realistic lightweighting that keeps its required coverage.
 
 ## Repository Reviews
 

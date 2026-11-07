@@ -8,12 +8,14 @@ disable-model-invocation: true
 
 ## Complete the assigned outcome
 
-Invoking this skill does not create a dispatch or grant additional authority.
-Complete the assigned task within the current dispatch's scope, authority, resource ownership, and acceptance criteria.
-Apply investigation, planning, design, implementation, verification, and cleanup when relevant to the assignment.
-Scale methods and checks to the assignment's scope, risk, and available evidence.
-Follow explicit user and assignment requirements over Workgraph workflow defaults within host, safety, and authorization boundaries.
-Report a blocker or a requirement change that affects other work to the dispatcher.
+Invocation creates no dispatch or authority.
+Complete the assigned outcome within its scope, authority, ownership, and acceptance criteria.
+For understood, reversible work with limited impact, act directly and run relevant checks.
+Use a short plan for bounded changes and deeper checks for uncertainty or serious consequences.
+File count alone does not determine rigor.
+Reassess as evidence changes, preserving required checks and the assigned outcome.
+Honor user and assignment requirements over defaults within host, safety, and authority boundaries.
+Report blockers or changes affecting other work to the dispatcher.
 
 ## Follow session boundaries
 
@@ -82,22 +84,12 @@ Continue independent allowed work when another operation remains blocked.
 
 ### Return owned resources
 
-Record resources created for the assignment so cleanup can use their known identifiers.
-Return check results in the requested format.
-Retain task-owned evidence only while needed for active checks, failure investigation, recovery, requested retention, or acceptance.
+Track assignment-owned resources and retain evidence needed for checks, investigation, recovery, requested retention, or acceptance.
 Exclude dependency trees, build caches, and redundant logs from retained evidence.
-Confirm cleanup ownership before deleting shared evidence.
-
-#### Retire owned resources
-
 Before handback, inspect running background processes and descendants against the recorded assignment resources.
 Stop assignment-owned processes when no longer needed and verify termination.
-Before handback, remove unneeded Docker containers and disposable caches created for the assignment.
-Before handback, remove clean assignment-created worktrees within granted cleanup when no longer needed.
-
-#### Preserve retained work
-
-Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
+Remove unneeded owned containers, caches, and clean worktrees within granted cleanup.
+Confirm ownership before deletion and preserve shared resources and artifacts needed for delivery, recovery, or continued use.
 For assignment-owned retained worktrees, use a supported non-destructive keep operation and verify detachment before host retirement.
 Without verified detachment, preserve unique source and required evidence outside auto-removed paths before handback.
 An idle prompt alone does not prove preservation.

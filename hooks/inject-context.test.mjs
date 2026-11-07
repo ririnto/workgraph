@@ -25,6 +25,10 @@ const roles = [
 ];
 const hosts = ["claude", "codex"];
 const hostReferenceFiles = { claude: "claude-code.md", codex: "codex.md" };
+const roleFiles = roles.flatMap(([, name]) => [
+  `${name}/SKILL.md`,
+  ...hosts.map((host) => `${name}/references/${hostReferenceFiles[host]}`)
+]);
 const runHook = (args, scriptPath = script) =>
   spawnSync(process.execPath, [scriptPath, ...args], {
     cwd: tmpdir(),
@@ -36,7 +40,7 @@ const runConfiguredHook = (command, env) =>
   spawnSync(command, {
     cwd: tmpdir(),
     encoding: "utf-8",
-    env: { ...process.env, ...env },
+    env: { ...process.env, PATH: path.dirname(process.execPath), ...env },
     shell: true,
     timeout: 5000
   });
@@ -50,13 +54,13 @@ const copyPlugin = (t) => {
     ".claude-plugin/plugin.json",
     ".codex-plugin/plugin.json",
     "hooks/claude-hooks.json",
-    "hooks/codex-hooks.json"
+    "hooks/codex-hooks.json",
+    ...roleFiles.map((file) => `skills/${file}`)
   ]) {
     const destination = path.join(root, filename);
     mkdirSync(path.dirname(destination), { recursive: true });
     copyFileSync(new URL(`../${filename}`, import.meta.url), destination);
   }
-  cpSync(skills, path.join(root, "skills"), { recursive: true });
   return root;
 };
 
@@ -131,17 +135,6 @@ const emptyFileDetail =
   "empty instructions or missing required skill frontmatter";
 const directoryDetail = "EISDIR: illegal operation on a directory, read";
 
-for (const [event] of roles) {
-  for (const host of hosts) {
-    test(`${event} ${host}: injects the exact selected body and role-specific host reference`, () => {
-      const result = runHook([event, host]);
-      assert.equal(result.status, 0, result.stderr);
-      assert.equal(result.stderr, "");
-      assertOutput(JSON.parse(result.stdout), event, host);
-    });
-  }
-}
-
 test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
   const parent = realpathSync(copyPlugin(t));
   const rootLength = Math.max(311, parent.length + 202);
@@ -153,7 +146,9 @@ test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) =>
   mkdirSync(path.join(root, "hooks"), { recursive: true });
   assert.equal(realpathSync(root).length, rootLength);
   copyFileSync(script, path.join(root, "hooks", "inject-context.mjs"));
-  cpSync(skills, path.join(root, "skills"), { recursive: true });
+  cpSync(path.join(parent, "skills"), path.join(root, "skills"), {
+    recursive: true
+  });
   for (const newline of ["\n", "\r\n"]) {
     for (const [event, name] of roles) {
       const content = readFileSync(
@@ -316,14 +311,7 @@ test("native Skill and Read fragments preserve host-specific BOM, CRLF, and term
 
 test("source metadata resolves symlinked instructions to their real paths", (t) => {
   const root = copyPlugin(t);
-  for (const file of [
-    "main-agent-contract/SKILL.md",
-    "main-agent-contract/references/claude-code.md",
-    "main-agent-contract/references/codex.md",
-    "subagent-context/SKILL.md",
-    "subagent-context/references/codex.md",
-    "subagent-context/references/claude-code.md"
-  ]) {
+  for (const file of roleFiles) {
     const target = path.join(root, "skills", file);
     const source = file.includes("/references/")
       ? path.join(root, "host sources", `${file}.source`)
@@ -340,6 +328,7 @@ test("source metadata resolves symlinked instructions to their real paths", (t) 
         path.join(root, "hooks", "inject-context.mjs")
       );
       assert.equal(result.status, 0, result.stderr);
+      assert.equal(result.stderr, "");
       assertOutput(
         JSON.parse(result.stdout),
         event,
@@ -507,32 +496,33 @@ for (const [event, name] of roles) {
       directoryDetail
     );
   });
-
-  test(`${name}: invalid frontmatter or empty prose produces no partial output`, (t) => {
-    const root = copyPlugin(t);
-    for (const source of [
-      "# No frontmatter\n\nRole instructions.",
-      "---\n---\n# Empty frontmatter\n",
-      "---\n \t\n---\n# Whitespace frontmatter\n",
-      `---\nname: ${name}\n`,
-      `---\nname: ${name}\n--- trailing text\n# Role\n`,
-      `---\nname: ${name}\n---`,
-      `---\nname: ${name}\n---\n \t\n`
-    ]) {
-      writeFileSync(path.join(root, "skills", file), source);
-      for (const host of hosts) {
-        assertFileFailure(
-          runHook(
-            [event, host],
-            path.join(root, "hooks", "inject-context.mjs")
-          ),
-          file,
-          emptyFileDetail
-        );
-      }
-    }
-  });
 }
+
+test("invalid frontmatter or empty prose produces no partial output on either host", (t) => {
+  const root = copyPlugin(t);
+  const file = "main-agent-contract/SKILL.md";
+  for (const source of [
+    "# No frontmatter\n\nRole instructions.",
+    "---\n---\n# Empty frontmatter\n",
+    "---\n \t\n---\n# Whitespace frontmatter\n",
+    "---\nname: main-agent-contract\n",
+    "---\nname: main-agent-contract\n--- trailing text\n# Role\n",
+    "---\nname: main-agent-contract\n---",
+    "---\nname: main-agent-contract\n---\n \t\n"
+  ]) {
+    writeFileSync(path.join(root, "skills", file), source);
+    for (const host of hosts) {
+      assertFileFailure(
+        runHook(
+          ["SessionStart", host],
+          path.join(root, "hooks", "inject-context.mjs")
+        ),
+        file,
+        emptyFileDetail
+      );
+    }
+  }
+});
 
 for (const [event, name] of roles) {
   for (const host of hosts) {

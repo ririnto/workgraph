@@ -115,8 +115,10 @@ The [Main contract](skills/main-agent-contract/SKILL.md) owns scope, authority, 
 PR readiness completes a publication request without authorizing a merge into its target branch.
 User-requested merging, automatic merging, and merge-queue enrollment follow [Delivery's merge authority](skills/delivery/SKILL.md#establish-merge-authority).
 Invocation does not grant new permissions or replace explicit user gates.
-Workflow and writing procedures are defaults that adapt to explicit user requests, task risk, and supported host capabilities.
-Review staffing, delegation, and delivery methods need no fixed ceremony when the task does not require one.
+The [execution criteria](skills/main-agent-contract/SKILL.md#select-an-execution-path) scale planning, delegation, review, and verification to the work.
+Small, understood changes use direct execution and relevant checks, while broader or uncertain work receives the coordination and evidence its risks require.
+A change with serious consequences can need deeper verification even when it touches one line.
+The approach adjusts as evidence changes, while preserving the complete requested outcome and required gates.
 Repository scope follows the request without an activity threshold or archive-status exclusion.
 Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
