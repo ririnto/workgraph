@@ -13,8 +13,7 @@ For JavaScript or TypeScript, also read [shared Node guidance](references/nodejs
 
 ## Development lifecycle
 
-Record the behavior contract, affected consumers, exclusions, and acceptance evidence before editing.
-Scale discovery, implementation, and verification to the request.
+Before editing, identify the behavior contract, affected consumers, exclusions, and acceptance evidence in context or an existing task record.
 Inspect affected code and stop discovery when evidence supports the smallest safe change.
 For bounded work, avoid optional review ceremony, speculative sweeps, and precautionary pauses.
 Retain rigor for irreversible, high-risk, or complex work and all safety, authority, and project gates.

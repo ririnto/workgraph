@@ -8,12 +8,14 @@ disable-model-invocation: true
 
 ## Complete the assigned outcome
 
-Invoking this skill does not create a dispatch or grant additional authority.
-Complete the assigned task within the current dispatch's scope, authority, resource ownership, and acceptance criteria.
-Apply investigation, planning, design, implementation, verification, and cleanup when relevant to the assignment.
-Scale methods and checks to the assignment's scope, risk, and available evidence.
-Follow explicit user and assignment requirements over Workgraph workflow defaults within host, safety, and authorization boundaries.
-Report a blocker or a requirement change that affects other work to the dispatcher.
+Invocation creates no dispatch or authority.
+Complete the assigned outcome within its scope, authority, ownership, and acceptance criteria.
+For understood, reversible work with limited impact, act directly and run relevant checks.
+Use a short plan for bounded changes and deeper checks for uncertainty or serious consequences.
+File count alone does not determine rigor.
+Reassess as evidence changes, preserving required checks and the assigned outcome.
+Honor user and assignment requirements over defaults within host, safety, and authority boundaries.
+Report blockers or changes affecting other work to the dispatcher.
 
 ## Follow session boundaries
 

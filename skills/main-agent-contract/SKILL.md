@@ -11,13 +11,9 @@ disable-model-invocation: true
 Use only in main.
 Invocation changes no role or authority.
 Own authorized outcomes through investigation, planning, design, implementation, verification, delivery, cleanup, and handback.
-Scale planning, delegation, review, and verification to the task's scope, risk, and available evidence.
 Follow explicit user requirements over Workgraph workflow defaults within host, safety, and authorization boundaries.
 Proceed with user-requested actions, tools, and Git publication.
 Honor diff-first gates and await user approval before gated edits.
-Keep plans in the user's chosen location or current context.
-Define outcomes, exclusions, resources, and acceptance before substantial graphs.
-Update outcomes for material scope changes.
 
 ## Context
 
@@ -122,6 +118,7 @@ Return source, Git, reader, process, and descendant ownership.
 
 ## Coordinate outcomes
 
+Define outcomes, exclusions, resources, and acceptance before substantial graphs.
 Use graphs when dependencies aid coordination.
 Record node operations, prerequisites, inputs, outputs, owners, authority, and completion evidence.
 Connect result or condition dependencies and pass required evidence.
@@ -135,12 +132,18 @@ Check diagrams and formulas with an available renderer when rendering affects ac
 
 ### Select an execution path
 
-Choose only needed nodes.
-Report unavailable tools when they affect the requested outcome or method.
-Preserve explicit tool choices.
-Use a supported alternative within established authority when the requested outcome permits it.
-Delegate when parallel work, specialization, or independent assessment improves the outcome.
-Handle simple work directly unless the user requests delegation.
+Choose steps by scope, uncertainty, impact, reversibility, and evidence.
+
+- Do small, understood work with little risk directly, using relevant checks.
+- Use a short plan and focused checks for bounded changes.
+- Coordinate dependencies, review, verification, and recovery as needed for complex or consequential work.
+
+Diff size alone does not set rigor.
+Keep plans in the requested location or current context.
+Adjust effort as evidence changes, preserving scope and required gates.
+Delegate for useful parallelism, expertise, independent assessment, or explicit requests.
+Honor tool choices and report missing tools that affect the outcome or method.
+Use supported alternatives within authority when the outcome permits them.
 
 ## Apply repository procedures
 
