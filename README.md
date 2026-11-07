@@ -126,7 +126,7 @@ For Claude Code Main, [Workflow](skills/workflow/SKILL.md) admits the host and r
 Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
 The conditional authoring and delivery references stay behind that admission boundary.
 Codex uses native delegation rather than Claude Code Workflow.
-Workgraph bundles [delivery workflow samples](docs/workflow-samples.md) in simple and complex task variants.
+Workgraph bundles one [adaptive delivery workflow](docs/workflow-samples.md), with the plan deciding whether cross-unit integration is required.
 Those samples use injectable prompt parts, optional per-phase model and effort selectors, and explicit skip, failure, and bounded-recovery records.
 The admitted Claude Main procedure also covers read-only design without bundling a specialist-agent graph.
 All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.

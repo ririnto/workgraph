@@ -486,8 +486,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
 
 const sampleRoot = path.resolve(import.meta.dirname, "..");
 const samplePaths = {
-  complex: path.join(sampleRoot, "workflows/delivery-complex.js"),
-  simple: path.join(sampleRoot, "workflows/delivery-simple.js")
+  delivery: path.join(sampleRoot, "workflows/delivery.js")
 };
 const scopeResult = {
   evidence: "e",
@@ -528,7 +527,7 @@ const simpleImplement = {
   evidence: "e",
   startRef: "task-branch"
 };
-const simpleRepair = { ...simpleImplement, startRef: "task-branch" };
+const simpleRepair = { ...simpleImplement, startRef: "unit-u1" };
 const splitImplement = (options) => {
   const secondUnit = options.label.startsWith("implement:u2");
   const repair = options.label.includes(":fix-");
@@ -711,9 +710,9 @@ test("delivery workflow samples inherit host models and honor model overrides", 
           { candidateBranch: "task-branch", efforts, models, task: "t" },
           dispatchTable({
             Explore: () => exploreResult,
-            Implement: () => simpleImplement,
-            Integrate: () => integrateSingle,
-            Plan: () => singleUnits,
+            Implement: splitImplement,
+            Integrate: () => integrateResult,
+            Plan: () => splitUnits,
             Publish: () => publishCreated,
             Review: () => reviewPass,
             Scope: () => scopeResult,
@@ -841,7 +840,7 @@ test("delivery workflow samples stop planning when exploration fails", async () 
 test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   {
     const { calls, result } = await runWorkflowSample(
-      samplePaths.simple,
+      samplePaths.delivery,
       {
         candidateBranch: "task-branch",
         issue: "#1",
@@ -868,7 +867,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         "completed",
         "completed",
         "completed",
-        "completed",
+        "skipped",
         "completed",
         "completed",
         "completed"
@@ -889,12 +888,17 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
       { branch: "unit-u1", key: "u1", paths: ["docs/guide.md"] }
     ]);
     assert.deepEqual(result.resources, [
-      { branch: "unit-u1", key: "u1", startRef: "task-branch", state: "merged" }
+      {
+        branch: "unit-u1",
+        key: "u1",
+        startRef: "unit-u1",
+        state: "implemented"
+      }
     ]);
   }
   {
     const { calls, result } = await runWorkflowSample(
-      samplePaths.simple,
+      samplePaths.delivery,
       {
         candidateBranch: "task-branch",
         issue: "#1",
@@ -923,7 +927,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   }
   {
     const { calls, result } = await runWorkflowSample(
-      samplePaths.simple,
+      samplePaths.delivery,
       {
         candidateBranch: "task-branch",
         issue: "#1",
@@ -956,7 +960,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   }
   {
     const { calls, result } = await runWorkflowSample(
-      samplePaths.complex,
+      samplePaths.delivery,
       {
         candidateBranch: "task-branch",
         issue: "#1",
@@ -996,7 +1000,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   }
   {
     const { calls, result } = await runWorkflowSample(
-      samplePaths.complex,
+      samplePaths.delivery,
       {
         candidateBranch: "task-branch",
         issue: "#1",
@@ -1035,7 +1039,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   }
   {
     const { calls, result } = await runWorkflowSample(
-      samplePaths.simple,
+      samplePaths.delivery,
       {
         issue: "#1",
         maxFixRounds: 0,
@@ -1068,7 +1072,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   }
   {
     const { calls, result } = await runWorkflowSample(
-      samplePaths.simple,
+      samplePaths.delivery,
       { issue: "#1", skips: { implement: true }, task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
@@ -1082,7 +1086,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   }
   {
     const { result } = await runWorkflowSample(
-      samplePaths.simple,
+      samplePaths.delivery,
       { candidateBranch: "task-branch", issue: "#1", task: "t" },
       dispatchTable({
         Explore: () => exploreResult,
@@ -1106,7 +1110,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   await assert.rejects(
     () =>
       runWorkflowSample(
-        samplePaths.simple,
+        samplePaths.delivery,
         { issue: "", task: "t" },
         dispatchTable({ Scope: () => scopeResult })
       ),
@@ -1120,7 +1124,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
   await Promise.all(
     [absoluteUnits, escapingUnits, nestedUnits].map(async (planPayload) => {
       const { calls, result } = await runWorkflowSample(
-        samplePaths.complex,
+        samplePaths.delivery,
         { issue: "#1", task: "t" },
         dispatchTable({
           Explore: () => exploreResult,
@@ -1156,7 +1160,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
   await Promise.all(
     [badOwnership, legacySummary, skippedCheck].map(async (payload) => {
       const { result } = await runWorkflowSample(
-        samplePaths.simple,
+        samplePaths.delivery,
         { candidateBranch: "task-branch", issue: "#1", task: "t" },
         dispatchTable({
           Explore: () => exploreResult,
@@ -1235,7 +1239,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       [null, ["implemented", "implemented"]]
     ].map(async ([payload, states]) => {
       const { result } = await runWorkflowSample(
-        samplePaths.complex,
+        samplePaths.delivery,
         { candidateBranch: "task-branch", issue: "#1", task: "t" },
         dispatchTable({
           Explore: () => exploreResult,
@@ -1266,7 +1270,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
 
 test("delivery workflow samples carry named candidates and per-key repair evidence", async () => {
   const { calls, result } = await runWorkflowSample(
-    samplePaths.complex,
+    samplePaths.delivery,
     { candidateBranch: "task-branch", issue: "#1", maxFixRounds: 1, task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
@@ -1293,7 +1297,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     { branch: "unit-u1", key: "u1", startRef: "wrong-ref", state: "attempted" }
   );
   const repairRun = await runWorkflowSample(
-    samplePaths.complex,
+    samplePaths.delivery,
     { candidateBranch: "task-branch", issue: "#1", maxFixRounds: 1, task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
@@ -1339,7 +1343,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     1
   );
   const candidateRun = await runWorkflowSample(
-    samplePaths.simple,
+    samplePaths.delivery,
     { candidateBranch: "wg-candidate", issue: "#1", task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
@@ -1364,7 +1368,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     }
   ]);
   const multiRun = await runWorkflowSample(
-    samplePaths.complex,
+    samplePaths.delivery,
     { candidateBranch: "task-branch", issue: "#1", maxFixRounds: 2, task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
@@ -1408,7 +1412,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     }
   ]);
   const supersededRun = await runWorkflowSample(
-    samplePaths.complex,
+    samplePaths.delivery,
     { candidateBranch: "task-branch", issue: "#1", maxFixRounds: 1, task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
@@ -1441,7 +1445,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     }
   ]);
   const missingRun = await runWorkflowSample(
-    samplePaths.complex,
+    samplePaths.delivery,
     { issue: "#1", task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
@@ -1474,9 +1478,12 @@ test("delivery samples validate integration destination and verify findings befo
         { candidateBranch: "other-task", issue: "#1", task: "t" },
         dispatchTable({
           Explore: () => exploreResult,
-          Implement: () => ({ ...simpleImplement, startRef: "other-task" }),
-          Integrate: () => integrateSingle,
-          Plan: () => singleUnits,
+          Implement: (options) => ({
+            ...splitImplement(options),
+            startRef: "other-task"
+          }),
+          Integrate: () => integrateResult,
+          Plan: () => splitUnits,
           Publish: () => publishCreated,
           Review: () => reviewFix,
           Scope: () => scopeResult,
@@ -1596,7 +1603,7 @@ test("delivery samples gate repairs on independent finding dispositions", async 
       );
       assert.equal(reviewRecord.status, "failed");
       assert.equal(unowned.result.fixRounds.used, 0);
-      for (const phase of ["Implement", "Integrate", "Publish", "Review"]) {
+      for (const phase of ["Implement", "Publish", "Review"]) {
         assert.equal(
           unowned.calls.filter((call) => call.phase === phase).length,
           1
@@ -1616,9 +1623,9 @@ test("delivery samples reject invalid integration path evidence and base destina
             { candidateBranch: "task-branch", issue: "#1", task: "t" },
             dispatchTable({
               Explore: () => exploreResult,
-              Implement: () => simpleImplement,
-              Integrate: () => ({ ...integrateSingle, changedFiles }),
-              Plan: () => singleUnits,
+              Implement: splitImplement,
+              Integrate: () => ({ ...integrateResult, changedFiles }),
+              Plan: () => splitUnits,
               Publish: () => publishCreated,
               Review: () => reviewPass,
               Scope: () => scopeResult,
@@ -1655,13 +1662,13 @@ test("delivery samples reject invalid integration path evidence and base destina
   );
 });
 
-test("complex delivery routes only independently confirmed findings to their owner", async () => {
+test("multi-unit delivery routes only independently confirmed findings to their owner", async () => {
   const findings = [
     { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
   ];
   const { calls, result } = await runWorkflowSample(
-    samplePaths.complex,
+    samplePaths.delivery,
     { candidateBranch: "task-branch", issue: "#1", task: "t" },
     dispatchTable({
       Explore: () => exploreResult,
@@ -1867,18 +1874,16 @@ test("delivery samples pass candidate, issue, request, and owned findings into p
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
   ];
   await Promise.all(
-    Object.entries(samplePaths).map(async ([variant, file]) => {
-      const reviewed = variant === "simple" ? findings.slice(0, 1) : findings;
+    Object.values(samplePaths).map(async (file) => {
+      const reviewed = findings;
       const { calls, result } = await runWorkflowSample(
         file,
         { candidateBranch: "task-branch", issue: "#1", task: "t" },
         dispatchTable({
           Explore: () => exploreResult,
-          Implement:
-            variant === "simple" ? () => simpleImplement : splitImplement,
-          Integrate: () =>
-            variant === "simple" ? integrateSingle : integrateResult,
-          Plan: () => (variant === "simple" ? singleUnits : splitUnits),
+          Implement: splitImplement,
+          Integrate: () => integrateResult,
+          Plan: () => splitUnits,
           Publish: sequence(publishCreated, publishUpdated),
           Review: sequence(
             { evidence: "e", findings: reviewed, verdict: "fix-required" },
@@ -1949,6 +1954,182 @@ test("delivery samples pass candidate, issue, request, and owned findings into p
         ),
         reviewed.map((_finding, index) => [`implement:u${index + 1}:fix-1`])
       );
+    })
+  );
+});
+
+test("delivery graph adapts single-unit candidates and records conditional integration evidence", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: () => simpleImplement,
+      Plan: () => singleUnits,
+      Publish: () => publishCreated,
+      Review: () => reviewPass,
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(result.complete, true);
+  assert.equal(result.split, false);
+  assert.equal(calls.filter(({ phase }) => phase === "Integrate").length, 0);
+  assert.deepEqual(result.integration, {
+    branch: "unit-u1",
+    reason:
+      "The plan defines a single work unit, so no cross-unit integration is required",
+    status: "skipped"
+  });
+  const integration = result.graph.nodes.find(({ key }) => key === "integrate");
+  assert.equal(integration.status, "skipped");
+  assert.equal(integration.reason, result.integration.reason);
+  assert.deepEqual(
+    integration.completionEvidence.at(-1).result,
+    result.integration
+  );
+  assert.deepEqual(result.resources, [
+    {
+      branch: "unit-u1",
+      key: "u1",
+      startRef: "task-branch",
+      state: "implemented"
+    }
+  ]);
+  for (const phase of ["Sweep", "Publish"]) {
+    assert.equal(
+      calls
+        .find((call) => call.phase === phase)
+        .prompt.split("\n\n")
+        .find((section) => section.startsWith("Candidate branch: ")),
+      "Candidate branch: unit-u1"
+    );
+  }
+  const explicitSkip = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", skips: { integrate: true }, task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: () => simpleImplement,
+      Plan: () => singleUnits,
+      Scope: () => scopeResult
+    })
+  );
+  assert.equal(explicitSkip.result.complete, false);
+  assert.equal(
+    explicitSkip.calls.some(({ phase }) => phase === "Publish"),
+    false
+  );
+});
+
+test("delivery graph exposes node contracts, condition edges, and dispatch positions", async () => {
+  await Promise.all(
+    [false, true].map(async (split) => {
+      const { calls, result } = await runWorkflowSample(
+        samplePaths.delivery,
+        { candidateBranch: "task-branch", task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: split
+            ? splitImplement
+            : sequence(simpleImplement, simpleRepair),
+          Integrate: () => integrateResult,
+          Plan: () => (split ? splitUnits : singleUnits),
+          Publish: sequence(publishCreated, publishUpdated),
+          Review: sequence(reviewFix, reviewPass),
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.equal(result.complete, true);
+      const nodes = new Map(result.graph.nodes.map((node) => [node.key, node]));
+      assert.equal(nodes.size, result.graph.nodes.length);
+      for (const node of nodes.values()) {
+        for (const field of [
+          "key",
+          "operation",
+          "prerequisites",
+          "inputs",
+          "outputs",
+          "owner",
+          "authority",
+          "completionEvidence",
+          "status",
+          "reason"
+        ]) {
+          assert.equal(Object.hasOwn(node, field), true);
+        }
+        assert.equal(
+          ["completed", "skipped", "failed"].includes(node.status),
+          true
+        );
+        assert.equal(node.completionEvidence.length > 0, true);
+        assert.deepEqual(
+          node.prerequisites,
+          result.graph.edges
+            .filter(({ to }) => to === node.key)
+            .map(({ from }) => from)
+        );
+      }
+      for (const edge of result.graph.edges) {
+        assert.equal(nodes.has(edge.from) && nodes.has(edge.to), true);
+        assert.equal(["result", "condition"].includes(edge.type), true);
+        assert.equal(
+          edge.type === "condition"
+            ? typeof edge.condition === "string"
+            : edge.condition === null,
+          true
+        );
+      }
+      assert.deepEqual(
+        result.graph.edges.find(
+          ({ from, to }) => from === "plan" && to === "integrate"
+        ),
+        {
+          condition: "units.length > 1",
+          from: "plan",
+          to: "integrate",
+          type: "condition"
+        }
+      );
+      assert.equal(nodes.get("verify-findings:1").status, "completed");
+      assert.deepEqual(nodes.get("implement:u1:fix-1").prerequisites, [
+        "plan",
+        "review",
+        "verify-findings:1"
+      ]);
+      for (const call of calls) {
+        const key = [
+          "Scope",
+          "Plan",
+          "Integrate",
+          "Sweep",
+          "Publish",
+          "Review"
+        ].includes(call.phase)
+          ? `${call.phase.toLowerCase()}${calls.filter((previous) => previous.phase === call.phase).indexOf(call) === 0 ? "" : ":fix-1"}`
+          : call.label;
+        const node = nodes.get(key);
+        const position = call.prompt.split("\n\n")[0].split("\n");
+        assert.equal(
+          position[0],
+          `Graph position: ${key}; owner: ${node.owner}; authority: ${node.authority}.`
+        );
+        assert.equal(
+          position[1],
+          `Prerequisites: ${node.prerequisites.length === 0 ? "none" : node.prerequisites.map((parent) => `${parent}=${nodes.get(parent).status} (graph.nodes[key=${parent}].completionEvidence)`).join("; ")}.`
+        );
+        assert.equal(
+          position[3],
+          `Outputs consumed downstream: ${node.outputs.join(", ")}.`
+        );
+        if (node.ownership !== undefined) {
+          assert.equal(
+            position[4],
+            `Owned ${node.ownership.kind}: ${JSON.stringify(node.ownership.value)}.`
+          );
+        }
+      }
     })
   );
 });
