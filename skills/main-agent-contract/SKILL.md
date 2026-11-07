@@ -102,18 +102,13 @@ Label unsupported findings and unavailable required verification unverified.
 
 ### Return owned resources
 
-Record owned resources.
-Retain evidence only for checks, investigation, recovery, or retention.
+Track owned resources and retain evidence needed for checks, investigation, recovery, or required retention.
 Exclude dependency trees, build caches, and redundant logs.
-Confirm ownership before deleting shared evidence.
-
-#### Retire owned resources
-
-At handback, check owned background processes and descendants, including unrecorded ones.
-Stop unneeded owned processes and verify exit.
+Before handback, inspect owned processes and descendants, including unrecorded ones.
+Stop those no longer needed and verify exit.
 Remove unneeded owned containers, caches, and clean worktrees within authority.
-Preserve shared assets and required delivery or recovery artifacts.
-Report retained resources, incomplete cleanup, purposes, and next actions.
+Confirm ownership before deletion and preserve shared assets and required delivery or recovery artifacts.
+Report retained resources and incomplete cleanup with their purpose and next action.
 Return source, Git, reader, process, and descendant ownership.
 
 ## Coordinate outcomes

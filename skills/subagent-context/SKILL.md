@@ -84,22 +84,12 @@ Continue independent allowed work when another operation remains blocked.
 
 ### Return owned resources
 
-Record resources created for the assignment so cleanup can use their known identifiers.
-Return check results in the requested format.
-Retain task-owned evidence only while needed for active checks, failure investigation, recovery, requested retention, or acceptance.
+Track assignment-owned resources and retain evidence needed for checks, investigation, recovery, requested retention, or acceptance.
 Exclude dependency trees, build caches, and redundant logs from retained evidence.
-Confirm cleanup ownership before deleting shared evidence.
-
-#### Retire owned resources
-
 Before handback, inspect running background processes and descendants against the recorded assignment resources.
 Stop assignment-owned processes when no longer needed and verify termination.
-Before handback, remove unneeded Docker containers and disposable caches created for the assignment.
-Before handback, remove clean assignment-created worktrees within granted cleanup when no longer needed.
-
-#### Preserve retained work
-
-Preserve shared resources and artifacts needed for delivery, recovery, or continued use.
+Remove unneeded owned containers, caches, and clean worktrees within granted cleanup.
+Confirm ownership before deletion and preserve shared resources and artifacts needed for delivery, recovery, or continued use.
 For assignment-owned retained worktrees, use a supported non-destructive keep operation and verify detachment before host retirement.
 Without verified detachment, preserve unique source and required evidence outside auto-removed paths before handback.
 An idle prompt alone does not prove preservation.

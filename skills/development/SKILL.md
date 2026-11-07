@@ -17,8 +17,6 @@ Before editing, identify the behavior contract, affected consumers, exclusions, 
 Inspect affected code and stop discovery when evidence supports the smallest safe change.
 For bounded work, avoid optional review ceremony, speculative sweeps, and precautionary pauses.
 Retain rigor for irreversible, high-risk, or complex work and all safety, authority, and project gates.
-Prefer existing checks, adding focused verification for material uncertainty or required acceptance.
-Report required checks blocked by the host.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -74,6 +72,8 @@ Do not treat ordinary array indexing as regex capture access.
 ## Documentation and comments
 
 Follow project documentation and comment conventions.
+Prefer names, types, and small functions that explain the code.
+Keep comments for contracts and rationale the code cannot express.
 Preserve declaration attachment, directives, licenses, and safety invariants.
 Remove obsolete workaround comments with affected code changes.
 
@@ -102,6 +102,9 @@ Preserve integrity checks, including lockfile fields, signatures, and checksums.
 
 ## Automation
 
+Fix recurring defects in data ownership and interfaces first.
+Use existing types, schemas, lint rules, or build checks for mechanical requirements.
+Keep judgment-dependent decisions in concise instructions instead of duplicating executable checks.
 Preserve lint and formatter choices when adding guidance or filling configuration gaps.
 
 When selecting, developing, configuring, or assessing authorized lint tools, rules, or fixes, read [lint rule guidance](references/lint-rules.md).
@@ -109,25 +112,18 @@ When selecting, developing, configuring, or assessing authorized lint tools, rul
 ## Verification
 
 Identify the target, trigger, input, and observable expected outcome.
-Use existing commands and supported entry points, preserving execution and import boundaries.
-Test changed behavior and run the application when integration, state, or external behavior matters.
-Extend the nearest meaningful check before adding a suite or helper.
-For each new test, identify an uncovered realistic failure and derive expected results independently of the implementation.
-Prefer consumer-visible outcomes, reserving source-shape assertions for explicit structural contracts.
+Use existing public interfaces at the lowest layer that exercises the failure.
+Keep process and application checks for execution, integration, state, or external behavior that direct calls cannot establish.
+Extend the nearest meaningful check for an uncovered requirement or realistic failure, with expectations independent of the implementation.
+Reserve source-shape assertions for explicit structural contracts.
 Exercise real owned behavior, substituting external or nondeterministic boundaries only when controlled input is needed.
-Remove redundant checks when retained coverage detects their relevant failures.
-Do not invent test-count, code-size ratio, or coverage targets.
-Stop expanding verification when required gates and changed risks have sufficient evidence, unless a concrete failure or requirement warrants more.
-Collect traces, screenshots, results, or timings when tests do not show outcomes.
-Record commands, setup, exit status, and raw results separately from interpretation.
-Retain failures and unexpected output, reproducing reports against stated expectations.
-Record measurement conditions for performance and duration claims.
-When hooks, tests, builds, or other checks delay work, or a bottleneck appears, report measured durations and slow parts to the user.
-Lighten or optimize them only on request, keeping required coverage.
+Remove duplicate assertions, fixtures, and runs when retained checks catch the same failures.
+Preserve security, external-input, and data-integrity coverage without test-count or coverage-percentage targets.
+Use repeatable inputs for stateful failures.
+Consider model checking when consequential transitions or interleavings remain untested by examples.
+Stop when required gates and changed risks have sufficient evidence, unless a concrete failure requires more.
+Record commands, setup, exit status, failures, and raw results separately from interpretation, using traces or screenshots when needed.
+Measure slow checks before authorized optimization and report durations, conditions, and preserved coverage.
 Leave execution, formal proof, native activation, and model adherence unverified without direct evidence.
+Report required checks blocked by the host.
 Create a focused feature map only for repeated reports or navigation needs, beside verification instructions, and update affected entries.
-Fix defect causes in code or data architecture first.
-A narrow guard may prevent new instances of a known bad pattern before separate debt cleanup.
-Use existing static checks or meaningful regression checks next.
-Update rules or skills to prevent recurrence, removing existing offending patterns where feasible.
-Change human-only guides last.
