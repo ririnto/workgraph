@@ -89,6 +89,7 @@ Invoking a skill does not create a dispatch, change the session's role, or grant
 The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.
 Main's [Claude reference](../../skills/main-agent-contract/references/claude-code.md) owns tool selection.
 The shared [Workflow entry point](../../skills/workflow/SKILL.md) admits only Claude Code Main before loading its execution procedure.
+The bundled [adaptive delivery workflow](../workflow-samples.md) registers as `workgraph:delivery`, with the plan's unit count selecting whether integration runs.
 Codex Scoped Cleanup does not authorize Codex resource operations when invoked in Claude Code.
 
 ## Evaluate discovery and outcomes

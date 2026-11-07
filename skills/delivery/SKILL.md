@@ -32,6 +32,7 @@ Avoid tiny phases and stacked PRs needing repeated rebases.
 Publish and review each authorized ready unit.
 Do setup only when an authorized operation needs it.
 Configure new CI only when needed.
+For an authorized Claude Code Main Workflow run, the [adaptive delivery sample](../../docs/workflow-samples.md) chooses single-unit delivery or cross-unit integration from the plan.
 Run applicable checks directly when appropriate.
 Preserve existing CI unless changes are authorized.
 Satisfy required CI, protections, and approvals.

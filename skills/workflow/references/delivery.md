@@ -5,6 +5,7 @@ Delivery owns repository tracking, exposure scans, review, integration gates, an
 This reference maps those requirements to Workflow nodes without repeating their procedures.
 
 Use only nodes allowed by the goal's scope and authority.
+The bundled [adaptive delivery workflow](../../../workflows/delivery.js) records its executed graph and selects cross-unit integration only when the accepted plan has several units.
 
 | Node | Owner and authority | Required inputs | Result and completion evidence |
 | --- | --- | --- | --- |

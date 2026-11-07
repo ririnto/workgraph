@@ -1,21 +1,21 @@
 export const meta = {
-  description: 'Single-unit delivery graph: separate scopes, explore in parallel, plan one unit, implement, sweep the diff, publish, and review',
-  name: 'delivery-simple',
+  description: 'Adaptive delivery graph: plan one or more units, implement, integrate only split work, sweep, publish, and review',
+  name: 'delivery',
   phases: [
     { detail: 'separate the goal into disjoint scopes', title: 'Scope' },
     { detail: 'one read-only explorer per scope', title: 'Explore' },
-    { detail: 'define exactly one implementation unit', title: 'Plan' },
-    { detail: 'implement the unit in an isolated worktree', title: 'Implement' },
-    { detail: 'merge the named unit branch into the task branch', title: 'Integrate' },
+    { detail: 'define the fewest disjoint implementation units', title: 'Plan' },
+    { detail: 'one isolated implementation agent per unit', title: 'Implement' },
+    { detail: 'merge named unit branches only for split work', title: 'Integrate' },
     { detail: 'diff-only environment-exposure sweep', title: 'Sweep' },
     { detail: 'create or update the PR or MR', title: 'Publish' },
     { detail: 'independent review of the complete change', title: 'Review' }
   ]
 }
 
-const variant = 'simple'
-const maxScopes = 2
-const unitCap = 1
+const variant = 'delivery'
+const maxScopes = 4
+const unitCap = 4
 const defaultFixRounds = 1
 const phaseKeys = ['scope', 'explore', 'plan', 'implement', 'integrate', 'sweep', 'publish', 'review']
 const phaseTitles = {
@@ -101,14 +101,76 @@ if (input.maxFixRounds !== undefined) {
   maxFixRounds = input.maxFixRounds
 }
 const compose = (...parts) => parts.filter(part => part.trim()).join('\n\n')
-const runAgent = async (prompt, options) =>
-  agent(prompt, options).then(
+const graph = { nodes: [], edges: [] }
+const activeNodes = Object.fromEntries(phaseKeys.map(key => [key, key]))
+const phaseRecords = {}
+const operations = {
+  scope: ['Separate disjoint scopes', 'delivery scope owner', 'read-only', ['task'], ['scopes', 'evidence']],
+  explore: ['Explore owned scopes', 'scope explorers', 'read-only', ['scopes'], ['explorations', 'evidence']],
+  plan: ['Define disjoint units', 'delivery planner', 'read-only', ['scopes', 'explorations'], ['units', 'evidence']],
+  implement: ['Implement owned units', 'unit workers', 'edit owned paths; commit unit branches; no push', ['units', 'explorations', 'candidateBranch'], ['unitResults', 'checks', 'resources']],
+  integrate: ['Merge named unit branches', 'integration owner', 'merge named branches; check combined candidate; no push', ['unitResults'], ['candidate branch', 'combined checks', 'resources']],
+  sweep: ['Scan the named candidate for exposures', 'exposure explorer', 'read-only', ['candidate branch'], ['exposures', 'evidence']],
+  publish: ['Publish the named candidate', 'publication owner', 'publish authorized PR/MR; no merge', ['unitResults', 'integration', 'exposures', 'issue'], ['request URL', 'action', 'evidence']],
+  review: ['Independently review the posted candidate', 'independent reviewer', 'read-only', ['request URL', 'unitResults', 'integration'], ['verdict', 'findings', 'evidence']]
+}
+for (const key of phaseKeys) {
+  const [operation, owner, authority, inputs, outputs] = operations[key]
+  graph.nodes.push({ key, operation, prerequisites: [], inputs, outputs, owner, authority, completionEvidence: [], status: 'pending', reason: null })
+}
+const nodeFor = key => graph.nodes.find(node => node.key === key)
+const connect = (from, to, type = 'result', condition = null) => {
+  graph.edges.push({ from, to, type, condition })
+  nodeFor(to).prerequisites.push(from)
+}
+connect('scope', 'explore')
+connect('scope', 'plan')
+connect('explore', 'plan', 'condition', '!skips.explore')
+connect('plan', 'implement')
+connect('implement', 'integrate')
+connect('plan', 'integrate', 'condition', 'units.length > 1')
+connect('implement', 'sweep')
+connect('integrate', 'sweep', 'condition', 'units.length > 1')
+connect('implement', 'publish')
+connect('integrate', 'publish', 'condition', 'units.length > 1')
+connect('sweep', 'publish')
+connect('publish', 'review')
+nodeFor('scope').inputs = { task }
+const edgeRequired = edge => edge.condition === null || (edge.condition === '!skips.explore' ? !skipped.explore : nodeFor('plan').completionEvidence.at(-1)?.result?.units?.length > 1 || skipped.integrate)
+const incompletePredecessor = key => graph.edges.find(edge => edge.to === activeNodes[key] && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')?.from
+const setOutcome = (key, status, reason, result = null) => {
+  const node = nodeFor(key)
+  node.status = status
+  node.reason = reason ?? null
+  node.completionEvidence.push({ status, reason: reason ?? null, result })
+}
+const recordPhase = (key, status, reason, result = null) => {
+  phaseRecords[key] = { reason: reason ?? null, status, title: phaseTitles[key] }
+  setOutcome(activeNodes[key], status, reason, result)
+}
+const graphPosition = key => {
+  const node = nodeFor(key)
+  return [
+    `Graph position: ${node.key}; owner: ${node.owner}; authority: ${node.authority}.`,
+    `Prerequisites: ${node.prerequisites.length === 0 ? 'none' : node.prerequisites.map(parent => `${parent}=${nodeFor(parent).status} (graph.nodes[key=${parent}].completionEvidence)`).join('; ')}.`,
+    `Inputs: ${Array.isArray(node.inputs.contract) ? node.inputs.contract.join(', ') : Object.keys(node.inputs.contract).join(', ')}; values in this prompt and graph.nodes[key=${key}].inputs; predecessor results at the evidence locations above.`,
+    `Outputs consumed downstream: ${node.outputs.join(', ')}.`,
+    node.ownership === undefined ? '' : `Owned ${node.ownership.kind}: ${JSON.stringify(node.ownership.value)}.`
+  ].filter(Boolean).join('\n')
+}
+const runAgent = async (prompt, options) => {
+  const key = options.label.startsWith('explore:') || options.label.startsWith('implement:') || options.label.startsWith('verify-findings:') ? options.label : activeNodes[options.phase.toLowerCase()]
+  const node = nodeFor(key)
+  const predecessor = graph.edges.find(edge => edge.to === key && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')
+  if (predecessor !== undefined) {
+    return { error: `Required graph predecessor ${predecessor.from} is incomplete` }
+  }
+  node.inputs = { contract: node.inputs, predecessors: Object.fromEntries(node.prerequisites.map(parent => [parent, nodeFor(parent).completionEvidence.at(-1)?.result ?? null])) }
+  node.status = 'running'
+  return agent(compose(graphPosition(key), prompt), options).then(
     result => ({ result }),
     error => ({ error: String(error instanceof Error ? error.message : error) })
   )
-const phaseRecords = {}
-const recordPhase = (key, status, reason) => {
-  phaseRecords[key] = { reason: reason ?? null, status, title: phaseTitles[key] }
 }
 const taskPart = `Delivery goal: ${task}`
 const basePart = baseBranch ? `Base branch: ${baseBranch}` : 'Base branch: the repository default branch'
@@ -154,6 +216,7 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
   taskPart,
   `Return between 1 and ${maxScopes} scopes that together cover the whole goal.`,
   'Give each scope a short unique key, a one-sentence description, and the repository paths it owns.',
+  'Express every path relative to the repository root, for example plugins/foo. Absolute paths are rejected.',
   'Couple paths into one scope only where the goal itself requires it.',
   readOnlyPart,
   promptParts.scope
@@ -209,17 +272,22 @@ if (skipped.scope) {
 } else if (!scopeShape) {
   recordPhase('scope', 'failed', `Scope result is missing, malformed, duplicated, or outside 1 through ${maxScopes} scopes`)
 } else {
-  recordPhase('scope', 'completed')
+  recordPhase('scope', 'completed', null, { scopes, evidence: scopeAttempt.result.evidence })
 }
 
 phase('Explore')
 let explorations = []
-if (phaseRecords.scope?.status !== 'completed') {
+if (incompletePredecessor('explore') !== undefined) {
   recordPhase('explore', 'skipped', 'Required Scope predecessor is incomplete')
 } else if (skipped.explore) {
   recordPhase('explore', 'skipped', 'Explicit dispatch skip, so parallel exploration did not run')
 } else {
   log(`Exploring ${scopes.length} scope${scopes.length === 1 ? '' : 's'} in parallel`)
+  for (const scope of scopes) {
+    graph.nodes.push({ ...nodeFor('explore'), key: `explore:${scope.key}`, prerequisites: [], owner: `explorer:${scope.key}`, ownership: { kind: 'scope', value: scope }, inputs: { scope, task }, status: 'pending', completionEvidence: [] })
+    connect('scope', `explore:${scope.key}`)
+    connect(`explore:${scope.key}`, 'explore')
+  }
   const attempts = await parallel(scopes.map(scope => () =>
     runAgent(compose(
       `Explore the repository for scope ${scope.key} only.`,
@@ -253,6 +321,7 @@ if (phaseRecords.scope?.status !== 'completed') {
     if (item === null) {
       exploreFailures.push('an explorer returned no result')
     } else if (item.attempt.error !== undefined) {
+      setOutcome(`explore:${item.key}`, 'failed', item.attempt.error)
       exploreFailures.push(`${item.key}: ${item.attempt.error}`)
     } else {
       const result = item.attempt.result
@@ -261,8 +330,10 @@ if (phaseRecords.scope?.status !== 'completed') {
         Array.isArray(result?.risks) && result.risks.every(risk => typeof risk === 'string') &&
         typeof result?.evidence === 'string' && result.evidence.trim().length > 0
       if (shape) {
+        setOutcome(`explore:${item.key}`, 'completed', null, result)
         explorations.push({ evidence: result.evidence, key: item.key, risks: result.risks, summary: result.summary })
       } else {
+        setOutcome(`explore:${item.key}`, 'failed', 'result is missing or malformed', result)
         exploreFailures.push(`${item.key}: result is missing or malformed`)
       }
     }
@@ -271,27 +342,30 @@ if (phaseRecords.scope?.status !== 'completed') {
     explorations = []
     recordPhase('explore', 'failed', exploreFailures.join('; '))
   } else {
-    recordPhase('explore', 'completed')
+    recordPhase('explore', 'completed', null, { explorations })
   }
 }
 
 phase('Plan')
 let units = []
-if (phaseRecords.explore?.status !== 'completed' && !(skipped.explore && phaseRecords.scope?.status === 'completed')) {
+if (incompletePredecessor('plan') !== undefined) {
   recordPhase('plan', 'skipped', 'Required Explore predecessor is incomplete')
 } else if (skipped.plan) {
   recordPhase('plan', 'skipped', 'Explicit dispatch skip, so planning did not run')
 } else {
   const planAttempt = await runAgent(compose(
     'Plan the implementation for the delivery goal.',
+    readOnlyPart,
     taskPart,
-    'This simple variant delivers through exactly one work unit, so define a single unit that covers the whole goal.',
+    `Decide whether the goal needs one work unit or several disjoint work units, and define at most ${unitCap} units.`,
+    'Use separate units only when parallel ownership or context size requires them, and prefer the fewest units that cover the goal.',
     `Scopes and exploration findings: ${JSON.stringify({
       explorations,
       scopes: scopes.map(scope => ({ description: scope.description, key: scope.key, paths: scope.paths }))
     })}`,
-    'Give the unit a short key, the owned paths, and concrete instructions that name the files to change and the checks to run.',
-    'List each owned path once.',
+    'Give each unit a short key, the owned paths, and concrete instructions that name the files to change and the checks to run.',
+    'Express every path relative to the repository root, for example plugins/foo. Absolute paths are rejected.',
+    'List each owned path once, and share no owned path between units.',
     promptParts.plan
   ), {
     label: 'plan',
@@ -346,8 +420,13 @@ if (phaseRecords.explore?.status !== 'completed' && !(skipped.explore && phaseRe
     recordPhase('plan', 'failed', `Plan result is missing, malformed, duplicated, unsafe or overlapping in unit ownership, or outside 1 through ${unitCap} units`)
   } else {
     units = unitList.map(unit => ({ instructions: unit.instructions, key: unit.key, paths: unit.paths.map(canonicalPath) }))
-    recordPhase('plan', 'completed')
+    recordPhase('plan', 'completed', null, { units, evidence: planAttempt.result.evidence })
   }
+}
+for (const unit of units) {
+  graph.nodes.push({ ...nodeFor('implement'), key: `implement:${unit.key}`, prerequisites: [], owner: `worker:${unit.key}`, ownership: { kind: 'unit', value: unit }, inputs: { unit, candidateBranch }, status: 'pending', completionEvidence: [] })
+  connect('plan', `implement:${unit.key}`)
+  connect(`implement:${unit.key}`, 'implement')
 }
 const split = units.length > 1
 log(split ? 'The plan split the work into parallel units' : 'The plan defined a single work unit')
@@ -364,6 +443,17 @@ const explorationsFor = unit => {
   return matches
 }
 const dispatchImplementation = async (targets, findings, roundLabel, requiredStart) => {
+  for (const unit of targets) {
+    const key = `implement:${unit.key}${roundLabel}`
+    if (nodeFor(key) === undefined) {
+      graph.nodes.push({ ...nodeFor('implement'), key, prerequisites: [], owner: `worker:${unit.key}`, ownership: { kind: 'unit', value: unit }, inputs: {}, status: 'pending', completionEvidence: [] })
+      connect('plan', key)
+      connect(`review${roundsUsed === 1 ? '' : `:fix-${roundsUsed - 1}`}`, key)
+      connect(`verify-findings:${roundsUsed}`, key)
+      connect(key, activeNodes.implement)
+    }
+    nodeFor(key).inputs = { unit, explorations: explorationsFor(unit), requiredStart, findings }
+  }
   const results = await parallel(targets.map(unit => () => {
     const options = {
       isolation: 'worktree',
@@ -417,6 +507,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     if (item === null) {
       failures.push('an implementation agent returned no result')
     } else if (item.attempt.error !== undefined) {
+      setOutcome(`implement:${item.key}${roundLabel}`, 'failed', item.attempt.error)
       failures.push(`${item.key}: ${item.attempt.error}`)
     } else {
       const result = item.attempt.result
@@ -451,6 +542,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
           state: problems.length === 0 ? 'implemented' : 'attempted'
         })
       }
+      setOutcome(`implement:${item.key}${roundLabel}`, problems.length === 0 ? 'completed' : 'failed', problems.join(', ') || null, result)
       if (problems.length === 0) {
         unitResults.push({
           branch: result.branch,
@@ -602,6 +694,7 @@ const dispatchSweep = async candidate => {
     'Run a quick environment-exposure sweep over the integrated change only.',
     basePart,
     `Candidate branch: ${candidate}`,
+    'Inspect this named branch, not the coordinator checkout.',
     'Inspect the candidate branch diff against the base branch and its checkout untracked files, and read only those files.',
     'Flag credentials, tokens, private hostnames, absolute home paths, session identifiers, and private environment details.',
     'Report each exposure with its file, a kind, and the exposing detail.',
@@ -652,7 +745,7 @@ const dispatchSweep = async candidate => {
 }
 const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   const attempt = await runAgent(compose(
-    'Publish the integrated candidate branch for review.',
+    'Publish the named candidate branch for review.',
     taskPart,
     basePart,
     `Candidate branch: ${integrationState.branch}`,
@@ -702,6 +795,7 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
 const dispatchReview = async (currentUnits, integrationState, publishState) => {
   const attempt = await runAgent(compose(
     'Independently review the complete current change for the delivery goal.',
+    `Candidate branch: ${integrationState.branch}.`,
     taskPart,
     basePart,
     issuePart,
@@ -771,6 +865,10 @@ const verifyFindings = async (review, integration, publication, round) => {
     return review
   }
   const findings = review.findings.map((finding, index) => ({ ...finding, id: `review-${round + 1}-finding-${index + 1}` }))
+  setOutcome(activeNodes.review, review.status, review.reason, review)
+  const key = `verify-findings:${round + 1}`
+  graph.nodes.push({ key, operation: 'Verify review findings', prerequisites: [], inputs: { findings, candidate: integration.branch, publication }, outputs: ['dispositions', 'confirmed findings', 'evidence'], owner: 'independent finding verifier', authority: 'read-only', completionEvidence: [], status: 'pending', reason: null })
+  connect(activeNodes.review, key)
   const attempt = await runAgent(compose(
     'Independently verify each review finding against source and requirements. Do not fix or modify anything.',
     'Refute a finding whose failure scenario cannot realistically occur.',
@@ -793,8 +891,10 @@ const verifyFindings = async (review, integration, publication, round) => {
       ['confirmed', 'refuted', 'unverified'].includes(item?.status) && typeof item?.evidence === 'string' && item.evidence.trim()) &&
     new Set(dispositions.map(item => item.id)).size === findings.length
   if (attempt.error !== undefined || !valid || dispositions.some(item => item.status === 'unverified')) {
+    setOutcome(key, 'failed', 'Finding verification failed or remains unresolved', { dispositions: dispositions ?? null, error: attempt.error ?? null })
     return { ...review, findings, verification: { dispositions: dispositions ?? null, error: attempt.error ?? null }, reason: 'Finding verification failed or remains unresolved', status: 'failed' }
   }
+  setOutcome(key, 'completed', null, { dispositions })
   const confirmed = findings.filter(finding => dispositions.some(item => item.id === finding.id && item.status === 'confirmed'))
   return { ...review, findings, confirmed, verification: { dispositions }, accepted: confirmed.length === 0 }
 }
@@ -802,14 +902,13 @@ const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) 
   if (skipped.publish) {
     return { reason: 'Explicit dispatch skip, so publication did not run', status: 'skipped' }
   }
-  if (phaseRecords.implement.status !== 'completed') {
-    return { reason: 'Implementation did not complete, so publication is blocked', status: 'skipped' }
-  }
-  if (phaseRecords.integrate.status !== 'completed') {
-    return { reason: 'Required Integration predecessor is incomplete, so publication is blocked', status: 'skipped' }
-  }
-  if (phaseRecords.sweep.status !== 'completed') {
-    return { reason: 'Required Sweep predecessor is incomplete', status: 'skipped' }
+  const predecessor = incompletePredecessor('publish')
+  if (predecessor !== undefined) {
+    return { reason: predecessor === 'implement'
+      ? 'Implementation did not complete, so publication is blocked'
+      : predecessor === 'integrate'
+        ? 'Required Integration predecessor is incomplete, so publication is blocked'
+        : 'Required Sweep predecessor is incomplete', status: 'skipped' }
   }
   const count = sweepState.exposures === undefined ? 0 : sweepState.exposures.length
   if (count > 0) {
@@ -825,7 +924,7 @@ const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) 
 phase('Implement')
 let unitResults = []
 const attemptLedger = []
-if (phaseRecords.plan?.status !== 'completed') {
+if (graph.edges.some(edge => edge.to === activeNodes.implement && !edge.from.startsWith('implement:') && nodeFor(edge.from).status !== 'completed')) {
   recordPhase('implement', 'skipped', 'Required Plan predecessor is incomplete')
 } else if (skipped.implement) {
   recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
@@ -834,40 +933,42 @@ if (phaseRecords.plan?.status !== 'completed') {
 } else if (baseBranch && candidateBranch === baseBranch) {
   recordPhase('implement', 'failed', 'The task candidate cannot equal the base branch')
 } else {
-  log('Implementing the planned unit')
+  log(split ? 'Implementing the planned units in parallel' : 'Implementing the planned unit')
   const implementState = await dispatchImplementation(units, null, '', candidateBranch)
-  recordPhase('implement', implementState.status, implementState.reason)
+  recordPhase('implement', implementState.status, implementState.reason, implementState)
   unitResults = implementState.unitResults
   retainAttempts(implementState.attemptResources, attemptLedger)
 }
 let integrationState = null
 phase('Integrate')
-if (phaseRecords.implement.status !== 'completed') {
+if (incompletePredecessor('integrate') !== undefined) {
   integrationState = { reason: 'Implementation did not complete', status: 'skipped' }
 } else if (skipped.integrate) {
   integrationState = { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
+} else if (graph.edges.some(edge => edge.to === activeNodes.integrate && edge.type === 'condition' && !edgeRequired(edge))) {
+  integrationState = { branch: unitResults[0].branch, reason: 'The plan defines a single work unit, so no cross-unit integration is required', status: 'skipped' }
 } else {
   log('Integrating the named unit branches into the task branch')
   integrationState = await dispatchIntegration(unitResults)
 }
-recordPhase('integrate', integrationState.status, integrationState.reason)
+recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
 applyLedger(integrationState, attemptLedger)
 let sweepState = null
 phase('Sweep')
-if (phaseRecords.integrate.status !== 'completed') {
-  sweepState = { reason: 'Integration did not complete', status: 'skipped' }
+if (incompletePredecessor('sweep') !== undefined) {
+  sweepState = { reason: `Required ${phaseTitles[incompletePredecessor('sweep')]} predecessor is incomplete`, status: 'skipped' }
 } else if (skipped.sweep) {
   sweepState = { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
 } else {
   log('Sweeping the change for environment exposures')
   sweepState = await dispatchSweep(integrationState.branch)
 }
-recordPhase('sweep', sweepState.status, sweepState.reason)
+recordPhase('sweep', sweepState.status, sweepState.reason, sweepState)
 let publishState = null
 let postedUrl = null
 phase('Publish')
 publishState = await runPublish(sweepState, unitResults, integrationState, null)
-recordPhase('publish', publishState.status, publishState.reason)
+recordPhase('publish', publishState.status, publishState.reason, publishState)
 if (publishState.status === 'completed') {
   postedUrl = publishState.url
 }
@@ -875,14 +976,14 @@ let reviewState = null
 phase('Review')
 if (skipped.review) {
   reviewState = { reason: 'Explicit dispatch skip, so independent review did not run', status: 'skipped' }
-} else if (publishState.status !== 'completed') {
+} else if (incompletePredecessor('review') !== undefined) {
   reviewState = { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
 } else {
   log('Reviewing the posted candidate')
   reviewState = await dispatchReview(unitResults, integrationState, publishState)
 }
 reviewState = await verifyFindings(reviewState, integrationState, publishState, 0)
-recordPhase('review', reviewState.status, reviewState.reason)
+recordPhase('review', reviewState.status, reviewState.reason, reviewState)
 const reviewHistory = [reviewState]
 let roundsUsed = 0
 while (
@@ -902,9 +1003,25 @@ while (
   const targets = units.filter(unit => reviewState.confirmed.some(finding => unit.paths.some(path => ownsPath(path, finding.file))))
   roundsUsed += 1
   const candidateName = integrationState.branch
+  for (const key of ['implement', 'integrate', 'sweep', 'publish', 'review']) {
+    const previous = nodeFor(activeNodes[key])
+    activeNodes[key] = `${key}:fix-${roundsUsed}`
+    graph.nodes.push({ ...previous, key: activeNodes[key], prerequisites: [], inputs: operations[key][3], status: 'pending', reason: null, completionEvidence: [] })
+  }
+  connect('plan', activeNodes.implement)
+  connect(`review${roundsUsed === 1 ? '' : `:fix-${roundsUsed - 1}`}`, activeNodes.implement)
+  connect(`verify-findings:${roundsUsed}`, activeNodes.implement)
+  connect(activeNodes.implement, activeNodes.integrate)
+  connect('plan', activeNodes.integrate, 'condition', 'units.length > 1')
+  connect(activeNodes.implement, activeNodes.sweep)
+  connect(activeNodes.integrate, activeNodes.sweep, 'condition', 'units.length > 1')
+  connect(activeNodes.implement, activeNodes.publish)
+  connect(activeNodes.integrate, activeNodes.publish, 'condition', 'units.length > 1')
+  connect(activeNodes.sweep, activeNodes.publish)
+  connect(activeNodes.publish, activeNodes.review)
   phase('Implement')
   const fixState = await dispatchImplementation(targets, reviewState.confirmed, `:fix-${roundsUsed}`, candidateName)
-  recordPhase('implement', fixState.status, fixState.reason)
+  recordPhase('implement', fixState.status, fixState.reason, fixState)
   retainAttempts(fixState.attemptResources, attemptLedger)
   const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
   unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
@@ -914,32 +1031,41 @@ while (
   phase('Integrate')
   integrationState = skipped.integrate
     ? { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
-    : await dispatchIntegration(unitResults)
-  recordPhase('integrate', integrationState.status, integrationState.reason)
+    : graph.edges.filter(edge => edge.to === activeNodes.integrate && edge.type === 'condition').every(edgeRequired)
+      ? await dispatchIntegration(unitResults)
+      : { branch: unitResults[0].branch, reason: 'The plan defines a single work unit, so no cross-unit integration is required', status: 'skipped' }
+  recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
   applyLedger(integrationState, attemptLedger)
   phase('Sweep')
-  sweepState = integrationState.status !== 'completed'
-    ? { reason: 'Integration did not complete', status: 'skipped' }
+  sweepState = incompletePredecessor('sweep') !== undefined
+    ? { reason: `Required ${phaseTitles[incompletePredecessor('sweep')]} predecessor is incomplete`, status: 'skipped' }
     : skipped.sweep
     ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
     : await dispatchSweep(integrationState.branch)
-  recordPhase('sweep', sweepState.status, sweepState.reason)
+  recordPhase('sweep', sweepState.status, sweepState.reason, sweepState)
   phase('Publish')
   publishState = await runPublish(sweepState, unitResults, integrationState, postedUrl)
-  recordPhase('publish', publishState.status, publishState.reason)
+  recordPhase('publish', publishState.status, publishState.reason, publishState)
   if (publishState.status === 'completed') {
     postedUrl = publishState.url
   }
   phase('Review')
-  reviewState = publishState.status === 'completed'
+  reviewState = incompletePredecessor('review') === undefined
     ? await dispatchReview(unitResults, integrationState, publishState)
     : { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
   reviewState = await verifyFindings(reviewState, integrationState, publishState, roundsUsed)
   reviewHistory.push(reviewState)
-  recordPhase('review', reviewState.status, reviewState.reason)
+  recordPhase('review', reviewState.status, reviewState.reason, reviewState)
 }
 if (reviewState.status === 'completed' && reviewState.verdict === 'fix-required' && !reviewState.accepted) {
-  recordPhase('review', 'completed', `Verdict fix-required after ${roundsUsed} of ${maxFixRounds} fix rounds`)
+  recordPhase('review', 'completed', `Verdict fix-required after ${roundsUsed} of ${maxFixRounds} fix rounds`, reviewState)
+}
+for (const node of graph.nodes) {
+  if (node.status === 'running') {
+    setOutcome(node.key, 'failed', 'The dispatched node returned no accepted result')
+  } else if (node.status === 'pending') {
+    setOutcome(node.key, 'skipped', 'A required predecessor or dispatch skip prevented this node from running')
+  }
 }
 const phaseEvidence = phaseKeys.map(key => phaseRecords[key])
 if (
@@ -949,7 +1075,11 @@ if (
   throw new Error('Phase evidence is incomplete')
 }
 const complete =
-  phaseEvidence.every(record => record.status === 'completed' || (record.title === 'Explore' && skipped.explore && record.status === 'skipped')) &&
+  phaseKeys.every(key => nodeFor(activeNodes[key]).status === 'completed' ||
+    (key === 'explore' && skipped.explore && nodeFor(activeNodes[key]).status === 'skipped') ||
+    (nodeFor(activeNodes[key]).status === 'skipped' && !skipped[key] &&
+      graph.edges.some(edge => edge.to === activeNodes[key] && edge.type === 'condition' && !edgeRequired(edge)) &&
+      incompletePredecessor(key) === undefined)) &&
   (phaseRecords.review.status !== 'completed' || (reviewState.verdict === 'pass' || reviewState.accepted === true))
 return {
   complete,
@@ -957,12 +1087,13 @@ return {
   exposures: sweepState.exposures ?? [],
   sweepEvidence: sweepState.evidence ?? null,
   fixRounds: { max: maxFixRounds, used: roundsUsed },
+  graph,
+  integration: integrationState,
   phaseEvidence,
   publish: publishState.status === 'completed'
     ? { action: publishState.action, url: publishState.url }
     : null,
   resources: attemptLedger,
-  integration: integrationState,
   review: reviewState,
   reviewHistory,
   scopes,
