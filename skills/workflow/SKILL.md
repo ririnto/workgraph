@@ -15,3 +15,4 @@ Complete an existing bounded assignment under its own contract, or report the ho
 
 As the Claude Code Main Agent, use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
 Read [the execution procedure](references/claude-code-main.md) before proceeding, unless its complete content is already loaded.
+For repository delivery, that procedure selects the single adaptive `workgraph:delivery` workflow.

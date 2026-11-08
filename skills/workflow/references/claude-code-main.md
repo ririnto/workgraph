@@ -22,7 +22,7 @@ Resume authorized edit work only after that approval, without adding gates to wo
 
 ## Run Workflow
 
-For bundled delivery graphs, read the applicable [simple](../../../workflows/delivery-simple.js) or [complex](../../../workflows/delivery-complex.js) source and call native Workflow with its registered plugin name.
+For bundled delivery graphs, read the [adaptive delivery](../../../workflows/delivery.js) source and call native Workflow with its registered plugin name.
 For other accepted graphs, author native source under the authoring reference and pass it as inline `script`.
 Use its returned `scriptPath` and same-session `resumeFromRunId` for an authorized continuation.
 Pass structured JSON through `args` when the script needs runtime inputs.

@@ -10,13 +10,14 @@ execution:
     - Read
   prompt: |-
     Use the planning-only run of the Workgraph delivery sample.
-    Read the bundled `skills/workflow/SKILL.md` and its `workflows/delivery-simple.js` source unless their complete content is already present.
+    Read the bundled `skills/workflow/SKILL.md` and its `workflows/delivery.js` source unless their complete content is already present.
     Resolve both paths from the Main contract's base directory in the session context.
     The `Skill` tool refuses Workgraph skills, which is expected.
-    Invoke the registered workgraph:delivery-simple workflow.
+    Invoke the registered workgraph:delivery workflow.
     Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.
-    Name the absolute paths of `docs/workflow-samples.md` and `workflows/delivery-simple.js` in `args.task`, because stages can read those files but cannot search outside the working directory.
+    Name the absolute paths of `docs/workflow-samples.md` and `workflows/delivery.js` in `args.task`, because stages can read those files but cannot search outside the working directory.
     Keep scope separation, exploration, and planning enabled.
+    Scope and plan outputs must express every owned path relative to the repository root, even though args.task identifies readable source files by absolute path.
     Because this request edits nothing and publishes nothing, skip implementation, integration, sweep, publication, and review through structured args.skips.
     Run exactly one native Workflow invocation.
     Do not retry or duplicate it after failure, incomplete results, or timeout.
@@ -35,9 +36,9 @@ graders:
     focus: trace
     criteria: |-
       Judge the observed tool trace, Workflow results, and final report together.
-      Require the complete bundled `skills/workflow/SKILL.md` and maintained `workflows/delivery-simple.js` source.
+      Require the complete bundled `skills/workflow/SKILL.md` and maintained `workflows/delivery.js` source.
       Accept complete Reads of the bundled files or complete content already supplied in the observed context.
-      Require its first native Workflow call to use the registered workgraph:delivery-simple name.
+      Require its first native Workflow call to use the registered workgraph:delivery name.
       Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
       A freshly authored replacement graph or an inline script does not establish source consumption.
       Judge stage results only from the returned `scopes` and `explorations` fields, because stage prompts are not in the trace.
