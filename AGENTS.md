@@ -1,10 +1,10 @@
-# Workgraph repository instructions
+# Workgraph Repository Instructions
 
 These instructions apply to repository contributors and are not injected into consumer sessions.
 Follow explicit user requirements before repository defaults and skills, within host and safety constraints.
 Complete authorized changes and relevant checks before returning a final result, or report the specific blocker.
 
-## Instruction ownership
+## Instruction Ownership
 
 - Keep contributor conventions and validation commands here.
 - Keep consumer behavior in `skills/` and the host adapters in `docs/harness/`.
@@ -72,7 +72,7 @@ Follow Development's [verification guidance](skills/development/SKILL.md#verific
 Assert strings only by exact equality, never by inclusion or non-inclusion.
 Do not keep or add tests that validate document or prompt prose.
 
-## Repository reviews
+## Repository Reviews
 
 For Workgraph contributor pull-request reviews, follow the scoped policy in [docs/reviews.md](docs/reviews.md).
 
@@ -110,7 +110,7 @@ Follow the active role's evidence policy in [Main Agent Contract](skills/main-ag
 Report exact commands, results, and unverified behavior.
 Run formatting fixes only within the authorized change.
 
-## Version and publication
+## Version And Publication
 
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit bodies and issue and pull request templates.
 

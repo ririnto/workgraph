@@ -28,10 +28,10 @@
     }
   },
   "customRules": [
-    "./rules/no-box-drawing.ts",
-    "./rules/no-em-dash.ts",
-    "./rules/prose-format.ts",
-    "./rules/table-separators.ts",
+    "rules/no-box-drawing.ts",
+    "rules/no-em-dash.ts",
+    "rules/prose-format.ts",
+    "rules/table-separators.ts",
     "markdownlint-rule-relative-links"
   ],
   "gitignore": true,

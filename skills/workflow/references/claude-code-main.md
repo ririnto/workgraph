@@ -1,4 +1,4 @@
-# Workgraph workflow
+# Workgraph Workflow
 
 Do not describe another execution method as native Workflow.
 
