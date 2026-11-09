@@ -9,6 +9,8 @@ import { stripVTControlCharacters } from "node:util";
 
 import { lint } from "markdownlint/sync";
 
+import noEmDash from "../rules/no-em-dash.ts";
+import proseFormat from "../rules/prose-format.ts";
 import tableSeparators from "../rules/table-separators.ts";
 
 test("Git hooks invoke pnpm directly and propagate its status", async () => {
@@ -198,6 +200,67 @@ test("Ultracite check and fix entry points preserve diagnostics and formatter co
   }
 });
 
+test("prose formatting checks sentences and preserves Markdown syntax", () => {
+  const source = [
+    "# One sentence. Another sentence.",
+    "",
+    "First sentence. Second sentence.",
+    "- First item. Second item.",
+    "A clause; it must continue.",
+    "",
+    "One sentence per line.",
+    "Another sentence with `one; two` and [a link](https://example.com/a;b).",
+    "1. A numbered item with &amp; and a list of red; green; and blue.",
+    "",
+    "| Heading | Value |",
+    "| --- | --- |",
+    "| First. Second. | a; b |",
+    "",
+    "```sh",
+    "if test; then run; fi",
+    "```"
+  ].join("\n");
+  const errors =
+    lint({
+      config: { default: false, "docs/prose-format": true },
+      customRules: [proseFormat],
+      strings: { "input.md": source }
+    })["input.md"] ?? [];
+  assert.deepEqual(
+    errors.map(({ lineNumber }) => lineNumber).toSorted((a, b) => a - b),
+    [1, 3, 4, 5]
+  );
+});
+
+test("em-dash rule checks prose and preserves code and links", () => {
+  const source = [
+    "# Heading — heading",
+    "",
+    "Prose — prose.",
+    "- Item — item.",
+    "",
+    "| Header | Value |",
+    "| --- | --- |",
+    "| Prose — prose | Value |",
+    "",
+    "Use `a—b` and [link](https://example.com/a—b).",
+    "",
+    "```text",
+    "a—b",
+    "```"
+  ].join("\n");
+  const errors =
+    lint({
+      config: { default: false, "docs/no-em-dash": true },
+      customRules: [noEmDash],
+      strings: { "input.md": source }
+    })["input.md"] ?? [];
+  assert.deepEqual(
+    errors.map(({ lineNumber }) => lineNumber).toSorted((a, b) => a - b),
+    [1, 3, 4, 8]
+  );
+});
+
 test("table separator traversal handles deeply nested blockquotes", () => {
   const quote = "> ".repeat(2000);
   const source = [
@@ -248,7 +311,7 @@ test("table separator diagnostics retain fix information", () => {
   );
 });
 
-test("search-replace covers box drawing in all Markdown with first UTF-16 match and no fix", async () => {
+test("box drawing rule covers all Markdown with first UTF-16 match and no fix", async () => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(
     path.join(tmpdir(), "workgraph-box-drawing-")
@@ -285,7 +348,7 @@ test("search-replace covers box drawing in all Markdown with first UTF-16 match 
     assert.deepEqual(
       [
         ...diagnostics.matchAll(
-          /fixture\.md:(?<line>\d+):(?<column>\d+) error search-replace Custom rule/gu
+          /fixture\.md:(?<line>\d+):(?<column>\d+) error docs\/no-box-drawing /gu
         )
       ].map(({ groups }) => [Number(groups.line), Number(groups.column)]),
       [

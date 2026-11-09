@@ -1,38 +1,38 @@
-# Workgraph Repository Instructions
+# Workgraph repository instructions
 
 These instructions apply to repository contributors and are not injected into consumer sessions.
 Follow explicit user requirements before repository defaults and skills, within host and safety constraints.
 Complete authorized changes and relevant checks before returning a final result, or report the specific blocker.
 
-## Instruction Ownership
+## Instruction ownership
 
-Keep contributor conventions and validation commands here.
-Keep consumer behavior in `skills/` and the host adapters in `docs/harness/`.
-Keep consumer links and required resources inside this plugin.
-Keep always-required procedures in each skill's `SKILL.md`, with each role body self-contained.
+- Keep contributor conventions and validation commands here.
+- Keep consumer behavior in `skills/` and the host adapters in `docs/harness/`.
+- Keep consumer links and required resources inside this plugin.
+- Keep always-required procedures in each skill's `SKILL.md`, with each role body self-contained.
 
-Keep host-specific execution timing in each role's references, and inject only the selected host's reference.
-Keep shared role and task procedures host-neutral.
-Keep native host mechanics in the matching host reference.
-Keep user-facing host setup, invocation, and update instructions in the matching `docs/harness/` adapter.
-Link policy owners instead of restating their procedures.
-Keep orchestration and model guidance in Main Agent references.
-Add no orchestration or model guidance in Worker references.
+- Keep host-specific execution timing in each role's references, and inject only the selected host's reference.
+- Keep shared role and task procedures host-neutral.
+- Keep native host mechanics in the matching host reference.
+- Keep user-facing host setup, invocation, and update instructions in the matching `docs/harness/` adapter.
+- Link policy owners instead of restating their procedures.
+- Keep orchestration and model guidance in Main Agent references.
+- Add no orchestration or model guidance in Worker references.
 
-Keep lifecycle procedures in `skills/development/playbooks/`, with Development selecting only the matching playbook and language references.
-Keep Workflow focused on its lower-level operation without repeating the Main contract or the Delivery checklist.
-Do not duplicate an operational rule, procedure, or checklist across sources that load in the same context.
-Link the sole owner instead, and keep each conditional procedure at its stated scope and read trigger.
+- Keep lifecycle procedures in `skills/development/playbooks/`, with Development selecting only the matching playbook and language references.
+- Keep Workflow focused on its lower-level operation without repeating the Main contract or the Delivery checklist.
+- Do not duplicate an operational rule, procedure, or checklist across sources that load in the same context.
+- Link the sole owner instead, and keep each conditional procedure at its stated scope and read trigger.
 
-Identify each loaded source by its actual file path and state which complete content is already present.
-Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
-Load every selected file before emitting context, without requiring model retrieval during hook startup.
-Keep all skills user-invocable, block their model invocation through each host's supported control, and route model reads through bundled `SKILL.md` links.
+- Identify each loaded source by its actual file path and state which complete content is already present.
+- Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
+- Load every selected file before emitting context, without requiring model retrieval during hook startup.
+- Keep all skills user-invocable, block their model invocation through each host's supported control, and route model reads through bundled `SKILL.md` links.
 
-Use `README.md` for installation and runtime behavior.
-Read `docs/design.md` when changing instruction boundaries or hook delivery.
-Read `docs/research.md` when changing behavior based on external research.
-Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
+- Use `README.md` for installation and runtime behavior.
+- Read `docs/design.md` when changing instruction boundaries or hook delivery.
+- Read `docs/research.md` when changing behavior based on external research.
+- Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 
 ## Writing
 
@@ -48,23 +48,23 @@ Exclude generated and vendored material from mechanical prose edits.
 
 ## Implementation
 
-Use Node built-ins compatible with Node.js 26 and later for the plugin runtime.
-Resolve bundled files from the executing module's location.
-Keep hook commands portable through the selected host's plugin-root variable.
-Emit context only after all required files load and contain text.
-Keep host permissions and task execution in the host.
+- Use Node built-ins compatible with Node.js 26 and later for the plugin runtime.
+- Resolve bundled files from the executing module's location.
+- Keep hook commands portable through the selected host's plugin-root variable.
+- Emit context only after all required files load and contain text.
+- Keep host permissions and task execution in the host.
 
-Use Node and pnpm for development.
-Follow the Node engine range in `package.json`.
-Keep dependency versions in the `pnpm-workspace.yaml` catalog and resolutions in `pnpm-lock.yaml` consistent with the manifest.
+- Use Node and pnpm for development.
+- Follow the Node engine range in `package.json`.
+- Keep dependency versions in the `pnpm-workspace.yaml` catalog and resolutions in `pnpm-lock.yaml` consistent with the manifest.
 
-Match the existing lint configuration.
-Use `const` for bindings that do not change.
-Keep explanations in declaration comments rather than comments inside function bodies.
-Leave no blank lines inside function bodies.
-Use no trailing commas in TypeScript.
-Use `.yaml` for maintained YAML files unless the consumer requires another exact filename.
-Use block sequences except for an explicit empty sequence.
+- Match the existing lint configuration.
+- Use `const` for bindings that do not change.
+- Keep explanations in declaration comments rather than comments inside function bodies.
+- Leave no blank lines inside function bodies.
+- Use no trailing commas in TypeScript.
+- Use `.yaml` for maintained YAML files unless the consumer requires another exact filename.
+- Use block sequences except for an explicit empty sequence.
 
 ## Tests
 
@@ -72,7 +72,7 @@ Follow Development's [verification guidance](skills/development/SKILL.md#verific
 Assert strings only by exact equality, never by inclusion or non-inclusion.
 Do not keep or add tests that validate document or prompt prose.
 
-## Repository Reviews
+## Repository reviews
 
 For Workgraph contributor pull-request reviews, follow the scoped policy in [docs/reviews.md](docs/reviews.md).
 
@@ -110,7 +110,7 @@ Follow the active role's evidence policy in [Main Agent Contract](skills/main-ag
 Report exact commands, results, and unverified behavior.
 Run formatting fixes only within the authorized change.
 
-## Version And Publication
+## Version and publication
 
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for commit bodies and issue and pull request templates.
 

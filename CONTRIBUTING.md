@@ -37,7 +37,7 @@ Run the Markdown check and record its result.
 Record any unavailable host validation without claiming model adherence.
 ```
 
-## Pull Requests
+## Pull requests
 
 Use the [pull request template](.github/pull_request_template.md), including when creating a PR through an API or CLI.
 Explain the problem, resulting changes, verification, and remaining limitations.
