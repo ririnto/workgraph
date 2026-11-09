@@ -7,6 +7,7 @@ execution:
   timeout_seconds: 360
   allowed_tools:
     - Agent
+    - Workflow
     - Read
   prompt: |-
     ultracode
@@ -14,6 +15,7 @@ execution:
     The `Skill` tool refuses Workgraph skills, which is expected.
     Delegate one bounded read-only assessment that ends in one phase to a worker.
     The assessment is complete in this phase, with no expected follow-up phase.
+    Do not add preparation, verification, or reporting phases merely to make Workflow eligible.
     Give that worker both batches and report its result in Main.
     A finding blocks release if its required timeout is absent.
     Batch A has A1 without a timeout, A2 with a timeout, and A3 with a timeout.
