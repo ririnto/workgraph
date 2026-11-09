@@ -12,6 +12,9 @@ Agent-tool subagents and Workflow stages lose the Workflow tool through the host
 Do not dispatch a Workgraph node as a fork, because forks keep the main tool pool including Workflow.
 If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
+Group outcomes in one Workflow only when they share a prerequisite, result, integration, or acceptance dependency.
+Use separate runs for independent repository tasks without such dependencies, so one cannot block another's validation or publication.
+A shared activity label or simultaneous request alone is not a dependency.
 For ownership of each outcome, follow the [Main Agent Contract](../../main-agent-contract/SKILL.md#assignments).
 For authorized engineering-delivery graphs, read [Delivery](../../delivery/SKILL.md) and [delivery mapping](delivery.md) unless their complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read [authoring](authoring.md) unless its complete content is already loaded.

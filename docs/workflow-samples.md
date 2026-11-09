@@ -63,7 +63,7 @@ That procedure describes requirement coverage, challenge, verification selected 
 | --- | --- |
 | `task` | Required nonempty string holding the delivery goal. |
 | `issue` | Optional nonempty issue reference included in the publication and review prompts. |
-| `baseBranch` | Optional base branch string used by the sweep, publication, and review prompts. |
+| `baseBranch` | Optional base branch string resolved during scope and used by downstream prompts, defaulting to the repository's default branch. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference and the exact integration destination for several units. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
 | `models` | Optional object of per-phase model selector strings and a separate `verify` selector. |
@@ -75,11 +75,11 @@ That procedure describes requirement coverage, challenge, verification selected 
 
 | Phase | Required predecessor data | Completion evidence |
 | --- | --- | --- |
-| Scope | The delivery goal. | Disjoint scopes with keys, descriptions, and owned paths. |
+| Scope | The delivery goal and optional base branch. | The resolved base branch and disjoint scopes with keys, descriptions, and owned paths. |
 | Explore | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
 | Plan | The scopes and any exploration findings with evidence. | Work units with disjoint owned paths and instructions. |
 | Implement | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
-| Integrate | All accepted unit results after implementation completes. | For several units, named unit branches merged, their resource states, and combined-candidate checks; for one unit, an explicit conditional skip and the accepted unit branch. |
+| Integrate | All accepted unit results after implementation completes. | For several units or a repair, named unit branches merged, their resource states, and combined-candidate checks; for one initial unit, a conditional skip and the accepted unit branch. |
 | Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
 | Publish | Completed implementation, completed or conditionally unnecessary integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
 | Review | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
@@ -88,6 +88,8 @@ Implementation runs every unit in its own isolated native worktree, including a 
 Each isolated worker verifies its worktree starts from the named task candidate before editing and synchronizes first when it does not.
 Implementation requires `args.candidateBranch` to name the task candidate, which stays distinct from the publication base branch.
 A missing candidate fails implementation before dispatch, so no editor edits from an unverified worktree start.
+Scope resolves the base identity even when `args.baseBranch` is omitted, and implementation rejects a reported unit branch equal to that base.
+The publisher verifies actual refs and branch protections before pushing, because reported names alone do not establish Git state.
 A repair round carries the current accepted candidate as its required starting reference.
 Unit ownership is normalized to canonical repository-relative paths, absolute and escaping paths are rejected before dispatch, and every reported changed file must normalize to a path inside its unit.
 Checks report explicit passed, failed, or skipped statuses, and a gate passes only when every required check passed.
@@ -107,17 +109,19 @@ For one accepted unit, integration records `skipped` with the reason that no cro
 Its resource stays `implemented`, not `merged`, because no merge occurred.
 Publication always precedes review, and review requires the request posted by the completed publication phase.
 Publication and review receive the per-unit checks and the combined-candidate checks.
-A fix round updates the same posted request, replaces only the repaired units' results by key, and reviews the posted candidate again.
+A fix round integrates the repaired unit branches into the original posted candidate, updates the same request, replaces only the repaired units' results by key, and reviews the candidate again.
+The result retains the last posted URL if a later attempt fails, while phase status records the failure.
+Accepted publication evidence remains in the graph.
 The scope, exploration, and sweep stages run with the built-in read-only Explore agent type, while review keeps the default agent and a read-only instruction.
 
 ## Executed graph
 
 The result includes `graph.nodes` and `graph.edges` using the [Main contract's graph vocabulary](../skills/main-agent-contract/SKILL.md#coordinate-outcomes) and [dependency design](design.md#compose-work-through-the-host).
 Each node records `key`, `operation`, `prerequisites`, `inputs`, `outputs`, `owner`, `authority`, `completionEvidence`, `status`, and `reason`.
-Result edges require accepted predecessor evidence, and condition edges evaluate `units.length > 1` or the explicit exploration choice.
+Result edges require accepted predecessor evidence, and condition edges evaluate the unit count or the explicit exploration choice.
 Readiness derives from these edges rather than phase order alone.
 Scope explorers, unit workers, finding verifiers, and repair attempts retain their own node records.
-Every dispatch receives a compact graph-position block rendered from its node, including prerequisite statuses and evidence locations, input contracts, downstream outputs, and owned unit or scope when applicable.
+Every dispatch receives a graph-position block with prerequisite statuses, predecessor results, input contracts, downstream outputs, and its owned unit or scope when applicable.
 
 ## Skip, failure, and recovery
 
@@ -138,7 +142,7 @@ Without a verifier selector, the agent call leaves that setting unset for host c
 It reports a confirmed, refuted, or unverified disposition with evidence for each finding.
 Missing, malformed, failed, or unverified dispositions block repairs and acceptance.
 Confirmed findings alone go to their owning units, bounded by `maxFixRounds`.
-Each repair repeats the same unit-count integration decision, sweep, publication, review, and finding verification.
+Each repair integrates its branch into the posted candidate, then repeats the sweep, publication, review, and finding verification.
 A fully refuted review can pass, and the result retains the review and disposition evidence.
 A fix round replaces the repaired units' results by key, so unaffected unit evidence stays while combined-candidate evidence is regenerated.
 A confirmed finding outside one unambiguous owned unit blocks the round for replanning.

@@ -135,7 +135,7 @@ connect('implement', 'publish')
 connect('integrate', 'publish', 'condition', 'units.length > 1')
 connect('sweep', 'publish')
 connect('publish', 'review')
-nodeFor('scope').inputs = { task }
+nodeFor('scope').inputs = { task, baseBranch }
 const edgeRequired = edge => edge.condition === null || (edge.condition === '!skips.explore' ? !skipped.explore : nodeFor('plan').completionEvidence.at(-1)?.result?.units?.length > 1 || skipped.integrate)
 const incompletePredecessor = key => graph.edges.find(edge => edge.to === activeNodes[key] && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')?.from
 const setOutcome = (key, status, reason, result = null) => {
@@ -152,8 +152,9 @@ const graphPosition = key => {
   const node = nodeFor(key)
   return [
     `Graph position: ${node.key}; owner: ${node.owner}; authority: ${node.authority}.`,
-    `Prerequisites: ${node.prerequisites.length === 0 ? 'none' : node.prerequisites.map(parent => `${parent}=${nodeFor(parent).status} (graph.nodes[key=${parent}].completionEvidence)`).join('; ')}.`,
-    `Inputs: ${Array.isArray(node.inputs.contract) ? node.inputs.contract.join(', ') : Object.keys(node.inputs.contract).join(', ')}; values in this prompt and graph.nodes[key=${key}].inputs; predecessor results at the evidence locations above.`,
+    `Prerequisites: ${node.prerequisites.length === 0 ? 'none' : node.prerequisites.map(parent => `${parent}=${nodeFor(parent).status}`).join('; ')}.`,
+    `Inputs: ${Array.isArray(node.inputs.contract) ? node.inputs.contract.join(', ') : Object.keys(node.inputs.contract).join(', ')}.`,
+    `Predecessor results: ${JSON.stringify(node.inputs.predecessors)}.`,
     `Outputs consumed downstream: ${node.outputs.join(', ')}.`,
     node.ownership === undefined ? '' : `Owned ${node.ownership.kind}: ${JSON.stringify(node.ownership.value)}.`
   ].filter(Boolean).join('\n')
@@ -214,6 +215,8 @@ log('Separating the delivery goal into scopes')
 const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compose(
   'Separate the delivery goal into disjoint exploration scopes for this repository.',
   taskPart,
+  basePart,
+  'Resolve the actual publication base branch name, using the repository default when no base was supplied, and report it as baseBranch.',
   `Return between 1 and ${maxScopes} scopes that together cover the whole goal.`,
   'Give each scope a short unique key, a one-sentence description, and the repository paths it owns.',
   'Express every path relative to the repository root, for example plugins/foo. Absolute paths are rejected.',
@@ -228,6 +231,7 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
   phase: 'Scope',
   schema: {
     properties: {
+      baseBranch: { type: 'string' },
       evidence: { type: 'string' },
       scopes: {
         items: {
@@ -242,13 +246,15 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
         type: 'array'
       }
     },
-    required: ['evidence', 'scopes'],
+    required: ['baseBranch', 'evidence', 'scopes'],
     type: 'object'
   }
 })
 const scopeList = Array.isArray(scopeAttempt.result?.scopes) ? scopeAttempt.result.scopes : []
 const scopeNames = scopeList.map(scope => (typeof scope?.key === 'string' ? scope.key.trim() : ''))
+const resolvedBase = typeof scopeAttempt.result?.baseBranch === 'string' ? scopeAttempt.result.baseBranch.trim() : ''
 const scopeShape =
+  resolvedBase.length > 0 && (!baseBranch || resolvedBase === baseBranch) &&
   typeof scopeAttempt.result?.evidence === 'string' &&
   scopeAttempt.result.evidence.trim().length > 0 &&
   scopeList.length >= 1 &&
@@ -272,7 +278,7 @@ if (skipped.scope) {
 } else if (!scopeShape) {
   recordPhase('scope', 'failed', `Scope result is missing, malformed, duplicated, or outside 1 through ${maxScopes} scopes`)
 } else {
-  recordPhase('scope', 'completed', null, { scopes, evidence: scopeAttempt.result.evidence })
+  recordPhase('scope', 'completed', null, { baseBranch: resolvedBase, scopes, evidence: scopeAttempt.result.evidence })
 }
 
 phase('Explore')
@@ -492,7 +498,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
       `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
       'You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.',
       `Required starting reference: ${requiredStart}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
-      `Create a branch named for unit ${unit.key} and commit your changes there with a descriptive subject.`,
+      `Create a new branch named for unit ${unit.key}${roundLabel ? `-fix-${roundsUsed}` : ''} from the required starting reference, and commit your changes there with a descriptive subject. Do not commit directly to the starting branch.`,
       'Edit only files inside your owned paths, and report every changed file as a repository-relative path.',
       'Run the narrowest relevant checks and report each command with status passed, failed, or skipped.',
       'Report the branch you committed to, the verified starting reference, the changed files, and the checks.',
@@ -517,7 +523,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
         changedFiles.every(file => file !== null && item.paths.some(owned => ownsPath(owned, file)))
       const handoffHeld =
         typeof result?.branch === 'string' && result.branch.trim().length > 0 &&
-        result.startRef === requiredStart
+        result.branch.trim() !== resolvedBase && result.branch.trim() !== requiredStart && result.startRef === requiredStart
       const evidenceHeld =
         typeof result?.diffSummary === 'string' && result.diffSummary.trim().length > 0 &&
         typeof result?.evidence === 'string' && result.evidence.trim().length > 0
@@ -529,7 +535,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
         problems.push('required checks are missing or did not all pass')
       }
       if (!handoffHeld) {
-        problems.push(`unit branch is missing or the worktree did not start from ${requiredStart}`)
+        problems.push(`unit branch is missing or equals the base or starting branch, or the worktree did not start from ${requiredStart}`)
       }
       if (!evidenceHeld) {
         problems.push('result is missing or malformed')
@@ -562,10 +568,10 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     ? { attemptResources, reason: failures.join('; '), status: 'failed', unitResults }
     : { attemptResources, reason: null, status: 'completed', unitResults }
 }
-const dispatchIntegration = async currentUnits => {
+const dispatchIntegration = async (currentUnits, destination) => {
   const attempt = await runAgent(compose(
-    `Integrate into the authorized destination: ${candidateBranch}.`,
-    basePart,
+    `Integrate into the authorized destination: ${destination}.`,
+    `Base branch: ${resolvedBase}`,
     `Unit resources: ${JSON.stringify(currentUnits.map(unit => ({ ...unit, paths: units.find(plan => plan.key === unit.key).paths })))}`,
     'Before writing, verify the actual checkout, destination, resolved base, branch protections, and named unit branches. Refuse a protected destination or one equal to the base.',
     'Inspect each unit branch by its own changes since its merge base with the destination, as `git diff <destination>...<unit branch>` reports them, including both sides of renames, deletions, and symlinks. Refuse unrelated changes and conflicts outside the responsible unit paths.',
@@ -631,7 +637,7 @@ const dispatchIntegration = async currentUnits => {
     new Set(namedKeys).size === namedKeys.length &&
     currentKeys.every(key => namedKeys.includes(key))
   const shape =
-    result?.branch === candidateBranch &&
+    result?.branch === destination &&
     Array.isArray(result?.changedFiles) && result.changedFiles.every(file => {
       const path = canonicalPath(file)
       return path !== null && path === file && units.some(unit => unit.paths.some(owned => ownsPath(owned, path)))
@@ -692,7 +698,7 @@ const applyLedger = (integrationState, attemptLedger) => {
 const dispatchSweep = async candidate => {
   const attempt = await runAgent(compose(
     'Run a quick environment-exposure sweep over the integrated change only.',
-    basePart,
+    `Base branch: ${resolvedBase}`,
     `Candidate branch: ${candidate}`,
     'Inspect this named branch, not the coordinator checkout.',
     'Inspect the candidate branch diff against the base branch and its checkout untracked files, and read only those files.',
@@ -747,8 +753,9 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   const attempt = await runAgent(compose(
     'Publish the named candidate branch for review.',
     taskPart,
-    basePart,
+    `Base branch: ${resolvedBase}`,
     `Candidate branch: ${integrationState.branch}`,
+    `Before pushing, verify the actual candidate and resolved base refs, confirm the candidate is not the base, and check branch protections. Refuse a protected candidate or one equal to the base. Expected base branch: ${resolvedBase}.`,
     'Push and create or update the review request for this exact candidate branch.',
     issuePart,
     priorUrl === null ? '' : `Update the existing open request at ${priorUrl} with the fixed change instead of creating another request.`,
@@ -790,14 +797,14 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   if (priorUrl !== null && (result.url !== priorUrl || result.action !== 'updated')) {
     return { reason: 'Publication did not update the previously posted request, so publication is blocked', status: 'failed' }
   }
-  return { action: result.action, reason: null, status: 'completed', url: result.url }
+  return { action: result.action, evidence: result.evidence, reason: null, status: 'completed', url: result.url }
 }
 const dispatchReview = async (currentUnits, integrationState, publishState) => {
   const attempt = await runAgent(compose(
     'Independently review the complete current change for the delivery goal.',
     `Candidate branch: ${integrationState.branch}.`,
     taskPart,
-    basePart,
+    `Base branch: ${resolvedBase}`,
     issuePart,
     `Change summary: ${JSON.stringify({
       integration: integrationState === null
@@ -874,7 +881,7 @@ const verifyFindings = async (review, integration, publication, round) => {
     'Refute a finding whose failure scenario cannot realistically occur.',
     'For runtime findings, execute a safe reproduction when available and report the command, expected result, and observed result; otherwise cite source or requirement evidence.',
     taskPart,
-    basePart,
+    `Base branch: ${resolvedBase}`,
     issuePart,
     `Candidate branch: ${integration.branch}; posted request: ${publication.url}`,
     `Review evidence and findings: ${JSON.stringify({ evidence: review.evidence, findings })}`,
@@ -930,7 +937,7 @@ if (graph.edges.some(edge => edge.to === activeNodes.implement && !edge.from.sta
   recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
 } else if (!candidateBranch) {
   recordPhase('implement', 'failed', 'Provide the named task candidate as a nonempty args.candidateBranch string, because implementation cannot verify a worktree starting reference without it')
-} else if (baseBranch && candidateBranch === baseBranch) {
+} else if (candidateBranch === resolvedBase) {
   recordPhase('implement', 'failed', 'The task candidate cannot equal the base branch')
 } else {
   log(split ? 'Implementing the planned units in parallel' : 'Implementing the planned unit')
@@ -949,7 +956,7 @@ if (incompletePredecessor('integrate') !== undefined) {
   integrationState = { branch: unitResults[0].branch, reason: 'The plan defines a single work unit, so no cross-unit integration is required', status: 'skipped' }
 } else {
   log('Integrating the named unit branches into the task branch')
-  integrationState = await dispatchIntegration(unitResults)
+  integrationState = await dispatchIntegration(unitResults, candidateBranch)
 }
 recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
 applyLedger(integrationState, attemptLedger)
@@ -1012,11 +1019,11 @@ while (
   connect(`review${roundsUsed === 1 ? '' : `:fix-${roundsUsed - 1}`}`, activeNodes.implement)
   connect(`verify-findings:${roundsUsed}`, activeNodes.implement)
   connect(activeNodes.implement, activeNodes.integrate)
-  connect('plan', activeNodes.integrate, 'condition', 'units.length > 1')
+  connect('plan', activeNodes.integrate)
   connect(activeNodes.implement, activeNodes.sweep)
-  connect(activeNodes.integrate, activeNodes.sweep, 'condition', 'units.length > 1')
+  connect(activeNodes.integrate, activeNodes.sweep)
   connect(activeNodes.implement, activeNodes.publish)
-  connect(activeNodes.integrate, activeNodes.publish, 'condition', 'units.length > 1')
+  connect(activeNodes.integrate, activeNodes.publish)
   connect(activeNodes.sweep, activeNodes.publish)
   connect(activeNodes.publish, activeNodes.review)
   phase('Implement')
@@ -1026,14 +1033,19 @@ while (
   const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
   unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
   if (fixState.status !== 'completed') {
+    integrationState = { reason: 'Implementation did not complete', status: 'skipped' }
+    sweepState = { reason: 'Required Integration predecessor is incomplete', status: 'skipped' }
+    publishState = { reason: 'Implementation did not complete, so publication is blocked', status: 'skipped' }
+    reviewState = { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
+    for (const [key, state] of Object.entries({ integrate: integrationState, sweep: sweepState, publish: publishState, review: reviewState })) {
+      recordPhase(key, state.status, state.reason, state)
+    }
     break
   }
   phase('Integrate')
   integrationState = skipped.integrate
     ? { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
-    : graph.edges.filter(edge => edge.to === activeNodes.integrate && edge.type === 'condition').every(edgeRequired)
-      ? await dispatchIntegration(unitResults)
-      : { branch: unitResults[0].branch, reason: 'The plan defines a single work unit, so no cross-unit integration is required', status: 'skipped' }
+    : await dispatchIntegration(unitResults, candidateName)
   recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
   applyLedger(integrationState, attemptLedger)
   phase('Sweep')
@@ -1090,9 +1102,7 @@ return {
   graph,
   integration: integrationState,
   phaseEvidence,
-  publish: publishState.status === 'completed'
-    ? { action: publishState.action, url: publishState.url }
-    : null,
+  publish: postedUrl === null ? null : { url: postedUrl, ...(nodeFor(activeNodes.publish).status === 'completed' ? { action: publishState.action, evidence: publishState.evidence } : {}) },
   resources: attemptLedger,
   review: reviewState,
   reviewHistory,
