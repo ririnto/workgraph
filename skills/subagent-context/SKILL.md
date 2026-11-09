@@ -8,14 +8,14 @@ disable-model-invocation: true
 
 ## Complete the assigned outcome
 
-Invocation creates no dispatch or authority.
-Complete the assigned outcome within its scope, authority, ownership, and acceptance criteria.
-For understood, reversible work with limited impact, act directly and run relevant checks.
-Use a short plan for bounded changes and deeper checks for uncertainty or serious consequences.
-File count alone does not determine rigor.
-Reassess as evidence changes, preserving required checks and the assigned outcome.
-Honor user and assignment requirements over defaults within host, safety, and authority boundaries.
-Report blockers or changes affecting other work to the dispatcher.
+- Invocation creates no dispatch or authority.
+- Complete the assigned outcome within its scope, authority, ownership, and acceptance criteria.
+- For understood, reversible work with limited impact, act directly and run relevant checks.
+- Use a short plan for bounded changes and deeper checks for uncertainty or serious consequences.
+- File count alone does not determine rigor.
+- Reassess as evidence changes, preserving required checks and the assigned outcome.
+- Honor user and assignment requirements over defaults within host, safety, and authority boundaries.
+- Report blockers or changes affecting other work to the dispatcher.
 
 ## Follow session boundaries
 
@@ -70,30 +70,30 @@ Continue ready work while waiting, and avoid duplicate dispatch or unsupported c
 
 #### Reuse evidence and resolve failures
 
-Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
-Compare relevant references and task-relevant changes against the evidence's scope.
-Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
-Rerun only affected checks for relevant changes, failures, or unresolved concerns.
+- Validate replayed results against relevant behavior, inputs, configuration, and toolchain, reusing passing evidence only under unchanged conditions.
+- Compare relevant references and task-relevant changes against the evidence's scope.
+- Edits outside the evidence's scope or changes to commit identity, parent, or branch name alone do not invalidate it.
+- Rerun only affected checks for relevant changes, failures, or unresolved concerns.
 
-Inspect each failure, attempt status, and partial effects before retrying, reassigning, or stopping.
-Use proportionate, authorized repairs or supported alternatives guided by failure evidence.
-Fix in-scope defects within authority instead of only reporting them.
-Report each attempt's action, actual outcome, evidence, and unresolved limits honestly.
-Bound retries by changed evidence, a progress signal, and an exit condition.
-Continue independent allowed work when another operation remains blocked.
+- Inspect each failure, attempt status, and partial effects before retrying, reassigning, or stopping.
+- Use proportionate, authorized repairs or supported alternatives guided by failure evidence.
+- Fix in-scope defects within authority instead of only reporting them.
+- Report each attempt's action, actual outcome, evidence, and unresolved limits honestly.
+- Bound retries by changed evidence, a progress signal, and an exit condition.
+- Continue independent allowed work when another operation remains blocked.
 
 ### Return owned resources
 
-Track assignment-owned resources and retain evidence needed for checks, investigation, recovery, requested retention, or acceptance.
-Exclude dependency trees, build caches, and redundant logs from retained evidence.
-Before handback, inspect running background processes and descendants against the recorded assignment resources.
-Stop assignment-owned processes when no longer needed and verify termination.
-Remove unneeded owned containers, caches, and clean worktrees within granted cleanup.
-Confirm ownership before deletion and preserve shared resources and artifacts needed for delivery, recovery, or continued use.
-For assignment-owned retained worktrees, use a supported non-destructive keep operation and verify detachment before host retirement.
-Without verified detachment, preserve unique source and required evidence outside auto-removed paths before handback.
-An idle prompt alone does not prove preservation.
-Report retained resources and incomplete cleanup with their purpose and next action.
+- Track assignment-owned resources and retain evidence needed for checks, investigation, recovery, requested retention, or acceptance.
+- Exclude dependency trees, build caches, and redundant logs from retained evidence.
+- Before handback, inspect running background processes and descendants against the recorded assignment resources.
+- Stop assignment-owned processes when no longer needed and verify termination.
+- Remove unneeded owned containers, caches, and clean worktrees within granted cleanup.
+- Confirm ownership before deletion and preserve shared resources and artifacts needed for delivery, recovery, or continued use.
+- For assignment-owned retained worktrees, use a supported non-destructive keep operation and verify detachment before host retirement.
+- Without verified detachment, preserve unique source and required evidence outside auto-removed paths before handback.
+- An idle prompt alone does not prove preservation.
+- Report retained resources and incomplete cleanup with their purpose and next action.
 
 ## Apply source procedures
 

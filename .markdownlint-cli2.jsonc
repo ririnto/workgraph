@@ -4,6 +4,9 @@
     "code-block-style": {
       "style": "fenced"
     },
+    "docs/no-box-drawing": true,
+    "docs/no-em-dash": true,
+    "docs/prose-format": true,
     "docs/table-separators": true,
     "line-length": false,
     "no-duplicate-heading": {
@@ -17,17 +20,6 @@
     "relative-links": {
       "root_path": "."
     },
-    "search-replace": {
-      "rules": [
-        {
-          "message": "Use ASCII tree markers such as +-- and | instead.",
-          "name": "no-box-drawing",
-          "replace": null,
-          "searchPattern": "/(?<![\\u2500-\\u257F][^\\n]*)[\\u2500-\\u257F]/gu",
-          "searchScope": "all"
-        }
-      ]
-    },
     "single-title": {
       "front_matter_title": ""
     },
@@ -36,8 +28,10 @@
     }
   },
   "customRules": [
+    "./rules/no-box-drawing.ts",
+    "./rules/no-em-dash.ts",
+    "./rules/prose-format.ts",
     "./rules/table-separators.ts",
-    "markdownlint-rule-search-replace",
     "markdownlint-rule-relative-links"
   ],
   "gitignore": true,
