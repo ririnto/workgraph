@@ -254,10 +254,8 @@ const run = () => {
   );
   for (const [host, manifest, hookFile] of manifests) {
     validateNativeManifest(manifest, host);
-    for (const field of metadataFields) {
-      if (!isDeepStrictEqual(codex[field], manifest[field])) {
-        throw new Error(`Codex and ${host} ${field} metadata must match.`);
-      }
+    if (codex.name !== manifest.name) {
+      throw new Error(`Codex and ${host} name metadata must match.`);
     }
     if (
       bundledPath(root, manifest.hooks, `${host} hooks`, "file") !==

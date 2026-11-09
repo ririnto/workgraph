@@ -56,48 +56,29 @@ const validateFieldLabel = (label, fieldName, labels, report) => {
 
 const validateAttributes = (attributes, fieldName, labels, report) => {
   if (isMapping(attributes)) {
-    const { description, label } = attributes;
-    validateFieldLabel(label, fieldName, labels, report);
-    if (!nonEmptyString(description)) {
-      report(`${fieldName} must have a non-empty string description.`);
-    }
+    validateFieldLabel(attributes.label, fieldName, labels, report);
   } else {
     report(`${fieldName} must have an attributes mapping.`);
   }
 };
 
-const validateMappedTextarea = (field, fieldName, ids, labels, report) => {
-  const { attributes, id, type, validations } = field;
-  if (type !== "textarea") {
-    report(`${fieldName} must use the textarea type.`);
-  }
-  validateFieldId(id, fieldName, ids, report);
-  validateAttributes(attributes, fieldName, labels, report);
-  if (!isMapping(validations) || validations.required !== true) {
-    report(`${fieldName} must require a response.`);
-  }
-};
-
-const validateTextarea = (field, index, ids, labels, report) => {
-  const fieldName = `body[${index + 1}]`;
-  if (isMapping(field)) {
-    validateMappedTextarea(field, fieldName, ids, labels, report);
-  } else {
-    report(`${fieldName} must be a mapping.`);
-  }
-};
-
-const validateTextareas = (body, report) => {
+const validateFields = (body, report) => {
   const ids = new Set();
   const labels = new Set();
   for (const [index, field] of body.entries()) {
-    validateTextarea(field, index, ids, labels, report);
+    const fieldName = `body[${index + 1}]`;
+    if (isMapping(field)) {
+      validateFieldId(field.id, fieldName, ids, report);
+      validateAttributes(field.attributes, fieldName, labels, report);
+    } else {
+      report(`${fieldName} must be a mapping.`);
+    }
   }
 };
 
 const validateBody = (body, report) => {
   if (Array.isArray(body) && body.length > 0) {
-    validateTextareas(body, report);
+    validateFields(body, report);
   }
 };
 

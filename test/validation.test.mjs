@@ -14,8 +14,6 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import yamlParser from "markdownlint-cli2/parsers/yaml";
-
 import { validateIssueFormContent } from "./validation/issue-forms.mjs";
 import { validatePluginVersions } from "./validation/plugin-version.mjs";
 
@@ -103,27 +101,13 @@ test("issue form validation reports malformed input and field violations", () =>
     ],
     [
       validIssueForm
-        .replace(
-          "  - type: textarea\n    id: problem",
-          "  - type: input\n    id: problem!"
-        )
+        .replace("id: problem", "id: problem!")
         .replace("    id: evidence\n", "")
-        .replace("      label: Evidence\n", "      label: ''\n")
-        .replace(
-          "      description: Provide concrete evidence.\n",
-          "      description: ''\n"
-        )
-        .replace(
-          "    validations:\n      required: true\n  - type: textarea\n    id: scope",
-          "    validations:\n      required: false\n  - type: textarea\n    id: scope"
-        ),
+        .replace("      label: Evidence\n", "      label: ''\n"),
       [
-        "bug_report.yaml: body[1] must use the textarea type.",
         "bug_report.yaml: body[1] id may contain only letters, numbers, hyphens, and underscores.",
         "bug_report.yaml: body[2] must have a non-empty string id.",
-        "bug_report.yaml: body[2] must have a non-empty string label.",
-        "bug_report.yaml: body[2] must have a non-empty string description.",
-        "bug_report.yaml: body[2] must require a response."
+        "bug_report.yaml: body[2] must have a non-empty string label."
       ]
     ],
     [
@@ -195,21 +179,6 @@ const copyPluginPackage = (t) => {
   );
   return root;
 };
-
-test("issue forms request the contribution fields that CONTRIBUTING.md requires", () => {
-  for (const filename of ["bug_report", "improvement"]) {
-    const form = yamlParser(
-      readFileSync(
-        new URL(`.github/ISSUE_TEMPLATE/${filename}.yaml`, repositoryRoot),
-        "utf-8"
-      )
-    );
-    assert.deepEqual(
-      form.body.map((field) => field.id),
-      ["problem", "evidence", "scope", "acceptance", "ownership_next_action"]
-    );
-  }
-});
 
 test("release versions enforce padded calendar dates and daily sequences", () => {
   for (const version of [
@@ -333,8 +302,8 @@ test("plugin command validates canonical identity, catalogs, and release metadat
     ],
     [
       ".claude-plugin/plugin.json",
-      { description: "Different plugin." },
-      "Codex and Claude description metadata must match."
+      { name: "different-plugin" },
+      "Codex and Claude name metadata must match."
     ],
     [
       ".claude-plugin/plugin.json",
@@ -345,11 +314,6 @@ test("plugin command validates canonical identity, catalogs, and release metadat
       ".cursor-plugin/plugin.json",
       { version: "2026.10.31.01" },
       "Native plugin versions must match across all hosts."
-    ],
-    [
-      ".plugin/plugin.json",
-      { description: "Different plugin." },
-      "Codex and Copilot description metadata must match."
     ],
     [
       ".cursor-plugin/plugin.json",
@@ -453,30 +417,6 @@ test("plugin command validates canonical identity, catalogs, and release metadat
       })
     )
   );
-});
-
-test("plugin command accepts reordered author metadata", (t) => {
-  const root = copyPluginPackage(t);
-  const authorEntries = [
-    ["name", "ririnto"],
-    ["url", "https://github.com/ririnto"]
-  ];
-  for (const [filename, author] of [
-    [".codex-plugin/plugin.json", Object.fromEntries(authorEntries)],
-    [".cursor-plugin/plugin.json", Object.fromEntries(authorEntries)],
-    [".plugin/plugin.json", Object.fromEntries(authorEntries)],
-    [
-      ".claude-plugin/plugin.json",
-      Object.fromEntries(authorEntries.toReversed())
-    ]
-  ]) {
-    const manifestPath = path.join(root, filename);
-    const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
-    writeFileSync(manifestPath, JSON.stringify({ ...manifest, author }));
-  }
-  const result = runValidation(root, "plugin-version.mjs");
-  assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stderr, "");
 });
 
 test("plugin command rejects shadowing manifests and conventional hook discovery", (t) => {

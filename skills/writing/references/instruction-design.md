@@ -74,7 +74,7 @@ Preserve effective guidance when comparisons give no reason to change it, unless
 Treat model-specific prompting observations as hypotheses for the selected workload, not universal rules.
 
 Confirm frontmatter and invocation fields against the target host's supported skill format.
-Keep model invocation enabled unless the user requires another policy.
+Follow the target repository's model invocation policy and any explicit user requirement.
 Check links from installed or relocated source directories, rather than assuming the repository working directory.
 
 Inspect actual hook contexts when changing injected instructions.

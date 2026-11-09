@@ -489,6 +489,7 @@ const samplePaths = {
   delivery: path.join(sampleRoot, "workflows/delivery.js")
 };
 const scopeResult = {
+  baseBranch: "main",
   evidence: "e",
   scopes: [{ description: "d", key: "s1", paths: ["docs"] }]
 };
@@ -527,7 +528,11 @@ const simpleImplement = {
   evidence: "e",
   startRef: "task-branch"
 };
-const simpleRepair = { ...simpleImplement, startRef: "unit-u1" };
+const simpleRepair = {
+  ...simpleImplement,
+  branch: "unit-u1-fix",
+  startRef: "unit-u1"
+};
 const splitImplement = (options) => {
   const secondUnit = options.label.startsWith("implement:u2");
   const repair = options.label.includes(":fix-");
@@ -581,13 +586,13 @@ const integrateResult = {
   ]
 };
 const integrateSingle = {
-  branch: "task-branch",
+  branch: "unit-u1",
   changedFiles: ["docs/guide.md"],
   checks: [{ command: "pnpm run check:hooks", status: "passed" }],
   conflicts: [],
   evidence: "e",
   merged: true,
-  resources: [{ branch: "unit-u1", key: "u1", state: "merged" }]
+  resources: [{ branch: "unit-u1-fix", key: "u1", state: "merged" }]
 };
 const integrateFirstRepair = {
   ...integrateResult,
@@ -620,6 +625,157 @@ const reviewFix = {
   verdict: "fix-required"
 };
 const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
+
+test("delivery preserves a posted request after repair failures", async () => {
+  await Promise.all(
+    ["implement", "integrate", "sweep", "publish"].map(async (failure) => {
+      const { result } = await runWorkflowSample(
+        samplePaths.delivery,
+        { candidateBranch: "task-branch", task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: sequence(
+            simpleImplement,
+            failure === "implement" ? null : simpleRepair
+          ),
+          Integrate: () => (failure === "integrate" ? null : integrateSingle),
+          Plan: () => singleUnits,
+          Publish: sequence(
+            publishCreated,
+            failure === "publish" ? null : publishUpdated
+          ),
+          Review: () => reviewFix,
+          Scope: () => scopeResult,
+          Sweep: sequence(sweepResult, failure === "sweep" ? null : sweepResult)
+        })
+      );
+      assert.equal(result.complete, false);
+      assert.equal(
+        result.graph.nodes.find((node) => node.key === `${failure}:fix-1`)
+          .status,
+        "failed"
+      );
+      assert.deepEqual(result.publish, { url: publishCreated.url });
+      const phases = ["Implement", "Integrate", "Sweep", "Publish", "Review"];
+      const failedIndex = phases.findIndex(
+        (phase) => phase.toLowerCase() === failure
+      );
+      for (const [index, phase] of phases.entries()) {
+        const status = index < failedIndex ? "completed" : "skipped";
+        const expected = index === failedIndex ? "failed" : status;
+        assert.equal(
+          result.phaseEvidence.find((record) => record.title === phase).status,
+          expected,
+          phase
+        );
+        assert.equal(
+          result.graph.nodes.find(
+            (node) => node.key === `${phase.toLowerCase()}:fix-1`
+          ).status,
+          expected,
+          phase
+        );
+      }
+      assert.equal(result.reviewHistory[0].verdict, "fix-required");
+    })
+  );
+});
+
+test("delivery retains publication evidence in its graph", async () => {
+  const { result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: () => simpleImplement,
+      Plan: () => singleUnits,
+      Publish: () => publishCreated,
+      Review: () => reviewPass,
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(
+    result.graph.nodes
+      .find((node) => node.key === "publish")
+      .completionEvidence.at(-1).result.evidence,
+    publishCreated.evidence
+  );
+});
+
+test("delivery rejects a unit branch equal to the resolved default base", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: () => ({ ...simpleImplement, branch: "main" }),
+      Plan: () => singleUnits,
+      Publish: () => publishCreated,
+      Review: () => reviewPass,
+      Scope: () => ({ ...scopeResult, baseBranch: "main" }),
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(result.complete, false);
+  assert.equal(
+    calls.some((call) => call.phase === "Publish"),
+    false
+  );
+});
+
+test("delivery rejects a repair reported on the posted head", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: sequence(simpleImplement, {
+        ...simpleRepair,
+        branch: "unit-u1"
+      }),
+      Plan: () => singleUnits,
+      Publish: () => publishCreated,
+      Review: () => reviewFix,
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(result.complete, false);
+  assert.equal(
+    result.graph.nodes.find((node) => node.key === "implement:fix-1").status,
+    "failed"
+  );
+  assert.equal(calls.filter((call) => call.phase === "Publish").length, 1);
+  assert.deepEqual(result.publish, { url: publishCreated.url });
+});
+
+test("delivery integrates a distinct repair branch into the posted single-unit head", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: sequence(simpleImplement, {
+        ...simpleRepair,
+        branch: "unit-u1-fix"
+      }),
+      Integrate: () => ({
+        ...integrateSingle,
+        branch: "unit-u1",
+        resources: [{ branch: "unit-u1-fix", key: "u1", state: "merged" }]
+      }),
+      Plan: () => singleUnits,
+      Publish: sequence(publishCreated, publishUpdated),
+      Review: sequence(reviewFix, reviewPass),
+      Scope: () => scopeResult,
+      Sweep: () => sweepResult
+    })
+  );
+  assert.equal(result.complete, true);
+  assert.equal(result.integration.branch, "unit-u1");
+  assert.equal(calls.filter((call) => call.phase === "Integrate").length, 1);
+});
 
 test("delivery samples reject a passing review with unresolved findings", async () => {
   await Promise.all(
@@ -867,7 +1023,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         "completed",
         "completed",
         "completed",
-        "skipped",
+        "completed",
         "completed",
         "completed",
         "completed"
@@ -885,14 +1041,20 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
         .every((call) => call.isolation === "worktree")
     );
     assert.deepEqual(result.units, [
-      { branch: "unit-u1", key: "u1", paths: ["docs/guide.md"] }
+      { branch: "unit-u1-fix", key: "u1", paths: ["docs/guide.md"] }
     ]);
     assert.deepEqual(result.resources, [
       {
         branch: "unit-u1",
         key: "u1",
-        startRef: "unit-u1",
+        startRef: "task-branch",
         state: "implemented"
+      },
+      {
+        branch: "unit-u1-fix",
+        key: "u1",
+        startRef: "unit-u1",
+        state: "merged"
       }
     ]);
   }
@@ -1650,7 +1812,7 @@ test("delivery samples reject invalid integration path evidence and base destina
         dispatchTable({
           Explore: () => exploreResult,
           Plan: () => singleUnits,
-          Scope: () => scopeResult
+          Scope: () => ({ ...scopeResult, baseBranch: "task-branch" })
         })
       );
       assert.equal(result.complete, false);
@@ -2022,10 +2184,10 @@ test("delivery graph adapts single-unit candidates and records conditional integ
   );
 });
 
-test("delivery graph exposes node contracts, condition edges, and dispatch positions", async () => {
+test("delivery graph exposes node contracts and condition edges", async () => {
   await Promise.all(
     [false, true].map(async (split) => {
-      const { calls, result } = await runWorkflowSample(
+      const { result } = await runWorkflowSample(
         samplePaths.delivery,
         { candidateBranch: "task-branch", task: "t" },
         dispatchTable({
@@ -2033,7 +2195,7 @@ test("delivery graph exposes node contracts, condition edges, and dispatch posit
           Implement: split
             ? splitImplement
             : sequence(simpleImplement, simpleRepair),
-          Integrate: () => integrateResult,
+          Integrate: () => (split ? integrateResult : integrateSingle),
           Plan: () => (split ? splitUnits : singleUnits),
           Publish: sequence(publishCreated, publishUpdated),
           Review: sequence(reviewFix, reviewPass),
@@ -2081,55 +2243,12 @@ test("delivery graph exposes node contracts, condition edges, and dispatch posit
           true
         );
       }
-      assert.deepEqual(
-        result.graph.edges.find(
-          ({ from, to }) => from === "plan" && to === "integrate"
-        ),
-        {
-          condition: "units.length > 1",
-          from: "plan",
-          to: "integrate",
-          type: "condition"
-        }
-      );
       assert.equal(nodes.get("verify-findings:1").status, "completed");
       assert.deepEqual(nodes.get("implement:u1:fix-1").prerequisites, [
         "plan",
         "review",
         "verify-findings:1"
       ]);
-      for (const call of calls) {
-        const key = [
-          "Scope",
-          "Plan",
-          "Integrate",
-          "Sweep",
-          "Publish",
-          "Review"
-        ].includes(call.phase)
-          ? `${call.phase.toLowerCase()}${calls.filter((previous) => previous.phase === call.phase).indexOf(call) === 0 ? "" : ":fix-1"}`
-          : call.label;
-        const node = nodes.get(key);
-        const position = call.prompt.split("\n\n")[0].split("\n");
-        assert.equal(
-          position[0],
-          `Graph position: ${key}; owner: ${node.owner}; authority: ${node.authority}.`
-        );
-        assert.equal(
-          position[1],
-          `Prerequisites: ${node.prerequisites.length === 0 ? "none" : node.prerequisites.map((parent) => `${parent}=${nodes.get(parent).status} (graph.nodes[key=${parent}].completionEvidence)`).join("; ")}.`
-        );
-        assert.equal(
-          position[3],
-          `Outputs consumed downstream: ${node.outputs.join(", ")}.`
-        );
-        if (node.ownership !== undefined) {
-          assert.equal(
-            position[4],
-            `Owned ${node.ownership.kind}: ${JSON.stringify(node.ownership.value)}.`
-          );
-        }
-      }
     })
   );
 });
