@@ -365,18 +365,18 @@ The reviewed evidence does not establish Terra's effort performance.
 
 | Tier | Workload and effort starting point |
 | --- | --- |
-| `haiku` | - Low for extraction. |
-| | - xhigh for coding and review. |
-| | - medium or high for other analysis. |
+| `haiku` | Low for extraction. |
+| `haiku` | Use xhigh for coding and review. |
+| `haiku` | Use medium or high for other analysis. |
 | `sonnet` | Medium or high for edits and review. |
 | `opus` | Medium or high for planning and complex reasoning. |
 | `fable` | High, xhigh, or max according to task difficulty and supported settings. |
-| `luna` | - Low for extraction. |
-| | - xhigh or max for coding and review. |
-| | - medium or high for other analysis. |
+| `luna` | Low for extraction. |
+| `luna` | Use xhigh or max for coding and review. |
+| `luna` | Use medium or high for other analysis. |
 | `terra` | Medium or high for substantive coding and refactoring. |
-| `sol` | - Low for extraction. |
-| | - medium or high for development, review, and analysis. |
+| `sol` | Low for extraction. |
+| `sol` | Use medium or high for development, review, and analysis. |
 | `astra` | Follow task difficulty, supported settings, and explicit choices. |
 
 Broad external benchmarks supply the primary effort comparisons.

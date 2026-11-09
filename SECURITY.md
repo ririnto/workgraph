@@ -1,6 +1,6 @@
 # Security policy
 
-## Report A Vulnerability
+## Report a vulnerability
 
 Use [GitHub's private reporting form](https://github.com/ririnto/workgraph/security/advisories/new) to report suspected vulnerabilities confidentially.
 Avoid public issues for undisclosed vulnerabilities.

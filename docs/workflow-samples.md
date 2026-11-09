@@ -79,8 +79,8 @@ That procedure describes requirement coverage, challenge, verification selected 
 | Explore | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
 | Plan | The scopes and any exploration findings with evidence. | Work units with disjoint owned paths and instructions. |
 | Implement | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
-| Integrate | All accepted unit results after implementation completes. | - For several units or a repair, named unit branches merged, their resource states, and combined-candidate checks. |
-| | | - For one initial unit, a conditional skip and the accepted unit branch. |
+| Integrate | All accepted unit results after implementation completes. | For several units or a repair, named unit branches merged, their resource states, and combined-candidate checks. |
+| Integrate | All accepted unit results after implementation completes. | For one initial unit, a conditional skip and the accepted unit branch. |
 | Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
 | Publish | Completed implementation, completed or conditionally unnecessary integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
 | Review | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
