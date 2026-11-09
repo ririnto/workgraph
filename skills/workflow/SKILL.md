@@ -6,7 +6,7 @@ argument-hint: "[goal]"
 disable-model-invocation: true
 ---
 
-# Workgraph workflow
+# Workgraph Workflow
 
 This skill is an entry point for the Claude Code Main Agent only.
 Verify the active host and role from session metadata, loaded role guidance, or native tool descriptions before reading its procedure.

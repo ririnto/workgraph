@@ -1,16 +1,16 @@
-# Third-party notices
+# Third-Party Notices
 
 Workgraph contains instructions informed by the projects and documents listed here.
 Bundled third-party tooling retains the attribution and license identified below.
 The [research notes](docs/research.md) record source evidence, reviewed sections, and limits.
 This document records attribution and prior sources.
 
-## Markdown link validation
+## Markdown Link Validation
 
 Workgraph uses [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) under the MIT license.
 The package credits Théo LUDWIG as its author and copyright holder.
 
-## Markdown box-drawing validation
+## Markdown Box-Drawing Validation
 
 Workgraph uses [markdownlint-rule-search-replace](https://github.com/OnkarRuikar/markdownlint-rule-search-replace) under the MIT license.
 The package credits Onkar Ruikar, copyright 2022.
@@ -71,7 +71,7 @@ We reviewed the official public embed excerpt of [Irushi's post](https://x.com/I
 Its reported test growth prompted a review of proportional design and redundant verification.
 The [research notes](docs/research.md#tests-and-failure-reports) distinguish that report from inspected code and measured model behavior.
 
-## Giver architecture
+## Giver Architecture
 
 We studied [sng2c/giver-architecture](https://github.com/sng2c/giver-architecture) at version `v0.1.1`.
 Its package metadata declares the MIT license and names sng2c as the author.
@@ -91,7 +91,7 @@ We used their prompting and effort sections to confirm supported settings and ev
 These references do not replace local model policy or configure the host.
 We reviewed the [Astra](https://developers.openai.com/api/docs/models/gpt-6-astra.md) and [Luna](https://developers.openai.com/api/docs/models/gpt-6-luna.md) model pages, [model selection](https://developers.openai.com/api/docs/guides/model-selection.md), [reasoning](https://developers.openai.com/api/docs/guides/reasoning.md), [deployment checklist](https://developers.openai.com/api/docs/guides/deployment-checklist.md), and [Codex models](https://developers.openai.com/codex/models.md) for effort, pricing, and host starting settings.
 
-## Codex app-server
+## Codex App-Server
 
 We inspected [openai/codex](https://github.com/openai/codex) on its named `main` branch and its installed app-server schemas.
 The repository declares the Apache License 2.0.
@@ -109,7 +109,7 @@ We also reviewed the official [hooks](https://learn.chatgpt.com/docs/hooks.md) a
 The MIT-licensed [VS Code plugin parser](https://github.com/microsoft/vscode/blob/main/src/vs/platform/agentPlugins/common/pluginParsers.ts), reviewed on its main branch as of 2026-10-31, informed manifest precedence and separation from default hook discovery.
 No upstream implementation code is bundled.
 
-## Anthropic guidance
+## Anthropic Guidance
 
 We read the complete official [Claude prompting best-practices guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices.md).
 Its explicit outcomes, contextual instructions, examples, source separation, and scoped tool guidance informed agent-facing instruction authoring.
@@ -136,7 +136,7 @@ Their benchmark results retain the task, harness, effort, and pricing limits des
 We read the supplied [Haiku 5.5 system card](https://www.anthropic.com/document/claude-haiku-5-5-system-card), including its capability methods and effort curves.
 Its reported FrontierCode comparisons inform Haiku's coding effort choices, with graph estimates distinguished from labeled figures.
 
-## xAI and Meta prompting guides
+## xAI And Meta Prompting Guides
 
 We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) and the official [Meta prompting guide](https://dev.meta.ai/llama/docs/how-to-guides/prompting) in full.
 We also fetched the official [Anthropic prompt-engineering overview](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview.md) and the [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full for the same decisions.
@@ -144,7 +144,7 @@ Their conflict audits, short focused rules, tool-schema alignment, example guida
 Workgraph adapts these lessons without redistributing their text or adopting their voice, audio, API, or format-specific guidance.
 The [research notes](docs/research.md#official-prompt-engineering-guides) record the reviewed sources, fetch conditions, and scope limits.
 
-## Model benchmarks and workload reports
+## Model Benchmarks And Workload Reports
 
 [Artificial Analysis](https://artificialanalysis.ai/methodology/intelligence-benchmarking) supplies the composite effort curves and terminal comparisons.
 [Datacurve's DeepSWE](https://deepswe.datacurve.ai/blog/deepswe) supplies the Astra terminal benchmark and public aggregate artifact.
@@ -166,7 +166,7 @@ It informed direct verbs, specific subjects, and removal of filler.
 The bundled Writing skill retains that guidance only for agent-facing instructions.
 The plugin does not redistribute the source skill or its reference files verbatim.
 
-## Sinon language tooling
+## Sinon Language Tooling
 
 We reviewed [ririnto/sinon](https://github.com/ririnto/sinon) on its named `main` branch.
 The repository's root MIT license credits ririnto, copyright 2026.
@@ -178,7 +178,7 @@ These files retain the Harness [Apache-2.0 license](LICENSES/sinon-harness.txt),
 The repository owns the copied configuration and checks without modifying the upstream Harness.
 Workgraph modifies the sentence and TSDoc copies while preserving their diagnostics.
 
-## Research and official documentation
+## Research And Official Documentation
 
 We consulted the [Google Rust Style Guide](https://google.github.io/styleguide/rustguide.html) for portable ownership, API design, module organization, and formatting guidance.
 Workgraph's Rust reference adapts those decisions while keeping Chromium and Fuchsia rules scoped to their codebases.
@@ -213,7 +213,7 @@ We also studied [context4ai/agent-graph](https://github.com/context4ai/agent-gra
 These sources informed discussion of context boundaries and graph execution.
 Workgraph does not bundle their code or adopt their runtime guarantees.
 
-## Communication guidance
+## Communication Guidance
 
 Earlier Writing versions adapted communication guidance from [i-have-adhd](https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md) by Ayoub Ghriss.
 The source repository declares the MIT license and identifies 2026 copyright.

@@ -98,7 +98,7 @@ Retain receipts until verification and required recovery finish.
 
 Before archiving, restoring, or removing worktrees or caches, read [Worktree and cache cleanup](references/worktrees-caches.md) unless fully loaded.
 
-## Thread worktree artifacts
+## Thread Worktree Artifacts
 
 For Worktree Artifact connection changes, read [Native Attachment Cleanup](references/native-attachments.md) unless fully loaded.
 
