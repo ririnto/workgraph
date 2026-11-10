@@ -15,7 +15,3 @@ Use the project's structured logger instead of `System.out` or `System.err` for 
 Keep package names, module names, coordinates, source sets, and build tasks within the requested scope.
 Introduce records, sealed types, pattern matching, or switch expressions only when the declared release supports them.
 Prefer stable syntax over preview features.
-
-## Tooling
-
-When configuring or assessing Java tooling, read [tooling guidance](java-tooling.md) unless fully loaded.

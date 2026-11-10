@@ -28,7 +28,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/workflow/references/delivery.md` | Admitted Claude Code Main Agent building delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
-| `skills/development/references/lint-rules.md` | Agents selecting, developing, configuring, or assessing authorized lint tools and rules | Agents follow rule selection, fixture, safe-fix, and rollout guidance. |
+| `skills/development/references/tooling.md` | Agents configuring or assessing build and language tooling | Development directly selects shared tooling guidance and the matching language section. |
 | `skills/writing/SKILL.md` | Agents doing Markdown, YAML, or instruction work | Agents follow source conventions and select instruction design for agent-facing work. |
 | `skills/writing/references/instruction-design.md` | Agents drafting, editing, or reviewing agent instructions | Agents follow prompt task contracts, source separation, loading boundaries, and instruction validation. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
@@ -85,7 +85,8 @@ Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, bran
 Main and Worker conditionally load Writing, Development, and Memory Maintenance for tasks within those skills' scopes.
 Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
-Development's language references keep source conventions together and load separate tooling references only for tool setup or assessment.
+Development links directly to one tooling reference with shared guidance and language-specific sections.
+Language references retain source conventions without another tooling read.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating common role rules.
 

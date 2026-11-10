@@ -56,10 +56,6 @@ Use doc examples for non-trivial APIs and verify them with the existing Rust tes
 Document the safety invariant of each `unsafe` block after checking for a safe alternative.
 Keep unsafe operations narrowly scoped and document the caller's obligations on unsafe APIs.
 
-## Tooling
-
-When configuring Rust formatting, linting, or Cargo checks, read [Rust tooling](rust-tooling.md) unless fully loaded.
-
 ## Bound recursion
 
 Bound recursion on untrusted input or use iteration with an explicit stack.

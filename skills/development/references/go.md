@@ -26,7 +26,3 @@ State each package's responsibility in its package comment.
 
 Use table-driven subtests for pure logic when they fit the behavior under test.
 Use `t.Parallel()` for independent cases whose setup and shared resources permit it.
-
-## Tooling
-
-When configuring or assessing Go workspaces, tool dependencies, or lint tooling, read [Go tooling guidance](go-tooling.md) unless fully loaded.

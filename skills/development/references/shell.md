@@ -14,9 +14,13 @@ Preserve exit status and evaluation order when changing conditional forms.
 Check failures that change the result and keep diagnostics visible.
 Rely on the caller's existing failure propagation when it already preserves the required exit behavior.
 Add shell error modes only where the command sequence needs them, rather than prepending them to every command.
-Choose conditionals or command chains that preserve required exit status and evaluation order.
-Do not hide required failures with `|| true` or discard diagnostics needed to understand them.
-Discard output only when the command's contract does not require it.
+Use an explicit `if ...; then` statement for shell validation and error-handling branches.
+Do not express these branches as short-circuit command chains such as `[ "$fail" -eq 0 ] || exit 1`, `[ ... ] || { ...; }`, or `command && action`.
+Conditional expressions inside an `if` condition remain valid.
+Do not hide failures with `|| true`.
+Do not use shell redirection to send stdout, stderr, or both to `/dev/null`, including `> /dev/null`, `2> /dev/null`, `&> /dev/null`, or `>/dev/null 2>&1`.
+Preserve command errors and diagnostic output.
+An explicit command option such as `curl -o /dev/null` is allowed when discarding the response body to retrieve only the HTTP status.
 Add output only when it supplies information the command's own diagnostics do not provide.
 Use `if command; then` instead of testing `$?` after intervening work.
 

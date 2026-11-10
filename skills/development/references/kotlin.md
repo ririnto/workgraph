@@ -63,7 +63,3 @@ Keep Java methods when no Kotlin equivalent satisfies the contract.
 ## Kotest
 
 When creating or changing Kotest specs or assertions, read [Kotest guidance](kotest.md) unless fully loaded.
-
-## Tooling
-
-When configuring or assessing Kotlin tooling, read [tooling guidance](kotlin-tooling.md) unless fully loaded.
