@@ -84,7 +84,7 @@ We read the complete official [Codex best-practices article](https://learn.chatg
 Their goal, context, constraint, completion, skill-scoping, and instruction-audit guidance informed agent-facing instruction authoring.
 Workgraph adapts these decisions without bundling their text or changing SDKs, model configuration, settings, or scheduling.
 
-We reviewed the supplied copies of [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) and [Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md).
+We read the complete official [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) and [Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md) documents.
 These documents informed scoped autonomy, instruction priority, concise writing, progressive disclosure, and proportional verification.
 We fetched the official [GPT-6 guide](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) and [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md).
 We used their prompting and effort sections to confirm supported settings and evaluation needs for the selected model and workload.
@@ -124,6 +124,10 @@ We read the complete original [How the Claude Code team does code review](https:
 The article credits Addy Osmani, Morgan Westlee Lunt, and Qing Wang.
 Its layered review, verified findings, risk selection, and convergence lessons informed Workgraph's Delivery procedure and Main review staffing guidance.
 Workgraph adapts those workflow decisions without redistributing the article or activating Anthropic review products.
+
+We read the complete official [Prompting Claude Fable 5.2](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-2.md) guide.
+Its approval, ownership, inherited-instruction, and evaluation guidance informed the instruction-design reference.
+Workgraph adapts these decisions without copying the example prompts or adopting their model-specific settings.
 
 We reviewed the supplied copy of [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5).
 Its guidance informed completion behavior for unattended tasks and proportional progress updates.
