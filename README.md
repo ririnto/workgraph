@@ -160,7 +160,7 @@ References hold detail selected by a task, host, language, or operation.
 | --- | --- | --- |
 | Agent instructions | Writing's [instruction design](skills/writing/references/instruction-design.md) | Drafting, editing, or reviewing agent-facing prompts or instructions requires this reference. |
 | Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
-| Build and tooling | Development's [tooling guidance](skills/development/references/tooling.md) | Build and tool setup, dependencies, lint rules, and fixes use the shared guidance and matching language section. |
+| Build and tooling | Development's [language references](skills/development/SKILL.md#development-lifecycle) and [lint rule guidance](skills/development/references/lint-rules.md) | Language references include their tooling conventions, while shared lint guidance covers rule selection and fixes. |
 | Kotest | Kotlin's [Kotest guidance](skills/development/references/kotest.md) | Creating or changing Kotest specs or assertions requires this reference. |
 | Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update uses the requested host's section once the version reaches its authorized distribution source. |
 | Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |

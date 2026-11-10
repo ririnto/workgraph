@@ -110,7 +110,8 @@ Preserve lint and formatter choices when adding guidance or filling configuratio
 Use the project's established commands for routine local and CI work.
 Keep supported automation declarative, using the project's implementation language only for substantial logic existing tools cannot provide.
 
-When configuring or assessing builds, tools, dependencies, checks, or lint rules and fixes, read [tooling guidance](references/tooling.md).
+When configuring or assessing builds or tools, read the matching language reference.
+For lint rules or fixes, also read [lint rule guidance](references/lint-rules.md).
 
 ## Verification
 
