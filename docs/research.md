@@ -639,7 +639,7 @@ The article's research-task gains do not establish coding-task gains.
 [More Agents Is All You Need](https://arxiv.org/abs/2402.05120) reports gains from independent sampling and voting on reasoning benchmarks.
 Its token cost rises with agent count, and its setup does not test delegated coding workers.
 This supports testing independent fan-out as a simpler baseline, not assuming more agents improve every task.
-In Claude Code, Workgraph recommends Workflow when an identified follow-up may depend on a prior result.
+In Claude Code, Workgraph reserves Workflow for genuine multi-phase work or joins and uses Agent for single-phase runs.
 The sources do not establish that this routing improves Workgraph outcomes.
 
 ## Verification and recovery
@@ -1000,7 +1000,7 @@ The bundled Claude Main Workflow references add graph mapping, result acceptance
 The upstream guide treats a typed `ultracode` keyword as a per-task workflow opt-in and the ultracode setting as letting Claude decide when a task warrants a workflow.
 The keyword does not start a workflow from a `-p` prompt, a scheduled prompt, or relayed text.
 Workgraph's maintainer policy is narrower: neither form forces Workflow.
-Workflow is used only for expected follow-up phase expansion or genuinely multi-phase work, and not for single-phase work, which uses Agent when no follow-up phase is expected.
+Workflow is used for genuine multi-phase work or joins, while a single-phase run uses Agent.
 That tool-selection policy belongs only to Main's Claude reference, rather than a shared role or task body.
 The subagent documentation explicitly removes Workflow from subagent tools.
 That host filter covers Agent-tool subagents and Workflow `agent()` stages, while the same documentation exempts forks, which keep the main conversation's tool pool.

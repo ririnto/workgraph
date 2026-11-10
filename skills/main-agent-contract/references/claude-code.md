@@ -8,11 +8,10 @@ After background Agent or Workflow dispatch and other ready work, end the turn w
 ### Select Agent or Workflow
 
 Neither `ultracode` nor its session setting forces Workflow.
-Choose Agent when it fits the work better, even with several steps or follow-ups.
-Use Workflow only when actual dependencies benefit from its orchestration and the host permits it.
-Do not add phases or split a bounded task to justify Workflow.
-Phase count does not justify Workflow.
-An initial phase may have a required continuation.
+Use Workflow only for genuine multi-phase work or joins when dependencies benefit and the host permits it.
+A single-phase run is Agent work and must use Agent.
+Never add verification, review, or display phases or split a bounded task to justify Workflow.
+If a genuine later phase emerges after Agent completes, consider a new Workflow run.
 Only the Claude Code Main Agent may start Workflow.
 Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) unless fully loaded.
 Read linked Workgraph skills with Read because `Skill` refuses them.
