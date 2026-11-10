@@ -6,7 +6,7 @@ Map children to an umbrella when it defines a coherent actionable unit.
 Use isolated workspaces and branches when concurrent assignments could conflict.
 Name responsibility for source changes, publication, integration, evidence, and cleanup without requiring a different person for each role.
 Use an isolation method supported by the host and assignment.
-The issue owner runs checks, publishes its branch, opens its PR, and returns the result and evidence.
+Assign checks, branch publication, PR creation, and evidence handback to the named owners within their authority.
 The integration owner applies Delivery's merge-authority rule and confirms acceptance before closure.
 Preserve each issue's original acceptance and exclusions, including any umbrella's separate acceptance.
 Skip ownership-blocked items and continue independent ready work within the assigned concurrency.

@@ -2,7 +2,7 @@
 
 ## Workspaces and tool dependencies
 
-Use `go.work` to coordinate repository modules when the declared Go version supports workspaces.
+Use `go.work` when repository modules need workspace coordination and the declared Go version supports it.
 Keep adopted Go tools and their versions in a repository-owned `go.mod` or dedicated modfile.
 Workspace coordination does not replace module ownership of tool dependencies.
 Manage and run tools using their owning module.
@@ -22,9 +22,9 @@ When the repository already uses golangci-lint or the user authorizes adopting i
 When using tool directives or `tools.go` for golangci-lint, isolate it in a dedicated repository-owned module or modfile.
 For `tools.go`, use the isolated tool module to keep its imports out of application `go mod tidy`.
 Keep its dependency graph separate from application modules and other tools.
-Do not add its module to the application's `go.work`.
-Resolve and build it with `GOWORK=off` to prevent workspace dependency selection.
-Run the built executable with the application's workspace configuration.
+Use `GOWORK=off` for isolated resolution or builds when an enclosing workspace would change dependency selection or conflict with `-modfile`.
+Keep that override scoped to the tool build, and run lint analysis with the application's required workspace configuration.
+Do not treat workspace membership alone as a defect when the selected installation supports it and preserves the required dependency versions.
 Do not upgrade golangci-lint's dependencies independently.
 See golangci-lint's [source-install guidance](https://golangci-lint.run/docs/welcome/install/local/#install-from-sources) for the limitations of module-based installation.
 

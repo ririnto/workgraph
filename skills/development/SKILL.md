@@ -8,15 +8,15 @@ disable-model-invocation: true
 
 Apply repository rules, lint configuration, and existing tools before these defaults.
 Honor user choices within task authority, required checks, and host capabilities.
-Read matching playbooks and references before use, skipping complete content already loaded.
+Read matching playbooks and references before use unless fully loaded.
 For JavaScript or TypeScript, also read [shared Node guidance](references/nodejs.md).
 
 ## Development lifecycle
 
-Before editing, identify the behavior contract, affected consumers, exclusions, and acceptance evidence in context or an existing task record.
+Before editing, identify the contract, consumers, exclusions, and acceptance evidence.
 Inspect affected code and stop discovery when evidence supports the smallest safe change.
 For bounded work, avoid optional review ceremony, speculative sweeps, and precautionary pauses.
-Retain rigor for irreversible, high-risk, or complex work and all safety, authority, and project gates.
+Preserve rigor for consequential work and all safety, authority, and project gates.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -52,13 +52,14 @@ Adapt tests to production interfaces without exposing internals or adding test-o
 Replace superseded implementations with their consumers and remove obsolete paths together.
 Avoid copying nearby workarounds as precedent.
 Use official SDK or framework properties directly when they satisfy the requirement.
+Do not duplicate an operation's input checks when its rejection already meets the contract.
 Prefer immutable bindings and minimize mutable state.
 
 ### Keep design proportional
 
-Prefer existing interfaces, direct data flow, and the smallest coherent required change.
-Add layers, helpers, options, dependencies, or fallbacks for concrete needs the existing design cannot handle simply.
-Avoid speculative extension points and parallel implementations for hypothetical needs.
+Prefer existing interfaces, direct data flow, and tool commands and help over wrappers or custom usage output.
+Keep required targets explicit, without invented defaults.
+Add abstractions, dependencies, or fallbacks only for concrete unmet needs.
 Do not implement or test handling for edge cases that cannot realistically occur.
 Reconsider data and ownership before adding complexity.
 
@@ -103,9 +104,11 @@ Preserve integrity checks, including lockfile fields, signatures, and checksums.
 ## Automation
 
 Fix recurring defects in data ownership and interfaces first.
-Use existing types, schemas, lint rules, or build checks for mechanical requirements.
-Keep judgment-dependent decisions in concise instructions instead of duplicating executable checks.
+Use existing types, schemas, lint, or build checks for mechanical requirements.
+Keep judgment in instructions without duplicating executable checks.
 Preserve lint and formatter choices when adding guidance or filling configuration gaps.
+Use the project's established commands for routine local and CI work.
+Keep supported automation declarative, using the project's implementation language only for substantial logic existing tools cannot provide.
 
 When selecting, developing, configuring, or assessing authorized lint tools, rules, or fixes, read [lint rule guidance](references/lint-rules.md).
 
@@ -113,17 +116,20 @@ When selecting, developing, configuring, or assessing authorized lint tools, rul
 
 Identify the target, trigger, input, and observable expected outcome.
 Use existing public interfaces at the lowest layer that exercises the failure.
-Keep process and application checks for execution, integration, state, or external behavior that direct calls cannot establish.
-Extend the nearest meaningful check for an uncovered requirement or realistic failure, with expectations independent of the implementation.
+Use process or application checks for behavior that direct calls cannot establish.
+Extend the nearest check for uncovered requirements or realistic failures, using expectations independent of the implementation.
 Reserve source-shape assertions for explicit structural contracts.
-Exercise real owned behavior, substituting external or nondeterministic boundaries only when controlled input is needed.
+Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
+Test owned changes and integration risks, not unchanged upstream behavior without a concrete requirement or defect.
 Remove duplicate assertions, fixtures, and runs when retained checks catch the same failures.
+Within scope, inspect and remove tests with no real requirement or realistic failure.
 Preserve security, external-input, and data-integrity coverage without test-count or coverage-percentage targets.
 Use repeatable inputs for stateful failures.
 Consider model checking when consequential transitions or interleavings remain untested by examples.
 Stop when required gates and changed risks have sufficient evidence, unless a concrete failure requires more.
-Record commands, setup, exit status, failures, and raw results separately from interpretation, using traces or screenshots when needed.
-Measure slow checks before authorized optimization and report durations, conditions, and preserved coverage.
+Record commands, setup, exit status, failures, and raw results separately from interpretation.
+Retain traces or screenshots when needed.
+Before optimizing slow checks, measure them and report conditions, durations, and preserved coverage.
 Leave execution, formal proof, native activation, and model adherence unverified without direct evidence.
 Report required checks blocked by the host.
-Create a focused feature map only for repeated reports or navigation needs, beside verification instructions, and update affected entries.
+Keep a feature map beside verification instructions only for recurring reporting or navigation needs, and update affected entries.

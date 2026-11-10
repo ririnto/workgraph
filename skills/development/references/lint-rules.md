@@ -3,8 +3,8 @@
 For authorized lint setup, select tools compatible with the project's language, runtime, and requirements.
 
 When lint automation is authorized, prefer built-in rules and supported configuration before custom rules.
-Use the Kotlin and Node.js tooling guidance in the matching language references.
-For other languages, use their existing standard tools.
+Read the matching language tooling reference for language-specific setup.
+Use existing standard tools for other languages.
 Add a custom rule only for a demonstrated recurring failure that existing tools cannot prevent.
 Verify tool-version support and realistic exceptions before adding it.
 Scope rules through existing file or module boundaries when those boundaries carry the requirement.

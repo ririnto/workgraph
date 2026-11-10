@@ -2,17 +2,17 @@
 
 ## Kotest specs
 
-Move reusable immutable declarations and functions from Spec superclass-constructor lambdas into a companion object when sharing preserves behavior.
+Share immutable fixtures only when reuse is required and sharing preserves behavior.
 Keep per-test state local and preserve initialization order, parallel isolation, and captured values.
 A `val` binding alone does not make its referenced object immutable or safe to share.
-Treat `RuleProvider` factories as potentially eager, and do not hoist them based only on syntax.
 Expose injected dependencies through explicit parameters or appropriate extension functions.
-Keep stateful rule instances scoped to their required lifecycle instead of sharing them unconditionally.
+Keep stateful fixtures scoped to their required lifecycle.
 
 ## Kotest assertions
 
-Use `assertSoftly(subject)` for consecutive assertions that share a subject, including service objects.
-Use `assertSoftly { ... }` for consecutive independent assertions without a common receiver.
+Use soft assertions when the test requires aggregated failures rather than fail-fast behavior.
+For soft assertions with a shared subject, use `assertSoftly(subject)`.
+Use `assertSoftly { ... }` when the group has no common receiver.
 Allow nested `assertSoftly` blocks when they clarify groups with different subjects.
 Do not use `assertSoftly` for a single assertion or add nested single-assertion wrappers.
 Use an existing infix assertion when its explicit receiver is natural and the API supports it.
@@ -28,6 +28,4 @@ Preserve receiver binding in nested groups and qualify a receiver only when need
 Keep assertions that depend on coroutine work inside the group after that work completes.
 Await structured child work in the surrounding coroutine scope.
 Verify assertion-context propagation for the project's Kotest version when assertions cross coroutine dispatchers or context boundaries.
-Inline a single-use test value only when construction timing, side effects, readability, resource lifetime, and fixture isolation remain unchanged.
-Inline a service used only as the `assertSoftly` subject when its construction or expression can move safely.
-Preserve setup timing, evaluation order, resource lifetime, mock verification order, and fixture isolation.
+Inline single-use values, including an `assertSoftly` subject, only when readability, setup timing, effects, evaluation order, resource lifetime, mock verification order, and fixture isolation remain unchanged.

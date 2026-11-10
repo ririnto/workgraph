@@ -85,6 +85,7 @@ Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, bran
 Main and Worker conditionally load Writing, Development, and Memory Maintenance for tasks within those skills' scopes.
 Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
+Development's language references keep source conventions together and load separate tooling references only for tool setup or assessment.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating common role rules.
 
