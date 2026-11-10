@@ -122,7 +122,7 @@ The approach adjusts as evidence changes, while preserving the complete requeste
 Repository scope follows the request without an activity threshold or archive-status exclusion.
 Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
-For Claude Code Main, [Workflow](skills/workflow/SKILL.md) admits the host and role before loading its [execution procedure](skills/workflow/references/claude-code-main.md).
+For Claude Code Main, [Workflow](skills/workflow/SKILL.md) contains host and role admission and the execution procedure.
 Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
 The conditional authoring and delivery references stay behind that admission boundary.
 Codex uses native delegation rather than Claude Code Workflow.
