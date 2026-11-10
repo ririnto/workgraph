@@ -16,7 +16,7 @@ Keep package names, module names, coordinates, source sets, and build tasks with
 Introduce records, sealed types, pattern matching, or switch expressions only when the declared release supports them.
 Prefer stable syntax over preview features.
 
-## Automation
+## Tooling
 
 Preserve existing Java tooling, including Spotless with Palantir Java Format and Checkstyle when selected.
 Map Kotlin rules only where Java syntax and the selected tool provide a safe equivalent.

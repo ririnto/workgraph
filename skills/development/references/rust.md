@@ -56,7 +56,13 @@ Use doc examples for non-trivial APIs and verify them with the existing Rust tes
 Document the safety invariant of each `unsafe` block after checking for a safe alternative.
 Keep unsafe operations narrowly scoped and document the caller's obligations on unsafe APIs.
 
-## Configure formatting and linting
+## Bound recursion
+
+Bound recursion on untrusted input or use iteration with an explicit stack.
+
+## Tooling
+
+### Configure formatting and linting
 
 For authorized setup, use the repository's Rust toolchain with its `rustfmt` and Clippy components.
 Keep formatter settings in the existing `rustfmt.toml` or `.rustfmt.toml`.
@@ -75,7 +81,7 @@ Use the existing Clippy lint set, adding individual rules for a demonstrated req
 Do not enable the entire `clippy::restriction` group because its rules can conflict.
 Keep human review for ownership, API semantics, and unsafe invariants that lints cannot establish.
 
-## Verify Cargo projects
+### Verify Cargo projects
 
 Run existing repository checks first.
 When establishing checks for an ordinary Cargo workspace, start with:
@@ -92,7 +98,3 @@ Use `--all-features` only when all features are designed to work together.
 Keep documentation tests in the test scope.
 If the test command selects `--all-targets`, run `cargo test --workspace --doc` separately for library documentation examples.
 Preserve the repository's lockfile policy and use `--locked` where checks require its recorded resolution.
-
-## Bound recursion
-
-Bound recursion on untrusted input or use iteration with an explicit stack.

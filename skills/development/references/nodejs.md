@@ -11,7 +11,7 @@ This is guidance only, not a lint requirement or automatic rewrite.
 Preserve callback contracts, async signatures, execution order, and intentional background work.
 For intentional background work, preserve its existing error-handling policy without forcing callers to wait.
 
-## Automation
+## Tooling
 
 For authorized Node.js lint automation with Ultracite, prefer supported built-in Oxlint rules and Oxfmt formatting.
 Invoke Oxlint and Oxfmt through Ultracite.

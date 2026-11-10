@@ -12,6 +12,8 @@ Preserve exit status and evaluation order when changing conditional forms.
 ## Handle failures
 
 Check failures that change the result and keep diagnostics visible.
+Rely on the caller's existing failure propagation when it already preserves the required exit behavior.
+Add shell error modes only where the command sequence needs them, rather than prepending them to every command.
 Use an explicit `if ...; then` statement for shell validation and error-handling branches.
 Do not express these branches as short-circuit command chains such as `[ "$fail" -eq 0 ] || exit 1`, `[ ... ] || { ...; }`, or `command && action`.
 Conditional expressions inside an `if` condition remain valid.
@@ -19,6 +21,7 @@ Do not hide failures with `|| true`.
 Do not use shell redirection to send stdout, stderr, or both to `/dev/null`, including `> /dev/null`, `2> /dev/null`, `&> /dev/null`, or `>/dev/null 2>&1`.
 Preserve command errors and diagnostic output.
 An explicit command option such as `curl -o /dev/null` is allowed when discarding the response body to retrieve only the HTTP status.
+Add output only when it supplies information the command's own diagnostics do not provide.
 Use `if command; then` instead of testing `$?` after intervening work.
 
 ## Use eval safely
@@ -34,8 +37,7 @@ Do not parse `ls` output.
 
 ## Validate and document scripts
 
-For repositories with shell assets, use their applicable `shfmt` and `shellcheck` checks.
-When available, apply `shellcheck` or `shfmt` and honor the project's indentation configuration.
+For shell assets, run applicable, available `shfmt` and `shellcheck` checks with the project's indentation settings.
 Report unavailable required checks instead of replacing them with weaker evidence.
 Document functions exposed by sourced scripts with declaration-level comment blocks describing their contracts.
 Treat callable sourced functions as public unless the script's API contract marks them internal.

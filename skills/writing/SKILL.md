@@ -11,13 +11,16 @@ They cover Markdown and YAML source and agent-facing instructions, not general p
 
 ## Markdown sentences
 
-Write complete sentences in prose and list items.
+Write complete sentences in prose and explanatory list items.
+Use lists for enumerated items and numbered lists for ordered steps.
+Keep name-only or label-only items as phrases without terminal punctuation.
 Put each sentence on its own source line.
 Do not force separate sentences together with semicolons or other punctuation.
 Do not replace sentence boundaries to fit several instructions onto one line.
 Do not reflow prose to a fixed column width.
 
 Preserve headings, code, metadata, links, and exact quotations in their required syntax.
+Preserve proper names, acronyms, and code identifiers when applying heading capitalization.
 
 ## Agent-facing documents
 
@@ -51,4 +54,5 @@ Preserve literal or folded semantics and validate parsed values, including templ
 
 Read the changed source for repeated rules, sentence boundaries, and detached conditions.
 Check table explanations for complete sentences and their required terminal punctuation.
+Inspect rendered layout when changing lists, paragraph breaks, or other layout-sensitive Markdown and a preview is available.
 Run the target's applicable Markdown check without changing unrelated files.

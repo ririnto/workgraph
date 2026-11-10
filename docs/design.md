@@ -28,7 +28,7 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/workflow/references/delivery.md` | Admitted Claude Code Main Agent building delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
-| `skills/development/references/lint-rules.md` | Agents selecting, developing, configuring, or assessing authorized lint tools and rules | Agents follow rule selection, fixture, safe-fix, and rollout guidance. |
+| `skills/development/references/lint-rules.md` | Agents configuring or assessing lint rules and fixes | Development selects shared rule selection, verification, and rollout guidance. |
 | `skills/writing/SKILL.md` | Agents doing Markdown, YAML, or instruction work | Agents follow source conventions and select instruction design for agent-facing work. |
 | `skills/writing/references/instruction-design.md` | Agents drafting, editing, or reviewing agent instructions | Agents follow prompt task contracts, source separation, loading boundaries, and instruction validation. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
@@ -85,6 +85,8 @@ Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, bran
 Main and Worker conditionally load Writing, Development, and Memory Maintenance for tasks within those skills' scopes.
 Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
+Development links directly to language references that combine source and tooling conventions.
+Shared lint-rule procedures remain in a separate reference selected directly by Development.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating common role rules.
 

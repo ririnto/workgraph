@@ -483,8 +483,8 @@ Codex's [versioned skill renderer](https://github.com/openai/codex/blob/rust-v0.
 The hooks match these instruction text fragments and identify already-loaded sources outside them.
 They cannot reproduce native message roles or tool-call envelopes.
 The [delivery design](design.md#deliver-context) records this boundary.
-Workflow's shared body checks host and role admission before loading its Claude Main execution reference.
-That reference owns dependency gates and conditionally loads its authoring and delivery mappings without repeating Main's finding classifications.
+Workflow's Claude-only skill checks host and role admission before its inline procedure.
+Main's Claude reference owns selection, while the skill keeps tool-use instructions inline and loads authoring and delivery mappings only when needed.
 Main and Worker inspect failures and partial effects before reasonable authorized retries or alternative supported forms.
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
@@ -948,6 +948,11 @@ Those contracts distinguished conversation archival from physical worktree archi
 This research did not establish installed-version parity, actual deletion results, Cloud filesystem cleanup, or model adherence.
 
 ## Go linting
+
+The official [installation guidance](https://golangci-lint.run/docs/welcome/install/local/#install-from-sources) recommends binaries and a dedicated module or modfile when using `go tool`.
+It also describes a workspace-based installation, so workspace membership alone is not an error.
+The [Go module reference](https://go.dev/ref/mod#workspaces) defines `GOWORK=off` as single-module mode.
+Workgraph scopes that override to builds requiring isolation rather than forcing it during application analysis.
 
 The official [Go Plugin System documentation](https://golangci-lint.run/docs/plugins/go-plugins/) recommends the Module Plugin System for custom linters.
 The official [Module Plugin System documentation](https://golangci-lint.run/docs/plugins/module-plugins/) describes its setup.
