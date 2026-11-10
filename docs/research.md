@@ -294,7 +294,7 @@ It warns that unclear or conflicting guidance in skills and files such as `AGENT
 [Rethinking skills and prompts for GPT-6 Astra](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra.md) recommends short activation descriptions and progressive disclosure.
 It warns against fixed itineraries, redundant repository maps, and approval rules that block authorized work.
 It recommends contextual pointers to documents instead of required reads before each edit, and notes that repository skills guide agents on different models.
-We reviewed supplied copies of both documents and fetched the GPT-6 guide's prompting and GPT-6.1 Sol sections.
+We read both official Markdown documents in full for this instruction review.
 OpenAI presents the prompts as starting points across the GPT-6 family, based on behavior observed with Astra.
 OpenAI recommends evaluating them with the selected model and workload.
 These recommendations guide instruction design without changing model or API configuration.
@@ -328,6 +328,23 @@ The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
 
 ### Claude model guidance
+
+We read the complete [Claude Fable 5.2 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-2.md).
+It recommends revisiting inherited approval rules, ownership wording, delegation prompts, and model-specific workarounds.
+Its examples distinguish recoverable tool failures from deliberate restrictions and place authorized exceptions inside the rule they qualify.
+The guide also reports unsolicited behavior changes after broad code-ownership prompts, even with a separate scope limit.
+
+The [instruction-design reference](../skills/writing/references/instruction-design.md) now covers carried reviewer conditions, action-specific approval exceptions, and the distinction between outcome ownership and change authority.
+The OpenAI skill guidance also informs its comparison of neighboring activation descriptions for conflicting or overly broad triggers.
+Existing role contracts retain completion, recovery, and assignment ownership, while Development retains proportional verification.
+These procedures need no duplicate model-specific reminders.
+
+Anthropic discusses reducing excessive delegation, while OpenAI discusses encouraging useful parallel delegation.
+Both recommendations depend on observed behavior in the selected host and workload.
+Workgraph keeps its task-based dispatch criteria and tests behavioral adjustments separately before adopting them.
+The review does not adopt broad ownership claims, fixed effort settings, or sentence-length limits as universal instructions.
+Progress-display settings and preserved-thinking API requirements remain host concerns.
+Source validation does not establish that these instruction changes improve model behavior.
 
 [Prompting Claude Opus 5.5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5) distinguishes prompt changes from host and API changes.
 We reviewed a supplied copy and fetched the official guide's effort and completion sections.

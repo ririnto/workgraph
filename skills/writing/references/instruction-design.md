@@ -13,6 +13,9 @@ Allow necessary repetition when loading points are fully separate and each conte
 Preserve explicit user requirements and authority boundaries when simplifying text.
 Explicit user requirements take precedence over skill defaults within host and safety boundaries.
 Audit applicable loading points and consumers for conflicting authority, completion, and stopping rules.
+Include carried notes and reviewer conditions when they affect the requested work.
+State approval requirements for specific actions, with authorized exceptions in the same rule.
+Distinguish responsibility for an outcome from permission to change unrelated code or behavior.
 Distinguish true authority or safety boundaries from recoverable failures and unsupported invocation forms.
 Keep reasonable authorized recovery available while preserving guards and honest attempt evidence.
 Put each action's completion or stop condition beside the action.
@@ -41,6 +44,7 @@ Apply this contract to agent instructions and prompts, not ordinary human-facing
 
 Keep each skill usable within its stated scope.
 Write a short activation description that distinguishes the skill from neighboring skills.
+Compare neighboring descriptions for conflicting triggers and broad wording that selects unrelated work.
 Keep instructions required whenever a skill loads in its `SKILL.md`.
 Put conditional detail in focused skills or references.
 
@@ -72,6 +76,8 @@ Calibrate semantic graders with known-good and known-bad responses before relyin
 Report failed requests, ungraded coverage, and grader controls separately from behavioral results.
 Preserve effective guidance when comparisons give no reason to change it, unless an explicit requirement takes precedence.
 Treat model-specific prompting observations as hypotheses for the selected workload, not universal rules.
+When revising guidance for a model change, test one behavioral adjustment at a time against the existing instructions.
+Compare task completion, scope adherence, and execution cost before adopting the adjustment.
 
 Confirm frontmatter and invocation fields against the target host's supported skill format.
 Follow the target repository's model invocation policy and any explicit user requirement.
