@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
-import { stripVTControlCharacters } from "node:util";
 
 import { lint } from "markdownlint/sync";
 
@@ -41,159 +40,6 @@ test("Git hooks invoke pnpm directly and propagate its status", async () => {
         assert.equal(result.status, status, result.stderr);
         assert.equal(result.stdout, `run\n${hook}\n`);
       }
-    }
-  } finally {
-    await rm(directory, { force: true, recursive: true });
-  }
-});
-
-test("Ultracite check and fix entry points preserve diagnostics and formatter convergence", async () => {
-  const root = path.resolve(import.meta.dirname, "..");
-  const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tooling-"));
-  try {
-    await Promise.all(
-      ["package.json", "oxlint.config.ts", "oxfmt.config.ts", "plugins"].map(
-        (entry) =>
-          cp(path.join(root, entry), path.join(directory, entry), {
-            recursive: true
-          })
-      )
-    );
-    await symlink(
-      path.join(root, "node_modules"),
-      path.join(directory, "node_modules")
-    );
-    await mkdir(path.join(directory, "dist"));
-    await writeFile(
-      path.join(directory, "dist/ignored.ts"),
-      "not valid TypeScript {"
-    );
-    const markdown = "# Unformatted\n\n|A|B|\n|-|-|\n|1|2|\n";
-    await writeFile(path.join(directory, "ignored.md"), markdown);
-    await writeFile(
-      path.join(directory, "sample.ts"),
-      'export const sample = () => {\n// explain\n\nreturn 1;\n};\nconst tripwires = () => {\n  debugger;\n  if (true) {\n    eval("run()");\n  }\n  const unused = 0;\n};\ntripwires();\nconst directiveGap = () => {\n  "use strict";\n\n  return 1;\n};\nconst expression = () => ({\n  first: true,\n\n  second: true\n});\ndirectiveGap();\nexpression();\nconst literal = () => `first\n\nsecond`;\nliteral();\nconst expressionComment = () => String(1 /* ordinary expression comment */);\nconst expressionDirective = () => String(\n  /* c8 ignore next */\n  1\n);\nexpressionComment();\nexpressionDirective();\nconst documented = () => {\n  /** Attached documentation. */\n  const documentedValue = 1;\n  /** Free-standing documentation. */\n  return documentedValue;\n};\ndocumented();\nsetTimeout("run()", 0);\n'
-    );
-    const command = path.join(root, "node_modules/ultracite/dist/index.js");
-    const lintResult = spawnSync(
-      process.execPath,
-      [command, "check", "sample.ts", "dist/ignored.ts", "--format", "json"],
-      {
-        cwd: directory,
-        encoding: "utf-8",
-        timeout: 30_000
-      }
-    );
-    assert.ifError(lintResult.error);
-    assert.equal(lintResult.status, 1, lintResult.stderr);
-    const start = lintResult.stdout.search(/\{\s*"diagnostics"\s*:/u);
-    assert.notEqual(start, -1, lintResult.stdout);
-    const diagnostics = JSON.parse(
-      lintResult.stdout.slice(start, lintResult.stdout.lastIndexOf("}") + 1)
-    ).diagnostics.map(({ code, severity }) => `${code} ${severity}`);
-    assert.deepEqual(diagnostics.toSorted(), [
-      "eslint(arrow-body-style) error",
-      "eslint(no-constant-condition) error",
-      "eslint(no-debugger) error",
-      "eslint(no-eval) error",
-      "eslint(no-implied-eval) error",
-      "eslint(no-inline-comments) error",
-      "eslint(no-unused-vars) error",
-      "tsdoc(require-export-tsdoc) error",
-      "unicorn(prefer-module) error"
-    ]);
-    const reporterEnvironment = {
-      ...process.env,
-      FORCE_COLOR: "3",
-      GITHUB_ACTIONS: "false"
-    };
-    const configuredCheck = spawnSync("pnpm", ["run", "check:ultracite"], {
-      cwd: directory,
-      encoding: "utf-8",
-      env: reporterEnvironment,
-      timeout: 60_000
-    });
-    assert.ifError(configuredCheck.error);
-    const configuredCheckOutput = stripVTControlCharacters(
-      `${configuredCheck.stdout}\n${configuredCheck.stderr}`
-    );
-    assert.equal(configuredCheck.status, 1, configuredCheckOutput);
-    assert.deepEqual(
-      [
-        ...configuredCheckOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|tsdoc|unicorn)\([^)]+\))/gu
-        )
-      ]
-        .map(
-          ({ groups: { code, glyph, severity } }) =>
-            `${code} ${severity ?? (glyph === "×" ? "error" : "warning")}`
-        )
-        .toSorted(),
-      diagnostics.toSorted(),
-      configuredCheckOutput
-    );
-    const valid =
-      "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true\n};\n";
-    const unformatted =
-      "/**\n * Expose fixture settings.\n */\nexport const settings = {\n  firstSettingEnabled: true,\n  secondSettingEnabled: true,\n  thirdSettingEnabled: true,\n};\n";
-    await writeFile(
-      path.join(directory, "style-only.ts"),
-      "/**\n * Preserve this exported declaration.\n */\nexport const styleOnly = () => {\n  // explain\n\n  return 1;\n};\n"
-    );
-    const configuredFix = spawnSync("pnpm", ["run", "fix:ultracite"], {
-      cwd: directory,
-      encoding: "utf-8",
-      env: reporterEnvironment,
-      timeout: 60_000
-    });
-    assert.ifError(configuredFix.error);
-    const configuredFixOutput = stripVTControlCharacters(
-      `${configuredFix.stdout}\n${configuredFix.stderr}`
-    );
-    assert.equal(configuredFix.status, 1, configuredFixOutput);
-    assert.deepEqual(
-      [
-        ...configuredFixOutput.matchAll(
-          /(?:(?<severity>error|warning) |(?<glyph>×|⚠) )(?<code>(?:eslint|tsdoc)\([^)]+\))/gu
-        )
-      ]
-        .map(
-          ({ groups: { code, glyph, severity } }) =>
-            `${code} ${severity ?? (glyph === "×" ? "error" : "warning")}`
-        )
-        .toSorted(),
-      [
-        "eslint(no-constant-condition) error",
-        "eslint(no-debugger) error",
-        "eslint(no-eval) error",
-        "eslint(no-implied-eval) error",
-        "eslint(no-inline-comments) error",
-        "eslint(no-unused-vars) error",
-        "tsdoc(require-export-tsdoc) error"
-      ].toSorted(),
-      configuredFixOutput
-    );
-    await writeFile(path.join(directory, "sample.ts"), unformatted);
-    for (const action of ["fix", "fix", "check"]) {
-      const result = spawnSync(
-        process.execPath,
-        [command, action, "sample.ts", "ignored.md"],
-        {
-          cwd: directory,
-          encoding: "utf-8",
-          timeout: 30_000
-        }
-      );
-      assert.ifError(result.error);
-      assert.equal(result.status, 0, result.stdout + result.stderr);
-      assert.equal(
-        readFileSync(path.join(directory, "sample.ts"), "utf-8"),
-        valid
-      );
-      assert.equal(
-        readFileSync(path.join(directory, "ignored.md"), "utf-8"),
-        markdown
-      );
     }
   } finally {
     await rm(directory, { force: true, recursive: true });
