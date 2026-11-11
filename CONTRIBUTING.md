@@ -10,6 +10,10 @@ Update every owned consumer of a renamed file in the same change.
 
 ## Issues
 
+Issues are optional unless the user explicitly requests one.
+Record scope and acceptance in the task or PR when no issue is used.
+Use `gh` or another supported, authorized GitHub tool for repository operations.
+
 Follow [the security policy](SECURITY.md) when reporting suspected vulnerabilities.
 Use the [bug report form](.github/ISSUE_TEMPLATE/bug_report.yaml) for reproducible defects.
 Use the [improvement request form](.github/ISSUE_TEMPLATE/improvement.yaml) for documentation changes, new requirements, and follow-up work.
@@ -41,6 +45,6 @@ Record any unavailable host validation without claiming model adherence.
 
 Use the [pull request template](.github/pull_request_template.md), including when creating a PR through an API or CLI.
 Explain the problem, resulting changes, verification, and remaining limitations.
-Link the issue and use a closing reference only when the change satisfies its acceptance criteria.
-Keep new requirements in separate linked issues.
+Link an issue when one exists and use a closing reference only when the change satisfies its acceptance criteria.
+Track new requirements separately in the task, PR, or an issue when useful.
 Follow the Delivery skill for publication, independent review, integration, and cleanup.

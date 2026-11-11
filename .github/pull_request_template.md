@@ -1,12 +1,12 @@
 # Problem
 
-Describe the problem and link the related issue.
+Describe the problem and link the related issue when one exists.
 Use a closing reference only when this change satisfies the issue's acceptance criteria.
 
 ## Changes
 
 Explain the resulting behavior or documentation and the affected scope.
-Identify preserved contracts and any separate follow-up issues.
+Identify preserved contracts and any separately tracked follow-up work.
 
 ## Verification
 
