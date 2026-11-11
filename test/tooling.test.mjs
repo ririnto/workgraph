@@ -497,7 +497,7 @@ const integrateResult = {
 const integrateSingle = {
   branch: "unit-u1",
   changedFiles: ["docs/guide.md"],
-  checks: [{ command: "pnpm run check:hooks", status: "passed" }],
+  checks: [{ command: "pnpm run check:test", status: "passed" }],
   conflicts: [],
   evidence: "e",
   merged: true,

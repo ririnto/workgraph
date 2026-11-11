@@ -82,12 +82,11 @@ Keep development validation gates in `test/validation/` and their Node tests in 
 Select the narrowest applicable read-only gate.
 
 - Use `pnpm run check:markdownlint-cli2` for prose-only changes.
-- Use `pnpm run check:hooks` for changes confined to hook execution.
+- Use `node --test "hooks/**/*.test.mjs"` for changes confined to hook execution.
 - Use `pnpm run check:issue-forms` for issue form YAML changes.
 - Use `pnpm run check:plugin-version` for host manifest version checks.
 - Use `pnpm run check:skill-metadata` for skill frontmatter, invocation policy, and native prompt compatibility checks.
-- Use `pnpm run check:tooling-tests` for adopted lint rule behavior and control-flow equivalence.
-- Use `pnpm run check:validation-tests` for issue form and release version gate tests.
+- Use `pnpm run check:test` for the maintained test suites.
 - Use `pnpm run check` for mixed changes or repository-wide validation.
   This covers Markdownlint, Ultracite, hooks, issue forms, plugin versions, skill metadata, tooling tests, validation tests, and the production dependency audit.
 - The production dependency audit contacts the package registry.
