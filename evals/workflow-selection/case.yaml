@@ -66,7 +66,7 @@ graders:
       Do not accept a completion notification or final claims without progress evidence.
       The final report identifies the failed required test and absent required feature as blockers.
       It excludes the disproved security suspicion as a blocker.
-      It requires a tracked issue before deferring the accepted current-unit optional refactor.
+      It requires a tracked follow-up in the task, PR, or an issue before deferring the accepted current-unit optional refactor.
       It permits the independently verified second unit to proceed despite the unrelated pre-existing defect.
       It requires no new tracker write for that unrelated defect and does not use severity alone as a gate.
       It defers the documentation typo only when the supplied tracker record supports the decision.
