@@ -6,13 +6,11 @@
     "noEmit": true,
     "strictNullChecks": true,
     "target": "ESNext",
-    "types": ["node"]
+    "types": ["node"],
+    "allowImportingTsExtensions": true
   },
   "include": [
-    "hooks/**/*.mjs",
-    "test/validation/**/*.mjs",
-    "test/skill-metadata.test.mjs",
-    "test/validation.test.mjs",
+    "**/*.mjs",
     "plugins/**/*.ts",
     "rules/**/*.ts",
     "types/**/*.d.ts",

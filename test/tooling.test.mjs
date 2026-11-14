@@ -12,7 +12,14 @@ import noEmDash from "../rules/no-em-dash.ts";
 import proseFormat from "../rules/prose-format.ts";
 import tableSeparators from "../rules/table-separators.ts";
 
-test("Git hooks invoke pnpm directly and propagate its status", async () => {
+/** @param {unknown} value Parsed JSON value. @returns {value is Record<string, unknown>} Whether the value is an object. */
+const isObject = (value) =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
+
+/** @param {unknown} value Parsed JSON value. @returns {value is unknown[]} Whether the value is an array. */
+const isArray = (value) => Array.isArray(value);
+
+void test("Git hooks invoke pnpm directly and propagate its status", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-hooks-"));
   try {
     await writeFile(
@@ -46,7 +53,7 @@ test("Git hooks invoke pnpm directly and propagate its status", async () => {
   }
 });
 
-test("prose formatting checks sentences and preserves Markdown syntax", () => {
+void test("prose formatting checks sentences and preserves Markdown syntax", () => {
   const source = [
     "# One sentence. Another sentence.",
     "",
@@ -78,7 +85,7 @@ test("prose formatting checks sentences and preserves Markdown syntax", () => {
   );
 });
 
-test("em-dash rule checks prose and preserves code and links", () => {
+void test("em-dash rule checks prose and preserves code and links", () => {
   const source = [
     "# Heading — heading",
     "",
@@ -107,7 +114,7 @@ test("em-dash rule checks prose and preserves code and links", () => {
   );
 });
 
-test("table separator traversal handles deeply nested blockquotes", () => {
+void test("table separator traversal handles deeply nested blockquotes", () => {
   const quote = "> ".repeat(2000);
   const source = [
     `${quote}| Header | Value |`,
@@ -124,7 +131,7 @@ test("table separator traversal handles deeply nested blockquotes", () => {
   );
 });
 
-test("table separator diagnostics retain fix information", () => {
+void test("table separator diagnostics retain fix information", () => {
   const source = "| Left | Right |\n| -- | ----: |\n| one | two |\n";
   const errors =
     lint({
@@ -157,7 +164,7 @@ test("table separator diagnostics retain fix information", () => {
   );
 });
 
-test("box drawing rule covers all Markdown with first UTF-16 match and no fix", async () => {
+void test("box drawing rule covers all Markdown with first UTF-16 match and no fix", async () => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(
     path.join(tmpdir(), "workgraph-box-drawing-")
@@ -196,7 +203,10 @@ test("box drawing rule covers all Markdown with first UTF-16 match and no fix", 
         ...diagnostics.matchAll(
           /fixture\.md:(?<line>\d+):(?<column>\d+) error docs\/no-box-drawing /gu
         )
-      ].map(({ groups }) => [Number(groups.line), Number(groups.column)]),
+      ].map(({ groups }) => {
+        assert.ok(groups);
+        return [Number(groups.line), Number(groups.column)];
+      }),
       [
         [3, 4],
         [4, 5],
@@ -220,16 +230,18 @@ test("box drawing rule covers all Markdown with first UTF-16 match and no fix", 
   }
 });
 
-test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
+void test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tsdoc-"));
-  t.after(() => rm(directory, { force: true, recursive: true }));
+  t.after(async () => {
+    await rm(directory, { force: true, recursive: true });
+  });
   await Promise.all(
-    ["oxlint.config.ts", "oxfmt.config.ts", "plugins"].map((entry) =>
-      cp(path.join(root, entry), path.join(directory, entry), {
+    ["oxlint.config.ts", "oxfmt.config.ts", "plugins"].map(async (entry) => {
+      await cp(path.join(root, entry), path.join(directory, entry), {
         recursive: true
-      })
-    )
+      });
+    })
   );
   await symlink(
     path.join(root, "node_modules"),
@@ -284,30 +296,124 @@ export { Store as Again };
   assert.equal(result.status, 1, result.stderr);
   const start = result.stdout.search(/\{\s*"diagnostics"\s*:/u);
   assert.notEqual(start, -1, result.stdout);
-  assert.deepEqual(
-    JSON.parse(result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1))
-      .diagnostics.filter(({ code }) => code === "tsdoc(require-export-tsdoc)")
-      .map(({ message }) => message)
-      .toSorted(),
-    [
-      'Missing TSDoc for exported public API class "Store".',
-      'Missing TSDoc for exported public API export list "Again".',
-      'Missing TSDoc for exported public API export list "Direct".',
-      'Missing TSDoc for exported public API export list "Public".',
-      'Missing TSDoc for exported public API method "constructor".',
-      'Missing TSDoc for exported public API method "read".',
-      'Missing TSDoc for exported public API method "run".',
-      'Missing TSDoc for exported public API property "enabled".',
-      'Missing TSDoc for exported public API property "status".',
-      'Missing TSDoc for exported public API property "status".'
-    ]
+  /** @type {unknown} */
+  const output = JSON.parse(
+    result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1)
   );
+  assert.ok(isObject(output));
+  assert.ok(isArray(output.diagnostics));
+  const { diagnostics } = output;
+  const messages = diagnostics.flatMap((entry) => {
+    assert.ok(isObject(entry));
+    assert.ok(typeof entry.code === "string");
+    assert.ok(typeof entry.message === "string");
+    return entry.code === "tsdoc(require-export-tsdoc)" ? [entry.message] : [];
+  });
+  assert.deepEqual(messages.toSorted(), [
+    'Missing TSDoc for exported public API class "Store".',
+    'Missing TSDoc for exported public API export list "Again".',
+    'Missing TSDoc for exported public API export list "Direct".',
+    'Missing TSDoc for exported public API export list "Public".',
+    'Missing TSDoc for exported public API method "constructor".',
+    'Missing TSDoc for exported public API method "read".',
+    'Missing TSDoc for exported public API method "run".',
+    'Missing TSDoc for exported public API property "enabled".',
+    'Missing TSDoc for exported public API property "status".',
+    'Missing TSDoc for exported public API property "status".'
+  ]);
 });
 
+/** @typedef {{result: unknown} & Record<string, unknown>} CompletionEvidence */
+/** @typedef {{key: string, status: string, reason: unknown, prerequisites: string[], completionEvidence: CompletionEvidence[]} & Record<string, unknown>} WorkflowNode */
+/** @typedef {{from: string, to: string, type: string, condition: unknown}} WorkflowEdge */
+/** @typedef {{title: string, status: string} & Record<string, unknown>} PhaseEvidence */
+/** @typedef {{key: string, state: string} & Record<string, unknown>} WorkflowResource */
+/** @typedef {{key: string, branch: unknown, paths: unknown} & Record<string, unknown>} WorkflowUnit */
+/** @typedef {{complete: boolean, split: boolean, graph: {nodes: WorkflowNode[], edges: WorkflowEdge[]}, phaseEvidence: PhaseEvidence[], resources: WorkflowResource[], units: WorkflowUnit[], review: Record<string, unknown>, reviewHistory: Record<string, unknown>[], integration: Record<string, unknown>, fixRounds: {max: number, used: number}, publish: unknown, explorations: unknown[], sweepEvidence: unknown}} WorkflowResult */
+
+/** @param {unknown} value Workflow node. @returns {value is WorkflowNode} Whether the node has the fields used by the tests. */
+const isWorkflowNode = (value) =>
+  isObject(value) &&
+  typeof value.key === "string" &&
+  typeof value.status === "string" &&
+  "reason" in value &&
+  isArray(value.prerequisites) &&
+  value.prerequisites.every((item) => typeof item === "string") &&
+  isArray(value.completionEvidence) &&
+  value.completionEvidence.every((item) => isObject(item) && "result" in item);
+
+/** @param {unknown} value Workflow edge. @returns {value is WorkflowEdge} Whether the edge has the fields used by the tests. */
+const isWorkflowEdge = (value) =>
+  isObject(value) &&
+  typeof value.from === "string" &&
+  typeof value.to === "string" &&
+  typeof value.type === "string" &&
+  "condition" in value;
+
+/** @type {(value: unknown) => asserts value is WorkflowResult} */
+const assertWorkflowResult = (value) => {
+  assert.ok(isObject(value));
+  assert.ok(typeof value.complete === "boolean");
+  assert.ok(typeof value.split === "boolean");
+  assert.ok(isObject(value.graph));
+  assert.ok(
+    isArray(value.graph.nodes) && value.graph.nodes.every(isWorkflowNode)
+  );
+  assert.ok(
+    isArray(value.graph.edges) && value.graph.edges.every(isWorkflowEdge)
+  );
+  assert.ok(isArray(value.phaseEvidence));
+  assert.ok(
+    value.phaseEvidence.every(
+      (item) =>
+        isObject(item) &&
+        typeof item.title === "string" &&
+        typeof item.status === "string"
+    )
+  );
+  assert.ok(isArray(value.resources));
+  assert.ok(
+    value.resources.every(
+      (item) =>
+        isObject(item) &&
+        typeof item.key === "string" &&
+        typeof item.state === "string"
+    )
+  );
+  assert.ok(isArray(value.units));
+  assert.ok(
+    value.units.every(
+      (item) =>
+        isObject(item) &&
+        typeof item.key === "string" &&
+        "branch" in item &&
+        "paths" in item
+    )
+  );
+  assert.ok(isObject(value.review));
+  assert.ok(
+    isArray(value.reviewHistory) && value.reviewHistory.every(isObject)
+  );
+  assert.ok(isObject(value.integration));
+  assert.ok(isObject(value.fixRounds));
+  assert.ok(
+    typeof value.fixRounds.max === "number" &&
+      typeof value.fixRounds.used === "number"
+  );
+  assert.ok("publish" in value && "sweepEvidence" in value);
+  assert.ok(isArray(value.explorations));
+};
+
+/** @param {string} file Workflow source path. */
 const compileWorkflowSource = (file) => {
-  const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+  /** @type {unknown} */
+  const prototype = Object.getPrototypeOf(async () => {});
+  assert.ok(isObject(prototype));
+  const { constructor } = prototype;
+  assert.ok(typeof constructor === "function");
   const source = readFileSync(file, "utf-8").replace(/^export /mu, "");
-  return new AsyncFunction(
+  /** @type {unknown} */
+  const compiled = Reflect.construct(constructor, [
     "args",
     "agent",
     "parallel",
@@ -317,8 +423,13 @@ const compileWorkflowSource = (file) => {
     "workflow",
     "budget",
     source
-  );
+  ]);
+  assert.ok(typeof compiled === "function");
+  return compiled;
 };
+/** @typedef {{phase: string, label: string, agentType?: unknown, effort?: unknown, isolation?: unknown, model?: unknown}} AgentOptions */
+
+/** @param {Record<string, (options: AgentOptions) => unknown>} table Phase handlers. @returns {(options: AgentOptions) => unknown} Agent handler. */
 const dispatchTable = (table) => (options) => {
   const entry = table[options.phase];
   if (options.phase === "Verify" && entry === undefined) {
@@ -337,6 +448,7 @@ const dispatchTable = (table) => (options) => {
   }
   return entry(options);
 };
+/** @param {...unknown} payloads Responses to return in order. */
 const sequence = (...payloads) => {
   let served = 0;
   return () => {
@@ -345,10 +457,13 @@ const sequence = (...payloads) => {
     return payload;
   };
 };
+/** @param {string} file Workflow source. @param {Record<string, unknown>} args Workflow input. @param {(options: AgentOptions) => unknown} payloadFor Agent response factory. */
 const runWorkflowSample = async (file, args, payloadFor) => {
+  /** @type {{agentType: unknown, effort: unknown, effortProvided: boolean, isolation: unknown, label: string, model: unknown, modelProvided: boolean, phase: string, prompt: string}[]} */
   const calls = [];
   const environment = {
-    agent: (prompt, options) => {
+    /** @param {string} prompt Agent prompt. @param {AgentOptions} options Agent dispatch options. */
+    agent: async (prompt, options) => {
       calls.push({
         agentType: options.agentType,
         effort: options.effort,
@@ -360,18 +475,17 @@ const runWorkflowSample = async (file, args, payloadFor) => {
         phase: options.phase,
         prompt
       });
-      try {
-        const payload = payloadFor(options);
-        return payload === null
-          ? Promise.reject(new Error("agent failure"))
-          : Promise.resolve(payload);
-      } catch (error) {
-        return Promise.reject(error);
+      const payload = payloadFor(options);
+      if (payload === null) {
+        throw new Error("agent failure");
       }
+      return await Promise.resolve(payload);
     },
     budget: { remaining: () => Infinity, spent: () => 0, total: null },
     log: () => null,
-    parallel: (thunks) => Promise.all(thunks.map((thunk) => thunk())),
+    /** @param {(() => Promise<unknown>)[]} thunks Work items. */
+    parallel: async (thunks) =>
+      await Promise.all(thunks.map(async (thunk) => await thunk())),
     phase: () => null,
     pipeline: () => {
       throw new Error("pipeline must not run in these samples");
@@ -380,7 +494,8 @@ const runWorkflowSample = async (file, args, payloadFor) => {
       throw new Error("workflow must not run in these samples");
     }
   };
-  const result = await compileWorkflowSource(file)(
+  /** @type {unknown} */
+  const result = await Reflect.apply(compileWorkflowSource(file), undefined, [
     args,
     environment.agent,
     environment.parallel,
@@ -389,7 +504,8 @@ const runWorkflowSample = async (file, args, payloadFor) => {
     environment.log,
     environment.workflow,
     environment.budget
-  );
+  ]);
+  assertWorkflowResult(result);
   return { calls, result };
 };
 
@@ -442,6 +558,7 @@ const simpleRepair = {
   branch: "unit-u1-fix",
   startRef: "unit-u1"
 };
+/** @param {AgentOptions} options Agent dispatch options. */
 const splitImplement = (options) => {
   const secondUnit = options.label.startsWith("implement:u2");
   const repair = options.label.includes(":fix-");
@@ -459,12 +576,14 @@ const splitImplement = (options) => {
     startRef: "task-branch"
   };
 };
+/** @param {AgentOptions} options Agent dispatch options. */
 const wrongStart = (options) => {
   const result = splitImplement(options);
   return options.label.includes(":fix-")
     ? { ...result, startRef: "wrong-ref" }
     : result;
 };
+/** @param {AgentOptions} options Agent dispatch options. */
 const failedRepair = (options) =>
   options.label.includes(":fix-")
     ? {
@@ -473,6 +592,7 @@ const failedRepair = (options) =>
         checks: [{ command: "check-failed", status: "failed" }]
       }
     : splitImplement(options);
+/** @param {AgentOptions} options Agent dispatch options. */
 const multiRound = (options) => {
   if (options.label.includes(":fix-1")) {
     return { ...splitImplement(options), branch: "unit-u1-r1" };
@@ -535,7 +655,7 @@ const reviewFix = {
 };
 const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
 
-test("delivery preserves a posted request after repair failures", async () => {
+void test("delivery preserves a posted request after repair failures", async () => {
   await Promise.all(
     ["implement", "integrate", "sweep", "publish"].map(async (failure) => {
       const { result } = await runWorkflowSample(
@@ -561,7 +681,7 @@ test("delivery preserves a posted request after repair failures", async () => {
       assert.equal(result.complete, false);
       assert.equal(
         result.graph.nodes.find((node) => node.key === `${failure}:fix-1`)
-          .status,
+          ?.status,
         "failed"
       );
       assert.deepEqual(result.publish, { url: publishCreated.url });
@@ -573,14 +693,14 @@ test("delivery preserves a posted request after repair failures", async () => {
         const status = index < failedIndex ? "completed" : "skipped";
         const expected = index === failedIndex ? "failed" : status;
         assert.equal(
-          result.phaseEvidence.find((record) => record.title === phase).status,
+          result.phaseEvidence.find((record) => record.title === phase)?.status,
           expected,
           phase
         );
         assert.equal(
           result.graph.nodes.find(
             (node) => node.key === `${phase.toLowerCase()}:fix-1`
-          ).status,
+          )?.status,
           expected,
           phase
         );
@@ -590,7 +710,7 @@ test("delivery preserves a posted request after repair failures", async () => {
   );
 });
 
-test("delivery retains publication evidence in its graph", async () => {
+void test("delivery retains publication evidence in its graph", async () => {
   const { result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -604,15 +724,14 @@ test("delivery retains publication evidence in its graph", async () => {
       Sweep: () => sweepResult
     })
   );
-  assert.equal(
-    result.graph.nodes
-      .find((node) => node.key === "publish")
-      .completionEvidence.at(-1).result.evidence,
-    publishCreated.evidence
-  );
+  const publishNode = result.graph.nodes.find((node) => node.key === "publish");
+  assert.ok(publishNode);
+  const evidence = publishNode.completionEvidence.at(-1);
+  assert.ok(evidence && isObject(evidence.result));
+  assert.equal(evidence.result.evidence, publishCreated.evidence);
 });
 
-test("delivery rejects a unit branch equal to the resolved default base", async () => {
+void test("delivery rejects a unit branch equal to the resolved default base", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -633,7 +752,7 @@ test("delivery rejects a unit branch equal to the resolved default base", async 
   );
 });
 
-test("delivery rejects a repair reported on the posted head", async () => {
+void test("delivery rejects a repair reported on the posted head", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -652,14 +771,14 @@ test("delivery rejects a repair reported on the posted head", async () => {
   );
   assert.equal(result.complete, false);
   assert.equal(
-    result.graph.nodes.find((node) => node.key === "implement:fix-1").status,
+    result.graph.nodes.find((node) => node.key === "implement:fix-1")?.status,
     "failed"
   );
   assert.equal(calls.filter((call) => call.phase === "Publish").length, 1);
   assert.deepEqual(result.publish, { url: publishCreated.url });
 });
 
-test("delivery integrates a distinct repair branch into the posted single-unit head", async () => {
+void test("delivery integrates a distinct repair branch into the posted single-unit head", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -686,7 +805,7 @@ test("delivery integrates a distinct repair branch into the posted single-unit h
   assert.equal(calls.filter((call) => call.phase === "Integrate").length, 1);
 });
 
-test("delivery samples reject a passing review with unresolved findings", async () => {
+void test("delivery samples reject a passing review with unresolved findings", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { result } = await runWorkflowSample(
@@ -713,7 +832,7 @@ test("delivery samples reject a passing review with unresolved findings", async 
   );
 });
 
-test("delivery samples fail a fix-required review without findings", async () => {
+void test("delivery samples fail a fix-required review without findings", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { result } = await runWorkflowSample(
@@ -741,14 +860,15 @@ test("delivery samples fail a fix-required review without findings", async () =>
       );
       assert.equal(result.complete, false);
       assert.equal(
-        result.phaseEvidence.find((record) => record.title === "Review").status,
+        result.phaseEvidence.find((record) => record.title === "Review")
+          ?.status,
         "failed"
       );
     })
   );
 });
 
-test("delivery workflow samples inherit host models and honor model overrides", async () => {
+void test("delivery workflow samples inherit host models and honor model overrides", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [
@@ -812,7 +932,7 @@ test("delivery workflow samples inherit host models and honor model overrides", 
   );
 });
 
-test("delivery workflow samples allow explicitly omitted exploration", async () => {
+void test("delivery workflow samples allow explicitly omitted exploration", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { calls, result } = await runWorkflowSample(
@@ -835,7 +955,7 @@ test("delivery workflow samples allow explicitly omitted exploration", async () 
       assert.equal(result.complete, true);
       assert.equal(
         result.phaseEvidence.find((record) => record.title === "Explore")
-          .status,
+          ?.status,
         "skipped"
       );
       const refuted = await runWorkflowSample(
@@ -876,7 +996,7 @@ test("delivery workflow samples allow explicitly omitted exploration", async () 
   );
 });
 
-test("delivery workflow samples stop planning when exploration fails", async () => {
+void test("delivery workflow samples stop planning when exploration fails", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { calls, result } = await runWorkflowSample(
@@ -890,7 +1010,7 @@ test("delivery workflow samples stop planning when exploration fails", async () 
       );
       assert.equal(
         result.phaseEvidence.find((record) => record.title === "Explore")
-          .status,
+          ?.status,
         "failed"
       );
       assert.equal(
@@ -902,7 +1022,7 @@ test("delivery workflow samples stop planning when exploration fails", async () 
   );
 });
 
-test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
+void test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.delivery,
@@ -994,6 +1114,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
+    assert.ok(reviewRecord);
     assert.equal(reviewRecord.status, "completed");
   }
   {
@@ -1027,6 +1148,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const publishRecord = result.phaseEvidence.find(
       (record) => record.title === "Publish"
     );
+    assert.ok(publishRecord);
     assert.equal(publishRecord.status, "failed");
   }
   {
@@ -1063,10 +1185,12 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const sweepRecord = result.phaseEvidence.find(
       (record) => record.title === "Sweep"
     );
+    assert.ok(sweepRecord);
     assert.equal(sweepRecord.status, "skipped");
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
+    assert.ok(reviewRecord);
     assert.equal(reviewRecord.status, "skipped");
   }
   {
@@ -1100,7 +1224,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     assert.ok(phases.indexOf("Publish") < phases.indexOf("Review"));
     assert.ok(phases.lastIndexOf("Publish") < phases.lastIndexOf("Review"));
     assert.equal(
-      result.units.find((unit) => unit.key === "u2").branch,
+      result.units.find((unit) => unit.key === "u2")?.branch,
       "unit-u2"
     );
     assert.deepEqual(
@@ -1139,6 +1263,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
+    assert.ok(reviewRecord);
     assert.equal(reviewRecord.status, "skipped");
   }
   {
@@ -1172,15 +1297,17 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
     const implementRecord = result.phaseEvidence.find(
       (record) => record.title === "Implement"
     );
+    assert.ok(implementRecord);
     assert.equal(implementRecord.status, "failed");
     const publishRecord = result.phaseEvidence.find(
       (record) => record.title === "Publish"
     );
+    assert.ok(publishRecord);
     assert.equal(publishRecord.status, "skipped");
   }
   await assert.rejects(
-    () =>
-      runWorkflowSample(
+    async () =>
+      await runWorkflowSample(
         samplePaths.delivery,
         { issue: "", task: "t" },
         dispatchTable({ Scope: () => scopeResult })
@@ -1191,7 +1318,7 @@ test("delivery workflow samples preserve post-then-review ordering and honest ph
   );
 });
 
-test("delivery workflow samples reject unsafe ownership and contradictory evidence", async () => {
+void test("delivery workflow samples reject unsafe ownership and contradictory evidence", async () => {
   await Promise.all(
     [absoluteUnits, escapingUnits, nestedUnits].map(async (planPayload) => {
       const { calls, result } = await runWorkflowSample(
@@ -1208,6 +1335,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       const planRecord = result.phaseEvidence.find(
         (record) => record.title === "Plan"
       );
+      assert.ok(planRecord);
       assert.equal(planRecord.status, "failed");
       assert.equal(
         calls.filter((call) => call.phase === "Implement").length,
@@ -1245,10 +1373,12 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       const implementRecord = result.phaseEvidence.find(
         (record) => record.title === "Implement"
       );
+      assert.ok(implementRecord);
       assert.equal(implementRecord.status, "failed");
       const publishRecord = result.phaseEvidence.find(
         (record) => record.title === "Publish"
       );
+      assert.ok(publishRecord);
       assert.equal(publishRecord.status, "skipped");
     })
   );
@@ -1325,6 +1455,7 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       const integrateRecord = result.phaseEvidence.find(
         (record) => record.title === "Integrate"
       );
+      assert.ok(integrateRecord);
       assert.equal(integrateRecord.status, "failed");
       assert.deepEqual(
         result.resources.map((resource) => resource.state),
@@ -1332,14 +1463,14 @@ test("delivery workflow samples reject unsafe ownership and contradictory eviden
       );
       assert.equal(
         result.phaseEvidence.find((record) => record.title === "Publish")
-          .status,
+          ?.status,
         "skipped"
       );
     })
   );
 });
 
-test("delivery workflow samples carry named candidates and per-key repair evidence", async () => {
+void test("delivery workflow samples carry named candidates and per-key repair evidence", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", issue: "#1", maxFixRounds: 1, task: "t" },
@@ -1362,6 +1493,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   const implementRecord = result.phaseEvidence.find(
     (record) => record.title === "Implement"
   );
+  assert.ok(implementRecord);
   assert.equal(implementRecord.status, "failed");
   assert.deepEqual(
     result.resources.find((resource) => resource.key === "u1"),
@@ -1385,7 +1517,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   assert.equal(
     repairRun.result.phaseEvidence.find(
       (record) => record.title === "Implement"
-    ).status,
+    )?.status,
     "failed"
   );
   assert.deepEqual(
@@ -1406,7 +1538,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
     ]
   );
   assert.equal(
-    repairRun.result.resources.find((resource) => resource.key === "u2").state,
+    repairRun.result.resources.find((resource) => resource.key === "u2")?.state,
     "merged"
   );
   assert.equal(
@@ -1429,6 +1561,7 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   const candidateRecord = candidateRun.result.phaseEvidence.find(
     (record) => record.title === "Implement"
   );
+  assert.ok(candidateRecord);
   assert.equal(candidateRecord.status, "failed");
   assert.deepEqual(candidateRun.result.resources, [
     {
@@ -1537,11 +1670,12 @@ test("delivery workflow samples carry named candidates and per-key repair eviden
   const missingRecord = missingRun.result.phaseEvidence.find(
     (record) => record.title === "Implement"
   );
+  assert.ok(missingRecord);
   assert.equal(missingRecord.status, "failed");
   assert.deepEqual(missingRun.result.resources, []);
 });
 
-test("delivery samples validate integration destination and verify findings before repairs", async () => {
+void test("delivery samples validate integration destination and verify findings before repairs", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { calls, result } = await runWorkflowSample(
@@ -1570,57 +1704,59 @@ test("delivery samples validate integration destination and verify findings befo
   );
 });
 
-test("delivery samples gate repairs on independent finding dispositions", async () => {
+void test("delivery samples gate repairs on independent finding dispositions", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
-      await Promise.all(
+      /** @type {[{evidence: string, id: string, status: string}[] | null, boolean, number][]} */
+      const cases = [
         [
           [
-            [
-              {
-                evidence: "Source disproves it.",
-                id: "review-1-finding-1",
-                status: "refuted"
-              }
-            ],
-            true,
-            0
+            {
+              evidence: "Source disproves it.",
+              id: "review-1-finding-1",
+              status: "refuted"
+            }
           ],
+          true,
+          0
+        ],
+        [
           [
-            [
-              {
-                evidence: "Source confirms it.",
-                id: "review-1-finding-1",
-                status: "confirmed"
-              }
-            ],
-            true,
-            1
+            {
+              evidence: "Source confirms it.",
+              id: "review-1-finding-1",
+              status: "confirmed"
+            }
           ],
+          true,
+          1
+        ],
+        [
           [
-            [
-              {
-                evidence: "Cannot determine.",
-                id: "review-1-finding-1",
-                status: "unverified"
-              }
-            ],
-            false,
-            0
+            {
+              evidence: "Cannot determine.",
+              id: "review-1-finding-1",
+              status: "unverified"
+            }
           ],
-          [[], false, 0],
-          [
-            [{ evidence: "Source.", id: "unknown", status: "confirmed" }],
-            false,
-            0
-          ],
-          [
-            [{ evidence: "", id: "review-1-finding-1", status: "confirmed" }],
-            false,
-            0
-          ],
-          [null, false, 0]
-        ].map(async ([dispositions, expectedComplete, expectedRepairs]) => {
+          false,
+          0
+        ],
+        [[], false, 0],
+        [
+          [{ evidence: "Source.", id: "unknown", status: "confirmed" }],
+          false,
+          0
+        ],
+        [
+          [{ evidence: "", id: "review-1-finding-1", status: "confirmed" }],
+          false,
+          0
+        ],
+        [null, false, 0]
+      ];
+      await Promise.all(
+        cases.map(async ([dispositions, expectedComplete, expectedRepairs]) => {
           const { calls, result } = await runWorkflowSample(
             file,
             { candidateBranch: "task-branch", issue: "#1", task: "t" },
@@ -1645,10 +1781,9 @@ test("delivery samples gate repairs on independent finding dispositions", async 
             calls.filter(({ phase }) => phase === "Publish").length,
             1 + expectedRepairs
           );
-          assert.deepEqual(
-            result.reviewHistory[0].verification.dispositions,
-            dispositions
-          );
+          const [{ verification }] = result.reviewHistory;
+          assert.ok(isObject(verification));
+          assert.deepEqual(verification.dispositions, dispositions);
         })
       );
       const unowned = await runWorkflowSample(
@@ -1672,6 +1807,7 @@ test("delivery samples gate repairs on independent finding dispositions", async 
       const reviewRecord = unowned.result.phaseEvidence.find(
         (record) => record.title === "Review"
       );
+      assert.ok(reviewRecord);
       assert.equal(reviewRecord.status, "failed");
       assert.equal(unowned.result.fixRounds.used, 0);
       for (const phase of ["Implement", "Publish", "Review"]) {
@@ -1684,7 +1820,7 @@ test("delivery samples gate repairs on independent finding dispositions", async 
   );
 });
 
-test("delivery samples reject invalid integration path evidence and base destinations", async () => {
+void test("delivery samples reject invalid integration path evidence and base destinations", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       await Promise.all(
@@ -1733,7 +1869,7 @@ test("delivery samples reject invalid integration path evidence and base destina
   );
 });
 
-test("multi-unit delivery routes only independently confirmed findings to their owner", async () => {
+void test("multi-unit delivery routes only independently confirmed findings to their owner", async () => {
   const findings = [
     { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
@@ -1778,10 +1914,12 @@ test("multi-unit delivery routes only independently confirmed findings to their 
     repairs.map(({ label }) => label),
     ["implement:u1:fix-1"]
   );
-  assert.equal(result.reviewHistory[0].verification.dispositions.length, 2);
+  const [{ verification }] = result.reviewHistory;
+  assert.ok(isObject(verification) && isArray(verification.dispositions));
+  assert.equal(verification.dispositions.length, 2);
 });
 
-test("delivery samples reject malformed findings and preserve review evidence", async () => {
+void test("delivery samples reject malformed findings and preserve review evidence", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [null, { detail: "d", file: null, scenario: "s" }].map(
@@ -1818,7 +1956,7 @@ test("delivery samples reject malformed findings and preserve review evidence", 
   );
 });
 
-test("delivery finding verification independently selects its model", async () => {
+void test("delivery finding verification independently selects its model", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [
@@ -1850,7 +1988,9 @@ test("delivery finding verification independently selects its model", async () =
           })
         );
         const review = calls.find(({ phase }) => phase === "Review");
+        assert.ok(review);
         const verification = calls.find(({ phase }) => phase === "Verify");
+        assert.ok(verification);
         assert.equal(review.effort, efforts.review);
         assert.equal(review.effortProvided, efforts.review !== undefined);
         assert.equal(verification.effort, efforts.verify);
@@ -1864,34 +2004,35 @@ test("delivery finding verification independently selects its model", async () =
   );
 });
 
-test("delivery samples validate the verification model selector", async () => {
+void test("delivery samples validate the verification model selector", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
-      ["", "  ", null, 42].map((verify) =>
-        assert.rejects(
+      ["", "  ", null, 42].map(async (verify) => {
+        await assert.rejects(
           runWorkflowSample(file, { models: { verify }, task: "t" }, () =>
             assert.fail("Invalid model selector dispatched an agent")
           ),
           {
             message: "Provide models.verify as a nonempty model selector string"
           }
-        )
-      )
+        );
+      })
     )
   );
   await Promise.all(
-    Object.values(samplePaths).map((file) =>
-      assert.rejects(
+    Object.values(samplePaths).map(async (file) => {
+      await assert.rejects(
         runWorkflowSample(file, { efforts: { verify: " " }, task: "t" }, () =>
           assert.fail("Invalid effort selector dispatched an agent")
         ),
         { message: "Provide efforts.verify as a nonempty effort string" }
-      )
-    )
+      );
+    })
   );
 });
 
-test("delivery samples append each phase's prompt part as its final section", async () => {
+void test("delivery samples append each phase's prompt part as its final section", async () => {
+  /** @type {Record<string, string>} */
   const promptParts = {
     explore: "explore part",
     implement: "implement part",
@@ -1939,7 +2080,7 @@ test("delivery samples append each phase's prompt part as its final section", as
   );
 });
 
-test("delivery samples pass candidate, issue, request, and owned findings into prompt sections", async () => {
+void test("delivery samples pass candidate, issue, request, and owned findings into prompt sections", async () => {
   const findings = [
     { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
@@ -1979,7 +2120,7 @@ test("delivery samples pass candidate, issue, request, and owned findings into p
       assert.equal(
         calls
           .find(({ phase }) => phase === "Plan")
-          .prompt.split("\n\n")
+          ?.prompt.split("\n\n")
           .find((section) =>
             section.startsWith("Scopes and exploration findings: ")
           ),
@@ -1990,6 +2131,7 @@ test("delivery samples pass candidate, issue, request, and owned findings into p
           scopes: scopeResult.scopes
         })}`
       );
+      /** @param {string} text Prompt section. */
       const owns = (text) =>
         calls
           .filter((call) => call.prompt.split("\n\n").includes(text))
@@ -2029,7 +2171,7 @@ test("delivery samples pass candidate, issue, request, and owned findings into p
   );
 });
 
-test("delivery graph adapts single-unit candidates and records conditional integration evidence", async () => {
+void test("delivery graph adapts single-unit candidates and records conditional integration evidence", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -2053,12 +2195,12 @@ test("delivery graph adapts single-unit candidates and records conditional integ
     status: "skipped"
   });
   const integration = result.graph.nodes.find(({ key }) => key === "integrate");
+  assert.ok(integration);
   assert.equal(integration.status, "skipped");
   assert.equal(integration.reason, result.integration.reason);
-  assert.deepEqual(
-    integration.completionEvidence.at(-1).result,
-    result.integration
-  );
+  const evidence = integration.completionEvidence.at(-1);
+  assert.ok(evidence);
+  assert.deepEqual(evidence.result, result.integration);
   assert.deepEqual(result.resources, [
     {
       branch: "unit-u1",
@@ -2071,7 +2213,7 @@ test("delivery graph adapts single-unit candidates and records conditional integ
     assert.equal(
       calls
         .find((call) => call.phase === phase)
-        .prompt.split("\n\n")
+        ?.prompt.split("\n\n")
         .find((section) => section.startsWith("Candidate branch: ")),
       "Candidate branch: unit-u1"
     );
@@ -2093,7 +2235,7 @@ test("delivery graph adapts single-unit candidates and records conditional integ
   );
 });
 
-test("delivery graph exposes node contracts and condition edges", async () => {
+void test("delivery graph exposes node contracts and condition edges", async () => {
   await Promise.all(
     [false, true].map(async (split) => {
       const { result } = await runWorkflowSample(
@@ -2152,8 +2294,8 @@ test("delivery graph exposes node contracts and condition edges", async () => {
           true
         );
       }
-      assert.equal(nodes.get("verify-findings:1").status, "completed");
-      assert.deepEqual(nodes.get("implement:u1:fix-1").prerequisites, [
+      assert.equal(nodes.get("verify-findings:1")?.status, "completed");
+      assert.deepEqual(nodes.get("implement:u1:fix-1")?.prerequisites, [
         "plan",
         "review",
         "verify-findings:1"
