@@ -37,7 +37,7 @@ The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks.md#plugin-bund
 Root `plugin.json` is intentionally absent because Codex `0.166.0` and the reviewed main source skip hook discovery for its portable Agent Plugins format.
 See the [source review](../research.md#codex-native-hook-discovery-and-trust) for the difference between advertised extension support and the actual loader path.
 
-Hook execution requires Node.js 26.13.0 or later within major version 26.
+Hook execution requires Node.js 24.22.3 or later within major version 24.
 The commands use `PLUGIN_ROOT` and keep complete context inline through `additionalContextLimit: 0`.
 Each context starts with the native `<skill>` fragment containing the qualified name, source path, and complete skill file with frontmatter.
 Source labels and the selected host reference follow it.

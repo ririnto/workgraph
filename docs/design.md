@@ -152,7 +152,7 @@ The script resolves bundled paths against `import.meta.url`, independent of the 
 It reports actual source paths after resolving symbolic links.
 Each output names the execution host from the hook argument without inferring it from the model family.
 
-The hook runtime uses built-ins and language features available in Node.js 26.
+The hook runtime uses built-ins and language features available in Node.js 24.
 Development tools follow the separate engine range in `package.json`.
 
 The script accepts a hook event and an explicit host name.
@@ -357,7 +357,7 @@ It rejects the root portable manifest and generic hook files that would shadow o
 `test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, the complete-file UTF-8 prompt boundary, and relocated execution.
 
 CI runs full development checks on Linux with the package's Node engine range.
-Separate macOS and Node.js 26 jobs run dependency-free hook tests without installing development tools.
+Separate macOS and Node.js 24 jobs run dependency-free hook tests without installing development tools.
 Those jobs verify hook runtime compatibility without installing development dependencies.
 Pull requests and main updates trigger the workflow without path filters, and its token receives read-only contents permission.
 Dependabot checks npm dependencies and GitHub Actions daily.

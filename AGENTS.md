@@ -48,7 +48,7 @@ Exclude generated and vendored material from mechanical prose edits.
 
 ## Implementation
 
-- Use Node built-ins compatible with Node.js 26 and later for the plugin runtime.
+- Use Node built-ins compatible with Node.js 24.22.3 or later within major version 24 for the plugin runtime.
 - Resolve bundled files from the executing module's location.
 - Keep hook commands portable through the selected host's plugin-root variable.
 - Emit context only after all required files load and contain text.
