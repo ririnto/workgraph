@@ -12,6 +12,7 @@
     "check:production-audit": "pnpm audit --prod",
     "check:skill-metadata": "node test/validation/skill-metadata.mjs",
     "check:ultracite": "ultracite check",
+    "check:ultracite-types": "ultracite check --type-aware oxfmt.config.ts oxlint.config.ts plugins rules",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
     "fix:ultracite": "ultracite fix",
@@ -29,6 +30,7 @@
     "npm-run-all2": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
     "pnpm": "catalog:",
     "typescript": "catalog:",
     "ultracite": "catalog:"

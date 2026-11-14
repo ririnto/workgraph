@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "noEmit": true,
+    "strictNullChecks": true,
+    "target": "ESNext"
+  },
+  "include": [
+    "plugins/**/*.ts",
+    "rules/**/*.ts",
+    "oxfmt.config.ts",
+    "oxlint.config.ts"
+  ]
+}

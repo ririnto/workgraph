@@ -5,7 +5,7 @@ const rule: Rule = {
   function: (params, onError) => {
     for (const [index, line] of params.lines.entries()) {
       const match = /(?<character>[─-╿])/u.exec(line);
-      if (match?.groups?.character) {
+      if (match?.groups?.character !== undefined) {
         onError({
           detail: "Use ASCII tree markers such as +-- and | instead.",
           lineNumber: index + 1,
@@ -15,6 +15,7 @@ const rule: Rule = {
     }
   },
   names: ["docs/no-box-drawing"],
+  parser: "none",
   tags: ["docs"]
 };
 
