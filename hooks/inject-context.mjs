@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
  * Report hook errors without emitting partial context.
  * @param {string} message Failure description.
  * @param {number} code Process exit status.
+ * @returns {never} This function exits the process.
  */
 const fail = (message, code) => {
   console.error(`inject-context: ${message}`);
@@ -26,31 +27,32 @@ const readInstruction = (file, stripFrontmatter) => {
       fileURLToPath(new URL(`../skills/${file}`, import.meta.url))
     );
     const content = readFileSync(source, "utf-8");
-    const lines = stripFrontmatter
-      ? content.replace(/^\uFEFF/u, "").split("\n")
-      : undefined;
-    const closingFrontmatterLine = lines?.findIndex(
-      (line, index) => index > 0 && line.trim() === "---"
-    );
-    const body = stripFrontmatter
-      ? lines.slice(closingFrontmatterLine + 1).join("\n")
-      : content;
-    if (
-      (stripFrontmatter &&
-        (lines[0].trim() !== "---" ||
-          closingFrontmatterLine < 1 ||
-          !lines
-            .slice(1, closingFrontmatterLine)
-            .some((line) => line.trim()))) ||
-      !body.trim()
-    ) {
+    let body = content;
+    if (stripFrontmatter) {
+      const lines = content.replace(/^\uFEFF/u, "").split("\n");
+      const closingFrontmatterLine = lines.findIndex(
+        (line, index) => index > 0 && line.trim() === "---"
+      );
+      body = lines.slice(closingFrontmatterLine + 1).join("\n");
+      if (
+        lines[0].trim() !== "---" ||
+        closingFrontmatterLine < 1 ||
+        !lines.slice(1, closingFrontmatterLine).some((line) => line.trim())
+      ) {
+        throw new Error(
+          "empty instructions or missing required skill frontmatter"
+        );
+      }
+    }
+    if (!body.trim()) {
       throw new Error(
         "empty instructions or missing required skill frontmatter"
       );
     }
     return { body, content, source };
   } catch (error) {
-    fail(`cannot load instruction file ${file}: ${error.message}`, 1);
+    const message = error instanceof Error ? error.message : String(error);
+    return fail(`cannot load instruction file ${file}: ${message}`, 1);
   }
 };
 

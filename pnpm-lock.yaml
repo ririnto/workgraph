@@ -167,6 +167,9 @@ catalogs:
     '@oxc-project/types':
       specifier: ^0.158.0
       version: 0.158.0
+    '@types/node':
+      specifier: ^26.6.6
+      version: 26.6.6
     husky:
       specifier: ^9.1.7
       version: 9.1.7
@@ -211,6 +214,9 @@ importers:
       '@oxc-project/types':
         specifier: 'catalog:'
         version: 0.158.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.6
       husky:
         specifier: 'catalog:'
         version: 9.1.7
@@ -656,6 +662,9 @@ packages:
 
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
+
+  '@types/node@26.6.6':
+    resolution: {integrity: sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==}
 
   '@types/unist@2.0.11':
     resolution: {integrity: sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA==}
@@ -1393,6 +1402,9 @@ packages:
       stylelint:
         optional: true
 
+  undici-types@8.9.0:
+    resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
@@ -1659,6 +1671,10 @@ snapshots:
   '@types/katex@0.16.8': {}
 
   '@types/ms@2.1.0': {}
+
+  '@types/node@26.6.6':
+    dependencies:
+      undici-types: 8.9.0
 
   '@types/unist@2.0.11': {}
 
@@ -2455,6 +2471,8 @@ snapshots:
     optionalDependencies:
       oxfmt: 0.78.0
       oxlint: 1.93.0(oxlint-tsgolint@7.0.2007)
+
+  undici-types@8.9.0: {}
 
   unicorn-magic@0.3.0: {}
 

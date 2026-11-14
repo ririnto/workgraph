@@ -25,26 +25,34 @@ const pollingCommand = new RegExp(
   "u"
 );
 
-/** Create private namespaces without following preexisting directory symlinks. */
+/**
+ * Create private namespaces without following preexisting directory symlinks.
+ * @param {string} directory Directory to create or validate.
+ */
 const privateDirectory = (directory) => {
   try {
     mkdirSync(directory, { mode: 0o700 });
   } catch (error) {
-    if (error.code !== "EEXIST") {
+    if (
+      !(error instanceof Error && "code" in error && error.code === "EEXIST")
+    ) {
       throw error;
     }
   }
   const metadata = lstatSync(directory);
   if (
     !metadata.isDirectory() ||
-    metadata.uid !== process.getuid() ||
+    metadata.uid !== process.getuid?.() ||
     metadata.mode % 0o100 !== 0
   ) {
     throw new Error("unsafe state directory");
   }
 };
 
-/** Read only the bounded counter file, never a symlink or another file type. */
+/**
+ * Read only the bounded counter file, never a symlink or another file type.
+ * @param {string} file Counter file path.
+ */
 const readCount = (file) => {
   let descriptor;
   try {
@@ -62,7 +70,7 @@ const readCount = (file) => {
     }
     return Number(count);
   } catch (error) {
-    if (error.code === "ENOENT") {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
       return 0;
     }
     throw error;
@@ -73,7 +81,10 @@ const readCount = (file) => {
   }
 };
 
-/** Acquire one session lock with a bounded wait, leaving stale locks untouched. */
+/**
+ * Acquire one session lock with a bounded wait, leaving stale locks untouched.
+ * @param {string} lock Lock file path.
+ */
 const acquireLock = async (lock) => {
   let attempts = 0;
   for await (const _tick of setInterval(10)) {
@@ -82,21 +93,46 @@ const acquireLock = async (lock) => {
       return;
     } catch (error) {
       attempts += 1;
-      if (error.code !== "EEXIST" || attempts === 100) {
+      if (
+        !(
+          error instanceof Error &&
+          "code" in error &&
+          error.code === "EEXIST"
+        ) ||
+        attempts === 100
+      ) {
         throw error;
       }
     }
   }
 };
 
-/** Serialize one session's transitions and disable enforcement after state failures. */
+/**
+ * Identify Bash hook input with a non-empty session identifier.
+ * @param {unknown} input Parsed hook input.
+ * @returns {input is {session_id: string, hook_event_name: unknown, tool_name: unknown, tool_input?: unknown}} Whether the input identifies a Bash hook.
+ */
+const isBashHookInput = (input) =>
+  typeof input === "object" &&
+  input !== null &&
+  "session_id" in input &&
+  "hook_event_name" in input &&
+  "tool_name" in input &&
+  typeof input.session_id === "string" &&
+  input.session_id !== "" &&
+  input.hook_event_name === "PreToolUse" &&
+  input.tool_name === "Bash";
+
+/**
+ * Serialize one session's transitions and disable enforcement after state failures.
+ * @param {unknown} input Parsed hook input.
+ * @param {string} host Execution host.
+ */
 const guard = async (input, host) => {
-  if (
-    typeof input.session_id !== "string" ||
-    !input.session_id ||
-    input.hook_event_name !== "PreToolUse" ||
-    input.tool_name !== "Bash"
-  ) {
+  if (input === null) {
+    throw new TypeError("invalid hook input");
+  }
+  if (!isBashHookInput(input)) {
     return;
   }
   if (
@@ -126,9 +162,13 @@ const guard = async (input, host) => {
     if (existsSync(disabled)) {
       return;
     }
+    const toolInput = "tool_input" in input ? input.tool_input : undefined;
     const matches =
-      typeof input.tool_input?.command === "string" &&
-      pollingCommand.test(input.tool_input.command);
+      typeof toolInput === "object" &&
+      toolInput !== null &&
+      "command" in toolInput &&
+      typeof toolInput.command === "string" &&
+      pollingCommand.test(toolInput.command);
     const count = matches ? Math.min(readCount(counter) + 1, 3) : 0;
     temporary = path.join(directory, randomUUID());
     writeFileSync(temporary, String(count), { flag: "wx", mode: 0o600 });

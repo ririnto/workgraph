@@ -11,8 +11,9 @@
     "check:plugin-version": "node test/validation/plugin-version.mjs",
     "check:production-audit": "pnpm audit --prod",
     "check:skill-metadata": "node test/validation/skill-metadata.mjs",
+    "check:types": "tsc --noEmit",
     "check:ultracite": "ultracite check",
-    "check:ultracite-types": "ultracite check --type-aware oxfmt.config.ts oxlint.config.ts plugins rules",
+    "check:ultracite-types": "ultracite check --type-aware oxfmt.config.ts oxlint.config.ts plugins rules hooks/bash-polling-guard.mjs hooks/inject-context.mjs",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
     "fix:ultracite": "ultracite fix",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@oxc-project/types": "catalog:",
+    "@types/node": "catalog:",
     "husky": "catalog:",
     "markdownlint": "catalog:",
     "markdownlint-cli2": "catalog:",

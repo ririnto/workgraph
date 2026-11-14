@@ -1,11 +1,16 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
     "module": "NodeNext",
     "noEmit": true,
     "strictNullChecks": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "types": ["node"]
   },
   "include": [
+    "hooks/bash-polling-guard.mjs",
+    "hooks/inject-context.mjs",
     "plugins/**/*.ts",
     "rules/**/*.ts",
     "oxfmt.config.ts",
