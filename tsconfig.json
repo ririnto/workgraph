@@ -1,14 +1,22 @@
 {
+  "extends": "@tsconfig/node-lts/tsconfig.json",
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
-    "module": "NodeNext",
     "noEmit": true,
-    "strictNullChecks": true,
     "target": "ESNext",
-    "types": ["node"],
     "allowImportingTsExtensions": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "dom.asynciterable",
+      "webworker.importscripts",
+      "scripthost"
+    ],
+    "skipLibCheck": false,
+    "moduleResolution": "nodenext"
   },
   "include": [
     "**/*.mjs",
@@ -21,9 +29,6 @@
     "**/*.cts"
   ],
   "exclude": [
-    "**/node_modules",
-    "**/bower_components",
-    "**/jspm_packages",
     "**/.claude/worktrees",
     ".worktrees",
     "**/coverage",

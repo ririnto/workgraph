@@ -12,7 +12,7 @@ The hook runtime uses Node built-ins and needs no npm dependencies.
 
 Native host manifests share the same skills across ChatGPT, Codex, Claude Code, GitHub Copilot, and Cursor.
 Codex and Claude Code select their own hook configurations explicitly.
-Hook execution requires Node.js 26.13.0 or later within major version 26.
+Hook execution requires Node.js 24.22.3 or later within major version 24.
 Choose the adapter for your execution host.
 
 | Host | Setup and usage |
@@ -192,7 +192,7 @@ For missing Codex hooks or update-time trust errors, follow [Confirm hook activa
 ## Development
 
 Use pnpm and the Node version range in `package.json` for development.
-Development tools require Node.js 26.13.0 or later within major version 26.
+Development tools require Node.js 24.22.3 or later within major version 24.
 Install the pnpm version declared in `package.json` before installing the pinned development tools.
 
 ```sh
