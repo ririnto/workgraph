@@ -48,10 +48,6 @@ See the official [tool dependency guidance](https://go.dev/doc/modules/managing-
 
 When the repository already uses golangci-lint or the user authorizes adopting it, use golangci-lint for Go linting.
 
-Manage golangci-lint through the repository's existing Go tool dependency workflow.
-Do not require a separate module, modfile, or workspace override solely because the tool is golangci-lint.
-See golangci-lint's [source-install guidance](https://golangci-lint.run/docs/welcome/install/local/#install-from-sources) for the limitations of module-based installation.
-
 Prefer built-in linters before custom extensions.
 Use its module plugin system for custom linters because golangci-lint recommends it over Go plugins.
 

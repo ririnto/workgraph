@@ -966,11 +966,6 @@ This research did not establish installed-version parity, actual deletion result
 
 ## Go linting
 
-The official [installation guidance](https://golangci-lint.run/docs/welcome/install/local/#install-from-sources) recommends binaries and a dedicated module or modfile when using `go tool`.
-It also describes a workspace-based installation, so workspace membership alone is not an error.
-Workgraph does not turn those installation recommendations into a mandatory dependency-isolation policy.
-Its Go guidance follows the repository's existing tool dependency workflow while retaining toolchain and custom-linter compatibility checks.
-
 The official [Go Plugin System documentation](https://golangci-lint.run/docs/plugins/go-plugins/) recommends the Module Plugin System for custom linters.
 The official [Module Plugin System documentation](https://golangci-lint.run/docs/plugins/module-plugins/) describes its setup.
 The Go Plugin System documentation describes Go plugin build and dependency constraints.
