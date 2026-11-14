@@ -1,6 +1,6 @@
 # Workgraph
 
-Workgraph supplies engineering coordination, writing, and development instructions for coding agents.
+Workgraph supplies engineering coordination and development instructions for coding agents.
 Its Main Agent mode routes work to focused skills, lifecycle playbooks and host references.
 Claude Code and supported Codex runtimes can load the selected Main or Worker role through native hooks.
 
@@ -149,7 +149,6 @@ Conditional skills load only when their stated task scope matches and their comp
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
 | Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
-| Scoped procedure | [Writing](skills/writing/SKILL.md) | Markdown, YAML, and agent instruction work load source conventions, with instruction design selected for agent-facing work. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |
 
@@ -158,7 +157,6 @@ References hold detail selected by a task, host, language, or operation.
 
 | Conditional detail | Source | Read trigger |
 | --- | --- | --- |
-| Agent instructions | Writing's [instruction design](skills/writing/references/instruction-design.md) | Drafting, editing, or reviewing agent-facing prompts or instructions requires this reference. |
 | Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
 | Build and tooling | Development's [language references](skills/development/SKILL.md#development-lifecycle) and [lint rule guidance](skills/development/references/lint-rules.md) | Language references include their tooling conventions, while shared lint guidance covers rule selection and fixes. |
 | Kotest | Kotlin's [Kotest guidance](skills/development/references/kotest.md) | Creating or changing Kotest specs or assertions requires this reference. |
@@ -167,7 +165,8 @@ References hold detail selected by a task, host, language, or operation.
 | Worktrees and caches | Cleanup's [worktree and cache guidance](skills/codex-scoped-cleanup/references/worktrees-caches.md) | Archiving, restoring, or removing worktrees or caches requires this reference. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
-Writing owns Markdown and YAML source conventions, agent-facing prompt contracts, and example separation.
+Development owns [agent instruction design](skills/development/references/instruction-design.md).
+General prose style is outside Workgraph’s scope.
 General human-facing prose style is outside Workgraph's scope.
 Consumer links and required resources stay bundled, without another plugin dependency or required online research.
 

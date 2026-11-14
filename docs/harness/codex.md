@@ -92,7 +92,7 @@ In ChatGPT, select Workgraph from the `@` menu and ask it to use Main Agent Cont
 An existing bounded worker assignment uses [Subagent Context](../../skills/subagent-context/SKILL.md).
 Role invocation applies the role's instructions within the current host's tools and permissions.
 
-For a focused task, select [Development](../../skills/development/SKILL.md) or [Writing](../../skills/writing/SKILL.md) directly.
+For a focused task, select [Development](../../skills/development/SKILL.md) directly.
 The [skill map](../../README.md#skill-invocation) lists the remaining procedures and their triggers.
 
 Workgraph retains an 8,000-byte complete-file portability budget derived from Codex's reviewed portable-plugin selection path.

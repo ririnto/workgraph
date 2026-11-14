@@ -29,8 +29,6 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
 | `skills/development/references/lint-rules.md` | Agents configuring or assessing lint rules and fixes | Development selects shared rule selection, verification, and rollout guidance. |
-| `skills/writing/SKILL.md` | Agents doing Markdown, YAML, or instruction work | Agents follow source conventions and select instruction design for agent-facing work. |
-| `skills/writing/references/instruction-design.md` | Agents drafting, editing, or reviewing agent instructions | Agents follow prompt task contracts, source separation, loading boundaries, and instruction validation. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents follow the complete owner-mediated lifecycle, scoped activity, preservation, and result verification procedure. |
 | `skills/codex-scoped-cleanup/references/native-attachments.md` | Codex agents changing Worktree Artifact connections | Agents follow connection inventory, removal, and recovery guidance for the selected scope. |
@@ -65,8 +63,7 @@ Its activation description identifies the mode without adding another public ent
 Main and Worker read conditional skills through bundled `SKILL.md` links when their stated task scope applies, because every skill blocks model invocation.
 Development's conditional loading keeps unrelated lifecycle and language guidance out of task context.
 Lint authoring and assessment, assigned queue handling, and agent-instruction design each have a focused reference with an explicit read trigger.
-Writing owns Markdown and YAML source conventions, the agent-facing prompt task contract, and source or example separation.
-General human-facing prose style belongs to a separate writing plugin, not Workgraph.
+General prose style is outside Workgraph’s scope.
 Workflow stays focused on its lower-level native operation without repeating the Main contract or Delivery checklist.
 Host adapters stay at user altitude and link to role references and sole policy owners.
 Contributor guidance identifies these directories and forbids duplicate same-context operational rules.
@@ -82,10 +79,11 @@ The [Delivery skill](../skills/delivery/SKILL.md#confirm-repository-access) owns
 ### Conditional loading
 
 Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, branch creation, implementation dispatch, commits, publication, or integration.
-Main and Worker conditionally load Writing, Development, and Memory Maintenance for tasks within those skills' scopes.
+Main and Worker conditionally load Development and Memory Maintenance for tasks within those skills' scopes.
 Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
 Development links directly to language references that combine source and tooling conventions.
+Its [instruction-design reference](../skills/development/references/instruction-design.md) owns agent-facing contracts and loading boundaries.
 Shared lint-rule procedures remain in a separate reference selected directly by Development.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating common role rules.
@@ -100,7 +98,6 @@ The [orchestration section](#compose-work-through-the-host) describes graph comp
 Both role contracts classify communication by the initiating sender rather than a relayed message envelope.
 Agent assignments remain agent-originated when they relay a human request.
 Communication follows the user's language for user-facing replies and English for agent-to-agent assignments and handbacks.
-Writing defers to the active role's policy.
 
 The host supplies general execution rules and tool mechanics.
 Role bodies contain no benchmark scores, prices, or source lists.
@@ -251,7 +248,7 @@ Like every Workgraph skill, it blocks model invocation, so Main reads its linked
 Its procedure owns execution, design, result acceptance, and conditional reference loading.
 The [authoring reference](../skills/workflow/references/authoring.md) covers native source and run-specific script copies, while the [delivery reference](../skills/workflow/references/delivery.md) maps Delivery requirements to nodes.
 Worker reads the authoring reference only when its assignment asks for a drafted script, and no reference has a non-Claude caller.
-The shared Main and Worker bodies, Development, Writing, and Delivery contain no Workflow tool procedures.
+The shared Main and Worker bodies, Development and Delivery contain no Workflow tool procedures.
 The Codex Main reference uses native delegation without loading the Claude reference.
 Cursor and Copilot discover the shared skills but receive no automatic Workgraph role or host context.
 Their manual Workflow entry reaches the same admission boundary and must not apply the execution procedure.

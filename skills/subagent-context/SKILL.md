@@ -38,7 +38,6 @@ Agent assignments remain agent-origin even when relaying a human project request
 Use the requester's language only for replies the assignment routes to the human.
 
 Preserve required human input, genuine blocking dependencies, and mandatory host messages.
-For Markdown, YAML, or agent instruction work, read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
 Before editing durable memory, read [Memory Maintenance](../memory-maintenance/SKILL.md) unless its complete content is already loaded.
 
 ### Select host guidance

@@ -43,7 +43,7 @@ The roles follow native tool descriptions when no matching bundled host referenc
 
 Workgraph uses manual role activation in Cursor.
 Its manifest selects the empty `hooks/skills-only.json` configuration, and the package omits conventionally discovered hook files.
-The [skill map](../../README.md#skill-invocation) lists focused development, writing, and delivery procedures.
+The [skill map](../../README.md#skill-invocation) lists focused development and delivery procedures.
 
 ## Update
 

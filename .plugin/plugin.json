@@ -2,7 +2,7 @@
   "author": {
     "name": "ririnto"
   },
-  "description": "Engineering coordination, writing, and development skills for coding agents.",
+  "description": "Engineering coordination and development skills for coding agents.",
   "homepage": "https://github.com/ririnto/workgraph",
   "hooks": "./hooks/skills-only.json",
   "keywords": [
@@ -16,5 +16,5 @@
   "name": "workgraph",
   "repository": "https://github.com/ririnto/workgraph",
   "skills": "./skills/",
-  "version": "2026.11.14.01"
+  "version": "2026.11.14.02"
 }

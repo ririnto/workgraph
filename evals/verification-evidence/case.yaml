@@ -8,7 +8,7 @@ execution:
   allowed_tools:
     - Read
   prompt: |-
-    Read the bundled `skills/development/SKILL.md` and `skills/writing/SKILL.md` unless their complete content is already present.
+    Read the bundled `skills/development/SKILL.md` unless its complete content is already present.
     The `Skill` tool refuses Workgraph skills, which is expected.
     This is a read-only assessment of supplied synthetic evidence.
     Do not run commands or edit files.
@@ -61,14 +61,14 @@ graders:
     arm: with-only
     focus: trace
     criteria: |-
-      Require the complete bundled Development and Writing instructions before the assessment.
+      Require the complete bundled Development instructions before the assessment.
       Accept complete Reads of the bundled files or complete content already supplied in the observed context.
       Reject mere skill mentions, descriptions, failed reads, or unsupported claims of loading.
   - name: evidence-attribution-and-evaluation-decision
     type: llm
     focus: trace
     criteria: |-
-      The trace reads the complete Writing instruction-design reference before assessing the instruction change, unless that complete content was already supplied.
+      Read the complete Development instruction-design reference before assessing instruction changes, unless already supplied.
       Packet A is direct evidence for the exact target and current verifier.
       Packet B is a lint proxy and does not establish evidence-attribution behavior.
       Packet C is a failed matching run despite the contradictory all-green summary.
