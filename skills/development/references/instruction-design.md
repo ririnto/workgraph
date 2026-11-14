@@ -25,6 +25,8 @@ Do not promote temporary examples or environment details into general rules.
 Keep each skill within its stated scope and compare neighboring activation descriptions for conflicting triggers.
 Keep always-required instructions in the skill body and conditional detail in focused references.
 Keep required supporting instructions inside the same plugin.
+Keep external instruction links optional and use them only for attribution.
+Name conditional skills plainly with their activation conditions, linking their bundled `SKILL.md` when model invocation is disabled.
 Link bundled references with read triggers and resolvable paths.
 Read selected references completely unless already loaded, identifying content already present.
 Resolve installed paths at invocation instead of retaining cache-version pointers.
@@ -42,6 +44,8 @@ Calibrate semantic graders with known-good and known-bad outputs.
 Separate failed requests, ungraded coverage, and grader controls from behavioral results.
 Preserve effective guidance when comparison shows no benefit unless an explicit requirement directs the change.
 Treat model-specific findings as workload hypotheses, not universal rules.
+For model changes, test one behavioral adjustment at a time against the existing instructions.
+Compare task completion, scope adherence, and execution cost before adopting it.
 Check frontmatter, invocation policy, and links against the target host and installed layout.
 Inspect actual hook contexts when injected instructions change.
 Development's verification rules govern execution evidence and unverified model adherence.
