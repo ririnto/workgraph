@@ -48,13 +48,8 @@ See the official [tool dependency guidance](https://go.dev/doc/modules/managing-
 
 When the repository already uses golangci-lint or the user authorizes adopting it, use golangci-lint for Go linting.
 
-When using tool directives or `tools.go` for golangci-lint, isolate it in a dedicated repository-owned module or modfile.
-For `tools.go`, use the isolated tool module to keep its imports out of application `go mod tidy`.
-Keep its dependency graph separate from application modules and other tools.
-Use `GOWORK=off` for isolated resolution or builds when an enclosing workspace would change dependency selection or conflict with `-modfile`.
-Keep that override scoped to the tool build, and run lint analysis with the application's required workspace configuration.
-Do not treat workspace membership alone as a defect when the selected installation supports it and preserves the required dependency versions.
-Do not upgrade golangci-lint's dependencies independently.
+Manage golangci-lint through the repository's existing Go tool dependency workflow.
+Do not require a separate module, modfile, or workspace override solely because the tool is golangci-lint.
 See golangci-lint's [source-install guidance](https://golangci-lint.run/docs/welcome/install/local/#install-from-sources) for the limitations of module-based installation.
 
 Prefer built-in linters before custom extensions.
