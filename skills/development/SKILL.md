@@ -116,14 +116,14 @@ For lint rules or fixes, also read [lint rule guidance](references/lint-rules.md
 ## Verification
 
 Identify the target, trigger, input, and observable expected outcome.
-Use existing public interfaces at the lowest layer that exercises the failure.
-Use process or application checks for behavior that direct calls cannot establish.
-Extend the nearest check for uncovered requirements or realistic failures, using expectations independent of the implementation.
+Use public interfaces at the lowest layer exercising the failure.
+Use process or application checks for behavior direct calls cannot establish.
+Extend the nearest check for uncovered requirements or realistic failures with implementation-independent expectations.
 Reserve source-shape assertions for explicit structural contracts.
 Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
-Test owned changes and integration risks, not unchanged upstream behavior without a concrete requirement or defect.
-Remove duplicate assertions, fixtures, and runs when retained checks catch the same failures.
-Within scope, inspect and remove tests with no real requirement or realistic failure.
+Before adding tests, assess purpose, overlapping coverage, external ownership, duplication, and cost-effectiveness.
+Test owned changes and integration risks, not unchanged upstream behavior without a concrete need.
+Remove redundant or low-value tests, fixtures, and runs within scope, preserving relevant failure coverage.
 Preserve security, external-input, and data-integrity coverage without test-count or coverage-percentage targets.
 Use repeatable inputs for stateful failures.
 Consider model checking when consequential transitions or interleavings remain untested by examples.
