@@ -58,9 +58,12 @@ body:
       required: true
 `;
 
+/** @param {import("node:test").TestContext} t Test lifecycle. */
 const copyValidation = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-validation-"));
-  t.after(() => rmSync(root, { force: true, recursive: true }));
+  t.after(() => {
+    rmSync(root, { force: true, recursive: true });
+  });
   cpSync(
     new URL("validation/", import.meta.url),
     path.join(root, "test/validation"),
@@ -73,6 +76,7 @@ const copyValidation = (t) => {
   return root;
 };
 
+/** @param {string} root Plugin root. @param {string} filename Validation entrypoint. */
 const runValidation = (root, filename) => {
   const result = spawnSync(
     process.execPath,
@@ -87,8 +91,9 @@ const runValidation = (root, filename) => {
   return result;
 };
 
-test("issue form validation reports malformed input and field violations", () => {
-  for (const [content, diagnostics] of [
+void test("issue form validation reports malformed input and field violations", () => {
+  /** @type {[string, string[]][]} */
+  const cases = [
     [validIssueForm, []],
     ["name: [\n", ["bug_report.yaml:2: issue form must contain valid YAML."]],
     [
@@ -119,7 +124,8 @@ test("issue form validation reports malformed input and field violations", () =>
         "bug_report.yaml: body[2] repeats field label Problem."
       ]
     ]
-  ]) {
+  ];
+  for (const [content, diagnostics] of cases) {
     assert.deepEqual(
       validateIssueFormContent(content, "bug_report.yaml"),
       diagnostics
@@ -127,7 +133,7 @@ test("issue form validation reports malformed input and field violations", () =>
   }
 });
 
-test("issue form command reports invalid input and duplicate names from discovered files", (t) => {
+void test("issue form command reports invalid input and duplicate names from discovered files", (t) => {
   const root = copyValidation(t);
   const directory = path.join(root, ".github/ISSUE_TEMPLATE");
   mkdirSync(directory, { recursive: true });
@@ -153,6 +159,7 @@ test("issue form command reports invalid input and duplicate names from discover
   );
 });
 
+/** @param {import("node:test").TestContext} t Test lifecycle. */
 const copyPluginPackage = (t) => {
   const root = copyValidation(t);
   for (const filename of [
@@ -180,7 +187,7 @@ const copyPluginPackage = (t) => {
   return root;
 };
 
-test("release versions enforce padded calendar dates and daily sequences", () => {
+void test("release versions enforce padded calendar dates and daily sequences", () => {
   for (const version of [
     "2026.01.01.01",
     "2026.10.30.06",
@@ -190,9 +197,9 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     "2026.12.31.100",
     "2027.01.01.01"
   ]) {
-    assert.doesNotThrow(() =>
-      validatePluginVersions(version, version, version, version)
-    );
+    assert.doesNotThrow(() => {
+      validatePluginVersions(version, version, version, version);
+    });
   }
   for (const version of [
     "2026.1030.5",
@@ -209,7 +216,9 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     null
   ]) {
     assert.throws(
-      () => validatePluginVersions(version, version, version, version),
+      () => {
+        validatePluginVersions(version, version, version, version);
+      },
       {
         message:
           "Codex plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10."
@@ -226,30 +235,34 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
     "2026.01.00.01"
   ]) {
     assert.throws(
-      () => validatePluginVersions(version, version, version, version),
+      () => {
+        validatePluginVersions(version, version, version, version);
+      },
       {
         message: "Codex plugin version must contain a valid date."
       }
     );
   }
   assert.throws(
-    () =>
+    () => {
       validatePluginVersions(
         "2026.10.30.06",
         "2026.10.30.07",
         "2026.10.30.06",
         "2026.10.30.06"
-      ),
+      );
+    },
     { message: "Native plugin versions must match across all hosts." }
   );
   assert.throws(
-    () =>
+    () => {
       validatePluginVersions(
         "2026.10.30.06",
         "2026.1030.5",
         "2026.10.30.06",
         "2026.10.30.06"
-      ),
+      );
+    },
     {
       message:
         "Claude plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10."
@@ -257,7 +270,8 @@ test("release versions enforce padded calendar dates and daily sequences", () =>
   );
 });
 
-test("plugin command validates canonical identity, catalogs, and release metadata", async (t) => {
+void test("plugin command validates canonical identity, catalogs, and release metadata", async (t) => {
+  /** @type {[string, Record<string, unknown>, string][]} */
   const cases = [
     [".codex-plugin/plugin.json", {}, ""],
     [
@@ -394,11 +408,17 @@ test("plugin command validates canonical identity, catalogs, and release metadat
     ]
   ];
   await Promise.all(
-    cases.map(([filename, patch, diagnostic]) =>
-      t.test(diagnostic || "valid relocated package", (context) => {
+    cases.map(async ([filename, patch, diagnostic]) => {
+      await t.test(diagnostic || "valid relocated package", (context) => {
         const root = copyPluginPackage(context);
         const manifestPath = path.join(root, filename);
+        /** @type {unknown} */
         const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+        assert.ok(
+          manifest !== null &&
+            typeof manifest === "object" &&
+            !Array.isArray(manifest)
+        );
         writeFileSync(manifestPath, JSON.stringify({ ...manifest, ...patch }));
         const result = runValidation(root, "plugin-version.mjs");
         assert.equal(result.status, diagnostic === "" ? 0 : 1, result.stderr);
@@ -414,14 +434,15 @@ test("plugin command validates canonical identity, catalogs, and release metadat
             ? ""
             : `Plugin version validation failed: ${diagnostic}\n`
         );
-      })
-    )
+      });
+    })
   );
 });
 
-test("plugin command rejects shadowing manifests and conventional hook discovery", (t) => {
+void test("plugin command rejects shadowing manifests and conventional hook discovery", (t) => {
   const root = copyPluginPackage(t);
-  for (const [filename, content] of [
+  /** @type {[string, Record<string, unknown>][]} */
+  const files = [
     [
       "plugin.json",
       {
@@ -432,7 +453,8 @@ test("plugin command rejects shadowing manifests and conventional hook discovery
     ],
     ["hooks.json", { hooks: {} }],
     ["hooks/hooks.json", { hooks: {} }]
-  ]) {
+  ];
+  for (const [filename, content] of files) {
     const file = path.join(root, filename);
     writeFileSync(file, JSON.stringify(content));
     const result = runValidation(root, "plugin-version.mjs");
@@ -445,10 +467,12 @@ test("plugin command rejects shadowing manifests and conventional hook discovery
   }
 });
 
-test("plugin command rejects escaping package symlinks", (t) => {
+void test("plugin command rejects escaping package symlinks", (t) => {
   const root = copyPluginPackage(t);
   const outside = mkdtempSync(path.join(tmpdir(), "workgraph-outside-"));
-  t.after(() => rmSync(outside, { force: true, recursive: true }));
+  t.after(() => {
+    rmSync(outside, { force: true, recursive: true });
+  });
   const outsideHooks = path.join(outside, "hooks.json");
   writeFileSync(outsideHooks, "{}");
   const bundledHooks = path.join(root, "hooks/codex-hooks.json");
@@ -462,9 +486,11 @@ test("plugin command rejects escaping package symlinks", (t) => {
   );
 });
 
-test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {
+void test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-entrypoints-"));
-  t.after(() => rmSync(root, { force: true, recursive: true }));
+  t.after(() => {
+    rmSync(root, { force: true, recursive: true });
+  });
   for (const [filename, expected] of [
     ["issue-forms.mjs", "Validated 2 GitHub issue forms.\n"],
     [

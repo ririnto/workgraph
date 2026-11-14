@@ -20,11 +20,14 @@ const skillContent = (
   body = "Run the sample task.\n"
 ) => `---\n${fields}\n---\n${body}`;
 
+/** @param {import("node:test").TestContext} t Test lifecycle. */
 const metadataFixture = (t) => {
   const temporary = mkdtempSync(
     path.join(tmpdir(), "workgraph-skill-metadata-")
   );
-  t.after(() => rmSync(temporary, { force: true, recursive: true }));
+  t.after(() => {
+    rmSync(temporary, { force: true, recursive: true });
+  });
   const root = path.join(temporary, "plugin");
   const source = fileURLToPath(
     new URL("validation/skill-metadata.mjs", import.meta.url)
@@ -39,6 +42,7 @@ const metadataFixture = (t) => {
   return { entrypoint, root };
 };
 
+/** @param {string} filename Entrypoint. @param {string} diagnostic Expected stderr. @param {number} count Expected skill count. */
 const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
   const result = spawnSync(process.execPath, [filename], {
     cwd: tmpdir(),
@@ -54,7 +58,7 @@ const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
   );
 };
 
-test("skill metadata accepts standard fields and host extensions", () => {
+void test("skill metadata accepts standard fields and host extensions", () => {
   const content = skillContent(`name: sample-skill
 description: >-
   Use for the sample task
@@ -78,7 +82,7 @@ user-invocable: true`);
   );
 });
 
-test("skill metadata checks required fields and directory identity", () => {
+void test("skill metadata checks required fields and directory identity", () => {
   for (const [fields, directory, diagnostic] of [
     ["description: Task.", "sample-skill", "name must be a non-empty string."],
     [
@@ -138,7 +142,7 @@ test("skill metadata checks required fields and directory identity", () => {
   }
 });
 
-test("skill metadata counts and normalizes Unicode characters", () => {
+void test("skill metadata counts and normalizes Unicode characters", () => {
   for (const [name, directory] of [
     ["技能", "技能"],
     ["мой-навык", "мой-навык"],
@@ -156,33 +160,36 @@ test("skill metadata counts and normalizes Unicode characters", () => {
       []
     );
   }
-  for (const [key, limit, value, directory] of [
+  /** @type {[string, number, string, string][]} */
+  const boundaries = [
     ["name", 64, "𐐨", "𐐨".repeat(64)],
     ["description", 1024, "😀", "sample-skill"],
     ["compatibility", 500, "😀", "sample-skill"]
-  ]) {
+  ];
+  for (const [key, limit, value, directory] of boundaries) {
     const defaults = {
       description: "Use for the sample task.",
       "disable-model-invocation": true,
       name: directory
     };
+    /** @type {Record<string, string | boolean>} */
     const fields = { ...defaults, [key]: value.repeat(limit) };
     assert.deepEqual(
       validateSkillContent(skillContent(JSON.stringify(fields)), directory),
       []
     );
-    fields[key] += value;
+    fields[key] = value.repeat(limit + 1);
     assert.deepEqual(
       validateSkillContent(
         skillContent(JSON.stringify(fields)),
-        key === "name" ? fields.name : directory
+        key === "name" ? value.repeat(limit + 1) : directory
       ),
       [`<skill>: ${key} must contain at most ${limit} characters.`]
     );
   }
 });
 
-test("portable skill prompts fit Codex's complete-file byte budget", () => {
+void test("portable skill prompts fit Codex's complete-file byte budget", () => {
   const source = skillContent();
   const boundary = source + "x".repeat(8000 - source.length);
   const unicodeBoundary = `${boundary.slice(0, -2)}é`;
@@ -201,7 +208,7 @@ test("portable skill prompts fit Codex's complete-file byte budget", () => {
   }
 });
 
-test("skill metadata rejects invalid optional field types", () => {
+void test("skill metadata rejects invalid optional field types", () => {
   for (const [extra, diagnostic] of [
     ["compatibility: false", "compatibility must be a non-empty string."],
     ["compatibility: ''", "compatibility must be a non-empty string."],
@@ -227,8 +234,9 @@ test("skill metadata rejects invalid optional field types", () => {
   }
 });
 
-test("skill metadata blocks model invocation and keeps user invocation on", () => {
-  for (const [key, accepted, rejected, diagnostic] of [
+void test("skill metadata blocks model invocation and keeps user invocation on", () => {
+  /** @type {[string, string[], string[], string][]} */
+  const invocationCases = [
     [
       "disable-model-invocation",
       ["true", "YES", "On", "1", '"true"'],
@@ -241,7 +249,8 @@ test("skill metadata blocks model invocation and keeps user invocation on", () =
       ["false", "NO", "Off", "0", "null", "[]"],
       "must keep the skill user-invocable."
     ]
-  ]) {
+  ];
+  for (const [key, accepted, rejected, diagnostic] of invocationCases) {
     for (const value of accepted) {
       assert.deepEqual(
         validateSkillContent(
@@ -272,7 +281,7 @@ test("skill metadata blocks model invocation and keeps user invocation on", () =
   );
 });
 
-test("skill metadata rejects malformed frontmatter and empty bodies", () => {
+void test("skill metadata rejects malformed frontmatter and empty bodies", () => {
   for (const content of [
     "name: sample-skill\ndescription: Task.\n",
     "---\nname: sample-skill\ndescription: Task.\n",
@@ -291,14 +300,16 @@ test("skill metadata rejects malformed frontmatter and empty bodies", () => {
       ["<skill>: frontmatter must be a YAML mapping."]
     );
   }
-  for (const [fields, line] of [
+  /** @type {[string, number][]} */
+  const invalidYaml = [
     ["name: [", 2],
     ["name: sample-skill\nname: different\ndescription: Task.", 3],
     [
       "name: sample-skill\ndescription: Task.\nmetadata:\n  key: one\n  key: two",
       6
     ]
-  ]) {
+  ];
+  for (const [fields, line] of invalidYaml) {
     const errors = validateSkillContent(
       skillContent(fields),
       "sample-skill",
@@ -314,7 +325,7 @@ test("skill metadata rejects malformed frontmatter and empty bodies", () => {
   );
 });
 
-test("skill metadata command resolves its own checkout", (t) => {
+void test("skill metadata command resolves its own checkout", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
   mkdirSync(path.join(directory, "agents"), { recursive: true });
@@ -324,7 +335,8 @@ test("skill metadata command resolves its own checkout", (t) => {
   );
   const alias = path.join(root, "validate.mjs");
   symlinkSync(entrypoint, alias, "file");
-  for (const [content, diagnostic] of [
+  /** @type {[string | null, string][]} */
+  const cases = [
     [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
     [skillContent(), ""],
     [
@@ -333,7 +345,8 @@ test("skill metadata command resolves its own checkout", (t) => {
       ),
       "skills/sample-skill/SKILL.md: name must match its parent directory.\n"
     ]
-  ]) {
+  ];
+  for (const [content, diagnostic] of cases) {
     if (content !== null) {
       writeFileSync(path.join(directory, "SKILL.md"), content);
     }
@@ -343,13 +356,14 @@ test("skill metadata command resolves its own checkout", (t) => {
   }
 });
 
-test("skill metadata command requires a Codex invocation policy", (t) => {
+void test("skill metadata command requires a Codex invocation policy", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
   mkdirSync(path.join(directory, "agents"), { recursive: true });
   writeFileSync(path.join(directory, "SKILL.md"), skillContent());
   const policy = path.join(directory, "agents/openai.yaml");
-  for (const [content, diagnostic] of [
+  /** @type {[string | null, string][]} */
+  const cases = [
     [null, "policy file must be readable."],
     ["policy: [", "policy file must contain valid YAML."],
     ["policy: {}", "policy.allow_implicit_invocation must be false."],
@@ -358,7 +372,8 @@ test("skill metadata command requires a Codex invocation policy", (t) => {
       "policy.allow_implicit_invocation must be false."
     ],
     ["policy:\n  allow_implicit_invocation: false", ""]
-  ]) {
+  ];
+  for (const [content, diagnostic] of cases) {
     if (content !== null) {
       writeFileSync(policy, content);
     }
@@ -369,7 +384,7 @@ test("skill metadata command requires a Codex invocation policy", (t) => {
   }
 });
 
-test("skill metadata command validates internal links by their alias", (t) => {
+void test("skill metadata command validates internal links by their alias", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "bundled/reference");
   mkdirSync(path.join(directory, "agents"), { recursive: true });
@@ -389,7 +404,8 @@ test("skill metadata command validates internal links by their alias", (t) => {
   symlinkSync("../bundled/reference", path.join(root, "skills/sample-skill"));
   writeFileSync(path.join(root, "bundled/notes.md"), "Supporting notes.\n");
   symlinkSync("../bundled/notes.md", path.join(root, "skills/notes.md"));
-  for (const [content, diagnostic] of [
+  /** @type {[string | null, string][]} */
+  const cases = [
     [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
     [skillContent(), ""],
     [
@@ -398,7 +414,8 @@ test("skill metadata command validates internal links by their alias", (t) => {
       ),
       "skills/sample-skill/SKILL.md: name must match its parent directory.\n"
     ]
-  ]) {
+  ];
+  for (const [content, diagnostic] of cases) {
     if (content !== null) {
       writeFileSync(path.join(directory, "SKILL.md"), content);
     }
@@ -406,7 +423,7 @@ test("skill metadata command validates internal links by their alias", (t) => {
   }
 });
 
-test("skill metadata command rejects paths outside its plugin root", (t) => {
+void test("skill metadata command rejects paths outside its plugin root", (t) => {
   for (const source of [
     "skills",
     "skills/sample-skill",
@@ -446,7 +463,7 @@ test("skill metadata command rejects paths outside its plugin root", (t) => {
   }
 });
 
-test("skill metadata command rejects unreadable linked skill files", (t) => {
+void test("skill metadata command rejects unreadable linked skill files", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
   mkdirSync(path.join(directory, "agents"), { recursive: true });

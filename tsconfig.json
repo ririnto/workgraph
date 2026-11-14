@@ -9,10 +9,13 @@
     "types": ["node"]
   },
   "include": [
-    "hooks/bash-polling-guard.mjs",
-    "hooks/inject-context.mjs",
+    "hooks/**/*.mjs",
+    "test/validation/**/*.mjs",
+    "test/skill-metadata.test.mjs",
+    "test/validation.test.mjs",
     "plugins/**/*.ts",
     "rules/**/*.ts",
+    "types/**/*.d.ts",
     "oxfmt.config.ts",
     "oxlint.config.ts"
   ]

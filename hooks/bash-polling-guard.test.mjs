@@ -17,10 +17,23 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
+/** @param {unknown} value Parsed JSON value. @returns {value is Record<string, unknown>} Whether the value is an object. */
+const isObject = (value) =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
+
+/** @param {string} text JSON document. @returns {Record<string, unknown>} Parsed object. */
+const parseObject = (text) => {
+  /** @type {unknown} */
+  const value = JSON.parse(text);
+  assert.ok(isObject(value));
+  return value;
+};
+
 const script = fileURLToPath(
   new URL("bash-polling-guard.mjs", import.meta.url)
 );
 
+/** @param {string} command Shell command. @param {Record<string, unknown>} extra Input overrides. */
 const makeInput = (command, extra = {}) => ({
   hook_event_name: "PreToolUse",
   session_id: "session",
@@ -29,10 +42,14 @@ const makeInput = (command, extra = {}) => ({
   ...extra
 });
 
+/** @param {import("node:test").TestContext} t Test lifecycle. */
 const setup = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph polling "));
-  t.after(() => rmSync(root, { force: true, recursive: true }));
+  t.after(() => {
+    rmSync(root, { force: true, recursive: true });
+  });
   const env = { ...process.env, TEMP: root, TMP: root, TMPDIR: root };
+  /** @param {string} command Shell command. @param {Record<string, unknown>} extra Input overrides. */
   const run = (command, extra = {}) =>
     spawnSync(process.execPath, [script, "claude"], {
       encoding: "utf-8",
@@ -40,6 +57,7 @@ const setup = (t) => {
       input: JSON.stringify(makeInput(command, extra)),
       timeout: 5000
     });
+  /** @param {string} command Shell command. @param {Record<string, unknown>} extra Input overrides. */
   const runConcurrently = async (command, extra = {}) => {
     const child = spawn(process.execPath, [script, "claude"], { env });
     let stdout = "";
@@ -51,17 +69,25 @@ const setup = (t) => {
       stderr += data;
     });
     child.stdin.end(JSON.stringify(makeInput(command, extra)));
-    const [status] = await once(child, "close");
+    /** @type {unknown} */
+    const closeArgs = await once(child, "close");
+    assert.ok(Array.isArray(closeArgs));
+    /** @type {unknown[]} */
+    const values = closeArgs;
+    const [status] = values;
+    assert.ok(status === null || typeof status === "number");
     return { status, stderr, stdout };
   };
   return { env, root, run, runConcurrently };
 };
 
+/** @param {{status: number | null, stderr: string, stdout: string}} result Hook process result. */
 const assertAllowed = (result) => {
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stdout, "");
 };
 
+/** @param {{status: number | null, stderr: string, stdout: string}} result Hook process result. */
 const assertDenied = (result) => {
   assert.equal(result.status, 0, result.stderr);
   assert.equal(result.stderr, "");
@@ -75,7 +101,7 @@ const assertDenied = (result) => {
   });
 };
 
-test("blocks the third mixed polling call until a nonmatch resets it", (t) => {
+void test("blocks the third mixed polling call until a nonmatch resets it", (t) => {
   const { run } = setup(t);
   assertAllowed(run("tail -n 10 build.log"));
   assertAllowed(run("sleep 1"));
@@ -93,8 +119,9 @@ test("blocks the third mixed polling call until a nonmatch resets it", (t) => {
   assertDenied(run("sleep 1"));
 });
 
-test("isolates sessions and resets on malformed Bash input", (t) => {
+void test("isolates sessions and resets on malformed Bash input", (t) => {
   const { run, root } = setup(t);
+  assert.ok(process.getuid);
   assertAllowed(run("sleep 1"));
   assertAllowed(run("sleep 1"));
   assertAllowed(run("sleep 1", { session_id: "another" }));
@@ -117,10 +144,10 @@ test("isolates sessions and resets on malformed Bash input", (t) => {
   assert.equal(readdirSync(root).length, 1);
 });
 
-test("serializes simultaneous calls before deciding", async (t) => {
+void test("serializes simultaneous calls before deciding", async (t) => {
   const { runConcurrently } = setup(t);
   const results = await Promise.all(
-    Array.from({ length: 8 }, () => runConcurrently("sleep 1"))
+    Array.from({ length: 8 }, async () => await runConcurrently("sleep 1"))
   );
   assert.equal(results.filter((result) => result.stdout === "").length, 2);
   for (const result of results) {
@@ -133,7 +160,7 @@ test("serializes simultaneous calls before deciding", async (t) => {
   }
 });
 
-test("matches only supported literal command positions", async (t) => {
+void test("matches only supported literal command positions", async (t) => {
   const { runConcurrently } = setup(t);
   const positives = [
     "tail",
@@ -201,8 +228,9 @@ test("matches only supported literal command positions", async (t) => {
   ]);
 });
 
-test("state failures allow execution and disable stale counter decisions", (t) => {
+void test("state failures allow execution and disable stale counter decisions", (t) => {
   const { root, run } = setup(t);
+  assert.ok(process.getuid);
   assertAllowed(run("sleep 1"));
   assertAllowed(run("sleep 1"));
   const namespace = path.join(
@@ -230,8 +258,9 @@ test("state failures allow execution and disable stale counter decisions", (t) =
   assertAllowed(run("sleep 1"));
 });
 
-test("a stale lock fails open without deleting another invocation's lock", (t) => {
+void test("a stale lock fails open without deleting another invocation's lock", (t) => {
   const { root, run } = setup(t);
+  assert.ok(process.getuid);
   assertAllowed(run("sleep 1"));
   const namespace = path.join(
     root,
@@ -256,34 +285,47 @@ test("a stale lock fails open without deleting another invocation's lock", (t) =
   assertAllowed(run("sleep 1"));
 });
 
-test("configured hooks run from relocated plugin paths without changing startup hooks", (t) => {
+void test("configured hooks run from relocated plugin paths without changing startup hooks", (t) => {
   const { root, env } = setup(t);
   const plugin = path.join(root, "plugin with spaces");
   mkdirSync(path.join(plugin, "hooks"), { recursive: true });
   copyFileSync(script, path.join(plugin, "hooks", "bash-polling-guard.mjs"));
   for (const host of ["claude", "codex"]) {
-    const descriptor = JSON.parse(
+    const descriptor = parseObject(
       readFileSync(
         new URL(`../.${host}-plugin/plugin.json`, import.meta.url),
         "utf-8"
       )
     );
-    const config = JSON.parse(
+    assert.ok(typeof descriptor.hooks === "string");
+    const config = parseObject(
       readFileSync(new URL(`../${descriptor.hooks}`, import.meta.url), "utf-8")
     );
+    assert.ok(isObject(config.hooks));
     assert.deepEqual(Object.keys(config.hooks), [
       "SessionStart",
       "SubagentStart",
       "PreToolUse"
     ]);
     for (const event of ["PreToolUse"]) {
-      const [entry] = config.hooks[event];
+      /** @type {unknown} */
+      const entries = config.hooks[event];
+      assert.ok(Array.isArray(entries));
+      /** @type {unknown[]} */
+      const checkedEntries = entries;
+      const [entry] = checkedEntries;
+      assert.ok(isObject(entry));
       assert.equal(entry.matcher, "Bash");
+      assert.ok(Array.isArray(entry.hooks));
       assert.equal(entry.hooks.length, 1);
-      const [hook] = entry.hooks;
+      /** @type {unknown[]} */
+      const checkedHooks = entry.hooks;
+      const [hook] = checkedHooks;
+      assert.ok(isObject(hook));
       assert.equal(hook.type, "command");
       assert.equal(hook.async, undefined);
       assert.equal(hook.timeout, 3);
+      assert.ok(typeof hook.command === "string");
       for (let index = 0; index < 3; index += 1) {
         const result = spawnSync(`exec ${hook.command}`, {
           cwd: tmpdir(),

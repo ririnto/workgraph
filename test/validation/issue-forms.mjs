@@ -5,11 +5,14 @@ import { fileURLToPath } from "node:url";
 import yamlParser from "markdownlint-cli2/parsers/yaml";
 
 const fieldIdPattern = /^[A-Za-z0-9_-]+$/u;
+/** @param {unknown} value Input value. @returns {value is Record<string, unknown>} Whether the value is a mapping. */
 const isMapping = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
+/** @param {unknown} value Input value. @returns {value is string} Whether the value is a non-empty string. */
 const nonEmptyString = (value) =>
   typeof value === "string" && value.trim() !== "";
 
+/** @param {Record<string, unknown>} form Parsed form. @param {(message: string) => void} report Diagnostic sink. */
 const validateTopLevel = (form, report) => {
   const { body, description, name } = form;
   for (const [key, value] of Object.entries({ description, name })) {
@@ -17,7 +20,7 @@ const validateTopLevel = (form, report) => {
       report(`top-level ${key} must be a non-empty string.`);
     }
   }
-  if (nonEmptyString(name) && [...name.trim()].length <= 3) {
+  if (nonEmptyString(name) && Array.from(name.trim(), () => 0).length <= 3) {
     report("top-level name must contain more than 3 characters.");
   }
   if (!Array.isArray(body) || body.length === 0) {
@@ -25,6 +28,7 @@ const validateTopLevel = (form, report) => {
   }
 };
 
+/** @param {unknown} id Candidate ID. @param {string} fieldName Field location. @param {Set<string>} ids Seen IDs. @param {(message: string) => void} report Diagnostic sink. */
 const validateFieldId = (id, fieldName, ids, report) => {
   if (nonEmptyString(id)) {
     if (!fieldIdPattern.test(id)) {
@@ -42,6 +46,7 @@ const validateFieldId = (id, fieldName, ids, report) => {
   }
 };
 
+/** @param {unknown} label Candidate label. @param {string} fieldName Field location. @param {Set<string>} labels Seen labels. @param {(message: string) => void} report Diagnostic sink. */
 const validateFieldLabel = (label, fieldName, labels, report) => {
   if (nonEmptyString(label)) {
     const normalizedLabel = label.trim().toLowerCase();
@@ -54,6 +59,7 @@ const validateFieldLabel = (label, fieldName, labels, report) => {
   }
 };
 
+/** @param {unknown} attributes Candidate attributes. @param {string} fieldName Field location. @param {Set<string>} labels Seen labels. @param {(message: string) => void} report Diagnostic sink. */
 const validateAttributes = (attributes, fieldName, labels, report) => {
   if (isMapping(attributes)) {
     validateFieldLabel(attributes.label, fieldName, labels, report);
@@ -62,8 +68,11 @@ const validateAttributes = (attributes, fieldName, labels, report) => {
   }
 };
 
+/** @param {unknown[]} body Form fields. @param {(message: string) => void} report Diagnostic sink. */
 const validateFields = (body, report) => {
+  /** @type {Set<string>} */
   const ids = new Set();
+  /** @type {Set<string>} */
   const labels = new Set();
   for (const [index, field] of body.entries()) {
     const fieldName = `body[${index + 1}]`;
@@ -76,12 +85,14 @@ const validateFields = (body, report) => {
   }
 };
 
+/** @param {unknown} body Candidate fields. @param {(message: string) => void} report Diagnostic sink. */
 const validateBody = (body, report) => {
   if (Array.isArray(body) && body.length > 0) {
     validateFields(body, report);
   }
 };
 
+/** @param {Record<string, unknown>} form Parsed form. @param {(message: string) => void} report Diagnostic sink. */
 const validateMappedForm = (form, report) => {
   const { body } = form;
   validateTopLevel(form, report);
@@ -95,8 +106,12 @@ const validateMappedForm = (form, report) => {
  * @returns {string[]} Schema diagnostics.
  */
 export const validateIssueForm = (form, source = "<form>") => {
+  /** @type {string[]} */
   const errors = [];
-  const report = (message) => errors.push(`${source}: ${message}`);
+  /** @param {string} message Diagnostic text. */
+  const report = (message) => {
+    errors.push(`${source}: ${message}`);
+  };
   if (isMapping(form)) {
     validateMappedForm(form, report);
   } else {
@@ -105,14 +120,19 @@ export const validateIssueForm = (form, source = "<form>") => {
   return errors;
 };
 
+/** @param {string} content YAML text. @param {string} source Diagnostic source. */
 const parseIssueFormContent = (content, source) => {
   try {
     const form = yamlParser(content);
     return { errors: validateIssueForm(form, source), form, source };
   } catch (error) {
-    const line = Number.isInteger(error?.mark?.line)
-      ? error.mark.line + 1
-      : null;
+    const mark = isMapping(error) && isMapping(error.mark) ? error.mark : null;
+    const line =
+      mark !== null &&
+      typeof mark.line === "number" &&
+      Number.isInteger(mark.line)
+        ? mark.line + 1
+        : null;
     const location = line === null ? source : `${source}:${line}`;
     return {
       errors: [`${location}: issue form must contain valid YAML.`],
@@ -143,7 +163,7 @@ export const validateIssueForms = (forms) => {
   const errors = parsedForms.flatMap(({ errors: formErrors }) => formErrors);
   const names = new Set();
   for (const { form, source } of parsedForms) {
-    if (nonEmptyString(form?.name)) {
+    if (isMapping(form) && nonEmptyString(form.name)) {
       const name = form.name.trim().toLowerCase();
       if (names.has(name)) {
         errors.push(
