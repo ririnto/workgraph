@@ -203,8 +203,9 @@ pnpm run check
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
 The real pre-commit and pre-push hooks run `pnpm run pre-commit` and `pnpm run pre-push`.
 Each script runs the complete existing check gate and blocks its Git operation on failure.
-`pnpm run check:ultracite-types` runs type-aware rules on the root configuration, plugin, and rule TypeScript files.
-The regular Ultracite check retains its existing JavaScript coverage without type-aware analysis.
+`pnpm run check:ultracite-types` runs type-aware rules on the root configuration, plugin, and rule TypeScript files and the two production hooks.
+`pnpm run check:types` checks the same TypeScript files and hooks with TypeScript and JSDoc.
+Other JavaScript files remain covered by the regular Ultracite check without type-aware analysis.
 `pnpm run check:production-audit` runs `pnpm audit --prod` to inspect production dependencies.
 The manifest currently declares none.
 It remains a forward-looking check when the project adds production dependencies.
