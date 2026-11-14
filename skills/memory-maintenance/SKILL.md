@@ -13,7 +13,6 @@ Apply the current role, assignment, and authorized memory write scope.
 This procedure grants no additional role or write authority.
 Identify the selected memory store, its index, record format, and current writer before changes.
 Preserve another owner's lease and use the host's supported memory mechanism.
-Read [Writing](../writing/SKILL.md) unless its complete content is already loaded.
 
 ## Read existing context
 

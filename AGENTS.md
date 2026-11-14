@@ -38,9 +38,9 @@ Complete authorized changes and relevant checks before returning a final result,
 
 Write maintained instructions and documentation in concise English.
 Follow the active role's request-origin communication policy for conversations and handbacks.
-Writing owns the agent-facing prompt task contract, so route instruction-contract design there instead of restating it here.
-
-When drafting, editing, or reviewing Markdown, YAML, or agent instructions, read [Writing](skills/writing/SKILL.md) unless its complete content is already loaded.
+Write one prose sentence per source line.
+Use lists for enumerated items.
+For agent-facing instruction changes, follow [Development instruction design](skills/development/references/instruction-design.md).
 
 Apply Markdown lint to `.md` files.
 Ultracite's code rules do not apply to Markdown.

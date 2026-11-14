@@ -27,7 +27,7 @@ Markdown endpoints were used when available, with extensionless official pages a
 | [Common workflows](https://code.claude.com/docs/en/common-workflows) and [native Workflow](https://code.claude.com/docs/en/workflows) | Preserve native execution, deterministic replay, permission boundaries, and explicit completion evidence. |
 | [Copilot plugins](https://docs.github.com/en/copilot/concepts/customizations/plugins) | Use portable skills and document the CLI's compatible marketplace installation route. |
 | [Cursor plugins](https://cursor.com/docs/plugins) and [plugin reference](https://cursor.com/docs/reference/plugins) | Use the native Cursor manifest for shared skills and the documented catalog for repository discovery. |
-| [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Keep human-facing prose style outside Workgraph's narrowed Writing scope. |
+| [Stop Slop](https://github.com/hardikpandya/stop-slop/blob/main/SKILL.md) | Keep human-facing prose style outside Workgraph. |
 
 Workgraph uses native Codex, Claude, Cursor, and OpenPlugin descriptors because the reviewed Codex portable loader omits hooks.
 They select one shared skills tree and explicit host-specific hook configurations.
@@ -217,7 +217,7 @@ The i-have-adhd [evaluation report](https://github.com/ayghri/i-have-adhd/blob/m
 Its partial-success case includes an unsupported authentication diagnosis, and the report proposes unconditional cause-first wording as a possible explanation.
 It does not establish that mechanism or measure current Workgraph behavior.
 Earlier Writing versions separated the observed failure, supported cause, and next diagnostic when the cause remained uncertain.
-That general reporting guidance now belongs to a separate writing plugin, so Workgraph no longer bundles it or its failure-reporting case.
+Workgraph no longer bundles that general reporting guidance or its failure-reporting case.
 
 These adaptations retain user-directed style, proportional review, valid evidence reuse, and Claude-only native Workflow.
 They add no universal design-approval gate, fixed list length, mandatory skill-activation threshold, or repository activity filter.
@@ -234,8 +234,7 @@ They support focused skills, useful examples, proportional checks, and independe
 The OpenAI guide warns that conflicting loaded instructions can stop authorized work.
 Anthropic recommends separating instructions from source material and using ordinary, direct language rather than aggressive tool triggers.
 
-Writing applies those lessons to agent-facing contracts and instruction-management skills.
-Writing keeps agent-facing prompt contracts and human-facing presentation guidance distinct.
+The removed Writing skill applied those lessons to agent-facing contracts and instruction-management skills.
 Authors audit actual loading points, replace conflicting consumers, and evaluate decision boundaries instead of testing exact prose.
 The user's approved scope determines Git delivery authority, while host permissions and server protections remain unchanged.
 A guide's sample approval prompt does not require renewed approval for operations already authorized by the user.
@@ -271,13 +270,13 @@ It recommends a clear task, relevant context, roles, restrictions, and an explic
 
 | Source lesson | Workgraph mapping |
 | --- | --- |
-| State the task, context, constraints, output, and completion criteria explicitly. | Writing already requires these elements in agent-facing task contracts. |
-| Audit loaded instruction sources for conflicts and ambiguity. | Writing already audits loading points and replaces conflicting consumers. |
-| Use concise and explicit output expectations. | Writing owns agent-facing contracts and Markdown and YAML source conventions. |
+| State the task, context, constraints, output, and completion criteria explicitly. | Development instruction design requires these elements in agent-facing task contracts. |
+| Audit loaded instruction sources for conflicts and ambiguity. | Development instruction design audits loading points and replaces conflicting consumers. |
+| Use concise and explicit output expectations. | Development owns agent-facing contracts, not general source formatting. |
 | Scale checks to the change and keep initiative within scope. | Development and the role contracts route checks and authority. |
 | Keep rules short and aligned with real tool schemas. | Role bodies and host references match native loading formats and tool contracts. |
-| Use examples where they clarify a decision boundary. | Writing owns contrasting examples for decision boundaries. |
-| Avoid accumulating emphasis and repeated directives. | Writing's final pass already removes repetition while preserving requirements. |
+| Use examples where they clarify a decision boundary. | Development instruction design uses contrasting examples for decision boundaries. |
+| Avoid accumulating emphasis and repeated directives. | Development instruction design removes repeated rules while preserving requirements. |
 
 Workgraph does not adopt the guides' voice-only output, confirm-before-mutation examples, fixed heading or second-person format rules, audio and API parameters, model defaults, or realtime preambles.
 It does not request private chain-of-thought, build majority-vote or program-execution infrastructure, or claim universal effectiveness for these instruction choices.
@@ -334,8 +333,8 @@ It recommends revisiting inherited approval rules, ownership wording, delegation
 Its examples distinguish recoverable tool failures from deliberate restrictions and place authorized exceptions inside the rule they qualify.
 The guide also reports unsolicited behavior changes after broad code-ownership prompts, even with a separate scope limit.
 
-The [instruction-design reference](../skills/writing/references/instruction-design.md) now covers carried reviewer conditions, action-specific approval exceptions, and the distinction between outcome ownership and change authority.
-The OpenAI skill guidance also informs its comparison of neighboring activation descriptions for conflicting or overly broad triggers.
+Development’s [instruction-design reference](../skills/development/references/instruction-design.md) covers carried reviewer conditions, action-specific approval exceptions, and the distinction between outcome ownership and change authority.
+The OpenAI skill guidance also informed its comparison of neighboring activation descriptions for conflicting or overly broad triggers.
 Existing role contracts retain completion, recovery, and assignment ownership, while Development retains proportional verification.
 These procedures need no duplicate model-specific reminders.
 
@@ -717,7 +716,7 @@ These are practitioner reports, not controlled Workgraph evaluations.
 | pstack hides its skills from the model and reads them by path. | All Workgraph skills block model invocation and link their bundled files. |
 
 pstack already owns verification-skill creation, decision logs, design arenas, intent restatement, and formal verification.
-Workgraph adds none of them, and its narrowed Writing skill leaves general prose style to a separate writing plugin.
+Workgraph adds none of them and does not bundle general prose-style guidance.
 Comment bans, path-encoded lint contexts, and size budgets apply to specific projects rather than to Workgraph's consumer defaults.
 The changes remain unverified for model adherence until behavioral evaluations cover them.
 

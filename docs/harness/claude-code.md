@@ -78,7 +78,6 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:delivery` | Load Main's repository delivery procedure. |
 | `/workgraph:workflow` | Request native Claude Code Workflow or load its design guidance. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
-| `/workgraph:writing` | Load Markdown, YAML, and instruction design guidance. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 
 Every Workgraph skill blocks model invocation, so these slash forms stay the user entries and models read the linked `SKILL.md` files directly.

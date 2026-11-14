@@ -32,7 +32,7 @@ The [VS Code agent skills guide](https://code.visualstudio.com/docs/copilot/cust
 For an assigned worker task, select [Subagent Context](../../skills/subagent-context/SKILL.md).
 The role uses the active host's tool descriptions when no matching bundled host reference exists.
 
-Use [Development](../../skills/development/SKILL.md) for implementation and [Writing](../../skills/writing/SKILL.md) for Markdown, YAML, or instructions.
+Use [Development](../../skills/development/SKILL.md) for implementation.
 The [skill map](../../README.md#skill-invocation) lists the other task procedures.
 
 Workgraph uses manual role activation in Copilot.

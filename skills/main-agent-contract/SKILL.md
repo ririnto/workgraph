@@ -40,7 +40,6 @@ Classify origin by initiating sender, retaining agent origin for relayed human r
 Write assignments, handbacks, and other agent-to-agent communication in English.
 
 Preserve required human input, genuine blockers, and host messages.
-Read [Writing](../writing/SKILL.md) for Markdown, YAML, or instructions unless fully loaded.
 
 ### Select host guidance
 

@@ -167,7 +167,7 @@ We used [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) for 
 We read its complete skill and the `phrases.md`, `structures.md`, and `examples.md` references.
 The local skill identifies Hardik Pandya as its author and declares the MIT license.
 It informed direct verbs, specific subjects, and removal of filler.
-The bundled Writing skill retains that guidance only for agent-facing instructions.
+The removed Writing skill used that guidance for agent-facing instructions.
 The plugin does not redistribute the source skill or its reference files verbatim.
 
 ## Sinon Language Tooling
@@ -221,7 +221,7 @@ Workgraph does not bundle their code or adopt their runtime guarantees.
 
 Earlier Writing versions adapted communication guidance from [i-have-adhd](https://github.com/ayghri/i-have-adhd/blob/main/skills/i-have-adhd/SKILL.md) by Ayoub Ghriss.
 The source repository declares the MIT license and identifies 2026 copyright.
-The current Writing skill no longer bundles that general communication guidance, and no version redistributed the source skill verbatim.
+Workgraph no longer bundles the Writing skill, and no version redistributed the source skill verbatim.
 We reviewed the [main branch](https://github.com/ayghri/i-have-adhd/tree/main) as of 2026-10-31, when it matched release tag [v0.4.1](https://github.com/ayghri/i-have-adhd/tree/v0.4.1), including its earlier timeout fix and recorded evaluation.
 These sources still inform Workgraph's context-hook startup allowance.
 The [dated comparison](docs/research.md#dated-plugin-comparisons) distinguishes upstream observations from Workgraph validation.

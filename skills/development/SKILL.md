@@ -6,17 +6,16 @@ disable-model-invocation: true
 
 # Development
 
-Apply repository rules, lint configuration, and existing tools before these defaults.
-Honor user choices within task authority, required checks, and host capabilities.
-Read matching playbooks and references before use unless fully loaded.
-For JavaScript or TypeScript, also read [shared Node guidance](references/nodejs.md).
+Follow repository rules, lint, tools, and user choices within task authority, required checks, and host capabilities.
+Read matching playbooks and references unless fully loaded.
+For JavaScript or TypeScript, read [Node guidance](references/nodejs.md).
 
 ## Development lifecycle
 
-Before editing, identify the contract, consumers, exclusions, and acceptance evidence.
+Identify contracts, consumers, exclusions, and acceptance evidence before editing.
+For agent instructions, read [instruction design](references/instruction-design.md).
 Inspect affected code and stop discovery when evidence supports the smallest safe change.
-For bounded work, avoid optional review ceremony, speculative sweeps, and precautionary pauses.
-Preserve rigor for consequential work and all safety, authority, and project gates.
+Skip optional ceremony, speculative sweeps, and precautionary pauses for bounded work, preserving safety, authority, and required gates.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -49,7 +48,8 @@ Limit external contribution style cleanup to the diff unless broader cleanup is 
 Preserve the declared runtime, toolchain, public contracts, and required failure behavior.
 During transformations, preserve evaluation order, effects, resource lifetimes, and required interfaces.
 Adapt tests to production interfaces without exposing internals or adding test-only hooks.
-Replace superseded implementations with their consumers and remove obsolete paths together.
+Replace superseded implementations and consumers together, removing obsolete paths.
+Revise or remove code rules at their source rather than adding opposite rules.
 Avoid copying nearby workarounds as precedent.
 Use official SDK or framework properties directly when they satisfy the requirement.
 Do not duplicate an operation's input checks when its rejection already meets the contract.
