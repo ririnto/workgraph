@@ -3,7 +3,7 @@ allowBuilds:
 
 catalog:
   "@oxc-project/types": ^0.158.0
-  "@tsconfig/node24": ^24.0.6
+  "@tsconfig/node-lts": ^24.0.1
   "@types/node": ^24.19.2
   husky: ^9.1.7
   markdownlint: ^0.42.1

@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@oxc-project/types": "catalog:",
-    "@tsconfig/node24": "catalog:",
+    "@tsconfig/node-lts": "catalog:",
     "@types/node": "catalog:",
     "husky": "catalog:",
     "markdownlint": "catalog:",
