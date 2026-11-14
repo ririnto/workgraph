@@ -7,14 +7,34 @@
     "strictNullChecks": true,
     "target": "ESNext",
     "types": ["node"],
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "jsx": "preserve"
   },
   "include": [
     "**/*.mjs",
-    "plugins/**/*.ts",
-    "rules/**/*.ts",
-    "types/**/*.d.ts",
-    "oxfmt.config.ts",
-    "oxlint.config.ts"
+    "**/*.js",
+    "**/*.cjs",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mts",
+    "**/*.cts"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/.claude/worktrees",
+    ".worktrees",
+    "**/coverage",
+    "evals/results",
+    "**/dist",
+    "**/build",
+    "**/generated",
+    "**/__generated__",
+    "**/*.gen.*",
+    "**/*.generated.*",
+    "**/*.auto.*",
+    "workflows/*.js"
   ]
 }
