@@ -25,11 +25,19 @@ const metadataFields = [
 ];
 const nativeFields = new Set(["$schema", ...metadataFields, "skills", "hooks"]);
 
+/** @param {unknown} value Input value. @returns {value is Record<string, unknown>} Whether the value is a JSON object. */
 const isObject = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
+/** @param {unknown} value Input value. @returns {value is unknown[]} Whether the value is an array. */
+const isArray = (value) => Array.isArray(value);
+
 /**
  * Validate matching yyyy.MM.dd.seq releases with real dates and padded sequences.
+ * @param {unknown} codexVersion Codex version.
+ * @param {unknown} claudeVersion Claude version.
+ * @param {unknown} cursorVersion Cursor version.
+ * @param {unknown} copilotVersion Copilot version.
  */
 export const validatePluginVersions = (
   codexVersion,
@@ -37,6 +45,7 @@ export const validatePluginVersions = (
   cursorVersion,
   copilotVersion
 ) => {
+  /** @type {[string, unknown][]} */
   const versions = [
     ["Codex", codexVersion],
     ["Claude", claudeVersion],
@@ -46,7 +55,7 @@ export const validatePluginVersions = (
   for (const [host, version] of versions) {
     const match =
       typeof version === "string" ? versionPattern.exec(version) : null;
-    if (!match) {
+    if (!match?.groups) {
       throw new Error(
         `${host} plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10.`
       );
@@ -70,29 +79,32 @@ export const validatePluginVersions = (
 
 /**
  * Reject duplicate release metadata in catalogs and the private package.
+ * @param {[string, Record<string, unknown>][]} marketplaces Catalog manifests.
+ * @param {Record<string, unknown>} packageManifest Private package manifest.
  */
 export const validateOmittedManifestVersions = (
   marketplaces,
   packageManifest
 ) => {
-  for (const [name, manifest] of [
-    ...marketplaces,
-    ["Private package", packageManifest]
-  ]) {
+  /** @type {[string, Record<string, unknown>][]} */
+  const manifests = [...marketplaces, ["Private package", packageManifest]];
+  for (const [name, manifest] of manifests) {
+    /** @type {unknown[]} */
+    const plugins = Array.isArray(manifest.plugins) ? manifest.plugins : [];
     if (
       Object.hasOwn(manifest, "version") ||
       (isObject(manifest.metadata) &&
         Object.hasOwn(manifest.metadata, "version")) ||
-      (Array.isArray(manifest.plugins) &&
-        manifest.plugins.some(
-          (plugin) => isObject(plugin) && Object.hasOwn(plugin, "version")
-        ))
+      plugins.some(
+        (plugin) => isObject(plugin) && Object.hasOwn(plugin, "version")
+      )
     ) {
       throw new Error(`${name} manifest must omit the version field.`);
     }
   }
 };
 
+/** @param {string} root Plugin root. @param {unknown} value Declared path. @param {string} label Diagnostic label. @param {"file" | "directory"} kind Expected path kind. */
 const bundledPath = (root, value, label, kind) => {
   if (
     typeof value !== "string" ||
@@ -123,7 +135,9 @@ const bundledPath = (root, value, label, kind) => {
   return resolved;
 };
 
+/** @param {string} root Plugin root. @param {string} filename Manifest path. */
 const readManifest = (root, filename) => {
+  /** @type {unknown} */
   const manifest = JSON.parse(
     readFileSync(bundledPath(root, `./${filename}`, filename, "file"), "utf-8")
   );
@@ -133,6 +147,7 @@ const readManifest = (root, filename) => {
   return manifest;
 };
 
+/** @param {Record<string, unknown>} manifest Manifest data. @param {string} host Host name. */
 const validateNativeManifest = (manifest, host) => {
   if (host !== "Claude" && Object.hasOwn(manifest, "$schema")) {
     throw new Error(`${host} native manifest must omit the schema field.`);
@@ -152,7 +167,8 @@ const validateNativeManifest = (manifest, host) => {
     throw new Error(`${host} manifest must contain a valid plugin name.`);
   }
   for (const field of ["description", "homepage", "repository", "license"]) {
-    if (typeof manifest[field] !== "string" || !manifest[field].trim()) {
+    const value = manifest[field];
+    if (typeof value !== "string" || !value.trim()) {
       throw new Error(`${host} ${field} must be a nonempty string.`);
     }
   }
@@ -175,18 +191,23 @@ const validateNativeManifest = (manifest, host) => {
   }
 };
 
+/** @param {string} root Plugin root. @param {string} name Catalog label. @param {Record<string, unknown>} marketplace Catalog data. @param {Record<string, unknown>} codex Native manifest. */
 const validateMarketplace = (root, name, marketplace, codex) => {
   if (
     marketplace.name !== codex.name ||
-    !Array.isArray(marketplace.plugins) ||
-    marketplace.plugins.length !== 1 ||
-    marketplace.plugins[0]?.name !== codex.name
+    !isArray(marketplace.plugins) ||
+    marketplace.plugins.length !== 1
   ) {
     throw new Error(
       `${name} must list Workgraph once under the matching marketplace name.`
     );
   }
   const [plugin] = marketplace.plugins;
+  if (!isObject(plugin) || plugin.name !== codex.name) {
+    throw new Error(
+      `${name} must list Workgraph once under the matching marketplace name.`
+    );
+  }
   const isOpenAI = name === "OpenAI marketplace";
   if (
     isOpenAI &&
@@ -194,17 +215,24 @@ const validateMarketplace = (root, name, marketplace, codex) => {
   ) {
     throw new Error("OpenAI marketplace must use a local plugin source.");
   }
-  const source = isOpenAI ? plugin.source.path : plugin.source;
+  const source =
+    isOpenAI && isObject(plugin.source) ? plugin.source.path : plugin.source;
   if (bundledPath(root, source, `${name} source`, "directory") !== root) {
     throw new Error(`${name} source must select the canonical plugin root.`);
   }
-  if (!isOpenAI && marketplace.owner?.name !== codex.author.name) {
+  if (
+    !isOpenAI &&
+    (!isObject(marketplace.owner) ||
+      !isObject(codex.author) ||
+      marketplace.owner.name !== codex.author.name)
+  ) {
     throw new Error(`${name} owner must match the plugin author.`);
   }
   if (
     isOpenAI &&
-    (plugin.policy?.installation !== "AVAILABLE" ||
-      plugin.policy?.authentication !== "ON_INSTALL")
+    (!isObject(plugin.policy) ||
+      plugin.policy.installation !== "AVAILABLE" ||
+      plugin.policy.authentication !== "ON_INSTALL")
   ) {
     throw new Error(
       "OpenAI marketplace must preserve user-controlled installation policy."
@@ -225,6 +253,7 @@ const run = () => {
   const claude = readManifest(root, ".claude-plugin/plugin.json");
   const cursor = readManifest(root, ".cursor-plugin/plugin.json");
   const copilot = readManifest(root, ".plugin/plugin.json");
+  /** @type {[string, Record<string, unknown>, string][]} */
   const manifests = [
     ["Codex", codex, "codex-hooks.json"],
     ["Claude", claude, "claude-hooks.json"],
@@ -232,6 +261,7 @@ const run = () => {
     ["Copilot", copilot, "skills-only.json"]
   ];
   const packageManifest = readManifest(root, "package.json");
+  /** @type {[string, Record<string, unknown>][]} */
   const marketplaces = [
     [
       "Claude marketplace",
@@ -322,7 +352,7 @@ if (
     run();
   } catch (error) {
     process.stderr.write(
-      `Plugin version validation failed: ${error.message}\n`
+      `Plugin version validation failed: ${error instanceof Error ? error.message : String(error)}\n`
     );
     process.exitCode = 1;
   }
