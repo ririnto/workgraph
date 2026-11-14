@@ -377,7 +377,10 @@ Its runtime delivers context through Claude Code hooks, and its instructions use
 
 The following tier and effort starting points combine workload evidence with design judgments.
 They depend on host support and assignment settings.
-The reviewed evidence does not establish Terra's effort performance.
+The `terra` tier names a model family, not a native Codex model ID.
+The [Codex model selection contract](../skills/main-agent-contract/references/codex.md#model-selection) owns host-confirmed model IDs and supported controls.
+[OpenAI reports](https://openai.com/index/introducing-gpt-6-1-terra/) GPT-6.1 Terra results on Terminal-Bench 4.0 at maximum effort.
+That provider-reported result does not establish Workgraph performance or validate the medium or high starting points below.
 
 | Tier | Workload and effort starting point |
 | --- | --- |
