@@ -15,8 +15,13 @@ Synchronize shared memory between goroutines.
 Define interfaces at consumption sites, accept interfaces, and return concrete types.
 Use pointer receivers for mutation or shared identity and value receivers for small independent structs.
 Use `any`, `slices`, and `maps` only when the declared Go version supports them.
-When the declared Go version supports them, use `maps.Values` to iterate map values when the key is unused and `slices.Values` to iterate slice values when the index is unused.
-Retain key or index iteration when the loop needs those values or must preserve its behavior.
+When the declared Go version is 1.23 or later, use these functions to express what the loop iterates:
+
+- Use `maps.Keys` when only map keys are needed.
+- Use `maps.Values` when the map key is unused.
+- Use `slices.Values` when the slice index is unused.
+
+Preserve needed keys or indices and existing behavior when changing iteration.
 
 Use `strings.Builder` for repeated concatenation in loops.
 Pre-size maps and slices when required hot-path performance justifies it.
