@@ -163,13 +163,14 @@ const guard = async (input, host) => {
       return;
     }
     const toolInput = "tool_input" in input ? input.tool_input : undefined;
-    const matches =
+    const count =
       typeof toolInput === "object" &&
       toolInput !== null &&
       "command" in toolInput &&
       typeof toolInput.command === "string" &&
-      pollingCommand.test(toolInput.command);
-    const count = matches ? Math.min(readCount(counter) + 1, 3) : 0;
+      pollingCommand.test(toolInput.command)
+        ? Math.min(readCount(counter) + 1, 3)
+        : 0;
     temporary = path.join(directory, randomUUID());
     writeFileSync(temporary, String(count), { flag: "wx", mode: 0o600 });
     renameSync(temporary, counter);
