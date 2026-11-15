@@ -18,16 +18,7 @@
     "skipLibCheck": false,
     "moduleResolution": "nodenext"
   },
-  "include": [
-    "**/*.mjs",
-    "**/*.js",
-    "**/*.cjs",
-    "**/*.jsx",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.mts",
-    "**/*.cts"
-  ],
+  "include": ["**/*", "**/.*/**/*"],
   "exclude": [
     "**/.claude/worktrees",
     ".worktrees",
