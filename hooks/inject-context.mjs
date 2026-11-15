@@ -27,23 +27,25 @@ const readInstruction = (file, stripFrontmatter) => {
       fileURLToPath(new URL(`../skills/${file}`, import.meta.url))
     );
     const content = readFileSync(source, "utf-8");
-    let body = content;
-    if (stripFrontmatter) {
-      const lines = content.replace(/^\uFEFF/u, "").split("\n");
-      const closingFrontmatterLine = lines.findIndex(
-        (line, index) => index > 0 && line.trim() === "---"
-      );
-      body = lines.slice(closingFrontmatterLine + 1).join("\n");
-      if (
-        lines[0].trim() !== "---" ||
+    const lines = stripFrontmatter
+      ? content.replace(/^\uFEFF/u, "").split("\n")
+      : [];
+    const closingFrontmatterLine = lines.findIndex(
+      (line, index) => index > 0 && line.trim() === "---"
+    );
+    if (
+      stripFrontmatter &&
+      (lines[0].trim() !== "---" ||
         closingFrontmatterLine < 1 ||
-        !lines.slice(1, closingFrontmatterLine).some((line) => line.trim())
-      ) {
-        throw new Error(
-          "empty instructions or missing required skill frontmatter"
-        );
-      }
+        !lines.slice(1, closingFrontmatterLine).some((line) => line.trim()))
+    ) {
+      throw new Error(
+        "empty instructions or missing required skill frontmatter"
+      );
     }
+    const body = stripFrontmatter
+      ? lines.slice(closingFrontmatterLine + 1).join("\n")
+      : content;
     if (!body.trim()) {
       throw new Error(
         "empty instructions or missing required skill frontmatter"
@@ -51,8 +53,10 @@ const readInstruction = (file, stripFrontmatter) => {
     }
     return { body, content, source };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return fail(`cannot load instruction file ${file}: ${message}`, 1);
+    return fail(
+      `cannot load instruction file ${file}: ${error instanceof Error ? error.message : String(error)}`,
+      1
+    );
   }
 };
 

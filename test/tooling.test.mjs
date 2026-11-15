@@ -19,7 +19,7 @@ const isObject = (value) =>
 /** @param {unknown} value Parsed JSON value. @returns {value is unknown[]} Whether the value is an array. */
 const isArray = (value) => Array.isArray(value);
 
-void test("Git hooks invoke pnpm directly and propagate its status", async () => {
+await test("Git hooks invoke pnpm directly and propagate its status", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-hooks-"));
   try {
     await writeFile(
@@ -53,7 +53,7 @@ void test("Git hooks invoke pnpm directly and propagate its status", async () =>
   }
 });
 
-void test("prose formatting checks sentences and preserves Markdown syntax", () => {
+await test("prose formatting checks sentences and preserves Markdown syntax", () => {
   const source = [
     "# One sentence. Another sentence.",
     "",
@@ -85,7 +85,7 @@ void test("prose formatting checks sentences and preserves Markdown syntax", () 
   );
 });
 
-void test("em-dash rule checks prose and preserves code and links", () => {
+await test("em-dash rule checks prose and preserves code and links", () => {
   const source = [
     "# Heading — heading",
     "",
@@ -114,7 +114,7 @@ void test("em-dash rule checks prose and preserves code and links", () => {
   );
 });
 
-void test("table separator traversal handles deeply nested blockquotes", () => {
+await test("table separator traversal handles deeply nested blockquotes", () => {
   const quote = "> ".repeat(2000);
   const source = [
     `${quote}| Header | Value |`,
@@ -131,7 +131,7 @@ void test("table separator traversal handles deeply nested blockquotes", () => {
   );
 });
 
-void test("table separator diagnostics retain fix information", () => {
+await test("table separator diagnostics retain fix information", () => {
   const source = "| Left | Right |\n| -- | ----: |\n| one | two |\n";
   const errors =
     lint({
@@ -164,7 +164,7 @@ void test("table separator diagnostics retain fix information", () => {
   );
 });
 
-void test("box drawing rule covers all Markdown with first UTF-16 match and no fix", async () => {
+await test("box drawing rule covers all Markdown with first UTF-16 match and no fix", async () => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(
     path.join(tmpdir(), "workgraph-box-drawing-")
@@ -230,7 +230,7 @@ void test("box drawing rule covers all Markdown with first UTF-16 match and no f
   }
 });
 
-void test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
+await test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tsdoc-"));
   t.after(async () => {
@@ -655,7 +655,7 @@ const reviewFix = {
 };
 const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
 
-void test("delivery preserves a posted request after repair failures", async () => {
+await test("delivery preserves a posted request after repair failures", async () => {
   await Promise.all(
     ["implement", "integrate", "sweep", "publish"].map(async (failure) => {
       const { result } = await runWorkflowSample(
@@ -710,7 +710,7 @@ void test("delivery preserves a posted request after repair failures", async () 
   );
 });
 
-void test("delivery retains publication evidence in its graph", async () => {
+await test("delivery retains publication evidence in its graph", async () => {
   const { result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -731,7 +731,7 @@ void test("delivery retains publication evidence in its graph", async () => {
   assert.equal(evidence.result.evidence, publishCreated.evidence);
 });
 
-void test("delivery rejects a unit branch equal to the resolved default base", async () => {
+await test("delivery rejects a unit branch equal to the resolved default base", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -752,7 +752,7 @@ void test("delivery rejects a unit branch equal to the resolved default base", a
   );
 });
 
-void test("delivery rejects a repair reported on the posted head", async () => {
+await test("delivery rejects a repair reported on the posted head", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -778,7 +778,7 @@ void test("delivery rejects a repair reported on the posted head", async () => {
   assert.deepEqual(result.publish, { url: publishCreated.url });
 });
 
-void test("delivery integrates a distinct repair branch into the posted single-unit head", async () => {
+await test("delivery integrates a distinct repair branch into the posted single-unit head", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -805,7 +805,7 @@ void test("delivery integrates a distinct repair branch into the posted single-u
   assert.equal(calls.filter((call) => call.phase === "Integrate").length, 1);
 });
 
-void test("delivery samples reject a passing review with unresolved findings", async () => {
+await test("delivery samples reject a passing review with unresolved findings", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { result } = await runWorkflowSample(
@@ -832,7 +832,7 @@ void test("delivery samples reject a passing review with unresolved findings", a
   );
 });
 
-void test("delivery samples fail a fix-required review without findings", async () => {
+await test("delivery samples fail a fix-required review without findings", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { result } = await runWorkflowSample(
@@ -868,7 +868,7 @@ void test("delivery samples fail a fix-required review without findings", async 
   );
 });
 
-void test("delivery workflow samples inherit host models and honor model overrides", async () => {
+await test("delivery workflow samples inherit host models and honor model overrides", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [
@@ -932,7 +932,7 @@ void test("delivery workflow samples inherit host models and honor model overrid
   );
 });
 
-void test("delivery workflow samples allow explicitly omitted exploration", async () => {
+await test("delivery workflow samples allow explicitly omitted exploration", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { calls, result } = await runWorkflowSample(
@@ -996,7 +996,7 @@ void test("delivery workflow samples allow explicitly omitted exploration", asyn
   );
 });
 
-void test("delivery workflow samples stop planning when exploration fails", async () => {
+await test("delivery workflow samples stop planning when exploration fails", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { calls, result } = await runWorkflowSample(
@@ -1022,7 +1022,7 @@ void test("delivery workflow samples stop planning when exploration fails", asyn
   );
 });
 
-void test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
+await test("delivery workflow samples preserve post-then-review ordering and honest phase records", async () => {
   {
     const { calls, result } = await runWorkflowSample(
       samplePaths.delivery,
@@ -1318,7 +1318,7 @@ void test("delivery workflow samples preserve post-then-review ordering and hone
   );
 });
 
-void test("delivery workflow samples reject unsafe ownership and contradictory evidence", async () => {
+await test("delivery workflow samples reject unsafe ownership and contradictory evidence", async () => {
   await Promise.all(
     [absoluteUnits, escapingUnits, nestedUnits].map(async (planPayload) => {
       const { calls, result } = await runWorkflowSample(
@@ -1470,7 +1470,7 @@ void test("delivery workflow samples reject unsafe ownership and contradictory e
   );
 });
 
-void test("delivery workflow samples carry named candidates and per-key repair evidence", async () => {
+await test("delivery workflow samples carry named candidates and per-key repair evidence", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", issue: "#1", maxFixRounds: 1, task: "t" },
@@ -1675,7 +1675,7 @@ void test("delivery workflow samples carry named candidates and per-key repair e
   assert.deepEqual(missingRun.result.resources, []);
 });
 
-void test("delivery samples validate integration destination and verify findings before repairs", async () => {
+await test("delivery samples validate integration destination and verify findings before repairs", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { calls, result } = await runWorkflowSample(
@@ -1704,7 +1704,7 @@ void test("delivery samples validate integration destination and verify findings
   );
 });
 
-void test("delivery samples gate repairs on independent finding dispositions", async () => {
+await test("delivery samples gate repairs on independent finding dispositions", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       /** @type {[{evidence: string, id: string, status: string}[] | null, boolean, number][]} */
@@ -1820,7 +1820,7 @@ void test("delivery samples gate repairs on independent finding dispositions", a
   );
 });
 
-void test("delivery samples reject invalid integration path evidence and base destinations", async () => {
+await test("delivery samples reject invalid integration path evidence and base destinations", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       await Promise.all(
@@ -1869,7 +1869,7 @@ void test("delivery samples reject invalid integration path evidence and base de
   );
 });
 
-void test("multi-unit delivery routes only independently confirmed findings to their owner", async () => {
+await test("multi-unit delivery routes only independently confirmed findings to their owner", async () => {
   const findings = [
     { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
@@ -1919,7 +1919,7 @@ void test("multi-unit delivery routes only independently confirmed findings to t
   assert.equal(verification.dispositions.length, 2);
 });
 
-void test("delivery samples reject malformed findings and preserve review evidence", async () => {
+await test("delivery samples reject malformed findings and preserve review evidence", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [null, { detail: "d", file: null, scenario: "s" }].map(
@@ -1956,7 +1956,7 @@ void test("delivery samples reject malformed findings and preserve review eviden
   );
 });
 
-void test("delivery finding verification independently selects its model", async () => {
+await test("delivery finding verification independently selects its model", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [
@@ -2004,7 +2004,7 @@ void test("delivery finding verification independently selects its model", async
   );
 });
 
-void test("delivery samples validate the verification model selector", async () => {
+await test("delivery samples validate the verification model selector", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       ["", "  ", null, 42].map(async (verify) => {
@@ -2031,7 +2031,7 @@ void test("delivery samples validate the verification model selector", async () 
   );
 });
 
-void test("delivery samples append each phase's prompt part as its final section", async () => {
+await test("delivery samples append each phase's prompt part as its final section", async () => {
   /** @type {Record<string, string>} */
   const promptParts = {
     explore: "explore part",
@@ -2080,7 +2080,7 @@ void test("delivery samples append each phase's prompt part as its final section
   );
 });
 
-void test("delivery samples pass candidate, issue, request, and owned findings into prompt sections", async () => {
+await test("delivery samples pass candidate, issue, request, and owned findings into prompt sections", async () => {
   const findings = [
     { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
@@ -2171,7 +2171,7 @@ void test("delivery samples pass candidate, issue, request, and owned findings i
   );
 });
 
-void test("delivery graph adapts single-unit candidates and records conditional integration evidence", async () => {
+await test("delivery graph adapts single-unit candidates and records conditional integration evidence", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
     { candidateBranch: "task-branch", task: "t" },
@@ -2235,7 +2235,7 @@ void test("delivery graph adapts single-unit candidates and records conditional 
   );
 });
 
-void test("delivery graph exposes node contracts and condition edges", async () => {
+await test("delivery graph exposes node contracts and condition edges", async () => {
   await Promise.all(
     [false, true].map(async (split) => {
       const { result } = await runWorkflowSample(

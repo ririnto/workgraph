@@ -91,7 +91,7 @@ const runValidation = (root, filename) => {
   return result;
 };
 
-void test("issue form validation reports malformed input and field violations", () => {
+await test("issue form validation reports malformed input and field violations", () => {
   /** @type {[string, string[]][]} */
   const cases = [
     [validIssueForm, []],
@@ -133,7 +133,7 @@ void test("issue form validation reports malformed input and field violations", 
   }
 });
 
-void test("issue form command reports invalid input and duplicate names from discovered files", (t) => {
+await test("issue form command reports invalid input and duplicate names from discovered files", (t) => {
   const root = copyValidation(t);
   const directory = path.join(root, ".github/ISSUE_TEMPLATE");
   mkdirSync(directory, { recursive: true });
@@ -187,7 +187,7 @@ const copyPluginPackage = (t) => {
   return root;
 };
 
-void test("release versions enforce padded calendar dates and daily sequences", () => {
+await test("release versions enforce padded calendar dates and daily sequences", () => {
   for (const version of [
     "2026.01.01.01",
     "2026.10.30.06",
@@ -270,7 +270,7 @@ void test("release versions enforce padded calendar dates and daily sequences", 
   );
 });
 
-void test("plugin command validates canonical identity, catalogs, and release metadata", async (t) => {
+await test("plugin command validates canonical identity, catalogs, and release metadata", async (t) => {
   /** @type {[string, Record<string, unknown>, string][]} */
   const cases = [
     [".codex-plugin/plugin.json", {}, ""],
@@ -439,7 +439,7 @@ void test("plugin command validates canonical identity, catalogs, and release me
   );
 });
 
-void test("plugin command rejects shadowing manifests and conventional hook discovery", (t) => {
+await test("plugin command rejects shadowing manifests and conventional hook discovery", (t) => {
   const root = copyPluginPackage(t);
   /** @type {[string, Record<string, unknown>][]} */
   const files = [
@@ -467,7 +467,7 @@ void test("plugin command rejects shadowing manifests and conventional hook disc
   }
 });
 
-void test("plugin command rejects escaping package symlinks", (t) => {
+await test("plugin command rejects escaping package symlinks", (t) => {
   const root = copyPluginPackage(t);
   const outside = mkdtempSync(path.join(tmpdir(), "workgraph-outside-"));
   t.after(() => {
@@ -486,7 +486,7 @@ void test("plugin command rejects escaping package symlinks", (t) => {
   );
 });
 
-void test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {
+await test("validation entrypoints execute from unrelated directories through real and symlinked paths", (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-entrypoints-"));
   t.after(() => {
     rmSync(root, { force: true, recursive: true });

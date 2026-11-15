@@ -58,7 +58,7 @@ const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
   );
 };
 
-void test("skill metadata accepts standard fields and host extensions", () => {
+await test("skill metadata accepts standard fields and host extensions", () => {
   const content = skillContent(`name: sample-skill
 description: >-
   Use for the sample task
@@ -82,7 +82,7 @@ user-invocable: true`);
   );
 });
 
-void test("skill metadata checks required fields and directory identity", () => {
+await test("skill metadata checks required fields and directory identity", () => {
   for (const [fields, directory, diagnostic] of [
     ["description: Task.", "sample-skill", "name must be a non-empty string."],
     [
@@ -142,7 +142,7 @@ void test("skill metadata checks required fields and directory identity", () => 
   }
 });
 
-void test("skill metadata counts and normalizes Unicode characters", () => {
+await test("skill metadata counts and normalizes Unicode characters", () => {
   for (const [name, directory] of [
     ["技能", "技能"],
     ["мой-навык", "мой-навык"],
@@ -189,7 +189,7 @@ void test("skill metadata counts and normalizes Unicode characters", () => {
   }
 });
 
-void test("portable skill prompts fit Codex's complete-file byte budget", () => {
+await test("portable skill prompts fit Codex's complete-file byte budget", () => {
   const source = skillContent();
   const boundary = source + "x".repeat(8000 - source.length);
   const unicodeBoundary = `${boundary.slice(0, -2)}é`;
@@ -208,7 +208,7 @@ void test("portable skill prompts fit Codex's complete-file byte budget", () => 
   }
 });
 
-void test("skill metadata rejects invalid optional field types", () => {
+await test("skill metadata rejects invalid optional field types", () => {
   for (const [extra, diagnostic] of [
     ["compatibility: false", "compatibility must be a non-empty string."],
     ["compatibility: ''", "compatibility must be a non-empty string."],
@@ -234,7 +234,7 @@ void test("skill metadata rejects invalid optional field types", () => {
   }
 });
 
-void test("skill metadata blocks model invocation and keeps user invocation on", () => {
+await test("skill metadata blocks model invocation and keeps user invocation on", () => {
   /** @type {[string, string[], string[], string][]} */
   const invocationCases = [
     [
@@ -281,7 +281,7 @@ void test("skill metadata blocks model invocation and keeps user invocation on",
   );
 });
 
-void test("skill metadata rejects malformed frontmatter and empty bodies", () => {
+await test("skill metadata rejects malformed frontmatter and empty bodies", () => {
   for (const content of [
     "name: sample-skill\ndescription: Task.\n",
     "---\nname: sample-skill\ndescription: Task.\n",
@@ -325,7 +325,7 @@ void test("skill metadata rejects malformed frontmatter and empty bodies", () =>
   );
 });
 
-void test("skill metadata command resolves its own checkout", (t) => {
+await test("skill metadata command resolves its own checkout", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
   mkdirSync(path.join(directory, "agents"), { recursive: true });
@@ -356,7 +356,7 @@ void test("skill metadata command resolves its own checkout", (t) => {
   }
 });
 
-void test("skill metadata command requires a Codex invocation policy", (t) => {
+await test("skill metadata command requires a Codex invocation policy", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
   mkdirSync(path.join(directory, "agents"), { recursive: true });
@@ -384,7 +384,7 @@ void test("skill metadata command requires a Codex invocation policy", (t) => {
   }
 });
 
-void test("skill metadata command validates internal links by their alias", (t) => {
+await test("skill metadata command validates internal links by their alias", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "bundled/reference");
   mkdirSync(path.join(directory, "agents"), { recursive: true });
@@ -423,7 +423,7 @@ void test("skill metadata command validates internal links by their alias", (t) 
   }
 });
 
-void test("skill metadata command rejects paths outside its plugin root", (t) => {
+await test("skill metadata command rejects paths outside its plugin root", (t) => {
   for (const source of [
     "skills",
     "skills/sample-skill",
@@ -463,7 +463,7 @@ void test("skill metadata command rejects paths outside its plugin root", (t) =>
   }
 });
 
-void test("skill metadata command rejects unreadable linked skill files", (t) => {
+await test("skill metadata command rejects unreadable linked skill files", (t) => {
   const { entrypoint, root } = metadataFixture(t);
   const directory = path.join(root, "skills/sample-skill");
   mkdirSync(path.join(directory, "agents"), { recursive: true });

@@ -101,7 +101,7 @@ const assertDenied = (result) => {
   });
 };
 
-void test("blocks the third mixed polling call until a nonmatch resets it", (t) => {
+await test("blocks the third mixed polling call until a nonmatch resets it", (t) => {
   const { run } = setup(t);
   assertAllowed(run("tail -n 10 build.log"));
   assertAllowed(run("sleep 1"));
@@ -119,7 +119,7 @@ void test("blocks the third mixed polling call until a nonmatch resets it", (t) 
   assertDenied(run("sleep 1"));
 });
 
-void test("isolates sessions and resets on malformed Bash input", (t) => {
+await test("isolates sessions and resets on malformed Bash input", (t) => {
   const { run, root } = setup(t);
   assert.ok(process.getuid);
   assertAllowed(run("sleep 1"));
@@ -144,7 +144,7 @@ void test("isolates sessions and resets on malformed Bash input", (t) => {
   assert.equal(readdirSync(root).length, 1);
 });
 
-void test("serializes simultaneous calls before deciding", async (t) => {
+await test("serializes simultaneous calls before deciding", async (t) => {
   const { runConcurrently } = setup(t);
   const results = await Promise.all(
     Array.from({ length: 8 }, async () => await runConcurrently("sleep 1"))
@@ -160,7 +160,7 @@ void test("serializes simultaneous calls before deciding", async (t) => {
   }
 });
 
-void test("matches only supported literal command positions", async (t) => {
+await test("matches only supported literal command positions", async (t) => {
   const { runConcurrently } = setup(t);
   const positives = [
     "tail",
@@ -228,7 +228,7 @@ void test("matches only supported literal command positions", async (t) => {
   ]);
 });
 
-void test("state failures allow execution and disable stale counter decisions", (t) => {
+await test("state failures allow execution and disable stale counter decisions", (t) => {
   const { root, run } = setup(t);
   assert.ok(process.getuid);
   assertAllowed(run("sleep 1"));
@@ -258,7 +258,7 @@ void test("state failures allow execution and disable stale counter decisions", 
   assertAllowed(run("sleep 1"));
 });
 
-void test("a stale lock fails open without deleting another invocation's lock", (t) => {
+await test("a stale lock fails open without deleting another invocation's lock", (t) => {
   const { root, run } = setup(t);
   assert.ok(process.getuid);
   assertAllowed(run("sleep 1"));
@@ -285,7 +285,7 @@ void test("a stale lock fails open without deleting another invocation's lock", 
   assertAllowed(run("sleep 1"));
 });
 
-void test("configured hooks run from relocated plugin paths without changing startup hooks", (t) => {
+await test("configured hooks run from relocated plugin paths without changing startup hooks", (t) => {
   const { root, env } = setup(t);
   const plugin = path.join(root, "plugin with spaces");
   mkdirSync(path.join(plugin, "hooks"), { recursive: true });

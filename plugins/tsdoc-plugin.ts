@@ -51,9 +51,8 @@ interface RuleContext {
  */
 const nameOf = (value: unknown): string | undefined => {
   const node = typeof value === "object" && value !== null ? value : undefined;
-  let name: string | undefined;
   if (node && "name" in node && typeof node.name === "string") {
-    ({ name } = node);
+    return node.name;
   } else if (
     node &&
     "value" in node &&
@@ -62,16 +61,15 @@ const nameOf = (value: unknown): string | undefined => {
       typeof node.value === "boolean" ||
       typeof node.value === "bigint")
   ) {
-    name = String(node.value);
+    return String(node.value);
   } else if (node && "left" in node && "right" in node) {
     const left = nameOf(node.left);
     const right = nameOf(node.right);
-    name =
-      left !== undefined && right !== undefined
-        ? `${left}.${right}`
-        : undefined;
+    return left !== undefined && right !== undefined
+      ? `${left}.${right}`
+      : undefined;
   }
-  return name;
+  return undefined;
 };
 
 /**
