@@ -19,16 +19,13 @@ const collect = (
   type: string
 ): MicromarkToken[] => {
   const matches: MicromarkToken[] = [];
-  const pending: MicromarkToken[] = [];
-  for (let index = tokens.length - 1; index >= 0; index -= 1) {
-    pending.push(tokens[index]);
-  }
+  const pending = tokens.toReversed();
   for (let token = pending.pop(); token !== undefined; token = pending.pop()) {
     if (token.type === type) {
       matches.push(token);
     }
-    for (let index = token.children.length - 1; index >= 0; index -= 1) {
-      pending.push(token.children[index]);
+    for (const child of token.children.toReversed()) {
+      pending.push(child);
     }
   }
   return matches;
