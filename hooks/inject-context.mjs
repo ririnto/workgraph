@@ -15,26 +15,6 @@ const fail = (message, code) => {
 };
 
 /**
- * Extract the body from nonempty skill frontmatter.
- * @param {string} content Complete skill source.
- * @returns {string} Instruction body after the closing delimiter.
- */
-const instructionBody = (content) => {
-  const lines = content.replace(/^\uFEFF/u, "").split("\n");
-  const closingFrontmatterLine = lines.findIndex(
-    (line, index) => index > 0 && line.trim() === "---"
-  );
-  if (
-    lines[0].trim() !== "---" ||
-    closingFrontmatterLine < 1 ||
-    !lines.slice(1, closingFrontmatterLine).some((line) => line.trim())
-  ) {
-    throw new Error("empty instructions or missing required skill frontmatter");
-  }
-  return lines.slice(closingFrontmatterLine + 1).join("\n");
-};
-
-/**
  * Resolve and load required text before emitting any context.
  * Match trimmed delimiter lines and preserve the remaining text.
  * @param {string} file Skill-relative instruction path.
@@ -47,7 +27,25 @@ const readInstruction = (file, stripFrontmatter) => {
       fileURLToPath(new URL(`../skills/${file}`, import.meta.url))
     );
     const content = readFileSync(source, "utf-8");
-    const body = stripFrontmatter ? instructionBody(content) : content;
+    const lines = stripFrontmatter
+      ? content.replace(/^\uFEFF/u, "").split("\n")
+      : [];
+    const closingFrontmatterLine = lines.findIndex(
+      (line, index) => index > 0 && line.trim() === "---"
+    );
+    if (
+      stripFrontmatter &&
+      (lines[0].trim() !== "---" ||
+        closingFrontmatterLine < 1 ||
+        !lines.slice(1, closingFrontmatterLine).some((line) => line.trim()))
+    ) {
+      throw new Error(
+        "empty instructions or missing required skill frontmatter"
+      );
+    }
+    const body = stripFrontmatter
+      ? lines.slice(closingFrontmatterLine + 1).join("\n")
+      : content;
     if (!body.trim()) {
       throw new Error(
         "empty instructions or missing required skill frontmatter"
