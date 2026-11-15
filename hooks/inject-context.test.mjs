@@ -163,7 +163,7 @@ const emptyFileDetail =
   "empty instructions or missing required skill frontmatter";
 const directoryDetail = "EISDIR: illegal operation on a directory, read";
 
-void test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
+await test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
   const parent = realpathSync(copyPlugin(t));
   const rootLength = Math.max(311, parent.length + 202);
   const root = path.join(
@@ -224,7 +224,7 @@ void test("Claude contexts stay inline with long plugin paths and LF or CRLF", (
   }
 });
 
-void test("configured Claude hooks load relocated skills and references with LF or CRLF", (t) => {
+await test("configured Claude hooks load relocated skills and references with LF or CRLF", (t) => {
   const root = copyPlugin(t);
   const descriptor = parseObject(
     readFileSync(path.join(root, ".claude-plugin/plugin.json"), "utf-8")
@@ -317,7 +317,7 @@ void test("configured Claude hooks load relocated skills and references with LF 
   }
 });
 
-void test("native Skill and Read fragments preserve host-specific BOM, CRLF, and terminal whitespace", (t) => {
+await test("native Skill and Read fragments preserve host-specific BOM, CRLF, and terminal whitespace", (t) => {
   const root = copyPlugin(t);
   const body = "# Exact role\r\nKeep terminal spaces. \t\r\n\r\n";
   const guidance =
@@ -354,7 +354,7 @@ void test("native Skill and Read fragments preserve host-specific BOM, CRLF, and
   }
 });
 
-void test("source metadata resolves symlinked instructions to their real paths", (t) => {
+await test("source metadata resolves symlinked instructions to their real paths", (t) => {
   const root = copyPlugin(t);
   for (const file of roleFiles) {
     const target = path.join(root, "skills", file);
@@ -384,7 +384,7 @@ void test("source metadata resolves symlinked instructions to their real paths",
   }
 });
 
-void test("configured Codex hooks load complete relocated skill files without a context limit", (t) => {
+await test("configured Codex hooks load complete relocated skill files without a context limit", (t) => {
   const root = copyPlugin(t);
   const descriptor = parseObject(
     readFileSync(path.join(root, ".codex-plugin/plugin.json"), "utf-8")
@@ -441,7 +441,7 @@ void test("configured Codex hooks load complete relocated skill files without a 
   }
 });
 
-void test("Codex delimiter lines preserve raw files and remove Claude body prefixes", (t) => {
+await test("Codex delimiter lines preserve raw files and remove Claude body prefixes", (t) => {
   const root = copyPlugin(t);
   for (const [event, name] of roles) {
     for (const newline of ["\n", "\r\n"]) {
@@ -476,7 +476,7 @@ void test("Codex delimiter lines preserve raw files and remove Claude body prefi
   }
 });
 
-void test("each role and host loads without other skills or the unselected host reference", (t) => {
+await test("each role and host loads without other skills or the unselected host reference", (t) => {
   for (const [event, name] of roles) {
     for (const host of hosts) {
       const root = copyPlugin(t);
@@ -509,7 +509,7 @@ void test("each role and host loads without other skills or the unselected host 
   }
 });
 
-void test("invalid or legacy arguments produce no context", () => {
+await test("invalid or legacy arguments produce no context", () => {
   /** @type {[string[], string][]} */
   const cases = [
     [[], "expected exactly one hook event and one host"],
@@ -531,35 +531,37 @@ void test("invalid or legacy arguments produce no context", () => {
   }
 });
 
-for (const [event, name] of roles) {
-  const file = `${name}/SKILL.md`;
-  void test(`${event} ${file}: missing, empty, or unreadable instructions produce no partial output`, (t) => {
-    const root = copyPlugin(t);
-    const target = path.join(root, "skills", file);
-    const copiedScript = path.join(root, "hooks", "inject-context.mjs");
-    rmSync(target);
-    assertFileFailure(
-      runHook([event, "claude"], copiedScript),
-      file,
-      missingFileDetail(target)
-    );
-    writeFileSync(target, " \n\t\n");
-    assertFileFailure(
-      runHook([event, "claude"], copiedScript),
-      file,
-      emptyFileDetail
-    );
-    rmSync(target);
-    mkdirSync(target);
-    assertFileFailure(
-      runHook([event, "claude"], copiedScript),
-      file,
-      directoryDetail
-    );
-  });
-}
+await Promise.all(
+  roles.map(async ([event, name]) => {
+    const file = `${name}/SKILL.md`;
+    await test(`${event} ${file}: missing, empty, or unreadable instructions produce no partial output`, (t) => {
+      const root = copyPlugin(t);
+      const target = path.join(root, "skills", file);
+      const copiedScript = path.join(root, "hooks", "inject-context.mjs");
+      rmSync(target);
+      assertFileFailure(
+        runHook([event, "claude"], copiedScript),
+        file,
+        missingFileDetail(target)
+      );
+      writeFileSync(target, " \n\t\n");
+      assertFileFailure(
+        runHook([event, "claude"], copiedScript),
+        file,
+        emptyFileDetail
+      );
+      rmSync(target);
+      mkdirSync(target);
+      assertFileFailure(
+        runHook([event, "claude"], copiedScript),
+        file,
+        directoryDetail
+      );
+    });
+  })
+);
 
-void test("invalid frontmatter or empty prose produces no partial output on either host", (t) => {
+await test("invalid frontmatter or empty prose produces no partial output on either host", (t) => {
   const root = copyPlugin(t);
   const file = "main-agent-contract/SKILL.md";
   for (const source of [
@@ -585,32 +587,34 @@ void test("invalid frontmatter or empty prose produces no partial output on eith
   }
 });
 
-for (const [event, name] of roles) {
-  for (const host of hosts) {
-    void test(`${name} ${host}: missing, empty, or unreadable host reference produces no partial output`, (t) => {
-      const root = copyPlugin(t);
-      const file = `${name}/references/${hostReferenceFiles[host]}`;
-      const target = path.join(root, "skills", file);
-      const copiedScript = path.join(root, "hooks", "inject-context.mjs");
-      rmSync(target);
-      assertFileFailure(
-        runHook([event, host], copiedScript),
-        file,
-        missingFileDetail(target)
-      );
-      writeFileSync(target, " \n\t\n");
-      assertFileFailure(
-        runHook([event, host], copiedScript),
-        file,
-        emptyFileDetail
-      );
-      rmSync(target);
-      mkdirSync(target);
-      assertFileFailure(
-        runHook([event, host], copiedScript),
-        file,
-        directoryDetail
-      );
-    });
-  }
-}
+await Promise.all(
+  roles.flatMap(([event, name]) =>
+    hosts.map(async (host) => {
+      await test(`${name} ${host}: missing, empty, or unreadable host reference produces no partial output`, (t) => {
+        const root = copyPlugin(t);
+        const file = `${name}/references/${hostReferenceFiles[host]}`;
+        const target = path.join(root, "skills", file);
+        const copiedScript = path.join(root, "hooks", "inject-context.mjs");
+        rmSync(target);
+        assertFileFailure(
+          runHook([event, host], copiedScript),
+          file,
+          missingFileDetail(target)
+        );
+        writeFileSync(target, " \n\t\n");
+        assertFileFailure(
+          runHook([event, host], copiedScript),
+          file,
+          emptyFileDetail
+        );
+        rmSync(target);
+        mkdirSync(target);
+        assertFileFailure(
+          runHook([event, host], copiedScript),
+          file,
+          directoryDetail
+        );
+      });
+    })
+  )
+);
