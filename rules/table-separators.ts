@@ -40,11 +40,10 @@ const collect = (
 const rule: Rule = {
   description: "Markdown table separators must use exactly three hyphens",
   function: (params, onError) => {
-    const delimiterRows = collect(
+    for (const row of collect(
       params.parsers.micromark?.tokens ?? [],
       "tableDelimiterRow"
-    );
-    for (const row of delimiterRows) {
+    )) {
       for (const [index, cell] of collect(
         row.children,
         "tableDelimiter"
