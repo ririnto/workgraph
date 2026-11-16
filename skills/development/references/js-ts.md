@@ -1,5 +1,7 @@
 # JavaScript and TypeScript
 
+When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
+
 ## Declaration documentation
 
 For JavaScript, use multiline JSDoc for exported declarations, re-exports, default exports, and public class members, including constructors.

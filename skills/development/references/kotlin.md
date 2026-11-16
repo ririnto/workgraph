@@ -1,5 +1,7 @@
 # Kotlin
 
+When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
+
 ## Declarations and documentation
 
 Document effective public and protected declarations with multiline KDoc.
