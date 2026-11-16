@@ -6,7 +6,7 @@ Treat parameters, loop targets, and module-level constants as immutable unless m
 Use `Final` for fixed module-level values and immutable collections for fixed values exposed across modules.
 Add defensive copies only when callers can mutate a shared value.
 
-Preserve evaluation order and exception timing when selecting generators or eager comprehensions.
+Meet functional requirements, including required effects and exceptions, when selecting generators or eager comprehensions.
 Use f-strings for interpolation and `pathlib.Path` for filesystem paths.
 Use standard parsers for structured data instead of string matching.
 
