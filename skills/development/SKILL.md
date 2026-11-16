@@ -33,8 +33,8 @@ Guidance alone authorizes no tooling or cross-project changes.
 | --- | --- | --- |
 | Java | `.java` | [Java](references/java.md) |
 | Kotlin | `.kt`, `.kts` | [Kotlin](references/kotlin.md) |
-| TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` | [TypeScript](references/typescript.md) |
-| JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JavaScript](references/javascript.md) |
+| TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` | [JS/TS](references/js-ts.md) |
+| JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JS/TS](references/js-ts.md) |
 | Python | `.py` | [Python](references/python.md) |
 | Go | `.go` | [Go](references/go.md) |
 | Rust | `.rs`, Cargo manifests, Rust toolchain and lint configuration | [Rust](references/rust.md) |
