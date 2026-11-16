@@ -1,5 +1,7 @@
 # Kotlin
 
+When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
+
 ## Declarations and documentation
 
 Document effective public and protected declarations with multiline KDoc.
@@ -27,14 +29,14 @@ Keep qualified names when declarations, imports, aliases, same-package symbols, 
 
 Use expression bodies when return types, `Unit` behavior, nullability, and API semantics stay unchanged.
 Use callable or property references for simple delegation or access lambdas when types, overload selection, and receivers stay unchanged.
-Preserve receiver evaluation timing, captures, nullability, and required lambda adaptation.
-Split pure independent predicates into chained `filter` or nullable `takeIf` calls when behavior stays unchanged.
-Preserve condition order, smart casts, nullability, effects, exceptions, allocations, and required performance.
+Meet functional requirements for receiver evaluation, captures, nullability, and lambda adaptation.
+Split pure independent predicates into chained `filter` or nullable `takeIf` calls when functional requirements are met.
+Meet functional requirements for smart casts, nullability, effects, exceptions, allocations, and performance.
 Keep negative or mixed-polarity predicates together when splitting would change their logic.
 Use sequences only when lazy evaluation matches the contract.
-Use `?.let` or an equivalent safe call for null-present work when behavior stays unchanged.
-Preserve stable-value semantics, getter evaluation count, smart casts, nullable-result and Elvis behavior, captures, and non-local returns.
-Use the captured non-null value instead of rereading a nullable property when access timing and getter evaluation stay equivalent.
+Use `?.let` or an equivalent safe call for null-present work when functional requirements are met.
+Meet functional requirements for stable values, getter evaluation, smart casts, nullable-result and Elvis behavior, captures, and non-local returns.
+Use the captured non-null value instead of rereading a nullable property when it meets functional requirements.
 Keep required validation and failure behavior explicit.
 Use subject-based `when` for complete comparisons of one stable subject when semantics match.
 Use braces for every `if` and `else` branch.

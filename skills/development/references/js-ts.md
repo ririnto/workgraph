@@ -1,5 +1,7 @@
 # JavaScript and TypeScript
 
+When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
+
 ## Declaration documentation
 
 For JavaScript, use multiline JSDoc for exported declarations, re-exports, default exports, and public class members, including constructors.
@@ -24,13 +26,15 @@ Use semantic elements before adding ARIA roles.
 Minimize `undefined` in new or changed code and prefer `null` when a value is needed.
 Do not require bulk conversion of existing `undefined` uses.
 Review behavior before changing constructs that depend on `undefined`, including default parameters and optional chaining.
+For null cleanup, early-return inversion, and discarded-call replacement, choose an order that meets functional requirements rather than preserving the existing order for its own sake.
 
-Review single-condition early returns for condition inversion and apply it when semantics and readability are preserved.
+Review single-condition early returns for condition inversion and apply it when functional requirements and readability are satisfied.
 Keep guards where inversion would harm either.
-Review `void` used solely to discard a function call and replace it with an appropriate call, such as `await`, when the call contract permits.
-Preserve rejection handling, concurrency, callback return contracts, async signatures, execution order, and intentional background work.
-For intentional background work, preserve its existing error-handling policy without forcing callers to wait.
-This is guidance, not a lint requirement or automatic rewrite.
+Replace every use of `void` solely to discard a function call, including in existing code, with an appropriate form such as `await`.
+Preserve required callback return contracts, async signatures, and concurrency.
+Propagate rejections to the caller or handle them explicitly without ignoring them, including in background work.
+Preserve parallel execution when needed, using an explicit error-handling path such as a non-ignoring `catch`.
+Do not use an empty `catch` or catch and ignore errors.
 
 ## Traversal
 

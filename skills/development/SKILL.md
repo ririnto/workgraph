@@ -46,7 +46,7 @@ Exclude externally maintained files and configurations, such as Gradle and Maven
 Limit external contribution style cleanup to the diff unless broader cleanup is authorized.
 
 Preserve the declared runtime, toolchain, public contracts, and required failure behavior.
-During transformations, preserve evaluation order, effects, resource lifetimes, and required interfaces.
+Meet required effects, resource lifetimes, and interfaces during transformations.
 Adapt tests to production interfaces without exposing internals or adding test-only hooks.
 Replace superseded implementations and consumers together, removing obsolete paths.
 Revise or remove code rules at their source rather than adding opposite rules.
@@ -89,7 +89,7 @@ Report material behavior changes and remaining uncertainty.
 | Comment changes | Check directives, declaration attachment, tooling, public contracts, and safety information. |
 | Explanatory logging | Check runtime effects, cost, and information exposure. |
 | Await instead of void | Check scheduling, callback contracts, rejection handling, and cancellation. |
-| Early-exit inversion | Check evaluation order, cleanup, cost, and security checks. |
+| Early-exit inversion | Check functional requirements, cleanup, cost, and security checks. |
 | Dependency changes | Check resolution, runtime requirements, and supported APIs. |
 | Rule rollout | Validate target-specific classification and behavior. |
 | Structured validation identifiers | Preserve observable diagnostics and error contracts, migrating consumers together when authorized. |

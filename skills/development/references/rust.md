@@ -1,5 +1,7 @@
 # Rust
 
+When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
+
 ## Inspect the project
 
 Read the owning `Cargo.toml`, workspace configuration, `rust-toolchain.toml` or `rust-toolchain`, and existing Rust checks before changing source or tooling.

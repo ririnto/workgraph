@@ -1,5 +1,7 @@
 # Go
 
+When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
+
 Wrap errors with `%w` when callers must inspect the chain.
 Return errors and log them at the boundary where handling ends.
 Name error variables `err` and check errors when failure can realistically affect the result.

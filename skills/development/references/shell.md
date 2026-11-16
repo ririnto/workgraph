@@ -1,5 +1,7 @@
 # Shell
 
+When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
+
 ## Use portable shell syntax
 
 Keep syntax compatible with the script's declared shell and supported platforms.
@@ -7,7 +9,7 @@ Default new portable scripts to POSIX `sh` unless the contract requires another 
 Use Bash-specific syntax only under a Bash shebang and its supported version.
 Quote expansions unless the shell syntax or required splitting calls for another form.
 Forward arguments with `"$@"`.
-Preserve exit status and evaluation order when changing conditional forms.
+Preserve required exit status and meet functional requirements when changing conditional forms.
 
 ## Handle failures
 
