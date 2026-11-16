@@ -30,11 +30,11 @@ Keep qualified names when declarations, imports, aliases, same-package symbols, 
 Use expression bodies when return types, `Unit` behavior, nullability, and API semantics stay unchanged.
 Use callable or property references for simple delegation or access lambdas when types, overload selection, and receivers stay unchanged.
 Meet functional requirements for receiver evaluation, captures, nullability, and lambda adaptation.
-Split pure independent predicates into chained `filter` or nullable `takeIf` calls when behavior stays unchanged.
+Split pure independent predicates into chained `filter` or nullable `takeIf` calls when functional requirements are met.
 Meet functional requirements for smart casts, nullability, effects, exceptions, allocations, and performance.
 Keep negative or mixed-polarity predicates together when splitting would change their logic.
 Use sequences only when lazy evaluation matches the contract.
-Use `?.let` or an equivalent safe call for null-present work when behavior stays unchanged.
+Use `?.let` or an equivalent safe call for null-present work when functional requirements are met.
 Meet functional requirements for stable values, getter evaluation, smart casts, nullable-result and Elvis behavior, captures, and non-local returns.
 Use the captured non-null value instead of rereading a nullable property when it meets functional requirements.
 Keep required validation and failure behavior explicit.
