@@ -44,7 +44,7 @@ Preserve required human input, genuine blockers, and host messages.
 ### Select host guidance
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
-Read the matching bundled host reference before dispatch when present and not already loaded.
+Before dispatch, read [Claude Code](references/claude-code.md) for Claude Code or [Codex](references/codex.md) for Codex unless already loaded.
 Otherwise, follow the active host's tool descriptions.
 
 ### Models

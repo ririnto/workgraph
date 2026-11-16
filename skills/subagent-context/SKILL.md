@@ -43,7 +43,7 @@ Before editing durable memory, read [Memory Maintenance](../memory-maintenance/S
 ### Select host guidance
 
 Identify the active host from metadata, references, or tool descriptions, never model names.
-Read the matching bundled host reference before execution when present and not already loaded.
+Before execution, read [Claude Code](references/claude-code.md) for Claude Code or [Codex](references/codex.md) for Codex unless already loaded.
 Otherwise, follow the active host's tool descriptions.
 Set model and effort for every subdelegated task through supported controls under applicable user, project, configured, and assignment rules.
 

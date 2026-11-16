@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Follow repository rules, lint, tools, and user choices within task authority, required checks, and host capabilities.
 Read matching playbooks and references unless fully loaded.
-For JS/TS, read [Node guidance](references/nodejs.md).
+For JS/TS, read [Node](references/nodejs.md).
 For new or changed loops, read [control flow](references/control-flow.md) unless fully loaded.
 For Kotest specs or assertions, read [Kotest](references/kotest.md) unless fully loaded.
 
@@ -17,7 +17,7 @@ For Kotest specs or assertions, read [Kotest](references/kotest.md) unless fully
 Identify contracts, consumers, exclusions, and acceptance evidence before editing.
 For agent instructions, read [instruction design](references/instruction-design.md).
 Inspect affected code and stop discovery when evidence supports the smallest safe change.
-Skip optional ceremony and speculative sweeps for bounded work, preserving safety, authority, and required gates.
+Skip optional ceremony, speculative sweeps, and precautionary pauses for bounded work, preserving safety, authority, and required gates.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -53,7 +53,7 @@ Adapt tests to production interfaces without exposing internals or adding test-o
 Replace superseded implementations and consumers together, removing obsolete paths.
 Revise or remove code rules at their source rather than adding opposite rules.
 Avoid copying nearby workarounds as precedent.
-Use official SDK or framework properties directly when suitable.
+Use suitable official SDK or framework properties directly.
 Do not duplicate input checks when an operation's rejection meets the contract.
 Prefer immutable bindings and minimal mutable state.
 
@@ -113,7 +113,7 @@ Use the project's established commands for routine local and CI work.
 Keep supported automation declarative, using the project's implementation language only for substantial logic existing tools cannot provide.
 
 When configuring or assessing builds or tools, read the matching language reference.
-For lint rules or fixes, also read [lint rule guidance](references/lint-rules.md).
+For lint rules or fixes, read [lint rule guidance](references/lint-rules.md).
 
 ## Verification
 
