@@ -1,7 +1,5 @@
 # Kotlin
 
-When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
-
 ## Declarations and documentation
 
 Document effective public and protected declarations with multiline KDoc.
@@ -61,10 +59,6 @@ Keep `java.nio.file.Path` as the path type and prefer supported `kotlin.io.path`
 Use the imported `div` operator for child paths when it preserves `resolve` semantics.
 Preserve results, exceptions, filtering callbacks, options, and resource handling when replacing Java file operations.
 Keep Java methods when no Kotlin equivalent satisfies the contract.
-
-## Kotest
-
-When creating or changing Kotest specs or assertions, read [Kotest guidance](kotest.md) unless fully loaded.
 
 ## Tooling
 

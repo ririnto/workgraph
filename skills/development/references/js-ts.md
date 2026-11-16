@@ -1,7 +1,5 @@
 # JavaScript and TypeScript
 
-When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
-
 ## Declaration documentation
 
 For JavaScript, use multiline JSDoc for exported declarations, re-exports, default exports, and public class members, including constructors.
@@ -26,7 +24,7 @@ Use semantic elements before adding ARIA roles.
 Minimize `undefined` in new or changed code and prefer `null` when a value is needed.
 Do not require bulk conversion of existing `undefined` uses.
 Review behavior before changing constructs that depend on `undefined`, including default parameters and optional chaining.
-For null cleanup, early-return inversion, and discarded-call replacement, choose an order that meets functional requirements rather than preserving the existing order for its own sake.
+For null cleanup, early-return inversion, and discarded-call replacement, meet functional requirements without preserving existing evaluation order for its own sake.
 
 Review single-condition early returns for condition inversion and apply it when functional requirements and readability are satisfied.
 Keep guards where inversion would harm either.

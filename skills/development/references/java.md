@@ -1,7 +1,5 @@
 # Java
 
-When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
-
 Use Javadoc for effective public and protected declarations, including constructors, fields, and implicitly public interface members.
 State contracts and constraints without restating names or signatures.
 
