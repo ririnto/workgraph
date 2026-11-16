@@ -8,14 +8,16 @@ disable-model-invocation: true
 
 Follow repository rules, lint, tools, and user choices within task authority, required checks, and host capabilities.
 Read matching playbooks and references unless fully loaded.
-For JavaScript or TypeScript, read [Node guidance](references/nodejs.md).
+For JS/TS, read [Node guidance](references/nodejs.md).
+For new or changed loops, read [control flow](references/control-flow.md) unless fully loaded.
+For Kotest specs or assertions, read [Kotest](references/kotest.md) unless fully loaded.
 
 ## Development lifecycle
 
 Identify contracts, consumers, exclusions, and acceptance evidence before editing.
 For agent instructions, read [instruction design](references/instruction-design.md).
 Inspect affected code and stop discovery when evidence supports the smallest safe change.
-Skip optional ceremony, speculative sweeps, and precautionary pauses for bounded work, preserving safety, authority, and required gates.
+Skip optional ceremony and speculative sweeps for bounded work, preserving safety, authority, and required gates.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -51,24 +53,24 @@ Adapt tests to production interfaces without exposing internals or adding test-o
 Replace superseded implementations and consumers together, removing obsolete paths.
 Revise or remove code rules at their source rather than adding opposite rules.
 Avoid copying nearby workarounds as precedent.
-Use official SDK or framework properties directly when they satisfy the requirement.
-Do not duplicate an operation's input checks when its rejection already meets the contract.
-Prefer immutable bindings and minimize mutable state.
+Use official SDK or framework properties directly when suitable.
+Do not duplicate input checks when an operation's rejection meets the contract.
+Prefer immutable bindings and minimal mutable state.
 
 ### Keep design proportional
 
 Prefer existing interfaces, direct data flow, and tool commands and help over wrappers or custom usage output.
 Keep required targets explicit, without invented defaults.
 Add abstractions, dependencies, or fallbacks only for concrete unmet needs.
-Do not implement or test handling for edge cases that cannot realistically occur.
+Do not implement or test unrealistic edge cases.
 Reconsider data and ownership before adding complexity.
 
 ### Extract regex matches
 
 Prefer native named regex captures, backreferences, and replacement references when the engine and interface support them.
-Use positional groups when the interface or task requires them, and supported forms when named groups are unavailable.
-Prefer an existing parser or literal operation when clearer, without unnecessary custom wrappers.
-Do not treat ordinary array indexing as regex capture access.
+Use positional groups when required, and supported forms when named groups are unavailable.
+Prefer an existing parser or literal operation when clearer, without unnecessary wrappers.
+Ordinary array indexing is not regex capture access.
 
 ## Documentation and comments
 

@@ -1,7 +1,5 @@
 # Python
 
-When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
-
 Treat parameters, loop targets, and module-level constants as immutable unless mutation is required.
 Use `Final` for fixed module-level values and immutable collections for fixed values exposed across modules.
 Add defensive copies only when callers can mutate a shared value.

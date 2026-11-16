@@ -1,7 +1,5 @@
 # Shell
 
-When writing or changing loops, read [loop control flow guidance](control-flow.md) unless fully loaded.
-
 ## Use portable shell syntax
 
 Keep syntax compatible with the script's declared shell and supported platforms.
