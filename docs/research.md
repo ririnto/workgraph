@@ -1093,7 +1093,7 @@ Use these APIs only when the declared Go version supports them and key or index 
 
 The official [setup-node version-file guidance](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file) supports selecting the development range from `package.json`.
 The workflow uses current [checkout](https://github.com/actions/checkout) and [setup-node](https://github.com/actions/setup-node) major releases.
-Separate dependency-free jobs exercise the declared hook runtime floor and macOS without installing development tools.
+The full Linux suite exercises the declared runtime floor, and the macOS job exercises the hooks without development dependencies.
 These checks establish source validation and runtime evidence, while model adherence requires a separate behavioral run.
 
 ## Development lifecycle
@@ -1127,6 +1127,6 @@ The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.1.1) installs the 
 
 We checked Husky `9.1.7` in the npm registry and reviewed its official [setup](https://typicode.github.io/husky/get-started.html) and [hook documentation](https://typicode.github.io/husky/how-to.html).
 It supports Node.js 24 and supplies the Git dispatchers through the standard `prepare` lifecycle.
-Workgraph's two hooks call the corresponding pnpm scripts and retain the complete existing check gate.
+Workgraph's pre-commit hook checks the staged diff and its pre-push hook runs the full repository gate.
 Actual commit and push operations in disposable repositories verify execution and intentional failure propagation.
 These local Git checks do not establish native plugin activation or provider behavior.

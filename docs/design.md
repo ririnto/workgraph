@@ -356,8 +356,7 @@ It rejects the root portable manifest and generic hook files that would shadow o
 `test/validation.test.mjs` exercises valid and invalid forms, package paths, and release versions through exact diagnostics.
 `test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, the complete-file UTF-8 prompt boundary, and relocated execution.
 
-CI runs full development checks on Linux with the package's Node engine range.
-Separate macOS and Node.js 24 jobs run dependency-free hook tests without installing development tools.
-Those jobs verify hook runtime compatibility without installing development dependencies.
+Linux CI runs the full suite, including hook tests, on the minimum supported Node version.
+The macOS job runs the hooks without installing development dependencies.
 Pull requests and main updates trigger the workflow without path filters, and its token receives read-only contents permission.
 Dependabot checks npm dependencies and GitHub Actions daily.

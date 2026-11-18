@@ -75,8 +75,8 @@ Select the narrowest applicable read-only gate.
   Its production dependency audit contacts the package registry.
 
 After plugin configuration changes, run `claude plugin validate --strict ./` and `claude plugin validate --strict .claude-plugin/plugin.json`.
-For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.
-Confirm the selected role and host reference appear without repository guidance or the other host's guidance.
+For injected prose, use the existing hook tests for role selection, host isolation, and context size.
+Inspect the affected rendered context when the changed property needs further evidence.
 
 Follow the [evaluation reporting requirements](README.md#development) for repeated behavioral runs, individual outcomes, and limited smoke checks.
 

@@ -117,11 +117,10 @@ For lint rules or fixes, read [lint rule guidance](references/lint-rules.md).
 Identify the target, trigger, input, and observable expected outcome.
 Use public interfaces at the lowest layer exercising the failure.
 Use process or application checks for behavior direct calls cannot establish.
-Extend the nearest check for uncovered requirements or realistic failures with implementation-independent expectations.
+Reuse existing checks that exercise the changed behavior.
+Add or extend a test only for a requested or required case, or a realistic regression the existing suite would miss.
 Reserve source-shape assertions for explicit structural contracts.
 Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
-Check existing coverage before adding tests.
-Test owned changes and integration risks, not unchanged upstream behavior without a concrete need.
 Remove redundant or low-value tests, fixtures, and runs within scope, preserving relevant failure coverage.
 Preserve security, external-input, and data-integrity coverage without test-count or coverage-percentage targets.
 Use repeatable inputs for stateful failures.

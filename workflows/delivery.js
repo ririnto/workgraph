@@ -307,7 +307,7 @@ if (incompletePredecessor('explore') !== undefined) {
     ), {
       agentType: 'Explore',
       label: `explore:${scope.key}`,
-      ...(models.explore === undefined ? {} : { model: models.explore }),
+      model: models.explore ?? 'haiku',
       ...(efforts.explore === undefined ? {} : { effort: efforts.explore }),
       phase: 'Explore',
       schema: {

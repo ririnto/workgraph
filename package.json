@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "check": "run-p check:*",
-    "check:test": "run-p check:test:*",
-    "check:test:tooling": "node --test \"**/*.test.mjs\"",
+    "check:test": "node --test \"**/*.test.mjs\"",
     "check:issue-forms": "node test/validation/issue-forms.mjs",
     "check:markdownlint-cli2": "markdownlint-cli2",
     "check:plugin-version": "node test/validation/plugin-version.mjs",
@@ -17,7 +16,7 @@
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
     "fix:ultracite": "ultracite fix",
-    "pre-commit": "run-s check",
+    "pre-commit": "git diff --cached --check",
     "pre-push": "run-s check",
     "prepare": "husky"
   },
