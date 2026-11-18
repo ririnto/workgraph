@@ -5,7 +5,7 @@ Explicit user requirements take priority over project defaults within host and s
 
 ## Instruction ownership
 
-- Put contributor conventions and checks here, consumer procedures in `skills/`, and user-facing host setup, invocation, and updates in `docs/harness/`.
+- Put contributor conventions and checks here, public skills in `skills/`, internal procedures in `instructions/`, and user-facing host setup, invocation, and updates in `docs/harness/`.
 - Keep each role body self-contained and host-neutral.
   Put native mechanics and execution timing in the selected role's host reference.
   Main's references own orchestration and model guidance.
@@ -16,7 +16,8 @@ Explicit user requirements take priority over project defaults within host and s
 - Load the role and its selected host reference completely and confirm both contain text before emitting hook context.
   Identify the actual source paths and content already present.
   Deliver the skill body without frontmatter for Claude and the complete file for Codex.
-- Keep every skill user-invocable, disable implicit model invocation with each host's control, and route model reads through bundled `SKILL.md` links.
+- Keep user-invocable skills in `skills/` with implicit model invocation disabled.
+  Load internal roles and procedures from `instructions/` through hooks or direct file reads.
 - Use `README.md` for installation and runtime behavior, `docs/design.md` for changes to loading boundaries, and `docs/research.md` for decisions based on external guidance.
   Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 

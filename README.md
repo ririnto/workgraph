@@ -29,12 +29,12 @@ All host manifests declare the same release version through [Version Updates](#v
 
 The following events apply to the bundled Claude Code and Codex hook adapters.
 Enable and trust plugin hooks through the host's supported controls before relying on automatic loading.
-Use manual skill loading when the active host does not run these hooks.
+When hooks are unavailable, read the applicable role instructions and host reference from the installed plugin.
 
 | Event | Recipient | Loaded sources |
 | --- | --- | --- |
-| SessionStart | Main session | The hook loads [Main Agent mode](skills/main-agent-contract/SKILL.md) and its selected host reference. |
-| SubagentStart | Dispatched agent | The hook loads the [Worker contract](skills/subagent-context/SKILL.md) and its selected host reference. |
+| SessionStart | Main session | The hook loads [Main Agent mode](instructions/main-agent-contract/instructions.md) and its selected host reference. |
+| SubagentStart | Dispatched agent | The hook loads the [Worker contract](instructions/subagent-context/instructions.md) and its selected host reference. |
 
 SessionStart covers startup, resume, clear, compact, and fork events supported by the host.
 Neither hook filters events with a matcher.
@@ -62,22 +62,20 @@ For example, a bug-fix request can name the trigger and expected result without 
 Fix the parser's escaped-quote bug, verify the original trigger, and publish a PR for review within the authorized scope.
 ```
 
-The stable `main-agent-contract` skill is the Main Agent mode entry, not a wrapper around another mode.
-Use your [host adapter](#install) to invoke it manually.
-The [Main contract](skills/main-agent-contract/SKILL.md) owns scope, authority, orchestration, evidence acceptance, and reporting.
+The [Main contract](instructions/main-agent-contract/instructions.md) owns scope, authority, orchestration, evidence acceptance, and reporting.
 [Delivery](skills/delivery/SKILL.md) owns authorized repository publication, review, integration, and cleanup procedures.
 PR readiness completes a publication request without authorizing a merge into its target branch.
 User-requested merging, automatic merging, and merge-queue enrollment follow [Delivery's merge authority](skills/delivery/SKILL.md#establish-merge-authority).
 Invocation does not grant new permissions or replace explicit user gates.
-The [execution criteria](skills/main-agent-contract/SKILL.md#select-an-execution-path) scale planning, delegation, review, and verification to the work.
+The [execution criteria](instructions/main-agent-contract/instructions.md#select-an-execution-path) scale planning, delegation, review, and verification to the work.
 Small, understood changes use direct execution and relevant checks, while broader or uncertain work receives the coordination and evidence its risks require.
 A change with serious consequences can need deeper verification even when it touches one line.
 The approach adjusts as evidence changes, while preserving the complete requested outcome and required gates.
 Repository scope follows the request without an activity threshold or archive-status exclusion.
 Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
-For Claude Code Main, [Workflow](skills/workflow/SKILL.md) contains host and role admission and the execution procedure.
-Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
+For Claude Code Main, [Workflow](instructions/workflow/instructions.md) contains host and role admission and the execution procedure.
+Main's [Claude reference](instructions/main-agent-contract/references/claude-code.md) owns tool selection.
 The conditional authoring and delivery references stay behind that admission boundary.
 Codex uses native delegation rather than Claude Code Workflow.
 Workgraph bundles one [adaptive delivery workflow](docs/workflow-samples.md), that can finish at Explore or Plan when the evidence shows no change is needed, or publish and review the requested change.
@@ -87,24 +85,25 @@ All workflow sources launch through the native Workflow interface, and Workgraph
 
 ## Skill invocation
 
-All skills remain user-invocable and block model invocation, following [pstack](https://github.com/cursor/plugins/tree/main/pstack)'s skill boundary.
-Roles and procedures link each bundled `SKILL.md`, so models read the linked file instead of invoking the skill.
-Users keep the explicit forms, such as `/workgraph:workflow` in Claude Code or `$workgraph:development` in Codex.
+Delivery, Development, and Memory Maintenance appear in the skill picker.
+Users invoke them explicitly, for example with `/workgraph:development` in Claude Code or `$workgraph:development` in Codex.
 Claude Code, Cursor, and Copilot read `disable-model-invocation: true`, and Codex reads each skill's `agents/openai.yaml` policy.
-Hooks operate without skill invocation.
-Conditional skills load only when their stated task scope matches and their complete content is not already present.
+
+Main Agent Contract, Subagent Context, Workflow, and Codex Scoped Cleanup live under `instructions/`, outside skill discovery and the agent's Skill tool.
+The startup hooks read the role files directly.
+The host references link to Workflow and cleanup instructions when their procedures apply.
 
 | Layer | Source | Audience and trigger |
 | --- | --- | --- |
-| Mode and Main role | [Main Agent Contract](skills/main-agent-contract/SKILL.md) | Main follows this contract for complete authorized outcomes. |
-| Worker role | [Subagent Context](skills/subagent-context/SKILL.md) | Dispatched agents follow bounded assignments and return evidence. |
+| Mode and Main role | [Main Agent Contract](instructions/main-agent-contract/instructions.md) | Main follows this contract for complete authorized outcomes. |
+| Worker role | [Subagent Context](instructions/subagent-context/instructions.md) | Dispatched agents follow bounded assignments and return evidence. |
 | Host reference | Each role's `references/claude-code.md` or `references/codex.md` | The hook selects the active role and host together. |
 | Development router | [Development](skills/development/SKILL.md) | Source work selects the matching lifecycle playbook and language references. |
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
-| Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
+| Scoped procedure | [Workflow](instructions/workflow/instructions.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
-| Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |
+| Scoped procedure | [Codex Scoped Cleanup](instructions/codex-scoped-cleanup/instructions.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |
 
 Each skill body contains the procedures required whenever that skill is used.
 References hold detail selected by a task, host, language, or operation.
@@ -115,8 +114,8 @@ References hold detail selected by a task, host, language, or operation.
 | Build and tooling | Development's [language references](skills/development/SKILL.md#development-lifecycle) and [lint rule guidance](skills/development/references/lint-rules.md) | Language references include their tooling conventions, while shared lint guidance covers rule selection and fixes. |
 | Kotest | Kotlin's [Kotest guidance](skills/development/references/kotest.md) | Creating or changing Kotest specs or assertions requires this reference. |
 | Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update selects the account release or marketplace installation and verifies the result at that destination. |
-| Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
-| Worktrees and caches | Cleanup's [worktree and cache guidance](skills/codex-scoped-cleanup/references/worktrees-caches.md) | Archiving, restoring, or removing worktrees or caches requires this reference. |
+| Worktree connections | Cleanup's [native attachment guidance](instructions/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
+| Worktrees and caches | Cleanup's [worktree and cache guidance](instructions/codex-scoped-cleanup/references/worktrees-caches.md) | Archiving, restoring, or removing worktrees or caches requires this reference. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
 Development owns [agent instruction design](skills/development/references/instruction-design.md).
@@ -125,7 +124,7 @@ Consumer links and required resources stay bundled, without another plugin depen
 
 Manual role loading reads a matching bundled host reference when present and not already loaded.
 Other hosts use their native tool descriptions with the shared role contract.
-Manual invocation changes neither the session's role nor its dispatch authority.
+Reading role instructions grants no dispatch authority.
 The host adapters list invocation forms and host-specific availability.
 
 ### Application verification

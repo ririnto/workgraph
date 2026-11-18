@@ -46,8 +46,8 @@ The [cost and usage guide](https://code.claude.com/docs/en/plugins/measure) expl
 
 ## Automatic loading
 
-SessionStart loads [Main Agent mode](../../skills/main-agent-contract/SKILL.md) with its [Claude reference](../../skills/main-agent-contract/references/claude-code.md).
-SubagentStart loads the [Worker contract](../../skills/subagent-context/SKILL.md) with its [Claude reference](../../skills/subagent-context/references/claude-code.md).
+SessionStart loads [Main Agent mode](../../instructions/main-agent-contract/instructions.md) with its [Claude reference](../../instructions/main-agent-contract/references/claude-code.md).
+SubagentStart loads the [Worker contract](../../instructions/subagent-context/instructions.md) with its [Claude reference](../../instructions/subagent-context/references/claude-code.md).
 Both references own execution timing.
 The Claude manifest selects `hooks/claude-hooks.json` explicitly.
 The Main reference also provides host-specific orchestration and model selection guidance.
@@ -61,33 +61,21 @@ The [delivery design](../design.md#deliver-context) describes whitespace handlin
 
 ## Manual invocation
 
-Use slash-prefixed, plugin-qualified skill names.
-The public mode entry remains `/workgraph:main-agent-contract`.
-
-```text
-/workgraph:main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger within the authorized scope.
-/workgraph:workflow Design a bounded in-memory LRU cache with deterministic eviction.
-```
+Claude Code lists three user-invocable Workgraph skills.
 
 | Invocation | Purpose |
 | --- | --- |
-| `/workgraph:main-agent-contract` | Load Main Agent mode in the main session. |
-| `/workgraph:subagent-context` | Load the Worker role for an existing bounded dispatch. |
 | `/workgraph:delivery` | Load Main's repository delivery procedure. |
-| `/workgraph:workflow` | Request native Claude Code Workflow or load its design guidance. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 
-Every Workgraph skill blocks model invocation, so these slash forms stay the user entries and models read the linked `SKILL.md` files directly.
-Locate a file by a search ending in `skills/<name>/SKILL.md` when no path is known.
-
-Manual role invocation reads its Claude reference unless that complete content is already present.
-Invoking a skill does not create a dispatch, change the session's role, or grant permissions.
+For example, use `/workgraph:development Fix the parser's escaped-quote bug and verify the original trigger.`
+Agents read linked instructions with Read.
+Without startup hooks, read the applicable role file and its Claude reference from [Automatic loading](#automatic-loading).
 The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.
-Main's [Claude reference](../../skills/main-agent-contract/references/claude-code.md) owns tool selection.
-The shared [Workflow entry point](../../skills/workflow/SKILL.md) admits only Claude Code Main before loading its execution procedure.
+Main's [Claude reference](../../instructions/main-agent-contract/references/claude-code.md) owns tool selection.
+The internal [Workflow instructions](../../instructions/workflow/instructions.md) describe when Claude Code Main can use the native Workflow tool.
 The bundled [adaptive delivery workflow](../workflow-samples.md) registers as `workgraph:delivery`, with the plan's unit count selecting whether integration runs.
-Codex Scoped Cleanup does not authorize Codex resource operations when invoked in Claude Code.
 
 ## Evaluate discovery and outcomes
 

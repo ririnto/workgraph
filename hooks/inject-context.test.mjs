@@ -30,7 +30,9 @@ const parseObject = (text) => {
 };
 
 const script = fileURLToPath(new URL("inject-context.mjs", import.meta.url));
-const skills = fileURLToPath(new URL("../skills/", import.meta.url));
+const instructions = fileURLToPath(
+  new URL("../instructions/", import.meta.url)
+);
 /** @type {[string, string][]} */
 const roles = [
   ["SessionStart", "main-agent-contract"],
@@ -40,7 +42,7 @@ const hosts = ["claude", "codex"];
 /** @type {Record<string, string>} */
 const hostReferenceFiles = { claude: "claude-code.md", codex: "codex.md" };
 const roleFiles = roles.flatMap(([, name]) => [
-  `${name}/SKILL.md`,
+  `${name}/instructions.md`,
   ...hosts.map((host) => `${name}/references/${hostReferenceFiles[host]}`)
 ]);
 /** @param {string[]} args Hook arguments. @param {string} scriptPath Hook script path. */
@@ -63,7 +65,7 @@ const runConfiguredHook = (command, env) =>
 
 /** @param {import("node:test").TestContext} t Test lifecycle. */
 const copyPlugin = (t) => {
-  const root = mkdtempSync(path.join(tmpdir(), "workgraph skills "));
+  const root = mkdtempSync(path.join(tmpdir(), "workgraph instructions "));
   t.after(() => {
     rmSync(root, { force: true, recursive: true });
   });
@@ -74,7 +76,8 @@ const copyPlugin = (t) => {
     ".codex-plugin/plugin.json",
     "hooks/claude-hooks.json",
     "hooks/codex-hooks.json",
-    ...roleFiles.map((file) => `skills/${file}`)
+    "skills/development/SKILL.md",
+    ...roleFiles.map((file) => `instructions/${file}`)
   ]) {
     const destination = path.join(root, filename);
     mkdirSync(path.dirname(destination), { recursive: true });
@@ -83,16 +86,24 @@ const copyPlugin = (t) => {
   return root;
 };
 
-/** @param {unknown} output Hook output. @param {string} event Hook event. @param {string} host Execution host. @param {string} rootSkills Skill root. @param {string} body Expected body. */
-const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
+/** @param {unknown} output Hook output. @param {string} event Hook event. @param {string} host Execution host. @param {string} instructionsRoot Internal instructions directory. @param {string} body Expected body. */
+const assertOutput = (
+  output,
+  event,
+  host,
+  instructionsRoot = instructions,
+  body = ""
+) => {
   assert.ok(isObject(output));
   assert.ok(isObject(output.hookSpecificOutput));
   assert.ok(typeof output.hookSpecificOutput.additionalContext === "string");
   const name =
     event === "SessionStart" ? "main-agent-contract" : "subagent-context";
-  const source = realpathSync(path.join(rootSkills, name, "SKILL.md"));
+  const source = realpathSync(
+    path.join(instructionsRoot, name, "instructions.md")
+  );
   const reference = realpathSync(
-    path.join(rootSkills, name, "references", hostReferenceFiles[host])
+    path.join(instructionsRoot, name, "references", hostReferenceFiles[host])
   );
   const content = readFileSync(source, "utf-8");
   const guidance = readFileSync(reference, "utf-8");
@@ -109,7 +120,7 @@ const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
   assert.equal(extraNotice, undefined);
   assert.equal(
     skillNotice,
-    `${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded above, without YAML frontmatter." : "The complete skill file is already loaded above, including YAML frontmatter."}`
+    `${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete role body is already loaded above, without YAML frontmatter." : "The complete role file is already loaded above, including YAML frontmatter."}`
   );
   const [location, referenceBody] = referenceContext.split(
     ".\nThe complete reference content is already loaded below.\n\n"
@@ -146,7 +157,7 @@ const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
   }
 };
 
-/** @param {import("node:child_process").SpawnSyncReturns<string>} result Hook process result. @param {string} file Skill file. @param {string} detail Expected error. */
+/** @param {import("node:child_process").SpawnSyncReturns<string>} result Hook process result. @param {string} file Instruction file. @param {string} detail Expected error. */
 const assertFileFailure = (result, file, detail) => {
   assert.equal(result.status, 1, result.stderr);
   assert.equal(result.stdout, "");
@@ -160,7 +171,7 @@ const assertFileFailure = (result, file, detail) => {
 const missingFileDetail = (target) =>
   `ENOENT: no such file or directory, lstat '${path.join(realpathSync(path.dirname(target)), path.basename(target))}'`;
 const emptyFileDetail =
-  "empty instructions or missing required skill frontmatter";
+  "empty instructions or missing required role frontmatter";
 const directoryDetail = "EISDIR: illegal operation on a directory, read";
 
 await test("Claude contexts stay inline with long plugin paths and LF or CRLF", (t) => {
@@ -174,23 +185,23 @@ await test("Claude contexts stay inline with long plugin paths and LF or CRLF", 
   mkdirSync(path.join(root, "hooks"), { recursive: true });
   assert.equal(realpathSync(root).length, rootLength);
   copyFileSync(script, path.join(root, "hooks", "inject-context.mjs"));
-  cpSync(path.join(parent, "skills"), path.join(root, "skills"), {
+  cpSync(path.join(parent, "instructions"), path.join(root, "instructions"), {
     recursive: true
   });
   for (const newline of ["\n", "\r\n"]) {
     for (const [event, name] of roles) {
       const content = readFileSync(
-        path.join(skills, name, "SKILL.md"),
+        path.join(instructions, name, "instructions.md"),
         "utf-8"
       );
       writeFileSync(
-        path.join(root, "skills", name, "SKILL.md"),
+        path.join(root, "instructions", name, "instructions.md"),
         content.replaceAll("\n", newline)
       );
       writeFileSync(
-        path.join(root, "skills", name, "references", "claude-code.md"),
+        path.join(root, "instructions", name, "references", "claude-code.md"),
         readFileSync(
-          path.join(skills, name, "references", "claude-code.md"),
+          path.join(instructions, name, "references", "claude-code.md"),
           "utf-8"
         ).replaceAll("\n", newline)
       );
@@ -209,7 +220,7 @@ await test("Claude contexts stay inline with long plugin paths and LF or CRLF", 
         output,
         event,
         "claude",
-        path.join(root, "skills"),
+        path.join(root, "instructions"),
         content.slice(content.indexOf("\n---\n") + 5).replaceAll("\n", newline)
       );
       const contextLength = output.hookSpecificOutput.additionalContext.length;
@@ -224,7 +235,7 @@ await test("Claude contexts stay inline with long plugin paths and LF or CRLF", 
   }
 });
 
-await test("configured Claude hooks load relocated skills and references with LF or CRLF", (t) => {
+await test("configured Claude hooks load relocated roles and references with LF or CRLF", (t) => {
   const root = copyPlugin(t);
   const descriptor = parseObject(
     readFileSync(path.join(root, ".claude-plugin/plugin.json"), "utf-8")
@@ -263,12 +274,12 @@ await test("configured Claude hooks load relocated skills and references with LF
     );
     for (const newline of ["\n", "\r\n"]) {
       const body =
-        `\n# Relocated ${event}\n\nUse the copied skill.\n\n---\n\nKeep body separators.\n`.replaceAll(
+        `\n# Relocated ${event}\n\nUse the copied role.\n\n---\n\nKeep body separators.\n`.replaceAll(
           "\n",
           newline
         );
       writeFileSync(
-        path.join(root, "skills", name, "SKILL.md"),
+        path.join(root, "instructions", name, "instructions.md"),
         `---\nname: ${name}\ndescription: |\n  Keep --- in metadata.\n  Keep inline dashes ---\n---\n`.replaceAll(
           "\n",
           newline
@@ -278,7 +289,7 @@ await test("configured Claude hooks load relocated skills and references with LF
         writeFileSync(
           path.join(
             root,
-            "skills",
+            "instructions",
             name,
             "references",
             hostReferenceFiles[host]
@@ -298,7 +309,7 @@ await test("configured Claude hooks load relocated skills and references with LF
         JSON.parse(result.stdout),
         event,
         "claude",
-        path.join(root, "skills"),
+        path.join(root, "instructions"),
         body
       );
       const codex = runHook(
@@ -310,7 +321,7 @@ await test("configured Claude hooks load relocated skills and references with LF
         JSON.parse(codex.stdout),
         event,
         "codex",
-        path.join(root, "skills"),
+        path.join(root, "instructions"),
         body
       );
     }
@@ -324,13 +335,24 @@ await test("native Skill and Read fragments preserve host-specific BOM, CRLF, an
     "\uFEFF# Guidance\r\n\r\nKeep spaces. \t\r\nTerminal lone CR.\r\n\r";
   for (const [event, name] of roles) {
     const raw = `\uFEFF---\r\nname: ${name}\r\n---\r\n\r\n \t\r\n  ${body}`;
-    writeFileSync(path.join(root, "skills", name, "SKILL.md"), raw);
+    writeFileSync(
+      path.join(root, "instructions", name, "instructions.md"),
+      raw
+    );
     for (const host of hosts) {
       writeFileSync(
-        path.join(root, "skills", name, "references", hostReferenceFiles[host]),
+        path.join(
+          root,
+          "instructions",
+          name,
+          "references",
+          hostReferenceFiles[host]
+        ),
         guidance
       );
-      const source = realpathSync(path.join(root, "skills", name, "SKILL.md"));
+      const source = realpathSync(
+        path.join(root, "instructions", name, "instructions.md")
+      );
       const result = runHook(
         [event, host],
         path.join(root, "hooks", "inject-context.mjs")
@@ -341,12 +363,18 @@ await test("native Skill and Read fragments preserve host-specific BOM, CRLF, an
           ? `Base directory for this skill: ${path.dirname(source)}\n\n${body}`
           : `<skill>\n<name>workgraph:${name}</name>\n<path>${source}</path>\n${raw}\n</skill>`;
       const referenceSource = realpathSync(
-        path.join(root, "skills", name, "references", hostReferenceFiles[host])
+        path.join(
+          root,
+          "instructions",
+          name,
+          "references",
+          hostReferenceFiles[host]
+        )
       );
       const reference = `\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(source), referenceSource) : referenceSource}.\nThe complete reference content is already loaded below.\n\n${host === "claude" ? "1\t# Guidance\n2\t\n3\tKeep spaces. \t\n4\tTerminal lone CR.\n5\t" : guidance}`;
       assert.deepEqual(JSON.parse(result.stdout), {
         hookSpecificOutput: {
-          additionalContext: `${fragment}\n\nWorkgraph instructions loaded from ${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded above, without YAML frontmatter." : "The complete skill file is already loaded above, including YAML frontmatter."}${reference}`,
+          additionalContext: `${fragment}\n\nWorkgraph instructions loaded from ${host === "claude" ? path.basename(source) : source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete role body is already loaded above, without YAML frontmatter." : "The complete role file is already loaded above, including YAML frontmatter."}${reference}`,
           hookEventName: event
         }
       });
@@ -357,7 +385,7 @@ await test("native Skill and Read fragments preserve host-specific BOM, CRLF, an
 await test("source metadata resolves symlinked instructions to their real paths", (t) => {
   const root = copyPlugin(t);
   for (const file of roleFiles) {
-    const target = path.join(root, "skills", file);
+    const target = path.join(root, "instructions", file);
     const source = file.includes("/references/")
       ? path.join(root, "host sources", `${file}.source`)
       : `${target}.source`;
@@ -378,13 +406,13 @@ await test("source metadata resolves symlinked instructions to their real paths"
         JSON.parse(result.stdout),
         event,
         host,
-        path.join(root, "skills")
+        path.join(root, "instructions")
       );
     }
   }
 });
 
-await test("configured Codex hooks load complete relocated skill files without a context limit", (t) => {
+await test("configured Codex hooks load complete relocated roles without a context limit", (t) => {
   const root = copyPlugin(t);
   const descriptor = parseObject(
     readFileSync(path.join(root, ".codex-plugin/plugin.json"), "utf-8")
@@ -437,7 +465,12 @@ await test("configured Codex hooks load complete relocated skill files without a
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stderr, "");
-    assertOutput(JSON.parse(result.stdout), event, "codex", selectedSkills);
+    assertOutput(
+      JSON.parse(result.stdout),
+      event,
+      "codex",
+      path.join(root, "instructions")
+    );
   }
 });
 
@@ -451,7 +484,7 @@ await test("Codex delimiter lines preserve raw files and remove Claude body pref
           newline
         );
       writeFileSync(
-        path.join(root, "skills", name, "SKILL.md"),
+        path.join(root, "instructions", name, "instructions.md"),
         ` \t--- \t\nname: ${name}\ndescription: |\n  First metadata line.\n  --- \t\n`.replaceAll(
           "\n",
           newline
@@ -468,7 +501,7 @@ await test("Codex delimiter lines preserve raw files and remove Claude body pref
           JSON.parse(result.stdout),
           event,
           host,
-          path.join(root, "skills"),
+          path.join(root, "instructions"),
           body
         );
       }
@@ -476,19 +509,20 @@ await test("Codex delimiter lines preserve raw files and remove Claude body pref
   }
 });
 
-await test("each role and host loads without other skills or the unselected host reference", (t) => {
+await test("each hook loads with only the selected role and host reference", (t) => {
   for (const [event, name] of roles) {
     for (const host of hosts) {
       const root = copyPlugin(t);
-      for (const other of readdirSync(path.join(root, "skills"))) {
+      rmSync(path.join(root, "skills"), { recursive: true });
+      for (const other of readdirSync(path.join(root, "instructions"))) {
         if (other !== name) {
-          rmSync(path.join(root, "skills", other), { recursive: true });
+          rmSync(path.join(root, "instructions", other), { recursive: true });
         }
       }
       rmSync(
         path.join(
           root,
-          "skills",
+          "instructions",
           name,
           "references",
           hostReferenceFiles[host === "claude" ? "codex" : "claude"]
@@ -503,7 +537,7 @@ await test("each role and host loads without other skills or the unselected host
         JSON.parse(result.stdout),
         event,
         host,
-        path.join(root, "skills")
+        path.join(root, "instructions")
       );
     }
   }
@@ -533,10 +567,10 @@ await test("invalid or legacy arguments produce no context", () => {
 
 await Promise.all(
   roles.map(async ([event, name]) => {
-    const file = `${name}/SKILL.md`;
+    const file = `${name}/instructions.md`;
     await test(`${event} ${file}: missing, empty, or unreadable instructions produce no partial output`, (t) => {
       const root = copyPlugin(t);
-      const target = path.join(root, "skills", file);
+      const target = path.join(root, "instructions", file);
       const copiedScript = path.join(root, "hooks", "inject-context.mjs");
       rmSync(target);
       assertFileFailure(
@@ -563,7 +597,7 @@ await Promise.all(
 
 await test("invalid frontmatter or empty prose produces no partial output on either host", (t) => {
   const root = copyPlugin(t);
-  const file = "main-agent-contract/SKILL.md";
+  const file = "main-agent-contract/instructions.md";
   for (const source of [
     "# No frontmatter\n\nRole instructions.",
     "---\n---\n# Empty frontmatter\n",
@@ -573,7 +607,7 @@ await test("invalid frontmatter or empty prose produces no partial output on eit
     "---\nname: main-agent-contract\n---",
     "---\nname: main-agent-contract\n---\n \t\n"
   ]) {
-    writeFileSync(path.join(root, "skills", file), source);
+    writeFileSync(path.join(root, "instructions", file), source);
     for (const host of hosts) {
       assertFileFailure(
         runHook(
@@ -593,7 +627,7 @@ await Promise.all(
       await test(`${name} ${host}: missing, empty, or unreadable host reference produces no partial output`, (t) => {
         const root = copyPlugin(t);
         const file = `${name}/references/${hostReferenceFiles[host]}`;
-        const target = path.join(root, "skills", file);
+        const target = path.join(root, "instructions", file);
         const copiedScript = path.join(root, "hooks", "inject-context.mjs");
         rmSync(target);
         assertFileFailure(

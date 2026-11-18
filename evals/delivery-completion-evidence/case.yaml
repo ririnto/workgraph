@@ -10,7 +10,7 @@ execution:
     - Read
   prompt: |-
     Invoke the registered workgraph:delivery workflow once to assess its bundled workflow documentation and plan a bounded clarification.
-    Read skills/workflow/SKILL.md and workflows/delivery.js from the plugin unless already fully loaded.
+    Read instructions/workflow/instructions.md and workflows/delivery.js from the plugin unless already fully loaded.
     Put the absolute paths to docs/workflow-samples.md and workflows/delivery.js in args.task for the stage agents.
     Enable Scope, Explore and Plan. Explicitly skip Implement, Integrate, Sweep, Publish and Review.
     Wait for completion and read the returned task output if backgrounded. Report the observed outcome and phase evidence.

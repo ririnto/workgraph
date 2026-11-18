@@ -17,14 +17,14 @@ const fail = (message, code) => {
 /**
  * Resolve and load required text before emitting any context.
  * Match trimmed delimiter lines and preserve the remaining text.
- * @param {string} file Skill-relative instruction path.
- * @param {boolean} stripFrontmatter Whether to remove skill metadata.
+ * @param {string} file Path relative to the bundled instructions directory.
+ * @param {boolean} stripFrontmatter Whether to remove role metadata.
  * @returns {{body: string, content: string, source: string}} Loaded instruction text and canonical path.
  */
 const readInstruction = (file, stripFrontmatter) => {
   try {
     const source = realpathSync(
-      fileURLToPath(new URL(`../skills/${file}`, import.meta.url))
+      fileURLToPath(new URL(`../instructions/${file}`, import.meta.url))
     );
     const content = readFileSync(source, "utf-8");
     const lines = stripFrontmatter
@@ -40,7 +40,7 @@ const readInstruction = (file, stripFrontmatter) => {
         !lines.slice(1, closingFrontmatterLine).some((line) => line.trim()))
     ) {
       throw new Error(
-        "empty instructions or missing required skill frontmatter"
+        "empty instructions or missing required role frontmatter"
       );
     }
     const body = stripFrontmatter
@@ -48,7 +48,7 @@ const readInstruction = (file, stripFrontmatter) => {
       : content;
     if (!body.trim()) {
       throw new Error(
-        "empty instructions or missing required skill frontmatter"
+        "empty instructions or missing required role frontmatter"
       );
     }
     return { body, content, source };
@@ -82,19 +82,19 @@ if (host !== "claude" && host !== "codex") {
 }
 const role =
   event === "SessionStart" ? "main-agent-contract" : "subagent-context";
-const skill = readInstruction(`${role}/SKILL.md`, true);
+const instructions = readInstruction(`${role}/instructions.md`, true);
 const reference = readInstruction(
   `${role}/references/${hostReferenceFiles[host]}`,
   false
 );
-const skillContext =
+const roleContext =
   host === "claude"
-    ? `Base directory for this skill: ${path.dirname(skill.source)}\n\n${skill.body.trimStart()}`
-    : `<skill>\n<name>workgraph:${role}</name>\n<path>${skill.source}</path>\n${skill.content}\n</skill>`;
+    ? `Base directory for this skill: ${path.dirname(instructions.source)}\n\n${instructions.body.trimStart()}`
+    : `<skill>\n<name>workgraph:${role}</name>\n<path>${instructions.source}</path>\n${instructions.content}\n</skill>`;
 process.stdout.write(
   `${JSON.stringify({
     hookSpecificOutput: {
-      additionalContext: `${skillContext}\n\nWorkgraph instructions loaded from ${host === "claude" ? path.basename(skill.source) : skill.source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete skill body is already loaded above, without YAML frontmatter." : "The complete skill file is already loaded above, including YAML frontmatter."}\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(skill.source), reference.source) : reference.source}.\nThe complete reference content is already loaded below.\n\n${
+      additionalContext: `${roleContext}\n\nWorkgraph instructions loaded from ${host === "claude" ? path.basename(instructions.source) : instructions.source}.\nThe active execution host is ${host === "claude" ? "Claude Code" : "Codex"}.\n${host === "claude" ? "The complete role body is already loaded above, without YAML frontmatter." : "The complete role file is already loaded above, including YAML frontmatter."}\n\nWorkgraph ${host} guidance loaded from ${host === "claude" ? path.relative(path.dirname(instructions.source), reference.source) : reference.source}.\nThe complete reference content is already loaded below.\n\n${
         host === "claude"
           ? reference.content
               .replace(/^\uFEFF/u, "")

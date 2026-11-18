@@ -20,23 +20,21 @@ The [CLI plugin reference](https://docs.github.com/en/copilot/reference/copilot-
 
 ## Use the shared skills
 
-Start an engineering task by invoking Workgraph's [Main Agent Contract](../../skills/main-agent-contract/SKILL.md) with its slash command:
+For implementation work, select [Development](../../skills/development/SKILL.md) from Workgraph.
 
 ```text
-/main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger.
+/development Fix the parser's escaped-quote bug and verify the original trigger.
 ```
 
 Workgraph skills set `disable-model-invocation: true`, so Copilot does not select them from a plain request.
 The [VS Code agent skills guide](https://code.visualstudio.com/docs/copilot/customization/agent-skills) documents this manual-only behavior.
 
-For an assigned worker task, select [Subagent Context](../../skills/subagent-context/SKILL.md).
+For role guidance, read [Main Agent Contract](../../instructions/main-agent-contract/instructions.md) or, for an assigned worker, [Subagent Context](../../instructions/subagent-context/instructions.md) from the installed plugin.
 The role uses the active host's tool descriptions when no matching bundled host reference exists.
 
-Use [Development](../../skills/development/SKILL.md) for implementation.
 The [skill map](../../README.md#skill-invocation) lists the other task procedures.
 
-Workgraph uses manual role activation in Copilot.
-Its manifest selects the empty `hooks/skills-only.json` configuration.
+The Copilot manifest selects the empty `hooks/skills-only.json` configuration.
 The package omits conventionally discovered hook files, so clients do not pick up Claude's separate configuration.
 
 Project or personal skills with the same name can take precedence over plugin skills.

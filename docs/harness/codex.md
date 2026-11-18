@@ -25,12 +25,12 @@ See the official [plugin guide](https://learn.chatgpt.com/docs/plugins.md) for s
 | Surface | Workgraph loading |
 | --- | --- |
 | Local Codex or local-only Work with plugin hooks enabled and trusted | SessionStart loads Main, and SubagentStart loads Worker. |
-| Cloud orchestration, including threads whose tools execute locally | Invoke the role skill explicitly at the start of its task. |
+| Cloud orchestration, including threads whose tools execute locally | Read the role instructions and Codex reference from the plugin files when available. |
 | Codex IDE extension | Plugins are unavailable on this surface, so use Codex CLI or the ChatGPT desktop app for plugin installation. |
 | Other supported skill clients | Use the client's skill picker or name the required Workgraph skill. |
 
 The native `.codex-plugin/plugin.json` selects the shared `skills/` directory and `hooks/codex-hooks.json`.
-Each skill's `agents/openai.yaml`, such as [the workflow policy](../../skills/workflow/agents/openai.yaml), sets `policy.allow_implicit_invocation: false`.
+Each skill's `agents/openai.yaml`, such as [the Development policy](../../skills/development/agents/openai.yaml), sets `policy.allow_implicit_invocation: false`.
 Codex then hides Workgraph skills from the model prompt while explicit selection still loads them.
 Main and Worker read the linked bundled files instead, as the [source review](../research.md#claude-code-workflow-and-subagent-contracts) describes.
 The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks.md#plugin-bundled-hooks) documents this native hook registration.
@@ -43,8 +43,8 @@ Each context starts with the native `<skill>` fragment containing the qualified 
 Source labels and the selected host reference follow it.
 The host still delivers a hook message, so matching the skill text does not create a user invocation or grant its permissions.
 
-Main receives its [Codex reference](../../skills/main-agent-contract/references/codex.md).
-Worker receives its [Codex reference](../../skills/subagent-context/references/codex.md).
+Main receives its [Codex reference](../../instructions/main-agent-contract/references/codex.md).
+Worker receives its [Codex reference](../../instructions/subagent-context/references/codex.md).
 Those references own host-specific execution and delegation.
 
 ## Confirm hook activation
@@ -77,22 +77,20 @@ Directly running the Node script checks its payload but does not establish any i
 If Workgraph is missing from `/hooks`, verify the installed native manifest and refreshed files first.
 If a registered command fails, inspect its error and confirm the supported Node executable is available in the host's environment.
 The [OpenAI hooks reference](https://learn.chatgpt.com/docs/hooks.md) explains disabled hooks and managed policy.
-Use the manual role entry below when the host cannot run local plugin hooks or its policy excludes them.
+When the host cannot run plugin hooks, follow [Start a task](#start-a-task).
 
 ## Start a task
 
-In Codex clients supporting dollar-prefixed skill invocation:
+Select Development, Delivery, or Memory Maintenance from Workgraph in ChatGPT or Codex.
+For example, Codex clients with dollar-prefixed invocation accept the following request.
 
 ```text
-$workgraph:main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger.
+$workgraph:development Fix the parser's escaped-quote bug and verify the original trigger.
 ```
 
-In ChatGPT, select Workgraph from the `@` menu and ask it to use Main Agent Contract for the task.
-An existing bounded worker assignment uses [Subagent Context](../../skills/subagent-context/SKILL.md).
-Role invocation applies the role's instructions within the current host's tools and permissions.
-
-For a focused task, select [Development](../../skills/development/SKILL.md) directly.
-The [skill map](../../README.md#skill-invocation) lists the remaining procedures and their triggers.
+Without startup hooks, read [Main Agent Contract](../../instructions/main-agent-contract/instructions.md) and its [Codex reference](../../instructions/main-agent-contract/references/codex.md) from the installed plugin when accessible.
+A dispatched worker uses [Subagent Context](../../instructions/subagent-context/instructions.md) and its [Codex reference](../../instructions/subagent-context/references/codex.md).
+The [skill map](../../README.md#skill-invocation) identifies the internal procedures each role reads by path.
 
 Workgraph retains an 8,000-byte complete-file portability budget derived from Codex's reviewed portable-plugin selection path.
 The current native package does not select that portable path.

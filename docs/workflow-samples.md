@@ -51,7 +51,7 @@ The dispatching session owns the task branch, initial candidate inspection, and 
 
 ## Read-only design
 
-For read-only design work, use the [Workflow skill](../skills/workflow/SKILL.md), which admits only the Claude Code Main Agent before loading its read-only design procedure.
+For read-only design work, Claude Code Main reads the [Workflow instructions](../instructions/workflow/instructions.md).
 That procedure describes requirement coverage, challenge, verification selected for the task, and the tool boundaries needed for delegation.
 
 ## Dispatch inputs
@@ -165,7 +165,7 @@ The scope, exploration, and sweep stages run with the built-in read-only Explore
 
 ## Executed graph
 
-The result includes `graph.nodes` and `graph.edges` using the [Main contract's graph vocabulary](../skills/main-agent-contract/SKILL.md#coordinate-outcomes) and [dependency design](design.md#compose-work-through-the-host).
+The result includes `graph.nodes` and `graph.edges` using the [Main contract's graph vocabulary](../instructions/main-agent-contract/instructions.md#coordinate-outcomes) and [dependency design](design.md#compose-work-through-the-host).
 Each node records `key`, `operation`, `prerequisites`, `inputs`, `outputs`, `owner`, `authority`, `completionEvidence`, `status`, and `reason`.
 Result edges require accepted predecessor evidence, and condition edges evaluate the unit count or the explicit exploration choice.
 Readiness derives from these edges rather than phase order alone.
@@ -216,7 +216,7 @@ The delivery sample accepts optional selectors by phase through `args.models` an
 An explicit selector in `args.models` takes precedence for that phase.
 Remove legacy `models.verify` and `efforts.verify` entries from saved arguments before starting a new run.
 Omitted effort selectors use host configuration.
-Main selects overrides using its [Claude Code guidance](../skills/main-agent-contract/references/claude-code.md#model-selection).
+Main selects overrides using its [Claude Code guidance](../instructions/main-agent-contract/references/claude-code.md#model-selection).
 Claude Code applies its [workflow model policy](https://code.claude.com/docs/en/workflows) to the requested selector.
 Every selector must be a nonempty string the host supports for agent calls.
 
@@ -226,7 +226,7 @@ Use host execution evidence to identify the model that actually ran.
 
 ## Cache reuse
 
-Follow the [Workflow authoring reference](../skills/workflow/references/authoring.md) for continuation and cache reuse.
+Follow the [Workflow authoring reference](../instructions/workflow/references/authoring.md) for continuation and cache reuse.
 A changed candidate, destination, owned path, finding set, or verification contract invalidates affected evidence and dependent decisions.
 Before resuming, check the live checkout, the named task and base branch refs, the toolchain configuration, and the posted request against what the recorded run used, because native cache keys carry none of that state.
 A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.

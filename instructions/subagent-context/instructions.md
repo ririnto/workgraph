@@ -36,7 +36,7 @@ Agent assignments remain agent-origin even when relaying a human project request
 Use the requester's language only for replies the assignment routes to the human.
 
 Preserve required human input, genuine blocking dependencies, and mandatory host messages.
-Before editing durable memory, read [Memory Maintenance](../memory-maintenance/SKILL.md) unless its complete content is already loaded.
+Before editing durable memory, read [Memory Maintenance](../../skills/memory-maintenance/SKILL.md) unless its complete content is already loaded.
 
 ### Select host guidance
 
@@ -94,7 +94,7 @@ Continue ready work while waiting, and avoid duplicate dispatch or unsupported c
 
 ## Apply source procedures
 
-Before source work or runtime verification, read [Development](../development/SKILL.md) unless its complete content is already loaded.
+Before source work or runtime verification, read [Development](../../skills/development/SKILL.md) unless its complete content is already loaded.
 
 ## Respect Git and delegation authority
 

@@ -44,7 +44,7 @@ The user adapters document installation, trust, invocation, and host-specific av
 The metadata gate uses the existing YAML parser rather than adding a runtime dependency or interpreting frontmatter during hook startup.
 It checks required fields, documented optional types, directory identity, character limits, and invocation policy.
 The standard's 500-line body guidance remains a recommendation rather than a rejection threshold.
-Host extension fields remain available for supported behavior such as Workflow's argument hint.
+The gate permits host-specific extension fields.
 
 The direct source-correction case uses an ordinary request without naming the desired skill.
 Its trace grader checks that Main loads Development and fixes the supplied Python helper directly, even though the request mentions a GitHub Actions workflow.
@@ -302,7 +302,7 @@ These recommendations guide instruction design without changing model or API con
 The fetched [GPT-6.1 Sol model page](https://developers.openai.com/api/docs/models/gpt-6.1-sol.md) lists `low`, `medium`, `high`, `xhigh`, and `max` effort settings, with `medium` as the default.
 It does not support `none` or `minimal` effort.
 We confirm supported settings from the model page.
-The [Main contract](../skills/main-agent-contract/SKILL.md#models) honors user settings and selects supported controls by workload.
+The [Main contract](../instructions/main-agent-contract/instructions.md#models) honors user settings and selects supported controls by workload.
 Consumer sessions do not need model comparisons or benchmark evaluations.
 Maintainers can use model-specific benchmark and workload evidence for scoped evaluations.
 Instruction text does not configure the host or establish model adherence.
@@ -317,12 +317,12 @@ The guide does not choose host tools for Workgraph tasks.
 The [Codex subagent guide](https://learn.chatgpt.com/docs/agent-configuration/subagents.md) recommends stating whether to wait for agents and what output to return.
 It does not set a minimum timeout or guarantee a native wait tool.
 Use suitable native host tools and name any authorized fallback's capability gap.
-The role skills leave native waiting and completion mechanics to the host.
+The role instructions leave native waiting and completion mechanics to the host.
 
 Workgraph keeps maintenance rules in `AGENTS.md` and runtime behavior in `skills/`.
 Each hook delivers the selected role and its active host reference without model-side retrieval.
 Worker references contain execution timing without Main orchestration or model policy.
-The Workflow skill can load its own delivery reference when that goal needs detailed publication and review graph guidance.
+The Workflow instructions link their delivery reference when that goal needs detailed publication and review graph guidance.
 Main loads the separate Delivery skill for repository changes or delivery, while hooks retain role and host guidance.
 The role contract sets no fixed agent count.
 Checks can reuse valid evidence instead of restarting a fixed process after each change.
@@ -379,7 +379,7 @@ Its runtime delivers context through Claude Code hooks, and its instructions use
 The following tier and effort starting points combine workload evidence with design judgments.
 They depend on host support and assignment settings.
 The `terra` tier names a model family, not a native Codex model ID.
-The [Codex model selection contract](../skills/main-agent-contract/references/codex.md#model-selection) owns host-confirmed model IDs and supported controls.
+The [Codex model selection contract](../instructions/main-agent-contract/references/codex.md#model-selection) owns host-confirmed model IDs and supported controls.
 [OpenAI reports](https://openai.com/index/introducing-gpt-6-1-terra/) GPT-6.1 Terra results on Terminal-Bench 4.0 at maximum effort.
 That provider-reported result does not establish Workgraph performance or validate the medium or high starting points below.
 
@@ -476,7 +476,7 @@ Commands, tool calls, edits, and messages are items within that turn.
 The [V2 control descriptions](https://github.com/openai/codex/blob/main/codex-rs/core/src/tools/handlers/multi_agents_spec.rs) distinguish a follow-up assignment, a message without a new turn, and waiting for an update.
 These interfaces do not establish a recommended numeric worker quota or unlimited execution.
 
-Main's [Codex reference](../skills/main-agent-contract/references/codex.md) selects history from the required context and sizes assignments around coherent outcomes.
+Main's [Codex reference](../instructions/main-agent-contract/references/codex.md) selects history from the required context and sizes assignments around coherent outcomes.
 It preserves earlier requirements in focused briefs, existing settings and budgets, and incomplete acceptance when a real limit prevents continuation.
 
 ### Skill structure
@@ -491,23 +491,23 @@ Main and Worker route prose, instruction design, and source work to bundled task
 Those skills retain their own procedures and conditional language references.
 Consumer references remain inside their owning plugin so installation and activation do not depend on another plugin.
 The hook names loaded source paths so the model can locate references and recognize content already present.
-All skills remain user-invocable and block model invocation, following the installed pstack `0.15.36` boundary.
+The three public skills remain user-invocable and block model invocation.
+For internal guidance, [pstack’s Main skill](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/SKILL.md) directs agents to read its bundled `worker.md` and playbooks by path.
+Workgraph likewise ships the role contracts, Workflow, and Codex Scoped Cleanup as supporting Markdown outside the skill directory.
 Each frontmatter sets `disable-model-invocation: true`, and role bodies and references link the bundled `SKILL.md` files that models read directly.
 Claude defaults `user-invocable` to `true`, so Workgraph omits that redundant frontmatter field.
-Their bodies define role and scope boundaries independently of invocation metadata.
 Claude's installed Skill loader strips YAML, preserves trailing body whitespace, and prepends a base-directory line.
 Its Read tool normalizes file text and adds tab-separated line numbers, including a final empty line.
 Codex's [versioned skill renderer](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/ext/skills/src/fragments.rs) wraps the complete file with its name and path.
 The hooks match these instruction text fragments and identify already-loaded sources outside them.
 They cannot reproduce native message roles or tool-call envelopes.
 The [delivery design](design.md#deliver-context) records this boundary.
-Workflow's Claude-only skill checks host and role admission before its inline procedure.
-Main's Claude reference owns selection, while the skill keeps tool-use instructions inline and loads authoring and delivery mappings only when needed.
+Main's Claude reference selects the internal Workflow procedure, which checks host and role before loading its authoring and delivery references.
 Main and Worker inspect failures and partial effects before reasonable authorized retries or alternative supported forms.
 They preserve security controls and report each attempt honestly rather than applying a blanket no-retry rule.
 We need behavioral evaluation to measure activation or model adherence for these structure choices.
 
-Workgraph keeps a stable Main mode entry, focused development playbooks, and host-specific user adapters.
+Workgraph keeps a shared Main role, focused development playbooks, and host-specific user adapters.
 The README leads users to installation and invocation guidance rather than repeating role procedures.
 User adapters separate host setup from role policy, while Workgraph retains its contracts and evidence rules.
 The official skills and prompting documents above support the adapter and contract separation.
@@ -928,7 +928,7 @@ These source decisions supply guidance rather than evidence that any consuming R
 
 This section records historical, non-operational transport research.
 It supplies no cleanup interface or fallback authority.
-Current cleanup follows [Codex Scoped Cleanup](../skills/codex-scoped-cleanup/SKILL.md) through the authorized resource owner and supported host operations.
+Current cleanup follows [Codex Scoped Cleanup](../instructions/codex-scoped-cleanup/instructions.md) through the authorized resource owner and supported host operations.
 
 We inspected Local CLI 0.161.0, managed daemon 0.162.1, and the official Codex checkout's named `main` branch.
 The inspected versions differed, so we generated experimental schemas from both executables and used the daemon schema for protocol checks.
@@ -1024,7 +1024,7 @@ That host filter covers Agent-tool subagents and Workflow `agent()` stages, whil
 Codex has no Workflow tool.
 Every Workgraph skill sets `disable-model-invocation: true`, so the `Skill` tool refuses it and `/workgraph:<name>` stays the user form.
 The [skills documentation](https://code.claude.com/docs/en/skills) states that a refused call also tells the model not to reproduce the steps another way.
-Roles therefore route model reads through bundled `SKILL.md` links, and each role's Claude reference names Read as the loading tool.
+The role contracts link to the bundled files that agents read directly.
 The control also removes descriptions from the model catalog and prevents subagent `skills:` preloading, which Workgraph does not use.
 That control gates the Skill tool only and never the Workflow tool itself.
 The Codex [skill discovery loader](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/loader/discovery.rs) reads `agents/openai.yaml` beside each `SKILL.md`, and its [metadata loader](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/ext/skills/src/loader/metadata.rs) reads `policy.allow_implicit_invocation`.
@@ -1038,8 +1038,7 @@ Plugin-qualified selection remains unconfirmed until an installed Workgraph rele
 The [Claude skills lifecycle](https://code.claude.com/docs/en/skills#skill-content-lifecycle) documents full-body loading on invocation and subagent preloading.
 Invocation controls do not select a host or role, and `compatibility` is informational.
 The [Cursor skill directories](https://cursor.com/docs/skills.md#skill-directories) also include Claude-compatible locations.
-Consequently, hook-selected host references alone do not isolate directly invoked shared skill bodies.
-The shared Workflow entry point defers operational references until host and role admission.
+The Workflow procedure lives outside those skill directories and defers operational references until host and role admission.
 This instruction boundary is not a host-enforced file-access restriction or proof of model adherence.
 
 [Semantic Line Breaks](https://sembr.org/) explains using source line breaks without changing rendered Markdown paragraphs.

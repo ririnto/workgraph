@@ -9,7 +9,7 @@ The smaller workload studies supply supporting evidence and limits.
 These results describe the authors' tasks, harnesses, and settings.
 Use their methods and limits when choosing comparable local experiments.
 Read [the research notes](research.md#model-effort-and-cost) for workload guidance and measurement limits.
-The [Main contract](../skills/main-agent-contract/SKILL.md#models) honors user settings and selects supported controls by workload.
+The [Main contract](../instructions/main-agent-contract/instructions.md#models) honors user settings and selects supported controls by workload.
 Local behavior checks do not establish universal model-effort rankings.
 
 ### Shared measurement limits

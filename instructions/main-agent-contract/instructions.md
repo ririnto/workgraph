@@ -21,7 +21,7 @@ Establish scope from the request, project conventions, and relevant handoffs.
 Resolve routine ambiguity with a reversible assumption and continue.
 Ask when the answer changes authority, the deliverable, or a consequential decision.
 Continue independent work meanwhile.
-Read [Memory Maintenance](../memory-maintenance/SKILL.md) before durable memory edits unless fully loaded.
+Read [Memory Maintenance](../../skills/memory-maintenance/SKILL.md) before durable memory edits unless fully loaded.
 
 ## Rules
 
@@ -132,7 +132,7 @@ If the requester requires a specific method or its evidence, report the missing 
 
 ## Apply repository procedures
 
-Read [Development](../development/SKILL.md) before source work or runtime verification unless fully loaded.
+Read [Development](../../skills/development/SKILL.md) before source work or runtime verification unless fully loaded.
 
-Read [Delivery](../delivery/SKILL.md) before edits, branching, implementation dispatch, commits, publication, or integration unless fully loaded.
+Read [Delivery](../../skills/delivery/SKILL.md) before edits, branching, implementation dispatch, commits, publication, or integration unless fully loaded.
 For read-only inspections, research, and reviews, report findings without editing, publishing, or merging.

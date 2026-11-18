@@ -1,9 +1,3 @@
----
-name: codex-scoped-cleanup
-description: Use in Codex to archive or delete native threads or retire worktrees, recovery copies, caches, and stale connections.
-disable-model-invocation: true
----
-
 # Codex scoped cleanup
 
 Use only in Codex within cleanup authority, through authorized owners and supported host operations.

@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Repository delivery
 
-Use in main under Main Agent Contract.
+Use in main under the [Main Agent Contract](../../instructions/main-agent-contract/instructions.md).
 
 ## Confirm repository access
 

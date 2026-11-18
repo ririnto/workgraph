@@ -30,19 +30,17 @@ The [plugin reference](https://cursor.com/docs/reference/plugins) defines that c
 
 ## Start a task
 
-Type `/` in chat and select the installed `main-agent-contract` skill.
+Type `/` in chat and select an installed Workgraph skill, such as Development.
 For example:
 
 ```text
-/main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger.
+/development Fix the parser's escaped-quote bug and verify the original trigger.
 ```
 
-[Main Agent Contract](../../skills/main-agent-contract/SKILL.md) coordinates the task through Cursor's available tools.
-An assigned worker uses [Subagent Context](../../skills/subagent-context/SKILL.md).
+For role guidance, read [Main Agent Contract](../../instructions/main-agent-contract/instructions.md) or, for an assigned worker, [Subagent Context](../../instructions/subagent-context/instructions.md) from the installed plugin.
 The roles follow native tool descriptions when no matching bundled host reference exists.
 
-Workgraph uses manual role activation in Cursor.
-Its manifest selects the empty `hooks/skills-only.json` configuration, and the package omits conventionally discovered hook files.
+The Cursor manifest selects the empty `hooks/skills-only.json` configuration, and the package omits conventionally discovered hook files.
 The [skill map](../../README.md#skill-invocation) lists focused development and delivery procedures.
 
 ## Update

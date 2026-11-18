@@ -1,19 +1,11 @@
----
-name: workflow
-description: >-
-  Use only as the Claude Code Main Agent for native Workflow execution or design after selecting Workflow under Main's host guidance.
-argument-hint: "[goal]"
-disable-model-invocation: true
----
-
 # Workgraph Workflow
 
-This skill is an entry point for the Claude Code Main Agent only.
+Only the Claude Code Main Agent uses this procedure.
 Verify the active host and role from session metadata, loaded role guidance, or native tool descriptions before reading its procedure.
 If this is not the Claude Code Main Agent, do not follow the procedure or load its references.
 Complete an existing bounded assignment under its own contract, or report the host or role mismatch to the requester.
 
-As the Claude Code Main Agent, use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
+Use the current user request as the goal.
 For repository delivery, this procedure selects the single adaptive `workgraph:delivery` workflow.
 
 Do not describe another execution method as native Workflow.
@@ -23,15 +15,15 @@ Do not describe another execution method as native Workflow.
 Do not use Workflow to replace independent native Task controllers.
 Keep each independent Task's Main and host manager distinct from bounded host Agent delegation.
 Workflow's internal `agent()` calls are stages, not additional host Agent dispatches or native Task Mains.
-A dispatched `claude -p` Task Main or reviewer loads Main's contract, so its brief must state that the session is a dispatch node and must read [Subagent Context](../subagent-context/SKILL.md).
+A dispatched `claude -p` Task Main or reviewer loads Main's contract, so its brief must state that the session is a dispatch node and must read [Subagent Context](../subagent-context/instructions.md).
 Agent-tool subagents and Workflow stages lose the Workflow tool through the host subagent filter.
 Do not dispatch a Workgraph node as a fork, because forks keep the main tool pool including Workflow.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 Group outcomes in one Workflow only when they share a prerequisite, result, integration, or acceptance dependency.
 Use separate runs for independent repository tasks without such dependencies, so one cannot block another's validation or publication.
 A shared activity label or simultaneous request alone is not a dependency.
-For ownership of each outcome, follow the [Main Agent Contract](../main-agent-contract/SKILL.md#assignments).
-For authorized engineering-delivery graphs, read [Delivery](../delivery/SKILL.md) and [delivery mapping](references/delivery.md) unless their complete content is already loaded.
+For ownership of each outcome, follow the [Main Agent Contract](../main-agent-contract/instructions.md#assignments).
+For authorized engineering-delivery graphs, read [Delivery](../../skills/delivery/SKILL.md) and [delivery mapping](references/delivery.md) unless their complete content is already loaded.
 Before authoring or editing a Workflow script, or resuming a run, read [authoring](references/authoring.md) unless its complete content is already loaded.
 The native Workflow tool description remains authoritative when its API differs from bundled guidance.
 Follow the Main Agent Contract's model policy for agent settings.

@@ -14,9 +14,9 @@ Use Agent for a delegated single-phase assignment.
 Never add verification, review, or display phases or split a bounded task to justify Workflow.
 If a genuine later phase emerges after Agent completes, consider a new Workflow run.
 Only the Claude Code Main Agent may start Workflow.
-If Workflow is unavailable, apply [Main's execution path](../SKILL.md#select-an-execution-path) to the remaining work.
+If Workflow is unavailable, apply [Main's execution path](../instructions.md#select-an-execution-path) to the remaining work.
 Report native execution as unverified when it could not run.
-Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) unless fully loaded.
+Before an authorized Workflow run or design request, read [Workflow](../../workflow/instructions.md) unless fully loaded.
 Read linked Workgraph skills with Read because `Skill` refuses them.
 Native worktree tools are `EnterWorktree` and `isolation: "worktree"`.
 
