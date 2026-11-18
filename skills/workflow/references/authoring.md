@@ -6,6 +6,8 @@ Use Main's accepted node contracts and dependencies as script inputs.
 Encode accepted dependencies in Workflow control flow, not progress labels.
 Pass each agent its accepted inputs, bounded task, authority, and output evidence contract.
 Pass each dependent call only the predecessor results it needs.
+Let the earliest stage with sufficient evidence finish a no-change task and record its reason, evidence, and skipped successors.
+When findings are missing, inconclusive, or cover only part of the task, carry that uncertainty forward.
 Do not assume local variables, progress labels, phases, or agent context transfer between calls.
 Keep deterministic tool selection, path routing, and retry decisions in native script control flow.
 Delegate filesystem and tool execution to agents because the script only coordinates them.
@@ -99,9 +101,9 @@ A malformed JSON Schema can fail before the agent runs.
 A required name missing from a schema's `properties` may not fail as expected.
 Treat schema validation as a format check, not proof of acceptance.
 Validate finding identifiers and evidence before synthesis or confirmed reporting.
-Pass candidates to a separate verifier stage when the Main Agent Contract requires independent verification.
-Require its result for every candidate covered by that acceptance requirement.
-Retain confirmed, refuted, and unverified outcomes separately, including missing or inconclusive verifier results.
+Main can assess findings directly or have Plan reassess them when revising the plan.
+When the task requires independence, select a reader other than the finder and fixer and retain its evidence for each required finding.
+Record missing or inconclusive evidence as unverified.
 Do not present schema validation, majority votes, or the finder's self-check as independent verification.
 
 ### Handle failed stages

@@ -3,7 +3,7 @@ name: development-natural-trigger
 description: Check natural Development activation and a bounded source correction without execution claims.
 tags:
   - triggering
-runs: 2
+runs: 1
 execution:
   max_turns: 16
   timeout_seconds: 300

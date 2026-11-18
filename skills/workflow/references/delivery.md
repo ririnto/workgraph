@@ -14,7 +14,6 @@ The bundled [adaptive delivery workflow](../../../workflows/delivery.js) records
 | Environment scan | An assigned read-only reader scans the candidate when Delivery requires a scan. | The complete candidate and scan purpose defined by Delivery. | The scan outcome and coverage limits requested by Delivery. |
 | Publication | Main or a named Worker publishes only to the user-authorized destination within assigned authority. | Accepted changes, required checks, exposure assessment, any required scan, working branch, and base branch. | Published branch and PR/MR URL when the selected delivery method uses one. |
 | Review | Reviewers selected under Delivery inspect the complete candidate and affected consumers. | Current candidate, intent, acceptance criteria, project review instructions, and validation evidence. | Findings with failure scenarios and source evidence, or an explicit no-findings result with coverage limits and truthful review timing. |
-| Finding verification | Main or a selected verifier checks candidates, preserving independence when required. | Complete predecessor result, candidate identifiers, evidence, affected source, and acceptance criteria. | Confirmed, refuted, or unverified outcomes for each candidate, with evidence and limits. |
 | Blocker fix | The same branch owner changes only confirmed affected scope. | Confirmed blocker, affected files, and existing PR/MR when available. | Fix with relevant verification evidence. |
 | Scoped review | Reviewers selected under Delivery reassess changes and interactions against the earlier review. | Prior findings and dispositions, updated files, and current PR/MR when available. | Reassessment with source evidence and a complete-review refresh when earlier coverage becomes insufficient. |
 | Deferral registration | Main records accepted follow-ups through the selected tracking method. | Newly accepted current-unit follow-up and access to any required tracker. | Record evidence, scope, acceptance, owner, and next action without requiring new records for unrelated pre-existing issues. |
@@ -26,7 +25,9 @@ The bundled [adaptive delivery workflow](../../../workflows/delivery.js) records
 Before starting a node, confirm its accepted inputs, owner, authority, tools, paths, and branch.
 Follow Main Agent Contract for graph readiness, dependencies, ownership, and result acceptance.
 Select needed nodes for each domain rather than copying the whole delivery graph across every domain and phase.
-Keep reports dependent on finding verification and edits dependent on any explicit user approval.
+Main assesses review findings against their evidence and can use Plan to revise ownership or scope.
+When a task requires an independent assessment before edits, return the review to Main with `maxFixRounds: 0`.
+Honor any explicit user approval required for edits.
 Omit an unrequested base-merge node and return the authorized delivery result with its readiness evidence.
 
 Main owns node status and decides whether to retry, reassign, or stop after a failure.

@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: delivery-completion-evidence
 description: Verify the bundled delivery sample gates a planning-only run on completed predecessors with fail-closed completion evidence.
-runs: 2
+runs: 1
 execution:
   max_turns: 20
   timeout_seconds: 1200
@@ -44,13 +44,15 @@ graders:
       Judge stage results only from the returned `scopes` and `explorations` fields, because stage prompts are not in the trace.
       Require the returned phase evidence to record Scope and Explore as completed.
       Require one returned exploration per returned scope, each with a summary, risks, and evidence.
-      Require the plan phase to run and its record to be completed or failed.
+      If exploration or planning returns a supported no-change decision, require complete true, publish null, zero fix rounds, the deciding phase, reason, and evidence for the full goal.
+      Require every successor of an accepted early exit to be recorded as skipped without dispatch.
+      Otherwise require Plan to run and its record to be completed or failed.
       Accept a failed plan record only with the source's own validation or agent-failure reason.
       Require every later phase record to be skipped with the nonempty reason that the source records for that outcome.
       Require no dispatch of Implement, Integrate, Sweep, Publish, or Review agents.
       For a background run, require one Read of its completed task output file before the final report.
       Judge the returned result from that Read result or the synchronous Workflow result.
-      Require the returned result to report `complete` false, `publish` null, and `fixRounds.used` zero.
+      Without an accepted early exit, require the returned result to report `complete` false, `publish` null, and `fixRounds.used` zero.
       Require the final report to restate the recorded statuses and reasons from the returned evidence.
       Fail a report that claims edits, publication, completed delivery, or a phase record that the run did not return.
       Fail a proposed-only workflow, an execution error, a retried or duplicated invocation, or a second host Agent or Workflow dispatch.

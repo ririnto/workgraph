@@ -4,8 +4,9 @@ Workgraph bundles one adaptive native Workflow delivery sample.
 The [model and effort settings](#models-and-effort) apply per phase.
 It uses the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 This optional complete-delivery recipe declares its own phases and review coverage.
-The plan decides whether the accepted unit branch is the candidate or named unit branches integrate into the candidate working branch.
-The sample finishes with a reviewed PR or MR and does not merge that request into its target branch, which follows [Delivery's separate merge authority](../skills/delivery/SKILL.md#establish-merge-authority).
+Explore or Plan can finish the run when the evidence shows the goal needs no changes.
+When changes are needed, the sample publishes and reviews a PR or MR.
+Merging that request follows [Delivery's separate merge authority](../skills/delivery/SKILL.md#establish-merge-authority).
 Choose a smaller graph or direct execution when the requested outcome does not need this process.
 Its scope count and repair limit are sample-specific choices, not global Workgraph requirements.
 
@@ -62,18 +63,36 @@ That procedure describes requirement coverage, challenge, verification selected 
 | `baseBranch` | Optional base branch string resolved during scope and used by downstream prompts, defaulting to the repository's default branch. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference and the exact integration destination for several units. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
-| `models` | Optional object of per-phase model selector strings and a separate `verify` selector. |
-| `efforts` | Optional object of per-phase effort strings and a separate `verify` selector. |
+| `models` | Optional object of per-phase model selector strings. |
+| `efforts` | Optional object of per-phase effort strings. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds, defaulting to 1. |
 
 ## Phases
 
+```mermaid
+flowchart TD
+    S[Scope] --> E[Explore]
+    S -->|Explore skipped| P[Plan]
+    E -->|All scopes need no action| N[Finish with evidence]
+    E -->|Work remains or evidence is mixed| P
+    P -->|No change warranted| N
+    P -->|External work units| H[Hand plan to Main]
+    P -->|Local work units| I[Implement]
+    I -->|Split work or repair| G[Integrate]
+    I -->|One initial unit| W[Sweep]
+    G --> W
+    W -->|Clean| U[Publish]
+    U --> R[Review]
+    R -->|Fix within budget| I
+    R -->|Pass| D[Reviewed request]
+```
+
 | Phase | Required predecessor data | Completion evidence |
 | --- | --- | --- |
 | Scope | The delivery goal and optional base branch. | The resolved base branch and disjoint scopes with keys, descriptions, and owned paths. |
-| Explore | One scope per explorer. | Per-scope summary, consumer risks, and evidence. |
-| Plan | The scopes and any exploration findings with evidence. | Work units with disjoint owned paths and instructions. |
+| Explore | One scope per explorer. | Per-scope summary, risks, evidence, and an optional reason to stop. |
+| Plan | The scopes and any exploration findings with evidence. | Work units with disjoint owned paths and instructions, or an evidence-backed reason to stop. |
 | Implement | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
 | Integrate | All accepted unit results after implementation completes. | For several units or a repair, named unit branches merged, their resource states, and combined-candidate checks. |
 | Integrate | All accepted unit results after implementation completes. | For one initial unit, a conditional skip and the accepted unit branch. |
@@ -88,7 +107,12 @@ A missing candidate fails implementation before dispatch, so no editor edits fro
 Scope resolves the base identity even when `args.baseBranch` is omitted, and implementation rejects a reported unit branch equal to that base.
 The publisher verifies actual refs and branch protections before pushing, because reported names alone do not establish Git state.
 A repair round carries the current accepted candidate as its required starting reference.
-Unit ownership is normalized to canonical repository-relative paths, absolute and escaping paths are rejected before dispatch, and every reported changed file must normalize to a path inside its unit.
+Express owned paths relative to the original checkout, including authorized parent or sibling paths such as `../shared`.
+The same normalized paths govern exploration, ownership, changed files, and review findings.
+Scope reports the original checkout root so local aliases such as `../project/src` and `src` resolve to the same owner when the checkout is named `project`.
+The execution environment controls filesystem access.
+If implementation needs external paths, the run returns `complete: false`, `earlyExit.kind: handoff`, the plan, and its intended owners.
+Main can continue at each owning location and publish Git changes in the repository that contains them.
 Checks report explicit passed, failed, or skipped statuses, and a gate passes only when every required check passed.
 Each implementation worker is instructed to commit to a branch named for its unit, so the result records a reported branch even when its checks fail, while a failed or missing worker result can leave the branch identity unknown.
 Integration receives the named candidate and each planned unit path.
@@ -117,14 +141,19 @@ The result includes `graph.nodes` and `graph.edges` using the [Main contract's g
 Each node records `key`, `operation`, `prerequisites`, `inputs`, `outputs`, `owner`, `authority`, `completionEvidence`, `status`, and `reason`.
 Result edges require accepted predecessor evidence, and condition edges evaluate the unit count or the explicit exploration choice.
 Readiness derives from these edges rather than phase order alone.
-Scope explorers, unit workers, finding verifiers, and repair attempts retain their own node records.
+Scope explorers, unit workers, and repair attempts retain their own node records.
 Every dispatch receives a graph-position block with prerequisite statuses, predecessor results, input contracts, downstream outputs, and its owned unit or scope when applicable.
 
 ## Skip, failure, and recovery
 
 Each phase records `completed`, `skipped`, or `failed` with a reason.
-The run returns `complete` only when every required phase completed and review passed or all findings were refuted.
-That result establishes the sample's publication and review outcome, not a merge into the target branch.
+Explore can end the run before Plan when every scope returns a nonempty `stopReason` and evidence, with no outstanding risks.
+An empty risk list alone passes the scope to Plan.
+Plan can stop when the issue is already resolved, invalid, or otherwise needs no change by returning `units: []`, a nonempty `stopReason`, and evidence.
+An unexplained empty plan or a failed exploration leaves the run incomplete.
+Both no-change exits return `complete: true`, `earlyExit` with the deciding phase, reason and evidence, and `publish: null`.
+Later phases are recorded as skipped and dispatch no agents.
+For a run that needs changes, completion requires the final review to pass and `earlyExit` is null.
 Exploration may be explicitly skipped when the accepted task does not need it.
 A skipped required phase does not pass, so skipping implementation or publication returns `complete: false`.
 Integration is required for several units, so an explicit skip or failed integration blocks publication.
@@ -133,22 +162,20 @@ The run result returns the separated scopes, each explorer's summary, risks, and
 The run result retains each branch identity reported by an implementation attempt and its recorded state, and superseded reported branches stay listed because the sample retires nothing.
 A retained resource never counts as passing evidence.
 A failed or missing predecessor skips its dependent phases instead of fabricating their results.
-A separate read-only agent verifies every `fix-required` finding before repair.
-The verifier uses `args.models.verify` and `args.efforts.verify` when supplied, independently of the review selectors.
-Without a verifier selector, the agent call leaves that setting unset for host configuration.
-It reports a confirmed, refuted, or unverified disposition with evidence for each finding.
-Missing, malformed, failed, or unverified dispositions block repairs and acceptance.
-Confirmed findings alone go to their owning units, bounded by `maxFixRounds`.
-Each repair integrates its branch into the posted candidate, then repeats the sweep, publication, review, and finding verification.
-A fully refuted review can pass, and the result retains the review and disposition evidence.
+Review checks each blocking finding against source, requirements, or a safe reproduction and includes that evidence in its report.
+A `fix-required` verdict sends each finding directly to its owning unit, within `maxFixRounds`.
+Set `maxFixRounds: 0` when Main needs to assess the findings or revise the plan before authorizing repairs.
+Main receives the verdict, evidence, and findings in `review` and each round's result in `reviewHistory`.
+Each repair integrates into the posted candidate, then repeats the sweep, publication, and review.
 A fix round replaces the repaired units' results by key, so unaffected unit evidence stays while combined-candidate evidence is regenerated.
-A confirmed finding outside one unambiguous owned unit blocks the round for replanning.
+A finding outside one unambiguous owned unit blocks the round for replanning.
 
 ## Models and effort
 
-The delivery sample accepts optional selectors by phase through `args.models` and `args.efforts`, plus `verify` selectors for finding verification.
+The delivery sample accepts optional selectors by phase through `args.models` and `args.efforts`.
 Explore requests `haiku` and Plan requests `sonnet` by default.
 An explicit selector in `args.models` takes precedence for that phase.
+Remove legacy `models.verify` and `efforts.verify` entries from saved arguments before starting a new run.
 Other omitted model selectors and all omitted effort selectors use host configuration.
 Main selects overrides using its [Claude Code guidance](../skills/main-agent-contract/references/claude-code.md#model-selection).
 Claude Code applies its [workflow model policy](https://code.claude.com/docs/en/workflows) to the requested selector.

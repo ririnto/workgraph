@@ -3,7 +3,7 @@ name: workflow-keyword-near-miss
 description: Reject orchestration triggered solely by the word workflow in a GitHub Actions explanation.
 tags:
   - triggering
-runs: 2
+runs: 1
 execution:
   max_turns: 12
   timeout_seconds: 240

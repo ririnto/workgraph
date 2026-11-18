@@ -198,7 +198,7 @@ The bundled Workflow samples integrate units into a candidate branch and end at 
 Superpowers' [v6.2.0 release](https://github.com/obra/superpowers/releases/tag/v6.2.0) introduced its revised [test-quality guidance](https://github.com/obra/superpowers/blob/main/skills/test-driven-development/writing-good-tests.md).
 Development now names the real failure a new test detects and requires independently derived expectations.
 Structural checks still verify explicit structural contracts without claiming host execution or model adherence.
-The [test-design case](../evals/development-test-design/case.yaml) covers that distinction without requiring new tests for a simple prose edit.
+The [Development verification guidance](../skills/development/SKILL.md#verification) gives the criteria for adding a regression check.
 
 The official public embed of the [supplied post](https://x.com/Im_IrushiK/status/2116182482152460479) exposes a truncated excerpt reporting 6,000 product lines and 115,000 test lines.
 Those figures are the author's report, not an independently inspected repository or evidence about every task performed by that model.
