@@ -173,10 +173,21 @@ A finding outside one unambiguous owned unit blocks the round for replanning.
 ## Models and effort
 
 The delivery sample accepts optional selectors by phase through `args.models` and `args.efforts`.
-Explore requests `haiku` and Plan requests `sonnet` by default.
+
+| Phase | Default model request | Work |
+| --- | --- | --- |
+| Scope | Host selection | Resolve the base and define disjoint scopes. |
+| Explore | `haiku` | Inspect assigned paths for evidence and remaining work. |
+| Plan | `sonnet` | Decide whether to stop or assign work units. |
+| Implement | Host selection | Change owned files and check the result. |
+| Integrate | `sonnet` | Reconcile branches, ownership, conflicts, and combined checks. |
+| Sweep | `haiku` | Inspect the diff and untracked files for exposures. |
+| Publish | `haiku` | Check the destination and create or update the request. |
+| Review | Host selection | Assess the posted candidate and blocking findings. |
+
 An explicit selector in `args.models` takes precedence for that phase.
 Remove legacy `models.verify` and `efforts.verify` entries from saved arguments before starting a new run.
-Other omitted model selectors and all omitted effort selectors use host configuration.
+Omitted effort selectors use host configuration.
 Main selects overrides using its [Claude Code guidance](../skills/main-agent-contract/references/claude-code.md#model-selection).
 Claude Code applies its [workflow model policy](https://code.claude.com/docs/en/workflows) to the requested selector.
 Every selector must be a nonempty string the host supports for agent calls.

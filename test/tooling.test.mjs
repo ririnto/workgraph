@@ -872,12 +872,12 @@ await test("delivery dispatches and records per-phase model selections", async (
         {
           Explore: models.explore ?? "haiku",
           Implement: models.implement,
-          Integrate: models.integrate,
+          Integrate: models.integrate ?? "sonnet",
           Plan: models.plan ?? "sonnet",
-          Publish: models.publish,
+          Publish: models.publish ?? "haiku",
           Review: models.review,
           Scope: models.scope,
-          Sweep: models.sweep
+          Sweep: models.sweep ?? "haiku"
         }
       );
       assert.deepEqual(

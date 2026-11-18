@@ -54,7 +54,13 @@ for (const map of [skipped, models, efforts, promptParts]) {
     }
   }
 }
-const defaultModels = { explore: 'haiku', plan: 'sonnet' }
+const defaultModels = {
+  explore: 'haiku',
+  plan: 'sonnet',
+  integrate: 'sonnet',
+  sweep: 'haiku',
+  publish: 'haiku'
+}
 for (const key of phaseKeys) {
   const skip = skipped[key]
   if (skip !== undefined && typeof skip !== 'boolean') {

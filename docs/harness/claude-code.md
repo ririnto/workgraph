@@ -95,23 +95,11 @@ Codex Scoped Cleanup does not authorize Codex resource operations when invoked i
 
 Use Claude Code 2.1.269 or later for native plugin evaluations.
 Use 2.1.305 or later for checks that require completed-call replay.
-The `triggering` cases exercise natural requests without naming the expected skill in the prompt.
-
-| Case | Expected behavior |
-| --- | --- |
-| [Source correction](../../evals/development-natural-trigger/case.yaml) | Load Development and correct the supplied function without claiming execution. |
-| [Workflow near miss](../../evals/workflow-keyword-near-miss/case.yaml) | Explain GitHub Actions without invoking Workgraph's native Workflow procedure. |
-
-Activation graders accept successful Skill results or complete reads of the corresponding bundled skill.
-They reject mentions, attempted loads, and descriptions alone as evidence of loading.
-Outcome graders check the answer separately.
-Tool graders check that these read-only requests cause no file writes or shell commands.
-
-Run a focused regression check from a trusted checkout.
-These evaluations call real models and keep their reports outside the repository.
+Choose the [case](../verification-map.md#native-evaluation-cases) for the affected host behavior and run it once from a trusted checkout.
+For example, this case checks whether Main handles a bounded source request directly.
 
 ```sh
-claude plugin eval ./ --tag triggering --runs 1 --ablation none --no-publish --output-dir ../workgraph-trigger-results
+claude plugin eval ./ --case development-natural-trigger --runs 1 --ablation none --no-publish --output-dir ../workgraph-eval-results
 ```
 
 For a paired no-plugin comparison, omit `--ablation none`.
