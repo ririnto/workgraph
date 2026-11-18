@@ -59,6 +59,7 @@ That procedure describes requirement coverage, challenge, verification selected 
 | Input | Contract |
 | --- | --- |
 | `task` | Required nonempty string holding the delivery goal. |
+| `scope` | Optional scope from Main. Supplying it bypasses the Scope agent. |
 | `issue` | Optional nonempty issue reference included in the publication and review prompts. |
 | `baseBranch` | Optional base branch string resolved during scope and used by downstream prompts, defaulting to the repository's default branch. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference and the exact integration destination for several units. |
@@ -67,6 +68,33 @@ That procedure describes requirement coverage, challenge, verification selected 
 | `efforts` | Optional object of per-phase effort strings. |
 | `promptParts` | Optional object of per-phase instruction strings injected into the composed prompts. |
 | `maxFixRounds` | Optional integer from 0 through 3 bounding review-driven fix rounds, defaulting to 1. |
+
+### Reuse a scope from Main
+
+Pass the scopes, supporting evidence, and resolved base from Main's assessment.
+The base may appear in `args.baseBranch` or `args.scope.baseBranch`; if both are present they must match.
+Provide `scope.checkoutRoot` when parent-relative aliases need resolving.
+For example, the following arguments start agent work at Explore.
+
+```js
+Workflow({
+  name: 'workgraph:delivery',
+  args: {
+    task: 'Fix the parser’s handling of escaped quotes.',
+    baseBranch: 'main',
+    candidateBranch: 'task/fix-parser',
+    skips: { scope: true },
+    scope: {
+      evidence: 'The failing escaped-quote case exercises src/parser.',
+      scopes: [{ key: 'parser', description: 'Quoted token parsing', paths: ['src/parser'] }]
+    }
+  }
+})
+```
+
+A valid `scope` is sufficient even when `skips.scope` is omitted.
+The graph records Scope as completed with `source: "argument"` and runs the same ownership checks used for agent output.
+Skipping Scope without supplying its result leaves its successors blocked.
 
 ## Phases
 

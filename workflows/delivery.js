@@ -359,8 +359,56 @@ function finish({
 
 // Phase implementations
 async function separateScopes() {
+  const supplied = input.scope !== undefined
+  if (!supplied && skipped.scope) {
+    recordPhase('scope', 'skipped', 'Scope dispatch was skipped without a supplied scope')
+    return { scopes: [], resolvedBase: '', checkoutParts: null }
+  }
+  const scopeAttempt = supplied ? { result: input.scope } : await dispatchScope()
+  const scopeList = Array.isArray(scopeAttempt.result?.scopes) ? scopeAttempt.result.scopes : []
+  const checkout = scopeAttempt.result?.checkoutRoot
+  const root = typeof checkout === 'string' ? checkout.trim().replace(/\\/g, '/') : ''
+  const absoluteRoot = /^(?:[A-Za-z]:\/|\/)/.test(root)
+  const checkoutParts = absoluteRoot ? root.replace(/^(?:[A-Za-z]:|\/\/[^/]+\/[^/]+)/, '').split('/').filter(Boolean) : null
+  const normalizedScopes = scopeList.map(scope => ({
+    ...scope,
+    paths: Array.isArray(scope?.paths) ? scope.paths.map(path => relativePath(path, checkoutParts)) : []
+  }))
+  const scopeNames = scopeList.map(scope => (typeof scope?.key === 'string' ? scope.key.trim() : ''))
+  const reportedBase = supplied && scopeAttempt.result?.baseBranch === undefined ? baseBranch : scopeAttempt.result?.baseBranch
+  const resolvedBase = typeof reportedBase === 'string' ? reportedBase.trim() : ''
+  const scopeShape =
+    resolvedBase.length > 0 && (!baseBranch || resolvedBase === baseBranch) &&
+    typeof scopeAttempt.result?.evidence === 'string' &&
+    scopeAttempt.result.evidence.trim().length > 0 &&
+    scopeList.length >= 1 &&
+    scopeList.length <= maxScopes &&
+    scopeNames.every(name => name.length > 0) &&
+    new Set(scopeNames).size === scopeNames.length &&
+    normalizedScopes.every(scope =>
+      typeof scope?.description === 'string' &&
+      scope.description.trim().length > 0 &&
+      Array.isArray(scope.paths) &&
+      scope.paths.length > 0 &&
+      scope.paths.every(path => path !== null)) &&
+    normalizedScopes.every((scope, index) => normalizedScopes.slice(index + 1).every(other =>
+      scope.paths.every(path => other.paths.every(peer => !ownsPath(path, peer) && !ownsPath(peer, path)))))
+  const scopes = scopeShape ? normalizedScopes : []
+  if (scopeAttempt.error !== undefined) {
+    recordPhase('scope', 'failed', `Scope agent failed: ${scopeAttempt.error}`)
+  } else if (!scopeShape) {
+    recordPhase('scope', 'failed', `Scope result is missing, malformed, duplicated, or outside 1 through ${maxScopes} scopes`)
+  } else {
+    recordPhase('scope', 'completed', supplied ? 'Used scope supplied by Main' : null, {
+      baseBranch: resolvedBase, scopes, evidence: scopeAttempt.result.evidence, source: supplied ? 'argument' : 'agent'
+    })
+  }
+  return { scopes, resolvedBase, checkoutParts }
+}
+
+async function dispatchScope() {
   log('Separating the delivery goal into scopes')
-  const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compose(
+  return runAgent(compose(
     'Separate the delivery goal into disjoint exploration scopes for this repository.',
     taskPart,
     basePart,
@@ -398,44 +446,6 @@ async function separateScopes() {
       type: 'object'
     }
   })
-  const scopeList = Array.isArray(scopeAttempt.result?.scopes) ? scopeAttempt.result.scopes : []
-  const checkout = scopeAttempt.result?.checkoutRoot
-  const root = typeof checkout === 'string' ? checkout.trim().replace(/\\/g, '/') : ''
-  const absoluteRoot = /^(?:[A-Za-z]:\/|\/)/.test(root)
-  const checkoutParts = absoluteRoot ? root.replace(/^(?:[A-Za-z]:|\/\/[^/]+\/[^/]+)/, '').split('/').filter(Boolean) : null
-  const normalizedScopes = scopeList.map(scope => ({
-    ...scope,
-    paths: Array.isArray(scope?.paths) ? scope.paths.map(path => relativePath(path, checkoutParts)) : []
-  }))
-  const scopeNames = scopeList.map(scope => (typeof scope?.key === 'string' ? scope.key.trim() : ''))
-  const resolvedBase = typeof scopeAttempt.result?.baseBranch === 'string' ? scopeAttempt.result.baseBranch.trim() : ''
-  const scopeShape =
-    resolvedBase.length > 0 && (!baseBranch || resolvedBase === baseBranch) &&
-    typeof scopeAttempt.result?.evidence === 'string' &&
-    scopeAttempt.result.evidence.trim().length > 0 &&
-    scopeList.length >= 1 &&
-    scopeList.length <= maxScopes &&
-    scopeNames.every(name => name.length > 0) &&
-    new Set(scopeNames).size === scopeNames.length &&
-    normalizedScopes.every(scope =>
-      typeof scope?.description === 'string' &&
-      scope.description.trim().length > 0 &&
-      Array.isArray(scope.paths) &&
-      scope.paths.length > 0 &&
-      scope.paths.every(path => path !== null)) &&
-    normalizedScopes.every((scope, index) => normalizedScopes.slice(index + 1).every(other =>
-      scope.paths.every(path => other.paths.every(peer => !ownsPath(path, peer) && !ownsPath(peer, path)))))
-  const scopes = scopeShape ? normalizedScopes : []
-  if (skipped.scope) {
-    recordPhase('scope', 'skipped', 'Explicit dispatch skip, so scope separation did not run')
-  } else if (scopeAttempt.error !== undefined) {
-    recordPhase('scope', 'failed', `Scope agent failed: ${scopeAttempt.error}`)
-  } else if (!scopeShape) {
-    recordPhase('scope', 'failed', `Scope result is missing, malformed, duplicated, or outside 1 through ${maxScopes} scopes`)
-  } else {
-    recordPhase('scope', 'completed', null, { baseBranch: resolvedBase, scopes, evidence: scopeAttempt.result.evidence })
-  }
-  return { scopes, resolvedBase, checkoutParts }
 }
 
 async function exploreScopes() {
