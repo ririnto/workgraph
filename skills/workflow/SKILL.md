@@ -14,7 +14,7 @@ If this is not the Claude Code Main Agent, do not follow the procedure or load i
 Complete an existing bounded assignment under its own contract, or report the host or role mismatch to the requester.
 
 As the Claude Code Main Agent, use `$ARGUMENTS` as the requested goal, or use the current user request when the arguments are empty.
-For repository delivery, this procedure selects the single adaptive `workgraph:delivery` workflow.
+For repository delivery, this procedure selects the single adaptive `workgraph:adaptive-delivery` workflow.
 
 Do not describe another execution method as native Workflow.
 

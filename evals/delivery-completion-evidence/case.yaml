@@ -9,7 +9,7 @@ execution:
     - Workflow
     - Read
   prompt: |-
-    Invoke the registered workgraph:delivery workflow once to assess its bundled workflow documentation and plan a bounded clarification.
+    Invoke the registered workgraph:adaptive-delivery workflow once to assess its bundled workflow documentation and plan a bounded clarification.
     Read skills/workflow/SKILL.md and workflows/delivery.js from the plugin unless already fully loaded.
     Put the absolute paths to docs/workflow-samples.md and workflows/delivery.js in args.task for the stage agents.
     Enable Scope, Explore and Plan. Explicitly skip Implement, Integrate, Sweep, Publish and Review.
@@ -25,7 +25,7 @@ graders:
     type: llm
     focus: trace
     criteria: |-
-      The trace invokes the bundled workgraph:delivery once with the requested args.skips and obtains its completed output.
+      The trace invokes the bundled workgraph:adaptive-delivery once with the requested args.skips and obtains its completed output.
       Scope and Explore complete with one evidenced result per scope. Plan runs unless Explore returns a justified no-change decision for every scope.
       An evidenced Explore or Plan no-change outcome may report complete true. Otherwise expect complete false.
       Every successor after a terminal decision is skipped. No implementation, integration, sweep, publication, or review runs.

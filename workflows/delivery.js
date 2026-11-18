@@ -1,6 +1,6 @@
 export const meta = {
   description: 'Adaptive delivery graph: stop on evidence or deliver a reviewed change',
-  name: 'delivery',
+  name: 'adaptive-delivery',
   phases: [
     { detail: 'separate the goal into disjoint scopes', title: 'Scope' },
     { detail: 'one read-only explorer per scope', title: 'Explore' },
