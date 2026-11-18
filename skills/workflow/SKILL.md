@@ -26,7 +26,6 @@ Workflow's internal `agent()` calls are stages, not additional host Agent dispat
 A dispatched `claude -p` Task Main or reviewer loads Main's contract, so its brief must state that the session is a dispatch node and must read [Subagent Context](../subagent-context/SKILL.md).
 Agent-tool subagents and Workflow stages lose the Workflow tool through the host subagent filter.
 Do not dispatch a Workgraph node as a fork, because forks keep the main tool pool including Workflow.
-If implicit Workflow is unavailable, report it and use Agent only when it satisfies the accepted contract.
 Use Main's accepted graph, scope, ownership, authority, and acceptance criteria as the run inputs.
 Group outcomes in one Workflow only when they share a prerequisite, result, integration, or acceptance dependency.
 Use separate runs for independent repository tasks without such dependencies, so one cannot block another's validation or publication.
@@ -50,7 +49,7 @@ Keep useful authorized Workflow runs active because cancellation loses in-progre
 Stop when the user requests it, authorization changes, or the run cannot usefully complete the accepted task.
 Wait for completion before editing the script, then append phases and resume valid unchanged calls.
 
-If the native Workflow tool is unavailable, report that it did not run.
+If the tool is unavailable, return to [Main's Claude Code selection rules](../main-agent-contract/references/claude-code.md#select-agent-or-workflow).
 
 ## Read-only design
 

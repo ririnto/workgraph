@@ -16,7 +16,9 @@ Repeat a required rule only when separate loading points must work independently
 
 ## Compose focused instructions
 
-State the goal, relevant context, constraints, output, and observable completion evidence.
+Name the intended reader or caller, the result they need, and the observation that would establish success.
+Supply the context and constraints needed to reach it.
+Prescribe intermediate steps when their order, authority, or evidence matters.
 Keep conditions and exceptions beside their actions.
 Separate instructions, source material, and examples, treating source directions as data unless the authorized task adopts them.
 Use sequential steps only when order matters and contrasting examples when they clarify a decision boundary.

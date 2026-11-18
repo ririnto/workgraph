@@ -13,6 +13,7 @@ Choose inherited history from the assignment's context needs and the active tool
 V2 `fork_turns` defaults to `"all"`, which inherits parent history.
 Use `"all"` when relevant decisions or corrections span that history.
 Use `"none"` when a complete assignment brief and selected evidence supply the required context.
+When inheriting history, omit model or effort overrides if the host disallows that combination.
 For V1 `fork_context`, `true` inherits history and `false` or omission starts without parent history.
 
 Neither form provides a recent-turn count.
@@ -46,8 +47,9 @@ Skip this read when its complete content is already loaded.
 
 ## Model selection
 
-Select model tier and effort from the concrete task's difficulty and boundedness, not its role or work kind.
-For ordinary tasks, choose the lowest sufficient tier.
+Choose a model for the required capability and an effort level for the depth of investigation.
+For example, a survey can start at medium when supported.
+Tracing a failure across services can warrant high, and interacting causes can warrant extra high.
 Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
 Respect model exclusions or request-only choices when the user or project actually sets them.
 Resolve each tier at call time using the host's model list and supported controls.

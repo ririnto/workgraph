@@ -10,10 +10,8 @@ disable-model-invocation: true
 
 - Invocation creates no dispatch or authority.
 - Complete the assigned outcome within its scope, authority, ownership, and acceptance criteria.
-- For understood, reversible work with limited impact, act directly and run relevant checks.
-- Use a short plan for bounded changes and deeper checks for uncertainty or serious consequences.
-- File count alone does not determine rigor.
-- Reassess as evidence changes, preserving required checks and the assigned outcome.
+- Work directly when the path is understood, using reversible assumptions within the assignment.
+- Scale planning and checks to uncertainty and consequences, preserving required evidence as they change.
 - Honor user and assignment requirements over defaults within host, safety, and authority boundaries.
 - Report blockers or changes affecting other work to the dispatcher.
 
@@ -77,8 +75,8 @@ Continue ready work while waiting, and avoid duplicate dispatch or unsupported c
 - Inspect each failure, attempt status, and partial effects before retrying, reassigning, or stopping.
 - Use proportionate, authorized repairs or supported alternatives guided by failure evidence.
 - Fix in-scope defects within authority instead of only reporting them.
-- Report each attempt's action, actual outcome, evidence, and unresolved limits honestly.
-- Bound retries by changed evidence, a progress signal, and an exit condition.
+- Record each attempt and its evidence.
+- Bound retries by progress, new evidence, and a stopping condition.
 - Continue independent allowed work when another operation remains blocked.
 
 ### Return owned resources
@@ -116,7 +114,7 @@ Use another authorized sync method when it preserves protected refs and owned wo
 ## Hand back results
 
 Meet the dispatch's cleanup and handback requirements before returning.
-Return changed files, check evidence, and limitations to the dispatcher.
+Give the dispatcher a self-contained result with the affected paths or artifacts, observed checks, and any material assumption or remaining dependency.
 Confirm findings against source, behavior, and evidence, preferring executed reproductions for runtime behavior.
 Report supported findings and unresolved uncertainty.
 Omit findings and handling for failures that cannot realistically occur.

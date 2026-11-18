@@ -26,9 +26,13 @@ Do not require bulk conversion of existing `undefined` uses.
 Review behavior before changing constructs that depend on `undefined`, including default parameters and optional chaining.
 For null cleanup, early-return inversion, and discarded-call replacement, meet functional requirements without preserving existing evaluation order for its own sake.
 
+Remove unnecessary terminal `return undefined` statements when fallthrough preserves the return contract.
+Keep required early exits and inferred or declared return types.
+Preserve required exits, labels, `finally` behavior, loop effects, and async contracts.
+
 Review single-condition early returns for condition inversion and apply it when functional requirements and readability are satisfied.
 Keep guards where inversion would harm either.
-Replace every use of `void` solely to discard a function call, including in existing code, with an appropriate form such as `await`.
+Within the requested change, replace `void` used solely to discard a function call with an appropriate form such as `await`.
 Preserve required callback return contracts, async signatures, and concurrency.
 Propagate rejections to the caller or handle them explicitly without ignoring them, including in background work.
 Preserve parallel execution when needed, using an explicit error-handling path such as a non-ignoring `catch`.

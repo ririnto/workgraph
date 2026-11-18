@@ -9,10 +9,13 @@ After background Agent or Workflow dispatch and other ready work, end the turn w
 
 Neither `ultracode` nor its session setting forces Workflow.
 Use Workflow only for genuine multi-phase work or joins when dependencies benefit and the host permits it.
-A single-phase run is Agent work and must use Agent.
+Handle bounded work directly unless delegation is requested or useful.
+Use Agent for a delegated single-phase assignment.
 Never add verification, review, or display phases or split a bounded task to justify Workflow.
 If a genuine later phase emerges after Agent completes, consider a new Workflow run.
 Only the Claude Code Main Agent may start Workflow.
+If Workflow is unavailable, apply [Main's execution path](../SKILL.md#select-an-execution-path) to the remaining work.
+Report native execution as unverified when it could not run.
 Before an authorized Workflow run or design request, read [Workflow](../../workflow/SKILL.md) unless fully loaded.
 Read linked Workgraph skills with Read because `Skill` refuses them.
 Native worktree tools are `EnterWorktree` and `isolation: "worktree"`.

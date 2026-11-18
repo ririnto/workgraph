@@ -255,8 +255,7 @@ We fetched the official [Anthropic prompt-engineering overview](https://platform
 It is a hub page that links the separately cited best-practices guide, rather than replacing that guide.
 It recommends defining success criteria, running empirical tests, and drafting instructions before refining them, and notes that prompts do not fix every failure.
 
-We fetched the official [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full.
-It recommends explicit user priority over skill text, auditing loaded `AGENTS.md` and skill files for conflicts, concise explicit output expectations, and checks proportional to the change.
+Our earlier review of the [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) recorded guidance on explicit user priority over skill text, auditing loaded `AGENTS.md` and skill files for conflicts, concise explicit output expectations, and checks proportional to the change.
 It permits initiative only within the authorized scope and treats its model-specific observations as hypotheses for the selected model and workload.
 
 We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) in full.
@@ -284,6 +283,12 @@ Meta's HTML extraction flattens code-block and table styling, so its read does n
 The guides document different models and products, so their lessons remain unverified for Workgraph model adherence without a behavioral evaluation.
 
 ### OpenAI guidance
+
+The [GPT-6.2 API guide](https://developers.openai.com/api/docs/guides/latest-model) connects autonomous completion to explicit scope, reversible assumptions, verification, and a handback the reader can use on its own.
+The [Codex prompting guide](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra) relates effort to investigation depth and parallelism to independent questions.
+For visual work it recommends reviewing the result at its intended size and exercising its interactions.
+Workgraph applies these choices in the role contracts, the Codex Main reference, and Development's verification guidance.
+The plugin supplies instructions to its host, which owns the model and API settings.
 
 [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) recommends action within the user's scope.
 It calls for explicit completion criteria, clear instruction priority, and checks proportional to the change.

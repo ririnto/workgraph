@@ -7,17 +7,17 @@ disable-model-invocation: true
 # Development
 
 Follow repository rules, lint, tools, and user choices within task authority, required checks, and host capabilities.
-Read matching playbooks and references unless fully loaded.
-For JS/TS, read [Node](references/nodejs.md).
-For new or changed loops, read [control flow](references/control-flow.md) unless fully loaded.
-For Kotest specs or assertions, read [Kotest](references/kotest.md) unless fully loaded.
+Read the matching playbook and language references for source, build, or tool changes unless already loaded.
+For Node.js lint tooling or dependency advisories, read [Node.js](references/nodejs.md).
+For new or changed loops, read [control flow](references/control-flow.md).
+For Kotest specs or assertions, read [Kotest](references/kotest.md).
 
 ## Development lifecycle
 
 Identify contracts, consumers, exclusions, and acceptance evidence before editing.
 For agent instructions, read [instruction design](references/instruction-design.md).
 Inspect affected code and stop discovery when evidence supports the smallest safe change.
-Skip optional ceremony, speculative sweeps, and precautionary pauses for bounded work, preserving safety, authority, and required gates.
+Keep bounded work within scope and preserve required checks.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -28,8 +28,6 @@ Skip optional ceremony, speculative sweeps, and precautionary pauses for bounded
 
 Verify each coherent unit before dependent work.
 Before publication, review the complete diff for unsupported guards, dead compatibility paths, and unrelated changes.
-
-Guidance alone authorizes no tooling or cross-project changes.
 
 | Language | Source | Reference |
 | --- | --- | --- |
@@ -60,7 +58,7 @@ Prefer immutable bindings and minimal mutable state.
 ### Keep design proportional
 
 Prefer existing interfaces, direct data flow, and tool commands and help over wrappers or custom usage output.
-Keep required targets explicit, without invented defaults.
+Keep required targets explicit.
 Add abstractions, dependencies, or fallbacks only for concrete unmet needs.
 Do not implement or test unrealistic edge cases.
 Reconsider data and ownership before adding complexity.
@@ -112,7 +110,6 @@ Preserve lint and formatter choices when adding guidance or filling configuratio
 Use the project's established commands for routine local and CI work.
 Keep supported automation declarative, using the project's implementation language only for substantial logic existing tools cannot provide.
 
-When configuring or assessing builds or tools, read the matching language reference.
 For lint rules or fixes, read [lint rule guidance](references/lint-rules.md).
 
 ## Verification
@@ -123,15 +120,17 @@ Use process or application checks for behavior direct calls cannot establish.
 Extend the nearest check for uncovered requirements or realistic failures with implementation-independent expectations.
 Reserve source-shape assertions for explicit structural contracts.
 Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
-Before adding tests, assess purpose, overlapping coverage, external ownership, duplication, and cost-effectiveness.
+Check existing coverage before adding tests.
 Test owned changes and integration risks, not unchanged upstream behavior without a concrete need.
 Remove redundant or low-value tests, fixtures, and runs within scope, preserving relevant failure coverage.
 Preserve security, external-input, and data-integrity coverage without test-count or coverage-percentage targets.
 Use repeatable inputs for stateful failures.
 Consider model checking when consequential transitions or interleavings remain untested by examples.
-Stop when required gates and changed risks have sufficient evidence, unless a concrete failure requires more.
+Stop when required checks and changed risks have sufficient evidence.
 Record commands, setup, exit status, failures, and raw results separately from interpretation.
-Retain traces or screenshots when needed.
+For visual changes, compare a render at the intended display size with the supplied reference or project design.
+For interactive changes, exercise the requested action and observe the result on the target surface.
+Keep traces or screenshots when needed.
 Before optimizing slow checks, measure them and report conditions, durations, and preserved coverage.
 Leave execution, formal proof, native activation, and model adherence unverified without direct evidence.
 Report required checks blocked by the host.
