@@ -1,38 +1,24 @@
 # Workgraph Repository Instructions
 
-These instructions apply to repository contributors and are not injected into consumer sessions.
-Follow explicit user requirements before repository defaults and skills, within host and safety constraints.
-Complete authorized changes and relevant checks before returning a final result, or report the specific blocker.
+Use these instructions when contributing to Workgraph.
+Explicit user requirements take priority over project defaults within host and safety constraints.
 
-## Instruction Ownership
+## Instruction ownership
 
-- Keep contributor conventions and validation commands here.
-- Keep consumer behavior in `skills/` and the host adapters in `docs/harness/`.
-- Keep consumer links and required resources inside this plugin.
-- Keep always-required procedures in each skill's `SKILL.md`, with each role body self-contained.
-
-- Keep host-specific execution timing in each role's references, and inject only the selected host's reference.
-- Keep shared role and task procedures host-neutral.
-- Keep native host mechanics in the matching host reference.
-- Keep user-facing host setup, invocation, and update instructions in the matching `docs/harness/` adapter.
-- Link policy owners instead of restating their procedures.
-- Keep orchestration and model guidance in Main Agent references.
-- Add no orchestration or model guidance in Worker references.
-
-- Keep lifecycle procedures in `skills/development/playbooks/`, with Development selecting only the matching playbook and language references.
-- Keep Workflow focused on its lower-level operation without repeating the Main contract or the Delivery checklist.
-- Do not duplicate an operational rule, procedure, or checklist across sources that load in the same context.
-- Link the sole owner instead, and keep each conditional procedure at its stated scope and read trigger.
-
-- Identify each loaded source by its actual file path and state which complete content is already present.
-- Match native loading by excluding YAML for Claude and retaining the complete skill file for Codex.
-- Load every selected file before emitting context, without requiring model retrieval during hook startup.
-- Keep all skills user-invocable, block their model invocation through each host's supported control, and route model reads through bundled `SKILL.md` links.
-
-- Use `README.md` for installation and runtime behavior.
-- Read `docs/design.md` when changing instruction boundaries or hook delivery.
-- Read `docs/research.md` when changing behavior based on external research.
-- Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
+- Put contributor conventions and checks here, consumer procedures in `skills/`, and user-facing host setup, invocation, and updates in `docs/harness/`.
+- Keep each role body self-contained and host-neutral.
+  Put native mechanics and execution timing in the selected role's host reference.
+  Main's references own orchestration and model guidance.
+- Keep required procedures in each skill body and link conditional resources inside the plugin where their read conditions apply.
+  Link the owner of a rule when both sources load together.
+- Route lifecycle and language guidance through Development, with lifecycle procedures in `skills/development/playbooks/`.
+  Workflow owns its native operation, Main owns coordination, and Delivery owns repository integration.
+- Load the role and its selected host reference completely and confirm both contain text before emitting hook context.
+  Identify the actual source paths and content already present.
+  Deliver the skill body without frontmatter for Claude and the complete file for Codex.
+- Keep every skill user-invocable, disable implicit model invocation with each host's control, and route model reads through bundled `SKILL.md` links.
+- Use `README.md` for installation and runtime behavior, `docs/design.md` for changes to loading boundaries, and `docs/research.md` for decisions based on external guidance.
+  Record third-party attribution in `THIRD_PARTY_NOTICES.md`.
 
 ## Writing
 
@@ -48,14 +34,12 @@ Exclude generated and vendored material from mechanical prose edits.
 
 ## Implementation
 
-- Use Node built-ins compatible with Node.js 24.22.3 or later within major version 24 for the plugin runtime.
+- Use Node built-ins compatible with the engine range in `package.json` for the plugin runtime.
 - Resolve bundled files from the executing module's location.
 - Keep hook commands portable through the selected host's plugin-root variable.
-- Emit context only after all required files load and contain text.
 - Keep host permissions and task execution in the host.
 
 - Use Node and pnpm for development.
-- Follow the Node engine range in `package.json`.
 - Keep dependency versions in the `pnpm-workspace.yaml` catalog and resolutions in `pnpm-lock.yaml` consistent with the manifest.
 
 - Match the existing lint configuration.
@@ -88,12 +72,11 @@ Select the narrowest applicable read-only gate.
 - Use `pnpm run check:skill-metadata` for skill frontmatter, invocation policy, and native prompt compatibility checks.
 - Use `pnpm run check:test` for the maintained test suites.
 - Use `pnpm run check` for mixed changes or repository-wide validation.
-  This covers Markdownlint, Ultracite, hooks, issue forms, plugin versions, skill metadata, tooling tests, validation tests, and the production dependency audit.
-- The production dependency audit contacts the package registry.
+  Its production dependency audit contacts the package registry.
 
 After plugin configuration changes, run `claude plugin validate --strict ./` and `claude plugin validate --strict .claude-plugin/plugin.json`.
-For injected prose, run the hook tests and inspect Main and Worker contexts for each supported host.
-Confirm the selected role and host reference appear without repository guidance or the other host's guidance.
+For injected prose, use the existing hook tests for role selection, host isolation, and context size.
+Inspect the affected rendered context when the changed property needs further evidence.
 
 Follow the [evaluation reporting requirements](README.md#development) for repeated behavioral runs, individual outcomes, and limited smoke checks.
 
@@ -102,11 +85,8 @@ This behavioral check uses real agents and requires a host with Workflow enabled
 Keep evaluation reports local and outside the repository with `--output-dir`.
 Inspect tool results because an attempted invocation alone does not prove successful execution.
 
-Report model adherence as unverified unless a behavioral evaluation supplies evidence.
-
-Follow the active role's evidence policy in [Main Agent Contract](skills/main-agent-contract/SKILL.md) or [Subagent Context](skills/subagent-context/SKILL.md).
-
-Report exact commands, results, and unverified behavior.
+Report exact commands, results, and unverified behavior under the active role's evidence policy.
+Claim model adherence only to the extent observed in behavioral evaluations.
 Run formatting fixes only within the authorized change.
 
 ## Version And Publication

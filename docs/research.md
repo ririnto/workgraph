@@ -255,8 +255,7 @@ We fetched the official [Anthropic prompt-engineering overview](https://platform
 It is a hub page that links the separately cited best-practices guide, rather than replacing that guide.
 It recommends defining success criteria, running empirical tests, and drafting instructions before refining them, and notes that prompts do not fix every failure.
 
-We fetched the official [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) in full.
-It recommends explicit user priority over skill text, auditing loaded `AGENTS.md` and skill files for conflicts, concise explicit output expectations, and checks proportional to the change.
+Our earlier review of the [OpenAI latest-model guide](https://developers.openai.com/api/docs/guides/latest-model.md) recorded guidance on explicit user priority over skill text, auditing loaded `AGENTS.md` and skill files for conflicts, concise explicit output expectations, and checks proportional to the change.
 It permits initiative only within the authorized scope and treats its model-specific observations as hypotheses for the selected model and workload.
 
 We fetched the official [xAI speech-to-speech prompting guide](https://docs.x.ai/developers/model-capabilities/audio/speech-to-speech/prompting-guide.md) in full.
@@ -284,6 +283,12 @@ Meta's HTML extraction flattens code-block and table styling, so its read does n
 The guides document different models and products, so their lessons remain unverified for Workgraph model adherence without a behavioral evaluation.
 
 ### OpenAI guidance
+
+The [GPT-6.2 API guide](https://developers.openai.com/api/docs/guides/latest-model) connects autonomous completion to explicit scope, reversible assumptions, verification, and a handback the reader can use on its own.
+The [Codex prompting guide](https://learn.chatgpt.com/guides/prompting-gpt-6-2-astra) relates effort to investigation depth and parallelism to independent questions.
+For visual work it recommends reviewing the result at its intended size and exercising its interactions.
+Workgraph applies these choices in the role contracts, the Codex Main reference, and Development's verification guidance.
+The plugin supplies instructions to its host, which owns the model and API settings.
 
 [Using GPT-6 Astra](https://developers.openai.com/api/docs/guides/latest-model/gpt-6-astra.md) recommends action within the user's scope.
 It calls for explicit completion criteria, clear instruction priority, and checks proportional to the change.
@@ -1088,7 +1093,7 @@ Use these APIs only when the declared Go version supports them and key or index 
 
 The official [setup-node version-file guidance](https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file) supports selecting the development range from `package.json`.
 The workflow uses current [checkout](https://github.com/actions/checkout) and [setup-node](https://github.com/actions/setup-node) major releases.
-Separate dependency-free jobs exercise the declared hook runtime floor and macOS without installing development tools.
+The full Linux suite exercises the declared runtime floor, and the macOS job exercises the hooks without development dependencies.
 These checks establish source validation and runtime evidence, while model adherence requires a separate behavioral run.
 
 ## Development lifecycle
@@ -1122,6 +1127,6 @@ The [pnpm setup action](https://github.com/pnpm/setup/tree/v3.1.1) installs the 
 
 We checked Husky `9.1.7` in the npm registry and reviewed its official [setup](https://typicode.github.io/husky/get-started.html) and [hook documentation](https://typicode.github.io/husky/how-to.html).
 It supports Node.js 24 and supplies the Git dispatchers through the standard `prepare` lifecycle.
-Workgraph's two hooks call the corresponding pnpm scripts and retain the complete existing check gate.
+Workgraph's pre-commit hook checks the staged diff and its pre-push hook runs the full repository gate.
 Actual commit and push operations in disposable repositories verify execution and intentional failure propagation.
 These local Git checks do not establish native plugin activation or provider behavior.

@@ -160,13 +160,12 @@ References hold detail selected by a task, host, language, or operation.
 | Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
 | Build and tooling | Development's [language references](skills/development/SKILL.md#development-lifecycle) and [lint rule guidance](skills/development/references/lint-rules.md) | Language references include their tooling conventions, while shared lint guidance covers rule selection and fixes. |
 | Kotest | Kotlin's [Kotest guidance](skills/development/references/kotest.md) | Creating or changing Kotest specs or assertions requires this reference. |
-| Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update uses the requested host's section once the version reaches its authorized distribution source. |
+| Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update selects the account release or marketplace installation and verifies the result at that destination. |
 | Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
 | Worktrees and caches | Cleanup's [worktree and cache guidance](skills/codex-scoped-cleanup/references/worktrees-caches.md) | Archiving, restoring, or removing worktrees or caches requires this reference. |
 
 [Development](skills/development/SKILL.md) names each playbook's read trigger and the supported language references.
 Development owns [agent instruction design](skills/development/references/instruction-design.md).
-General prose style is outside Workgraph’s scope.
 General human-facing prose style is outside Workgraph's scope.
 Consumer links and required resources stay bundled, without another plugin dependency or required online research.
 
@@ -201,8 +200,8 @@ pnpm run check
 ```
 
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
-The real pre-commit and pre-push hooks run `pnpm run pre-commit` and `pnpm run pre-push`.
-Each script runs the complete existing check gate and blocks its Git operation on failure.
+The pre-commit hook checks the staged diff for whitespace errors and conflict markers.
+The pre-push hook runs the full repository check before publication.
 `pnpm run check:ultracite-types` runs type-aware rules on JavaScript and TypeScript files across the repository, excluding generated files and the host workflow DSL.
 `pnpm run check:types` checks the configured JavaScript and TypeScript files with TypeScript and JSDoc.
 TypeScript uses the includes and exclusions in `tsconfig.json`, while Ultracite also applies its preset and Git ignores.
@@ -220,16 +219,17 @@ Remove that override when the parent supports a patched release directly, tracke
 The unpatched braces advisory remains in development dependencies, tracked in [Issue #78](https://github.com/ririnto/workgraph/issues/78).
 These development dependencies are not required by the hook runtime.
 
-The native behavioral suite requires Claude Code with Agent, Workflow, and Bash available.
+For a change that needs native behavioral evidence, select the case that exercises the affected decision and enable the tools it uses.
 Run it from a trusted checkout and inspect actual tool results before claiming completion.
 Evaluation relocates `HOME` into its sandbox, which can break home-dependent Node version-manager shims.
 Prepend the resolved Node binary directory to `PATH` for the evaluator and its isolated runs.
 
 ```sh
-PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --runs 2 --ablation none --allow-tools Agent Workflow Bash --keep-temp --no-publish --output-dir ../workgraph-eval-results
+PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 2 --ablation none --allow-tools Workflow --keep-temp --no-publish --output-dir ../workgraph-eval-results
 ```
 
-Run each case at least twice for instruction-behavior evidence.
+The example exercises Workflow delivery.
+Repeat the selected case at least twice when assessing model adherence.
 Report each case's individual run outcomes, including failures and incomplete runs, rather than only an aggregate score.
 Use `--runs 1` only for a labeled packaging or invocation smoke check.
 A smoke check does not satisfy instruction-behavior acceptance.

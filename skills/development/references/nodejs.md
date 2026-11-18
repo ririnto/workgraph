@@ -1,10 +1,4 @@
-# JavaScript and TypeScript
-
-## Control flow and async calls
-
-Remove unnecessary terminal `return undefined` statements when fallthrough preserves the return contract.
-Keep required early exits and inferred or declared return types.
-Preserve required exits, labels, `finally` behavior, loop effects, and async contracts.
+# Node.js tooling and dependency security
 
 ## Tooling
 

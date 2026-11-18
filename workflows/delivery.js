@@ -307,7 +307,7 @@ if (incompletePredecessor('explore') !== undefined) {
     ), {
       agentType: 'Explore',
       label: `explore:${scope.key}`,
-      ...(models.explore === undefined ? {} : { model: models.explore }),
+      model: models.explore ?? 'haiku',
       ...(efforts.explore === undefined ? {} : { effort: efforts.explore }),
       phase: 'Explore',
       schema: {
@@ -369,7 +369,7 @@ if (incompletePredecessor('plan') !== undefined) {
       explorations,
       scopes: scopes.map(scope => ({ description: scope.description, key: scope.key, paths: scope.paths }))
     })}`,
-    'Give each unit a short key, the owned paths, and concrete instructions that name the files to change and the checks to run.',
+    'Give each unit a short key and owned paths. Its instructions must tell the implementer which behavior to deliver, which constraints to preserve, and what result the checks should show.',
     'Express every path relative to the repository root, for example plugins/foo. Absolute paths are rejected.',
     'List each owned path once, and share no owned path between units.',
     promptParts.plan
@@ -703,7 +703,7 @@ const dispatchSweep = async candidate => {
     'Inspect this named branch, not the coordinator checkout.',
     'Inspect the candidate branch diff against the base branch and its checkout untracked files, and read only those files.',
     'Flag credentials, tokens, private hostnames, absolute home paths, session identifiers, and private environment details.',
-    'Report each exposure with its file, a kind, and the exposing detail.',
+    'For each exposure, give the file, kind, and enough redacted detail to locate it. Omit the sensitive value.',
     'Report an empty list when the change is clean.',
     readOnlyPart,
     promptParts.sweep

@@ -710,27 +710,6 @@ await test("delivery preserves a posted request after repair failures", async ()
   );
 });
 
-await test("delivery retains publication evidence in its graph", async () => {
-  const { result } = await runWorkflowSample(
-    samplePaths.delivery,
-    { candidateBranch: "task-branch", task: "t" },
-    dispatchTable({
-      Explore: () => exploreResult,
-      Implement: () => simpleImplement,
-      Plan: () => singleUnits,
-      Publish: () => publishCreated,
-      Review: () => reviewPass,
-      Scope: () => scopeResult,
-      Sweep: () => sweepResult
-    })
-  );
-  const publishNode = result.graph.nodes.find((node) => node.key === "publish");
-  assert.ok(publishNode);
-  const evidence = publishNode.completionEvidence.at(-1);
-  assert.ok(evidence && isObject(evidence.result));
-  assert.equal(evidence.result.evidence, publishCreated.evidence);
-});
-
 await test("delivery rejects a unit branch equal to the resolved default base", async () => {
   const { calls, result } = await runWorkflowSample(
     samplePaths.delivery,
@@ -868,67 +847,65 @@ await test("delivery samples fail a fix-required review without findings", async
   );
 });
 
-await test("delivery workflow samples inherit host models and honor model overrides", async () => {
+await test("delivery applies the Explore default and honors phase overrides", async () => {
   await Promise.all(
-    Object.values(samplePaths).flatMap((file) =>
-      [
-        {},
-        { scope: "configured-selector" },
-        Object.fromEntries(
-          [
-            "scope",
-            "explore",
-            "plan",
-            "implement",
-            "integrate",
-            "sweep",
-            "publish",
-            "review"
-          ].map((phase) => [phase, `custom-${phase}`])
-        )
-      ].map(async (models) => {
-        const efforts = Object.fromEntries(
-          Object.keys(models).map((phase) => [phase, `effort-${phase}`])
-        );
-        const { calls } = await runWorkflowSample(
-          file,
-          { candidateBranch: "task-branch", efforts, models, task: "t" },
-          dispatchTable({
-            Explore: () => exploreResult,
-            Implement: splitImplement,
-            Integrate: () => integrateResult,
-            Plan: () => splitUnits,
-            Publish: () => publishCreated,
-            Review: () => reviewPass,
-            Scope: () => scopeResult,
-            Sweep: () => sweepResult
-          })
-        );
-        assert.deepEqual(
-          Object.fromEntries(calls.map((call) => [call.phase, call.model])),
-          {
-            Explore: models.explore,
-            Implement: models.implement,
-            Integrate: models.integrate,
-            Plan: models.plan,
-            Publish: models.publish,
-            Review: models.review,
-            Scope: models.scope,
-            Sweep: models.sweep
-          }
-        );
-        assert.deepEqual(
-          Object.fromEntries(calls.map((call) => [call.phase, call.effort])),
-          Object.fromEntries(
-            calls.map((call) => [call.phase, efforts[call.phase.toLowerCase()]])
-          )
-        );
-        for (const call of calls) {
-          assert.equal(call.effortProvided, call.effort !== undefined);
-          assert.equal(call.modelProvided, call.model !== undefined);
+    [
+      {},
+      { explore: "sonnet" },
+      Object.fromEntries(
+        [
+          "scope",
+          "explore",
+          "plan",
+          "implement",
+          "integrate",
+          "sweep",
+          "publish",
+          "review"
+        ].map((phase) => [phase, `custom-${phase}`])
+      )
+    ].map(async (models) => {
+      const efforts = Object.fromEntries(
+        Object.keys(models).map((phase) => [phase, `effort-${phase}`])
+      );
+      const { calls } = await runWorkflowSample(
+        samplePaths.delivery,
+        { candidateBranch: "task-branch", efforts, models, task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: splitImplement,
+          Integrate: () => integrateResult,
+          Plan: () => splitUnits,
+          Publish: () => publishCreated,
+          Review: () => reviewPass,
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult
+        })
+      );
+      assert.deepEqual(
+        Object.fromEntries(calls.map((call) => [call.phase, call.model])),
+        {
+          Explore: models.explore ?? "haiku",
+          Implement: models.implement,
+          Integrate: models.integrate,
+          Plan: models.plan,
+          Publish: models.publish,
+          Review: models.review,
+          Scope: models.scope,
+          Sweep: models.sweep
         }
-      })
-    )
+      );
+      assert.deepEqual(
+        Object.fromEntries(calls.map((call) => [call.phase, call.effort])),
+        Object.fromEntries(
+          calls.map((call) => [call.phase, efforts[call.phase.toLowerCase()]])
+        )
+      );
+      for (const call of calls) {
+        assert.equal(call.effortProvided, call.effort !== undefined);
+        assert.equal(call.modelProvided, call.model !== undefined);
+      }
+    })
   );
 });
 
@@ -2194,6 +2171,11 @@ await test("delivery graph adapts single-unit candidates and records conditional
       "The plan defines a single work unit, so no cross-unit integration is required",
     status: "skipped"
   });
+  const publishNode = result.graph.nodes.find((node) => node.key === "publish");
+  assert.ok(publishNode);
+  const published = publishNode.completionEvidence.at(-1);
+  assert.ok(published && isObject(published.result));
+  assert.equal(published.result.evidence, publishCreated.evidence);
   const integration = result.graph.nodes.find(({ key }) => key === "integrate");
   assert.ok(integration);
   assert.equal(integration.status, "skipped");

@@ -1,23 +1,33 @@
 # Plugin update guidance
 
-Use this reference when the task authorizes an installed plugin update.
+Use the update route for the user's requested destination once the version reaches its authorized source.
+Follow Delivery's merge-authority rule if distribution requires a source merge.
 
-Once the requested version is available from the authorized distribution source, update the marketplace and installed plugin for the requested hosts.
-Any needed source merge follows Delivery's merge-authority rule before distribution.
-Refresh all configured marketplaces when the user requests that broader update.
+## ChatGPT account plugin
 
-Run only the requested hosts' supported update commands.
-For other hosts, use their supported plugin update mechanism and report a limitation when unavailable.
+Identify the existing plugin and its current release through the account's supported plugin tools.
+Check whether its source is Git-managed or manually editable.
+For a Git-managed plugin, follow its configured release process and read back the resulting revision.
+For a manually editable plugin, compare its published files with the authorized source, preserving account-specific metadata, settings, and audience.
+Update the existing plugin against the release you inspected, including explicit removal of superseded files when the update overlays the old package.
+If the release changed, reconcile the new contents before retrying.
+Read back the saved release, affected files, and removed paths.
+Claim activation in a running client only when observed there.
 
-After the update, start a new session or use the host's plugin reload so later sessions load the updated files.
+## Marketplace installations
 
-## Claude Code
+Update the requested marketplace and installed plugin with its supported controls.
+Refresh all configured marketplaces only when requested.
+Use the host's reload mechanism or a fresh session to verify activation when available.
+For other hosts, use their supported update mechanism and report any missing capability that affects the requested result.
+
+### Claude Code
 
 Run `claude plugin marketplace update <marketplace>`.
 
 Then run `claude plugin update <plugin>@<marketplace>`.
 
-## Codex
+### Codex
 
 Identify whether the configured marketplace uses a Git source or a local checkout, and record the installed plugin's version and enabled state.
 For a Git marketplace, run `codex plugin marketplace upgrade <marketplace>`.

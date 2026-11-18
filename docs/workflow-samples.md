@@ -1,7 +1,7 @@
 # Workflow samples
 
 Workgraph bundles one adaptive native Workflow delivery sample.
-It accepts optional model and effort selectors and otherwise uses host configuration.
+The [model and effort settings](#models-and-effort) apply per phase.
 It uses the native Workflow interface without adding a scheduler, execution engine, or repository dependency.
 This optional complete-delivery recipe declares its own phases and review coverage.
 The plan decides whether the accepted unit branch is the candidate or named unit branches integrate into the candidate working branch.
@@ -27,9 +27,7 @@ Workflow({
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
     candidateBranch: 'task/fix-parser',
-    issue: '#12',
-    models: { scope: '<model>', explore: '<model>', plan: '<model>', implement: '<model>', integrate: '<model>', sweep: '<model>', publish: '<model>', review: '<model>', verify: '<model>' },
-    efforts: { scope: '<effort>', explore: '<effort>', plan: '<effort>', implement: '<effort>', integrate: '<effort>', sweep: '<effort>', publish: '<effort>', review: '<effort>', verify: '<effort>' }
+    issue: '#12'
   }
 })
 ```
@@ -40,9 +38,7 @@ Workflow({
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
     candidateBranch: 'task/fix-parser',
-    issue: '#12',
-    models: { scope: '<model>', explore: '<model>', plan: '<model>', implement: '<model>', integrate: '<model>', sweep: '<model>', publish: '<model>', review: '<model>', verify: '<model>' },
-    efforts: { scope: '<effort>', explore: '<effort>', plan: '<effort>', implement: '<effort>', integrate: '<effort>', sweep: '<effort>', publish: '<effort>', review: '<effort>', verify: '<effort>' }
+    issue: '#12'
   },
   resumeFromRunId: '<run ID returned by the first run>',
   scriptPath: '<scriptPath returned by the first run>'
@@ -151,8 +147,10 @@ A confirmed finding outside one unambiguous owned unit blocks the round for repl
 ## Models and effort
 
 The delivery sample accepts optional selectors by phase through `args.models` and `args.efforts`, plus `verify` selectors for finding verification.
-Main supplies both selectors for each phase it runs, following the [Main Agent Contract](../skills/main-agent-contract/SKILL.md#models).
-An omitted selector stays unset so the host can apply its current configuration.
+Explore requests `haiku` for routine lookup unless the caller sets `args.models.explore`.
+Other omitted model selectors and all omitted effort selectors use host configuration.
+Main selects overrides using its [Claude Code guidance](../skills/main-agent-contract/references/claude-code.md#model-selection).
+Claude Code applies its [workflow model policy](https://code.claude.com/docs/en/workflows) to the requested selector.
 Every selector must be a nonempty string the host supports for agent calls.
 
 ## Cache reuse

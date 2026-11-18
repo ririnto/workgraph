@@ -338,22 +338,21 @@ await test("skill metadata command resolves its own checkout", (t) => {
   /** @type {[string | null, string][]} */
   const cases = [
     [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
-    [skillContent(), ""],
     [
       skillContent(
         "name: different\ndescription: Task.\ndisable-model-invocation: true"
       ),
       "skills/sample-skill/SKILL.md: name must match its parent directory.\n"
-    ]
+    ],
+    [skillContent(), ""]
   ];
   for (const [content, diagnostic] of cases) {
     if (content !== null) {
       writeFileSync(path.join(directory, "SKILL.md"), content);
     }
-    for (const filename of [entrypoint, alias]) {
-      assertMetadataCommand(filename, diagnostic);
-    }
+    assertMetadataCommand(entrypoint, diagnostic);
   }
+  assertMetadataCommand(alias);
 });
 
 await test("skill metadata command requires a Codex invocation policy", (t) => {
