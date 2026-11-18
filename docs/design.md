@@ -201,11 +201,6 @@ On a file or frontmatter error, it identifies the failing file without emitting 
 The [README](../README.md#hook-errors) lists exit codes and the effect on startup.
 This context-loading hook cannot enforce permissions.
 
-The separate `hooks/bash-polling-guard.mjs` command handles Bash `PreToolUse` events in both host configurations.
-The [runtime contract](../README.md#bash-polling-guard) defines matching, denial, shared session counters, state ownership, and failure behavior.
-Its deliberately restricted literal grammar excludes unsupported syntax instead of guessing shell semantics.
-The guard emits only a native denial decision and leaves execution and permission settings with the host.
-
 The host determines which delegated executions emit hook events.
 Do not assume that every orchestration system creates a Claude Code subagent.
 Dispatch prompts must carry the constraints needed by a receiver whose context is unknown.
@@ -301,10 +296,6 @@ It executes the registered shell commands from a path with spaces and an unrelat
 The configured-command tests select each host's hook configuration through its relocated native manifest and use the shared skills directory.
 It checks Claude's inline limit with complete instructions, long plugin paths, and LF or CRLF line endings.
 Each test removes its disposable plugin copies.
-
-`hooks/bash-polling-guard.test.mjs` runs the host-independent matcher and counter cases once and checks host separation through both registered commands.
-Its syntax matrix runs independent sessions concurrently because each case is bounded by process startup.
-It also covers session isolation, resets, concurrency, and state failures.
 
 The skill metadata gate parses names, descriptions, optional fields, and invocation controls through the existing YAML parser.
 It preserves host extensions while enforcing portable field types, character limits, directory identity, and nonempty bodies.

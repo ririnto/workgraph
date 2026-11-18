@@ -1,0 +1,31 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "author": {
+    "name": "ririnto"
+  },
+  "description": "Engineering coordination and development skills for coding agents.",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "capabilities": [],
+        "category": "Developer Tools",
+        "developerName": "ririnto",
+        "displayName": "Workgraph",
+        "longDescription": "Engineering coordination and development instructions for coding agents.",
+        "shortDescription": "Engineering agent workflows"
+      }
+    }
+  },
+  "homepage": "https://github.com/ririnto/workgraph",
+  "keywords": [
+    "engineering",
+    "instructions",
+    "hooks",
+    "skills",
+    "context-contracts"
+  ],
+  "license": "MIT",
+  "name": "workgraph",
+  "repository": "https://github.com/ririnto/workgraph",
+  "version": "2026.11.20"
+}

@@ -137,12 +137,11 @@ The [Codex adapter](harness/codex.md#confirm-hook-activation) now distinguishes 
 
 The i-have-adhd [hook history on main](https://github.com/ayghri/i-have-adhd/commits/main/hooks/hooks.json), reviewed on 2026-10-31, records an August 18 timeout fix reporting a 6,549 ms Node cold start under concurrent hooks that exceeded its former five-second deadline.
 Workgraph increases its context-hook ceiling to 30 seconds to allow startup under contention.
-This adds headroom rather than a delay, and the independent polling-guard timeout remains unchanged.
 The upstream report is not a reproduction of missing Workgraph context or proof of startup performance on another host.
 The [Claude hooks reference](https://code.claude.com/docs/en/hooks) describes event timing and timeout handling.
 
 Ponytail's [main branch history](https://github.com/DietrichGebert/ponytail/commits/main/), reviewed on 2026-10-31, records an October 18 timeout fix that raised lifecycle deadlines from five to fifteen seconds after reports of slow Windows startup.
-Workgraph's existing thirty-second context ceiling already accommodates that rationale without changing the polling guard.
+Workgraph's existing thirty-second context ceiling already accommodates that rationale.
 Ponytail's optional codebase map and persistent personal mode do not create corresponding Workgraph requirements.
 Workgraph retains canonical skill files rather than duplicating fallback instructions in its injector.
 Pstack's current manifests declare no lifecycle hooks, and its dependency bootstrap script is not a session-start hook.

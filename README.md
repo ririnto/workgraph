@@ -4,7 +4,6 @@ Workgraph supplies engineering coordination and development instructions for cod
 Its Main Agent mode routes work to focused skills, lifecycle playbooks and host references.
 Claude Code and supported Codex runtimes can load the selected Main or Worker role through native hooks.
 
-Workgraph supplies instructions and a narrow Bash polling guard.
 The host controls execution, model settings, permissions, and completion notifications.
 The hook runtime uses Node built-ins and needs no npm dependencies.
 
@@ -53,51 +52,6 @@ Parent history can still carry Main context into a forked Worker.
 
 The [delivery design](docs/design.md#deliver-context) explains native loading formats, message-envelope differences, and Claude's inline-context limit.
 Hook checks establish source delivery, not installed activation or model adherence.
-
-## Bash polling guard
-
-### Count repeated commands
-
-Both host configurations register a synchronous `PreToolUse` command hook matching `Bash`.
-The guard denies the third consecutive matching Bash call within the same host and session ID.
-Matches can mix `tail` and `sleep`.
-Further matching calls remain denied until a nonmatching Bash command resets the counter.
-Other tools leave the counter unchanged.
-The denial directs agents to end the turn and await an available completion callback.
-For an existing command without a callback, it directs agents to use the host-native wait instead of polling.
-Codex's `write_stdin` can collect completion for an existing unified execution session.
-Installation changes no host enable settings or permission configuration.
-
-### Recognize matching commands
-
-The guard recognizes literal leading `tail` and `sleep` commands with ordinary arguments and simple pipelines.
-Spaces, tabs, single quotes, double quotes without expansion, trailing comments, and one final newline are supported.
-Occurrences in prose arguments, quoted executable names, and later pipeline commands do not match.
-Paths, wrappers, expansions, redirections, compound commands, functions, and unsupported syntax do not match.
-These excluded forms reset the counter because safe detection takes precedence over broad coverage.
-The guard never executes or rewrites a command.
-
-### Apply the counter
-
-`tail -f`, `tail -F`, and `tail --follow` count like other `tail` calls.
-The guard limits repeated tool invocations, including repeated follow commands.
-A single inspection after completion remains allowed when fewer than two matching calls precede it.
-Completion callbacks do not reset the counter.
-Codex maps shell and unified execution calls to `Bash` with `tool_input.command` in its [hook interface](https://developers.openai.com/codex/hooks/).
-Codex subagents share the parent session ID and therefore share its counter.
-
-### Store state and handle failures
-
-State uses private directories beneath the operating system's temporary directory.
-Only a bounded counter and failure markers are stored, under hashed host and session identifiers.
-The guard serializes concurrent counter changes with an exclusive lock and atomically replaces the counter file.
-It rejects unsafe directories and counter symlinks.
-State errors allow execution and disable further decisions for that session when the failure marker can be written.
-The lock wait is bounded to approximately one second.
-A crashed invocation's lock remains untouched, so later calls fail open rather than reclaiming another invocation's lock.
-Temporary state remains until operating system cleanup, avoiding session-end deletion races with active delegated work.
-The guard emits generic errors without commands, session identifiers, or private paths.
-Enforcement requires POSIX user IDs and no-follow file opens, so Windows fails open.
 
 ## Goal-driven work
 
@@ -283,3 +237,10 @@ The [source review](docs/research.md#codex-native-hook-discovery-and-trust) reco
 A working-branch push reaches installed users only when their marketplace source tracks that branch.
 Follow the authorized repository release process to update the distribution branch.
 Use the matching [host adapter](#install) for installed-plugin updates and fresh-session checks.
+
+### ChatGPT account releases
+
+Use `.chatgpt-plugin/plugin.json` as the root `plugin.json` in a ChatGPT upload archive.
+Include the shared `skills/` tree and its referenced files when preparing a complete package.
+The account manifest uses a three-part semantic version.
+Increment it for an account release and preserve the existing account attribution when updating through Plugin Creator.

@@ -46,7 +46,6 @@ The host still delivers a hook message, so matching the skill text does not crea
 Main receives its [Codex reference](../../skills/main-agent-contract/references/codex.md).
 Worker receives its [Codex reference](../../skills/subagent-context/references/codex.md).
 Those references own host-specific execution and delegation.
-The [Bash polling guard](../../README.md#bash-polling-guard) applies where the host runs its registered PreToolUse hook.
 
 ## Confirm hook activation
 
@@ -62,7 +61,7 @@ A catalog entry listed as available is not an installed plugin.
 Release `2026.10.31.06` restores native Codex hook registration.
 An older cached portable package can expose skills while contributing no hooks.
 
-In a supported local Codex session, open `/hooks` and check that the Workgraph source lists SessionStart, SubagentStart, and Bash PreToolUse.
+In a supported local Codex session, open `/hooks` and check that the Workgraph source lists SessionStart and SubagentStart.
 Review and trust the current plugin through the host controls if you intend to run its hooks.
 Installation and enablement alone do not grant trust.
 Codex also checks plugin contents, so skill, documentation, or version changes can require renewed approval even when hook commands are unchanged.
