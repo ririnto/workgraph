@@ -33,18 +33,8 @@ Select the scenario affected by the change.
 Each case defaults to one run.
 Repeat a selected case when comparing behavior across runs.
 
-| Case | Decision observed |
-| --- | --- |
-| [agent-completion-callback](../evals/agent-completion-callback/case.yaml) | Worker completion and the requested language of the handoff. |
-| [agent-fan-out](../evals/agent-fan-out/case.yaml) | Independent single-phase Agent assignments. |
-| [background-completion](../evals/background-completion/case.yaml) | Dependent work after host command completion. |
-| [workflow-follow-up](../evals/workflow-follow-up/case.yaml) | Conditional Workflow routing and reconciliation of two independent batches. |
-| [delivery-completion-evidence](../evals/delivery-completion-evidence/case.yaml) | Actual invocation of the installed delivery workflow and its returned outcome. |
-| [development-natural-trigger](../evals/development-natural-trigger/case.yaml) | Natural Development activation and a source correction. |
-| [workflow-keyword-near-miss](../evals/workflow-keyword-near-miss/case.yaml) | A GitHub Actions question answered directly. |
-| [workflow-design-invocation](../evals/workflow-design-invocation/case.yaml) | Read-only design, conflicting requirements, and missing independent evidence. |
-| [delivery-decisions](../evals/delivery-decisions/case.yaml) | PR authority, queue status, and verified issue closure. |
-| [user-directed-defaults](../evals/user-directed-defaults/case.yaml) | User choices, required approvals, and host boundaries. |
-| [codex-delegation-context](../evals/codex-delegation-context/case.yaml) | Codex context and continuation decisions in a synthetic scenario. |
-| [codex-plugin-updates](../evals/codex-plugin-updates/case.yaml) | Plugin refresh choices and preserved enablement in a synthetic scenario. |
-| [verification-evidence](../evals/verification-evidence/case.yaml) | Evidence attribution and when an instruction change is justified. |
+| Host path | Case | Evidence |
+| --- | --- | --- |
+| Direct | [Source correction](../evals/development-natural-trigger/case.yaml) | Main loads Development and fixes the supplied bug without delegation. |
+| Agent | [Worker completion](../evals/agent-completion-callback/case.yaml) | Main waits for the background worker and uses its completed result. |
+| Workflow | [Bundled delivery](../evals/delivery-completion-evidence/case.yaml) | The registered workflow returns phase records that support the reported outcome. |

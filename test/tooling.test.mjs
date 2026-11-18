@@ -872,12 +872,12 @@ await test("delivery dispatches and records per-phase model selections", async (
         {
           Explore: models.explore ?? "haiku",
           Implement: models.implement,
-          Integrate: models.integrate,
+          Integrate: models.integrate ?? "sonnet",
           Plan: models.plan ?? "sonnet",
-          Publish: models.publish,
+          Publish: models.publish ?? "haiku",
           Review: models.review,
           Scope: models.scope,
-          Sweep: models.sweep
+          Sweep: models.sweep ?? "haiku"
         }
       );
       assert.deepEqual(
@@ -1022,6 +1022,50 @@ await test("delivery can finish at Explore or Plan when the whole goal needs no 
       }
     })
   );
+});
+
+await test("delivery reuses a scope supplied by Main without a Scope agent", async () => {
+  const scope = { evidence: scopeResult.evidence, scopes: scopeResult.scopes };
+  const cases = [
+    { scope },
+    { skips: { scope: true }, scope },
+    { skips: { scope: true } },
+    { scope: { ...scope, baseBranch: "other" } }
+  ];
+  const [provided, explicit, missing, conflicting] = await Promise.all(
+    cases.map(
+      async (args) =>
+        await runWorkflowSample(
+          samplePaths.delivery,
+          { task: "Assess parsing", baseBranch: "main", ...args },
+          dispatchTable({
+            Explore: () => exploreResult,
+            Plan: () => ({
+              evidence: "The trigger passes.",
+              stopReason: "Already fixed",
+              units: []
+            })
+          })
+        )
+    )
+  );
+  for (const accepted of [provided, explicit]) {
+    assert.deepEqual(
+      accepted.calls.map(({ phase }) => phase),
+      ["Explore", "Plan"]
+    );
+    assert.equal(accepted.result.complete, true);
+    const node = accepted.result.graph.nodes.find(({ key }) => key === "scope");
+    assert.deepEqual(node?.completionEvidence.at(-1)?.result, {
+      ...scope,
+      baseBranch: "main",
+      source: "argument"
+    });
+  }
+  for (const blocked of [missing, conflicting]) {
+    assert.deepEqual(blocked.calls, []);
+    assert.equal(blocked.result.complete, false);
+  }
 });
 
 await test("delivery workflow samples stop planning when exploration fails", async () => {

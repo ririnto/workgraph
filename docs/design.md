@@ -318,14 +318,8 @@ Use the validation commands and prose review requirements from the auto-injected
 Workgraph's scoped contributor review policy lives in [docs/reviews.md](reviews.md).
 
 Behavioral evaluation requires a host run with the changed plugin loaded.
-The maintained cases cover single and parallel independent Agent selection, bundled-source Workflow invocation, expected continuation, and both conditional follow-up outcomes.
-Additional cases check an idle background command and an Agent completion callback.
-The communication case checks a worker handoff and the requested language of the human report.
-The test-design case checks independent expectations, legitimate structural contracts, and proportionate verification of prose changes.
-The delivery-decision case covers scoped Git authority, proportional review, current-unit gates, authorized recovery, true boundaries, and isolated parallel work.
-The user-directed-defaults case checks explicit procedural choices and repository scope without arbitrary age or archive filters.
-The conditional Workflow case uses two independent batches and dispatches a follow-up only for the batch with a finding.
-These policy assessments do not perform Git delivery or establish installed activation.
+The [three native cases](verification-map.md#native-evaluation-cases) exercise direct skill use, a background Agent handoff, and the registered delivery Workflow.
+Deterministic graph and ownership behavior is covered by the workflow harness.
 Completion graders inspect actual traces rather than relying on final claims.
 Retained local traces let maintainers distinguish completed command and worker outcomes from reported acceptance.
 Record which model, host, and loaded plugin produced the result.

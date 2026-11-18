@@ -46,10 +46,9 @@ It checks required fields, documented optional types, directory identity, charac
 The standard's 500-line body guidance remains a recommendation rather than a rejection threshold.
 Host extension fields remain available for supported behavior such as Workflow's argument hint.
 
-The new triggering cases use ordinary requests without naming the desired skill.
-Activation graders inspect actual loaded content, while outcome graders assess factual preservation and source behavior.
-A GitHub Actions near miss checks that a shared keyword does not select Claude's native Workflow procedure.
-The maintained two-run minimum and individual-outcome reporting remain unchanged.
+The direct source-correction case uses an ordinary request without naming the desired skill.
+Its trace grader checks that Main loads Development and fixes the supplied Python helper directly, even though the request mentions a GitHub Actions workflow.
+A smoke case runs once by default, and repeated comparisons report individual outcomes.
 Package checks, context measurements, native activation, and model outcomes remain separate evidence.
 
 ### Codex marketplace resolution and updates
@@ -79,7 +78,6 @@ Codex CLI `0.166.0` exposes no separate local refresh command that preserves dis
 Its [plugin browser](https://github.com/openai/codex/blob/main/codex-rs/tui/src/app/background_requests.rs) lists plugins without requesting that refresh.
 Its [JSON listing](https://github.com/openai/codex/blob/main/codex-rs/cli/src/plugin_cmd.rs) reports the installed version and enabled state for readback.
 The [Codex adapter](harness/codex.md#update) and [Delivery update reference](../skills/delivery/references/plugin-updates.md#codex) apply these distinctions.
-The [update assessment](../evals/codex-plugin-updates/case.yaml) checks synthetic decisions without performing installation or establishing native cache behavior.
 
 ### Codex native hook discovery and trust
 
@@ -187,7 +185,6 @@ Pstack's [Babysit playbook](https://github.com/cursor/plugins/blob/main/pstack/s
 Its [Shipping playbook](https://github.com/cursor/plugins/blob/main/pstack/skills/poteto-mode/playbooks/shipping.md) checks actual merged state rather than treating queue enrollment as a completed merge.
 Delivery adopts these distinctions, preserves prior scoped user authorization, and completes preparation without adding a mandatory confirmation ritual.
 The merge-authority clause predates the October 27 change and is not attributed to that commit.
-The [delivery decision case](../evals/delivery-decisions/case.yaml) covers publication-only requests, later scoped grants, and queued requests still awaiting integration.
 
 Pstack's October 27 change removed its orchestration CLI and state store in favor of native host capabilities.
 Workgraph already uses native delegation and Claude-only Workflow, so this review adds no execution layer or optional state machinery.
@@ -205,7 +202,7 @@ Those figures are the author's report, not an independently inspected repository
 The full post was unavailable through the reviewed public routes.
 Development addresses the general failure mode by requiring concrete needs for added abstractions, existing-check reuse, and an uncovered realistic failure for each added test.
 It stops optional verification growth after required gates and changed risks have sufficient evidence, without inventing a test-count, coverage, or code-ratio target.
-The test-design case now includes a passing, adequately checked change for which a generic framework and ratio-driven helper tests add no demonstrated coverage.
+The former test-design case illustrated a passing change for which extra helper tests added no coverage.
 
 Workgraph applies that guidance to its own checks.
 The Workflow tests retain actual phase execution and remove a duplicate source-spelling assertion about the same order.
@@ -482,8 +479,6 @@ These interfaces do not establish a recommended numeric worker quota or unlimite
 
 Main's [Codex reference](../skills/main-agent-contract/references/codex.md) selects history from the required context and sizes assignments around coherent outcomes.
 It preserves earlier requirements in focused briefs, existing settings and budgets, and incomplete acceptance when a real limit prevents continuation.
-The [delegation assessment](../evals/codex-delegation-context/case.yaml) covers these decisions through synthetic V1 and V2 interfaces without dispatching workers.
-Its own runner limit does not represent a worker control, and its results cannot establish native Codex dispatch or actual history transfer.
 
 ### Skill structure
 
@@ -817,8 +812,7 @@ These controls calibrate the grader and are not additional solver successes.
 The graded comparison ties, so it gives no measured reason to expand Verification or add redundant rules.
 The proposed expansion remained unmerged at the time of the comparison.
 The authoring change requires grader calibration and explicit coverage reporting.
-The native [case](../evals/verification-evidence/case.yaml) defines regression coverage.
-Neither provides evidence of runtime or model-adherence gains.
+The comparison provides no evidence of runtime or model-adherence gains.
 No native activation, generalization, stock JobBench, recursive sweep, or selection evidence exists.
 
 ### Instruction boundary reinforcement rerun
@@ -849,7 +843,7 @@ Public-only source and inputs were read-only mounts, with writable task-owned ou
 The container had a non-root user, read-only root filesystem, resource limits, and a 900-second timeout.
 Network egress was not enforced, and model output was never executed.
 The run establishes neither native activation, permission enforcement, broad model adherence, nor stock benchmark or recursive-sweep coverage.
-The maintained native evidence-assessment case remains unrun because the worktree isolation guard refused its evaluator invocation.
+The native evidence-assessment case was unrun at the time of this comparison because the worktree isolation guard refused its evaluator invocation.
 
 ### Scoped contributor review reinforcement
 

@@ -9,22 +9,12 @@ execution:
     - Workflow
     - Read
   prompt: |-
-    Use the planning-only run of the Workgraph delivery sample.
-    Read the bundled `skills/workflow/SKILL.md` and its `workflows/delivery.js` source unless their complete content is already present.
-    Resolve both paths from the Main contract's base directory in the session context.
-    The `Skill` tool refuses Workgraph skills, which is expected.
-    Invoke the registered workgraph:delivery workflow.
-    Assess the bundled workflow sample documentation and plan one bounded clarification follow-up.
-    Name the absolute paths of `docs/workflow-samples.md` and `workflows/delivery.js` in `args.task`, because stages can read those files but cannot search outside the working directory.
-    Keep scope separation, exploration, and planning enabled.
-    Scope and plan outputs must express every owned path relative to the repository root, even though args.task identifies readable source files by absolute path.
-    Because this request edits nothing and publishes nothing, skip implementation, integration, sweep, publication, and review through structured args.skips.
-    Run exactly one native Workflow invocation.
-    Do not retry or duplicate it after failure, incomplete results, or timeout.
-    If the run launches in the background, wait for its completion notification.
-    Then read its task output file once so the returned result appears in the trace.
-    Report the returned phase evidence and completion outcome only from the returned result.
-    Do not edit files, run shell commands, use Git, publish, or dispatch host Agents.
+    Invoke the registered workgraph:delivery workflow once to assess its bundled workflow documentation and plan a bounded clarification.
+    Read skills/workflow/SKILL.md and workflows/delivery.js from the plugin unless already fully loaded.
+    Put the absolute paths to docs/workflow-samples.md and workflows/delivery.js in args.task for the stage agents.
+    Enable Scope, Explore and Plan. Explicitly skip Implement, Integrate, Sweep, Publish and Review.
+    Wait for completion and read the returned task output if backgrounded. Report the observed outcome and phase evidence.
+    Make no edits or publications.
 graders:
   - name: delivery-workflow-invoked
     type: tool_used
@@ -35,27 +25,8 @@ graders:
     type: llm
     focus: trace
     criteria: |-
-      Judge the observed tool trace, Workflow results, and final report together.
-      Require the complete bundled `skills/workflow/SKILL.md` and maintained `workflows/delivery.js` source.
-      Accept complete Reads of the bundled files or complete content already supplied in the observed context.
-      Require its first native Workflow call to use the registered workgraph:delivery name.
-      Require that call to pass the assessment task and args.skips marking exactly implement, integrate, sweep, publish, and review as true.
-      A freshly authored replacement graph or an inline script does not establish source consumption.
-      Judge stage results only from the returned `scopes` and `explorations` fields, because stage prompts are not in the trace.
-      Require the returned phase evidence to record Scope and Explore as completed.
-      Require one returned exploration per returned scope, each with a summary, risks, and evidence.
-      If exploration or planning returns a supported no-change decision, require complete true, publish null, zero fix rounds, the deciding phase, reason, and evidence for the full goal.
-      Require every successor of an accepted early exit to be recorded as skipped without dispatch.
-      Otherwise require Plan to run and its record to be completed or failed.
-      Accept a failed plan record only with the source's own validation or agent-failure reason.
-      Require every later phase record to be skipped with the nonempty reason that the source records for that outcome.
-      Require no dispatch of Implement, Integrate, Sweep, Publish, or Review agents.
-      For a background run, require one Read of its completed task output file before the final report.
-      Judge the returned result from that Read result or the synchronous Workflow result.
-      Without an accepted early exit, require the returned result to report `complete` false, `publish` null, and `fixRounds.used` zero.
-      Require the final report to restate the recorded statuses and reasons from the returned evidence.
-      Fail a report that claims edits, publication, completed delivery, or a phase record that the run did not return.
-      Fail a proposed-only workflow, an execution error, a retried or duplicated invocation, or a second host Agent or Workflow dispatch.
-      Fail fabricated phase records or a report before the returned result exists.
-      A launch acknowledgment that reports no phase results is not such a report.
-      Judge observed tool results and evidence, not specific prose wording.
+      The trace invokes the bundled workgraph:delivery once with the requested args.skips and obtains its completed output.
+      Scope and Explore complete with one evidenced result per scope. Plan runs unless Explore returns a justified no-change decision for every scope.
+      An evidenced Explore or Plan no-change outcome may report complete true. Otherwise expect complete false.
+      Every successor after a terminal decision is skipped. No implementation, integration, sweep, publication, or review runs.
+      The final report matches the observed phase records, publish null, and zero fix rounds. A launch acknowledgment alone fails.
