@@ -60,6 +60,7 @@ for (const map of [skipsInput, modelsInput, effortsInput, partsInput]) {
   }
 }
 const skipped = {}
+const defaultModels = { explore: 'haiku', plan: 'sonnet' }
 const models = {}
 const efforts = {}
 const promptParts = {}
@@ -160,15 +161,22 @@ const graphPosition = key => {
   ].filter(Boolean).join('\n')
 }
 const runAgent = async (prompt, options) => {
-  const key = options.label.startsWith('explore:') || options.label.startsWith('implement:') || options.label.startsWith('verify-findings:') ? options.label : activeNodes[options.phase.toLowerCase()]
+  const phaseKey = options.phase.toLowerCase()
+  const key = options.label.startsWith('explore:') || options.label.startsWith('implement:') || options.label.startsWith('verify-findings:') ? options.label : activeNodes[phaseKey]
   const node = nodeFor(key)
   const predecessor = graph.edges.find(edge => edge.to === key && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')
   if (predecessor !== undefined) {
     return { error: `Required graph predecessor ${predecessor.from} is incomplete` }
   }
-  node.inputs = { contract: node.inputs, predecessors: Object.fromEntries(node.prerequisites.map(parent => [parent, nodeFor(parent).completionEvidence.at(-1)?.result ?? null])) }
+  const requestedModel = models[phaseKey] ?? defaultModels[phaseKey]
+  const defaultSource = requestedModel === undefined ? 'host' : 'workflow-default'
+  node.inputs = {
+    contract: node.inputs,
+    predecessors: Object.fromEntries(node.prerequisites.map(parent => [parent, nodeFor(parent).completionEvidence.at(-1)?.result ?? null])),
+    modelSelection: { requestedModel: requestedModel ?? null, source: models[phaseKey] === undefined ? defaultSource : 'argument' }
+  }
   node.status = 'running'
-  return agent(compose(graphPosition(key), prompt), options).then(
+  return agent(compose(graphPosition(key), prompt), requestedModel === undefined ? options : { ...options, model: requestedModel }).then(
     result => ({ result }),
     error => ({ error: String(error instanceof Error ? error.message : error) })
   )
@@ -226,7 +234,6 @@ const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compo
 ), {
   agentType: 'Explore',
   label: 'scope',
-  ...(models.scope === undefined ? {} : { model: models.scope }),
   ...(efforts.scope === undefined ? {} : { effort: efforts.scope }),
   phase: 'Scope',
   schema: {
@@ -307,7 +314,6 @@ if (incompletePredecessor('explore') !== undefined) {
     ), {
       agentType: 'Explore',
       label: `explore:${scope.key}`,
-      model: models.explore ?? 'haiku',
       ...(efforts.explore === undefined ? {} : { effort: efforts.explore }),
       phase: 'Explore',
       schema: {
@@ -365,17 +371,12 @@ if (incompletePredecessor('plan') !== undefined) {
     taskPart,
     `Decide whether the goal needs one work unit or several disjoint work units, and define at most ${unitCap} units.`,
     'Use separate units only when parallel ownership or context size requires them, and prefer the fewest units that cover the goal.',
-    `Scopes and exploration findings: ${JSON.stringify({
-      explorations,
-      scopes: scopes.map(scope => ({ description: scope.description, key: scope.key, paths: scope.paths }))
-    })}`,
     'Give each unit a short key and owned paths. Its instructions must tell the implementer which behavior to deliver, which constraints to preserve, and what result the checks should show.',
     'Express every path relative to the repository root, for example plugins/foo. Absolute paths are rejected.',
     'List each owned path once, and share no owned path between units.',
     promptParts.plan
   ), {
     label: 'plan',
-    ...(models.plan === undefined ? {} : { model: models.plan }),
     ...(efforts.plan === undefined ? {} : { effort: efforts.plan }),
     phase: 'Plan',
     schema: {
@@ -464,7 +465,6 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     const options = {
       isolation: 'worktree',
       label: `implement:${unit.key}${roundLabel}`,
-      ...(models.implement === undefined ? {} : { model: models.implement }),
       ...(efforts.implement === undefined ? {} : { effort: efforts.implement }),
       phase: 'Implement',
       schema: {
@@ -583,7 +583,6 @@ const dispatchIntegration = async (currentUnits, destination) => {
     promptParts.integrate
   ), {
     label: 'integrate',
-    ...(models.integrate === undefined ? {} : { model: models.integrate }),
     ...(efforts.integrate === undefined ? {} : { effort: efforts.integrate }),
     phase: 'Integrate',
     schema: {
@@ -710,7 +709,6 @@ const dispatchSweep = async candidate => {
   ), {
     agentType: 'Explore',
     label: 'sweep',
-    ...(models.sweep === undefined ? {} : { model: models.sweep }),
     ...(efforts.sweep === undefined ? {} : { effort: efforts.sweep }),
     phase: 'Sweep',
     schema: {
@@ -770,7 +768,6 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
     promptParts.publish
   ), {
     label: 'publish',
-    ...(models.publish === undefined ? {} : { model: models.publish }),
     ...(efforts.publish === undefined ? {} : { effort: efforts.publish }),
     phase: 'Publish',
     schema: {
@@ -825,7 +822,6 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     promptParts.review
   ), {
     label: 'review',
-    ...(models.review === undefined ? {} : { model: models.review }),
     ...(efforts.review === undefined ? {} : { effort: efforts.review }),
     phase: 'Review',
     schema: {
@@ -888,7 +884,7 @@ const verifyFindings = async (review, integration, publication, round) => {
     'Return exactly one disposition per finding with its id, status confirmed, refuted, or unverified, and nonempty evidence.',
     readOnlyPart,
     promptParts.review
-  ), { label: `verify-findings:${round + 1}`, ...(models.verify === undefined ? {} : { model: models.verify }), ...(efforts.verify === undefined ? {} : { effort: efforts.verify }), phase: 'Verify', schema: {
+  ), { label: `verify-findings:${round + 1}`, ...(efforts.verify === undefined ? {} : { effort: efforts.verify }), phase: 'Verify', schema: {
     properties: { dispositions: { items: { properties: { id: { type: 'string' }, status: { enum: ['confirmed', 'refuted', 'unverified'], type: 'string' }, evidence: { type: 'string' } }, required: ['id', 'status', 'evidence'], type: 'object' }, type: 'array' } },
     required: ['dispositions'], type: 'object'
   } })

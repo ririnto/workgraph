@@ -147,11 +147,16 @@ A confirmed finding outside one unambiguous owned unit blocks the round for repl
 ## Models and effort
 
 The delivery sample accepts optional selectors by phase through `args.models` and `args.efforts`, plus `verify` selectors for finding verification.
-Explore requests `haiku` for routine lookup unless the caller sets `args.models.explore`.
+Explore requests `haiku` and Plan requests `sonnet` by default.
+An explicit selector in `args.models` takes precedence for that phase.
 Other omitted model selectors and all omitted effort selectors use host configuration.
 Main selects overrides using its [Claude Code guidance](../skills/main-agent-contract/references/claude-code.md#model-selection).
 Claude Code applies its [workflow model policy](https://code.claude.com/docs/en/workflows) to the requested selector.
 Every selector must be a nonempty string the host supports for agent calls.
+
+Each dispatched graph node records `inputs.modelSelection.requestedModel` and its `source` (`argument`, `workflow-default`, or `host`).
+A `host` record has a null requested model because the workflow omitted the selector.
+Use host execution evidence to identify the model that actually ran.
 
 ## Cache reuse
 

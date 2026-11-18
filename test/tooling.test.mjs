@@ -847,11 +847,11 @@ await test("delivery samples fail a fix-required review without findings", async
   );
 });
 
-await test("delivery applies the Explore default and honors phase overrides", async () => {
+await test("delivery dispatches and records per-phase model selections", async () => {
   await Promise.all(
     [
       {},
-      { explore: "sonnet" },
+      { explore: "sonnet", plan: "haiku" },
       Object.fromEntries(
         [
           "scope",
@@ -868,7 +868,7 @@ await test("delivery applies the Explore default and honors phase overrides", as
       const efforts = Object.fromEntries(
         Object.keys(models).map((phase) => [phase, `effort-${phase}`])
       );
-      const { calls } = await runWorkflowSample(
+      const { calls, result } = await runWorkflowSample(
         samplePaths.delivery,
         { candidateBranch: "task-branch", efforts, models, task: "t" },
         dispatchTable({
@@ -888,7 +888,7 @@ await test("delivery applies the Explore default and honors phase overrides", as
           Explore: models.explore ?? "haiku",
           Implement: models.implement,
           Integrate: models.integrate,
-          Plan: models.plan,
+          Plan: models.plan ?? "sonnet",
           Publish: models.publish,
           Review: models.review,
           Scope: models.scope,
@@ -902,6 +902,17 @@ await test("delivery applies the Explore default and honors phase overrides", as
         )
       );
       for (const call of calls) {
+        const inputs = result.graph.nodes.find(
+          (node) => node.key === call.label
+        )?.inputs;
+        assert.ok(isObject(inputs));
+        const defaultSource = call.modelProvided ? "workflow-default" : "host";
+        assert.deepEqual(inputs.modelSelection, {
+          requestedModel: call.model ?? null,
+          source: Object.hasOwn(models, call.phase.toLowerCase())
+            ? "argument"
+            : defaultSource
+        });
         assert.equal(call.effortProvided, call.effort !== undefined);
         assert.equal(call.modelProvided, call.model !== undefined);
       }
@@ -1215,7 +1226,6 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
       {
         issue: "#1",
         maxFixRounds: 0,
-        models: { scope: "configured-selector" },
         skips: { implement: true, integrate: true, publish: true },
         task: "t"
       },
@@ -1232,11 +1242,6 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
     assert.equal(phases.filter((phase) => phase === "Publish").length, 0);
     assert.equal(phases.filter((phase) => phase === "Integrate").length, 0);
     assert.equal(phases.filter((phase) => phase === "Review").length, 0);
-    const models = Object.fromEntries(
-      calls.map((call) => [call.phase, call.model])
-    );
-    assert.equal(models.Scope, "configured-selector");
-    assert.equal(models.Plan, undefined);
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
@@ -2058,6 +2063,8 @@ await test("delivery samples append each phase's prompt part as its final sectio
 });
 
 await test("delivery samples pass candidate, issue, request, and owned findings into prompt sections", async () => {
+  const evidence = "scope-specific observation";
+  const description = "scope-specific description";
   const findings = [
     { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
@@ -2069,7 +2076,7 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
         file,
         { candidateBranch: "task-branch", issue: "#1", task: "t" },
         dispatchTable({
-          Explore: () => exploreResult,
+          Explore: () => ({ ...exploreResult, evidence }),
           Implement: splitImplement,
           Integrate: () => integrateResult,
           Plan: () => splitUnits,
@@ -2078,7 +2085,10 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
             { evidence: "e", findings: reviewed, verdict: "fix-required" },
             reviewPass
           ),
-          Scope: () => scopeResult,
+          Scope: () => ({
+            ...scopeResult,
+            scopes: [{ ...scopeResult.scopes[0], description }]
+          }),
           Sweep: () => sweepResult,
           Verify: () => ({
             dispositions: reviewed.map((_finding, index) => ({
@@ -2092,22 +2102,13 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
       assert.equal(result.complete, true);
       assert.equal(result.sweepEvidence, sweepResult.evidence);
       assert.deepEqual(result.explorations, [
-        { evidence: "e", key: "s1", risks: ["r"], summary: "s" }
+        { ...exploreResult, evidence, key: "s1" }
       ]);
-      assert.equal(
-        calls
-          .find(({ phase }) => phase === "Plan")
-          ?.prompt.split("\n\n")
-          .find((section) =>
-            section.startsWith("Scopes and exploration findings: ")
-          ),
-        `Scopes and exploration findings: ${JSON.stringify({
-          explorations: [
-            { evidence: "e", key: "s1", risks: ["r"], summary: "s" }
-          ],
-          scopes: scopeResult.scopes
-        })}`
-      );
+      const plan = calls.find((call) => call.phase === "Plan");
+      assert.ok(plan);
+      for (const value of [description, evidence]) {
+        assert.equal(plan.prompt.split(value).length - 1, 1);
+      }
       /** @param {string} text Prompt section. */
       const owns = (text) =>
         calls
