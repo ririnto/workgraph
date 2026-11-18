@@ -324,7 +324,7 @@ The communication case checks a worker handoff and the requested language of the
 The test-design case checks independent expectations, legitimate structural contracts, and proportionate verification of prose changes.
 The delivery-decision case covers scoped Git authority, proportional review, current-unit gates, authorized recovery, true boundaries, and isolated parallel work.
 The user-directed-defaults case checks explicit procedural choices and repository scope without arbitrary age or archive filters.
-The Workflow-selection case uses keyed parser and documentation assessments with one necessary reconciliation rather than a domain-by-phase review matrix.
+The conditional Workflow case uses two independent batches and dispatches a follow-up only for the batch with a finding.
 These policy assessments do not perform Git delivery or establish installed activation.
 Completion graders inspect actual traces rather than relying on final claims.
 Retained local traces let maintainers distinguish completed command and worker outcomes from reported acceptance.

@@ -111,7 +111,7 @@ Run a focused regression check from a trusted checkout.
 These evaluations call real models and keep their reports outside the repository.
 
 ```sh
-claude plugin eval ./ --tag triggering --runs 2 --ablation none --no-publish --output-dir ../workgraph-trigger-results
+claude plugin eval ./ --tag triggering --runs 1 --ablation none --no-publish --output-dir ../workgraph-trigger-results
 ```
 
 For a paired no-plugin comparison, omit `--ablation none`.

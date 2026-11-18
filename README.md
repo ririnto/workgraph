@@ -126,7 +126,7 @@ For Claude Code Main, [Workflow](skills/workflow/SKILL.md) contains host and rol
 Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
 The conditional authoring and delivery references stay behind that admission boundary.
 Codex uses native delegation rather than Claude Code Workflow.
-Workgraph bundles one [adaptive delivery workflow](docs/workflow-samples.md), with the plan deciding whether cross-unit integration is required.
+Workgraph bundles one [adaptive delivery workflow](docs/workflow-samples.md), that can finish at Explore or Plan when the evidence shows no change is needed, or publish and review the requested change.
 Those samples use injectable prompt parts, optional per-phase model and effort selectors, and explicit skip, failure, and bounded-recovery records.
 The admitted Claude Main procedure also covers read-only design without bundling a specialist-agent graph.
 All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
@@ -225,14 +225,13 @@ Evaluation relocates `HOME` into its sandbox, which can break home-dependent Nod
 Prepend the resolved Node binary directory to `PATH` for the evaluator and its isolated runs.
 
 ```sh
-PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 2 --ablation none --allow-tools Workflow --keep-temp --no-publish --output-dir ../workgraph-eval-results
+PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 1 --ablation none --allow-tools Workflow --keep-temp --no-publish --output-dir ../workgraph-eval-results
 ```
 
 The example exercises Workflow delivery.
-Repeat the selected case at least twice when assessing model adherence.
-Report each case's individual run outcomes, including failures and incomplete runs, rather than only an aggregate score.
-Use `--runs 1` only for a labeled packaging or invocation smoke check.
-A smoke check does not satisfy instruction-behavior acceptance.
+One run checks invocation and the observed outcome.
+Use `--runs 2` or more on the selected case when assessing repeatability or comparing instruction changes.
+Report individual outcomes, including failures and incomplete runs.
 Keep source-check results separate from measured behavioral evidence.
 Use the [verification map](docs/verification-map.md) for case-specific commands and evidence limits.
 

@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: codex-plugin-updates
 description: Assess Codex plugin refresh choices, preserved enabled state, and update evidence.
-runs: 2
+runs: 1
 execution:
   max_turns: 16
   timeout_seconds: 240

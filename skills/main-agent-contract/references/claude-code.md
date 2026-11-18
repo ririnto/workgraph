@@ -23,8 +23,9 @@ Native worktree tools are `EnterWorktree` and `isolation: "worktree"`.
 ## Model selection
 
 Choose the lowest sufficient tier for ordinary work.
-For routine repository lookups in `workgraph:delivery`, leave `models.explore` unset to use its Haiku default.
-Pass an explicit selector for a user or project model choice, or when the exploration itself requires deeper analysis.
+In `workgraph:delivery`, leave `models.explore` and `models.plan` unset for routine lookup and planning.
+The workflow requests Haiku for Explore and Sonnet for Plan.
+Override a phase when the user or project specifies a model, or when the work calls for a higher tier.
 Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
 
 Verify selected settings are supported and each request returns a result.

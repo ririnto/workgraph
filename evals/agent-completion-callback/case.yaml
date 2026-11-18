@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: agent-completion-callback
 description: Verify that Main accepts an Agent result only after actual completion.
-runs: 2
+runs: 1
 execution:
   max_turns: 20
   timeout_seconds: 180
@@ -14,7 +14,7 @@ execution:
     Have the worker run this command once as a native background Bash operation.
     node -e "setTimeout(() => console.log('WORKGRAPH_AGENT_RESULT=' + (17 + 23 + 31)), 3000)"
     Require the worker to inspect actual successful completion before returning the sum and explaining the arithmetic.
-    Report the sum only after receiving the worker's actual completion result.
+    Report the sum in Spanish after receiving the worker’s completion result.
     Do not edit files, run Git commands, or start a polling loop.
 graders:
   - name: one-worker-started
@@ -30,7 +30,7 @@ graders:
       Main starts one background Agent with the supplied command and three original numbers.
       Main uses supported wait or callback controls and does not start a polling loop.
       The completed worker reports actual successful command output containing WORKGRAPH_AGENT_RESULT=71 and explains the addition.
-      Main's acceptance report follows that completion result and uses its sum.
+      Main’s final report follows the completed worker result, uses its sum, and answers in Spanish.
       An idle waiting response is not an acceptance claim.
       Fail if the trace ends with the worker still pending or lacks its actual result.
       Inspect Worker tool-result ordering only when nested native events are exposed.

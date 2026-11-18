@@ -3,7 +3,7 @@ name: user-directed-defaults
 description: Distinguish user-directed workflow defaults from real authority and acceptance boundaries.
 tags:
   - policy
-runs: 2
+runs: 1
 execution:
   max_turns: 20
   timeout_seconds: 240

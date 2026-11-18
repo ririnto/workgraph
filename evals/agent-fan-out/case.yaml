@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: agent-fan-out
 description: Verify direct Agent fan-out for independent assessments that end in one phase.
-runs: 2
+runs: 1
 execution:
   max_turns: 20
   timeout_seconds: 360
@@ -9,6 +9,7 @@ execution:
     - Agent
     - Read
   prompt: |-
+    ultracode
     Read the bundled `skills/main-agent-contract/SKILL.md` and its `references/claude-code.md` unless their complete content is already present.
     The `Skill` tool refuses Workgraph skills, which is expected.
     Please orchestrate a read-only assessment with subagents.

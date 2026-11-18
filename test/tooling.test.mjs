@@ -329,7 +329,7 @@ export { Store as Again };
 /** @typedef {{title: string, status: string} & Record<string, unknown>} PhaseEvidence */
 /** @typedef {{key: string, state: string} & Record<string, unknown>} WorkflowResource */
 /** @typedef {{key: string, branch: unknown, paths: unknown} & Record<string, unknown>} WorkflowUnit */
-/** @typedef {{complete: boolean, split: boolean, graph: {nodes: WorkflowNode[], edges: WorkflowEdge[]}, phaseEvidence: PhaseEvidence[], resources: WorkflowResource[], units: WorkflowUnit[], review: Record<string, unknown>, reviewHistory: Record<string, unknown>[], integration: Record<string, unknown>, fixRounds: {max: number, used: number}, publish: unknown, explorations: unknown[], sweepEvidence: unknown}} WorkflowResult */
+/** @typedef {{complete: boolean, earlyExit: unknown, split: boolean, graph: {nodes: WorkflowNode[], edges: WorkflowEdge[]}, phaseEvidence: PhaseEvidence[], resources: WorkflowResource[], units: WorkflowUnit[], review: Record<string, unknown>, reviewHistory: Record<string, unknown>[], integration: Record<string, unknown>, fixRounds: {max: number, used: number}, publish: unknown, explorations: unknown[], sweepEvidence: unknown}} WorkflowResult */
 
 /** @param {unknown} value Workflow node. @returns {value is WorkflowNode} Whether the node has the fields used by the tests. */
 const isWorkflowNode = (value) =>
@@ -432,17 +432,6 @@ const compileWorkflowSource = (file) => {
 /** @param {Record<string, (options: AgentOptions) => unknown>} table Phase handlers. @returns {(options: AgentOptions) => unknown} Agent handler. */
 const dispatchTable = (table) => (options) => {
   const entry = table[options.phase];
-  if (options.phase === "Verify" && entry === undefined) {
-    return {
-      dispositions: [
-        {
-          evidence: "Verified against source.",
-          id: `review-${options.label.split(":")[1]}-finding-1`,
-          status: "confirmed"
-        }
-      ]
-    };
-  }
   if (entry === undefined) {
     throw new Error(`unexpected phase ${options.phase}`);
   }
@@ -533,10 +522,6 @@ const nestedUnits = {
 const absoluteUnits = {
   evidence: "e",
   units: [{ instructions: "i", key: "u1", paths: ["/repository/docs"] }]
-};
-const escapingUnits = {
-  evidence: "e",
-  units: [{ instructions: "i", key: "u1", paths: ["docs/../../outside"] }]
 };
 const splitUnits = {
   evidence: "e",
@@ -847,11 +832,11 @@ await test("delivery samples fail a fix-required review without findings", async
   );
 });
 
-await test("delivery applies the Explore default and honors phase overrides", async () => {
+await test("delivery dispatches and records per-phase model selections", async () => {
   await Promise.all(
     [
       {},
-      { explore: "sonnet" },
+      { explore: "sonnet", plan: "haiku" },
       Object.fromEntries(
         [
           "scope",
@@ -868,7 +853,7 @@ await test("delivery applies the Explore default and honors phase overrides", as
       const efforts = Object.fromEntries(
         Object.keys(models).map((phase) => [phase, `effort-${phase}`])
       );
-      const { calls } = await runWorkflowSample(
+      const { calls, result } = await runWorkflowSample(
         samplePaths.delivery,
         { candidateBranch: "task-branch", efforts, models, task: "t" },
         dispatchTable({
@@ -888,7 +873,7 @@ await test("delivery applies the Explore default and honors phase overrides", as
           Explore: models.explore ?? "haiku",
           Implement: models.implement,
           Integrate: models.integrate,
-          Plan: models.plan,
+          Plan: models.plan ?? "sonnet",
           Publish: models.publish,
           Review: models.review,
           Scope: models.scope,
@@ -902,6 +887,17 @@ await test("delivery applies the Explore default and honors phase overrides", as
         )
       );
       for (const call of calls) {
+        const inputs = result.graph.nodes.find(
+          (node) => node.key === call.label
+        )?.inputs;
+        assert.ok(isObject(inputs));
+        const defaultSource = call.modelProvided ? "workflow-default" : "host";
+        assert.deepEqual(inputs.modelSelection, {
+          requestedModel: call.model ?? null,
+          source: Object.hasOwn(models, call.phase.toLowerCase())
+            ? "argument"
+            : defaultSource
+        });
         assert.equal(call.effortProvided, call.effort !== undefined);
         assert.equal(call.modelProvided, call.model !== undefined);
       }
@@ -935,30 +931,6 @@ await test("delivery workflow samples allow explicitly omitted exploration", asy
           ?.status,
         "skipped"
       );
-      const refuted = await runWorkflowSample(
-        file,
-        { candidateBranch: "task-branch", skips: { explore: true }, task: "t" },
-        dispatchTable({
-          Implement: () => simpleImplement,
-          Integrate: () => integrateSingle,
-          Plan: () => singleUnits,
-          Publish: () => publishCreated,
-          Review: () => reviewFix,
-          Scope: () => scopeResult,
-          Sweep: () => sweepResult,
-          Verify: () => ({
-            dispositions: [
-              {
-                evidence: "Source disproves it.",
-                id: "review-1-finding-1",
-                status: "refuted"
-              }
-            ]
-          })
-        })
-      );
-      assert.equal(refuted.result.complete, true);
-      assert.equal(refuted.result.review.accepted, true);
       const failed = await runWorkflowSample(
         file,
         { candidateBranch: "task-branch", skips: { explore: true }, task: "t" },
@@ -969,6 +941,85 @@ await test("delivery workflow samples allow explicitly omitted exploration", asy
         failed.calls.some((call) => call.phase === "Plan"),
         false
       );
+    })
+  );
+});
+
+await test("delivery can finish at Explore or Plan when the whole goal needs no change", async () => {
+  const settled = {
+    evidence: "The original trigger passes.",
+    risks: [],
+    stopReason: "Already fixed",
+    summary: "Resolved"
+  };
+  const open = { ...exploreResult, risks: [] };
+  const scope = {
+    ...scopeResult,
+    scopes: [
+      ...scopeResult.scopes,
+      { description: "Second area", key: "s2", paths: ["src"] }
+    ]
+  };
+  const plan = {
+    evidence: "The reported behavior is required.",
+    stopReason: "Invalid report",
+    units: []
+  };
+  /** @type {[typeof open, { evidence: string, units: unknown[], stopReason?: string }, string | null][]} */
+  const cases = [
+    [settled, plan, "Explore"],
+    [open, plan, "Plan"],
+    [open, { evidence: "No decision", units: [] }, null],
+    [open, { ...plan, units: singleUnits.units }, null]
+  ];
+  await Promise.all(
+    cases.map(async ([second, decision, expectedPhase]) => {
+      const { calls, result } = await runWorkflowSample(
+        samplePaths.delivery,
+        { task: "Assess the reported issue" },
+        dispatchTable({
+          Scope: () => scope,
+          Explore: sequence(settled, second),
+          Plan: () => decision
+        })
+      );
+      assert.deepEqual(
+        calls.map(({ phase }) => phase),
+        expectedPhase === "Explore"
+          ? ["Scope", "Explore", "Explore"]
+          : ["Scope", "Explore", "Explore", "Plan"]
+      );
+      assert.equal(result.complete, expectedPhase !== null);
+      assert.equal(result.publish, null);
+      if (expectedPhase === null) {
+        assert.equal(result.earlyExit, null);
+        assert.equal(
+          result.phaseEvidence.find((record) => record.title === "Plan")
+            ?.status,
+          "failed"
+        );
+      } else {
+        assert.ok(isObject(result.earlyExit));
+        assert.equal(result.earlyExit.phase, expectedPhase);
+        assert.deepEqual(
+          result.earlyExit.evidence,
+          expectedPhase === "Plan"
+            ? [{ key: "plan", evidence: plan.evidence }]
+            : scope.scopes.map(({ key }) => ({
+                key,
+                reason: settled.stopReason,
+                evidence: settled.evidence
+              }))
+        );
+        const stop = result.phaseEvidence.findIndex(
+          (record) => record.title === expectedPhase
+        );
+        assert.ok(
+          result.phaseEvidence
+            .slice(stop + 1)
+            .every((record) => record.status === "skipped")
+        );
+      }
     })
   );
 });
@@ -1215,7 +1266,6 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
       {
         issue: "#1",
         maxFixRounds: 0,
-        models: { scope: "configured-selector" },
         skips: { implement: true, integrate: true, publish: true },
         task: "t"
       },
@@ -1232,11 +1282,6 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
     assert.equal(phases.filter((phase) => phase === "Publish").length, 0);
     assert.equal(phases.filter((phase) => phase === "Integrate").length, 0);
     assert.equal(phases.filter((phase) => phase === "Review").length, 0);
-    const models = Object.fromEntries(
-      calls.map((call) => [call.phase, call.model])
-    );
-    assert.equal(models.Scope, "configured-selector");
-    assert.equal(models.Plan, undefined);
     const reviewRecord = result.phaseEvidence.find(
       (record) => record.title === "Review"
     );
@@ -1297,7 +1342,7 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
 
 await test("delivery workflow samples reject unsafe ownership and contradictory evidence", async () => {
   await Promise.all(
-    [absoluteUnits, escapingUnits, nestedUnits].map(async (planPayload) => {
+    [absoluteUnits, nestedUnits].map(async (planPayload) => {
       const { calls, result } = await runWorkflowSample(
         samplePaths.delivery,
         { issue: "#1", task: "t" },
@@ -1320,6 +1365,27 @@ await test("delivery workflow samples reject unsafe ownership and contradictory 
       );
     })
   );
+  const external = await runWorkflowSample(
+    samplePaths.delivery,
+    { task: "Update the sibling project" },
+    dispatchTable({
+      Scope: () => ({ ...scopeResult, checkoutRoot: "/workspace/project" }),
+      Explore: () => exploreResult,
+      Plan: () => ({
+        ...singleUnits,
+        units: [{ ...singleUnits.units[0], paths: ["docs/../../shared"] }]
+      })
+    })
+  );
+  assert.deepEqual(
+    external.calls.map((call) => call.phase),
+    ["Scope", "Explore", "Plan"]
+  );
+  assert.equal(external.result.complete, false);
+  assert.equal(external.result.publish, null);
+  assert.deepEqual(external.result.units[0].paths, ["../shared"]);
+  assert.ok(isObject(external.result.earlyExit));
+  assert.equal(external.result.earlyExit.kind, "handoff");
   const legacySummary = {
     ...simpleImplement,
     checks: [{ command: "pnpm run check", status: "failed" }],
@@ -1652,7 +1718,7 @@ await test("delivery workflow samples carry named candidates and per-key repair 
   assert.deepEqual(missingRun.result.resources, []);
 });
 
-await test("delivery samples validate integration destination and verify findings before repairs", async () => {
+await test("delivery samples reject publication to the wrong integration destination", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
       const { calls, result } = await runWorkflowSample(
@@ -1681,88 +1747,9 @@ await test("delivery samples validate integration destination and verify finding
   );
 });
 
-await test("delivery samples gate repairs on independent finding dispositions", async () => {
+await test("delivery leaves findings outside unit ownership for replanning", async () => {
   await Promise.all(
     Object.values(samplePaths).map(async (file) => {
-      /** @type {[{evidence: string, id: string, status: string}[] | null, boolean, number][]} */
-      const cases = [
-        [
-          [
-            {
-              evidence: "Source disproves it.",
-              id: "review-1-finding-1",
-              status: "refuted"
-            }
-          ],
-          true,
-          0
-        ],
-        [
-          [
-            {
-              evidence: "Source confirms it.",
-              id: "review-1-finding-1",
-              status: "confirmed"
-            }
-          ],
-          true,
-          1
-        ],
-        [
-          [
-            {
-              evidence: "Cannot determine.",
-              id: "review-1-finding-1",
-              status: "unverified"
-            }
-          ],
-          false,
-          0
-        ],
-        [[], false, 0],
-        [
-          [{ evidence: "Source.", id: "unknown", status: "confirmed" }],
-          false,
-          0
-        ],
-        [
-          [{ evidence: "", id: "review-1-finding-1", status: "confirmed" }],
-          false,
-          0
-        ],
-        [null, false, 0]
-      ];
-      await Promise.all(
-        cases.map(async ([dispositions, expectedComplete, expectedRepairs]) => {
-          const { calls, result } = await runWorkflowSample(
-            file,
-            { candidateBranch: "task-branch", issue: "#1", task: "t" },
-            dispatchTable({
-              Explore: () => exploreResult,
-              Implement: sequence(simpleImplement, simpleRepair),
-              Integrate: () => integrateSingle,
-              Plan: () => singleUnits,
-              Publish: sequence(publishCreated, publishUpdated),
-              Review: sequence(reviewFix, reviewPass),
-              Scope: () => scopeResult,
-              Sweep: () => sweepResult,
-              Verify: () => (dispositions === null ? null : { dispositions })
-            })
-          );
-          assert.equal(result.complete, expectedComplete);
-          assert.equal(
-            calls.filter(({ phase }) => phase === "Implement").length,
-            1 + expectedRepairs
-          );
-          assert.equal(
-            calls.filter(({ phase }) => phase === "Publish").length,
-            1 + expectedRepairs
-          );
-          const [{ verification }] = result.reviewHistory;
-          assert.ok(isObject(verification));
-          assert.deepEqual(verification.dispositions, dispositions);
-        })
-      );
       const unowned = await runWorkflowSample(
         file,
         { candidateBranch: "task-branch", issue: "#1", task: "t" },
@@ -1787,6 +1774,10 @@ await test("delivery samples gate repairs on independent finding dispositions", 
       assert.ok(reviewRecord);
       assert.equal(reviewRecord.status, "failed");
       assert.equal(unowned.result.fixRounds.used, 0);
+      assert.deepEqual(
+        unowned.result.review.findings,
+        unowned.result.reviewHistory[0].findings
+      );
       for (const phase of ["Implement", "Publish", "Review"]) {
         assert.equal(
           unowned.calls.filter((call) => call.phase === phase).length,
@@ -1846,62 +1837,12 @@ await test("delivery samples reject invalid integration path evidence and base d
   );
 });
 
-await test("multi-unit delivery routes only independently confirmed findings to their owner", async () => {
-  const findings = [
-    { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
-    { detail: "second", file: "src/main.js", scenario: "second trigger" }
-  ];
-  const { calls, result } = await runWorkflowSample(
-    samplePaths.delivery,
-    { candidateBranch: "task-branch", issue: "#1", task: "t" },
-    dispatchTable({
-      Explore: () => exploreResult,
-      Implement: splitImplement,
-      Integrate: () => integrateResult,
-      Plan: () => splitUnits,
-      Publish: sequence(publishCreated, publishUpdated),
-      Review: sequence(
-        { evidence: "Review evidence", findings, verdict: "fix-required" },
-        reviewPass
-      ),
-      Scope: () => scopeResult,
-      Sweep: () => sweepResult,
-      Verify: () => ({
-        dispositions: [
-          {
-            evidence: "Confirmed in source",
-            id: "review-1-finding-1",
-            status: "confirmed"
-          },
-          {
-            evidence: "Refuted in source",
-            id: "review-1-finding-2",
-            status: "refuted"
-          }
-        ]
-      })
-    })
-  );
-  assert.equal(result.complete, true);
-  const repairs = calls.filter(
-    ({ label }) =>
-      label === "implement:u1:fix-1" || label === "implement:u2:fix-1"
-  );
-  assert.deepEqual(
-    repairs.map(({ label }) => label),
-    ["implement:u1:fix-1"]
-  );
-  const [{ verification }] = result.reviewHistory;
-  assert.ok(isObject(verification) && isArray(verification.dispositions));
-  assert.equal(verification.dispositions.length, 2);
-});
-
 await test("delivery samples reject malformed findings and preserve review evidence", async () => {
   await Promise.all(
     Object.values(samplePaths).flatMap((file) =>
       [null, { detail: "d", file: null, scenario: "s" }].map(
         async (finding) => {
-          const { calls, result } = await runWorkflowSample(
+          const { result } = await runWorkflowSample(
             file,
             { candidateBranch: "task-branch", issue: "#1", task: "t" },
             dispatchTable({
@@ -1923,88 +1864,10 @@ await test("delivery samples reject malformed findings and preserve review evide
           assert.equal(result.review.status, "failed");
           assert.equal(result.review.evidence, "review evidence");
           assert.deepEqual(result.review.findings, [finding]);
-          assert.equal(
-            calls.some(({ phase }) => phase === "Verify"),
-            false
-          );
+          assert.equal(result.fixRounds.used, 0);
         }
       )
     )
-  );
-});
-
-await test("delivery finding verification independently selects its model", async () => {
-  await Promise.all(
-    Object.values(samplePaths).flatMap((file) =>
-      [
-        {},
-        { review: "review-selector" },
-        { review: "review-selector", verify: "verify-selector" }
-      ].map(async (models) => {
-        const efforts = Object.fromEntries(
-          Object.keys(models).map((phase) => [phase, `effort-${phase}`])
-        );
-        const { calls } = await runWorkflowSample(
-          file,
-          {
-            candidateBranch: "task-branch",
-            efforts,
-            issue: "#1",
-            models,
-            task: "t"
-          },
-          dispatchTable({
-            Explore: () => exploreResult,
-            Implement: () => simpleImplement,
-            Integrate: () => integrateSingle,
-            Plan: () => singleUnits,
-            Publish: () => publishCreated,
-            Review: () => reviewFix,
-            Scope: () => scopeResult,
-            Sweep: () => sweepResult
-          })
-        );
-        const review = calls.find(({ phase }) => phase === "Review");
-        assert.ok(review);
-        const verification = calls.find(({ phase }) => phase === "Verify");
-        assert.ok(verification);
-        assert.equal(review.effort, efforts.review);
-        assert.equal(review.effortProvided, efforts.review !== undefined);
-        assert.equal(verification.effort, efforts.verify);
-        assert.equal(verification.effortProvided, efforts.verify !== undefined);
-        assert.equal(review.model, models.review);
-        assert.equal(review.modelProvided, models.review !== undefined);
-        assert.equal(verification.model, models.verify);
-        assert.equal(verification.modelProvided, models.verify !== undefined);
-      })
-    )
-  );
-});
-
-await test("delivery samples validate the verification model selector", async () => {
-  await Promise.all(
-    Object.values(samplePaths).flatMap((file) =>
-      ["", "  ", null, 42].map(async (verify) => {
-        await assert.rejects(
-          runWorkflowSample(file, { models: { verify }, task: "t" }, () =>
-            assert.fail("Invalid model selector dispatched an agent")
-          ),
-          {
-            message: "Provide models.verify as a nonempty model selector string"
-          }
-        );
-      })
-    )
-  );
-  await Promise.all(
-    Object.values(samplePaths).map(async (file) => {
-      await assert.rejects(
-        runWorkflowSample(file, { efforts: { verify: " " }, task: "t" }, () =>
-          assert.fail("Invalid effort selector dispatched an agent")
-        ),
-        { message: "Provide efforts.verify as a nonempty effort string" }
-      );
-    })
   );
 });
 
@@ -2038,10 +1901,7 @@ await test("delivery samples append each phase's prompt part as its final sectio
       );
       assert.deepEqual(
         calls.map(({ phase, prompt }) => [phase, prompt.split("\n\n").at(-1)]),
-        calls.map(({ phase }) => [
-          phase,
-          promptParts[phase === "Verify" ? "review" : phase.toLowerCase()]
-        ])
+        calls.map(({ phase }) => [phase, promptParts[phase.toLowerCase()]])
       );
       await assert.rejects(
         runWorkflowSample(
@@ -2058,6 +1918,8 @@ await test("delivery samples append each phase's prompt part as its final sectio
 });
 
 await test("delivery samples pass candidate, issue, request, and owned findings into prompt sections", async () => {
+  const evidence = "scope-specific observation";
+  const description = "scope-specific description";
   const findings = [
     { detail: "first", file: "docs/guide.md", scenario: "first trigger" },
     { detail: "second", file: "src/main.js", scenario: "second trigger" }
@@ -2069,45 +1931,41 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
         file,
         { candidateBranch: "task-branch", issue: "#1", task: "t" },
         dispatchTable({
-          Explore: () => exploreResult,
+          Explore: () => ({ ...exploreResult, evidence }),
           Implement: splitImplement,
           Integrate: () => integrateResult,
-          Plan: () => splitUnits,
+          Plan: () => ({
+            ...splitUnits,
+            units: [
+              { ...splitUnits.units[0], paths: ["../project/docs"] },
+              splitUnits.units[1]
+            ]
+          }),
           Publish: sequence(publishCreated, publishUpdated),
           Review: sequence(
             { evidence: "e", findings: reviewed, verdict: "fix-required" },
             reviewPass
           ),
-          Scope: () => scopeResult,
-          Sweep: () => sweepResult,
-          Verify: () => ({
-            dispositions: reviewed.map((_finding, index) => ({
-              evidence: "Confirmed in source",
-              id: `review-1-finding-${index + 1}`,
-              status: "confirmed"
-            }))
-          })
+          Scope: () => ({
+            ...scopeResult,
+            checkoutRoot: "/workspace/project",
+            scopes: [
+              { ...scopeResult.scopes[0], description, paths: ["../shared"] }
+            ]
+          }),
+          Sweep: () => sweepResult
         })
       );
       assert.equal(result.complete, true);
       assert.equal(result.sweepEvidence, sweepResult.evidence);
       assert.deepEqual(result.explorations, [
-        { evidence: "e", key: "s1", risks: ["r"], summary: "s" }
+        { ...exploreResult, evidence, key: "s1" }
       ]);
-      assert.equal(
-        calls
-          .find(({ phase }) => phase === "Plan")
-          ?.prompt.split("\n\n")
-          .find((section) =>
-            section.startsWith("Scopes and exploration findings: ")
-          ),
-        `Scopes and exploration findings: ${JSON.stringify({
-          explorations: [
-            { evidence: "e", key: "s1", risks: ["r"], summary: "s" }
-          ],
-          scopes: scopeResult.scopes
-        })}`
-      );
+      const plan = calls.find((call) => call.phase === "Plan");
+      assert.ok(plan);
+      for (const value of [description, evidence]) {
+        assert.equal(plan.prompt.split(value).length - 1, 1);
+      }
       /** @param {string} text Prompt section. */
       const owns = (text) =>
         calls
@@ -2122,9 +1980,7 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
       assert.deepEqual(
         owns("Linked issue reference: #1"),
         calls
-          .filter(({ phase }) =>
-            ["Publish", "Review", "Verify"].includes(phase)
-          )
+          .filter(({ phase }) => ["Publish", "Review"].includes(phase))
           .map(({ label }) => label)
       );
       const publishes = calls.filter(({ phase }) => phase === "Publish");
@@ -2276,11 +2132,9 @@ await test("delivery graph exposes node contracts and condition edges", async ()
           true
         );
       }
-      assert.equal(nodes.get("verify-findings:1")?.status, "completed");
       assert.deepEqual(nodes.get("implement:u1:fix-1")?.prerequisites, [
         "plan",
-        "review",
-        "verify-findings:1"
+        "review"
       ]);
     })
   );

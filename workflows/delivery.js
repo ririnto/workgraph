@@ -1,10 +1,10 @@
 export const meta = {
-  description: 'Adaptive delivery graph: plan one or more units, implement, integrate only split work, sweep, publish, and review',
+  description: 'Adaptive delivery graph: stop on evidence or deliver a reviewed change',
   name: 'delivery',
   phases: [
     { detail: 'separate the goal into disjoint scopes', title: 'Scope' },
     { detail: 'one read-only explorer per scope', title: 'Explore' },
-    { detail: 'define the fewest disjoint implementation units', title: 'Plan' },
+    { detail: 'decide whether to stop or define disjoint work units', title: 'Plan' },
     { detail: 'one isolated implementation agent per unit', title: 'Implement' },
     { detail: 'merge named unit branches only for split work', title: 'Integrate' },
     { detail: 'diff-only environment-exposure sweep', title: 'Sweep' },
@@ -13,21 +13,16 @@ export const meta = {
   ]
 }
 
+// Dispatch settings
 const variant = 'delivery'
 const maxScopes = 4
 const unitCap = 4
 const defaultFixRounds = 1
-const phaseKeys = ['scope', 'explore', 'plan', 'implement', 'integrate', 'sweep', 'publish', 'review']
 const phaseTitles = {
-  explore: 'Explore',
-  implement: 'Implement',
-  integrate: 'Integrate',
-  plan: 'Plan',
-  publish: 'Publish',
-  review: 'Review',
-  scope: 'Scope',
-  sweep: 'Sweep'
+  scope: 'Scope', explore: 'Explore', plan: 'Plan', implement: 'Implement',
+  integrate: 'Integrate', sweep: 'Sweep', publish: 'Publish', review: 'Review'
 }
+const phaseKeys = Object.keys(phaseTitles)
 const input = args === null || typeof args !== 'object' || Array.isArray(args) ? {} : args
 if (typeof input.task !== 'string' || !input.task.trim()) {
   throw new Error('Provide the delivery goal as a nonempty args.task string')
@@ -48,66 +43,50 @@ const settingsMap = (value, name) => {
   }
   return value
 }
-const skipsInput = settingsMap(input.skips, 'args.skips')
-const modelsInput = settingsMap(input.models, 'args.models')
-const effortsInput = settingsMap(input.efforts, 'args.efforts')
-const partsInput = settingsMap(input.promptParts, 'args.promptParts')
-for (const map of [skipsInput, modelsInput, effortsInput, partsInput]) {
+const skipped = settingsMap(input.skips, 'args.skips')
+const models = settingsMap(input.models, 'args.models')
+const efforts = settingsMap(input.efforts, 'args.efforts')
+const promptParts = settingsMap(input.promptParts, 'args.promptParts')
+for (const map of [skipped, models, efforts, promptParts]) {
   for (const key of Object.keys(map)) {
-    if (!phaseKeys.includes(key) && !([modelsInput, effortsInput].includes(map) && key === 'verify')) {
+    if (!phaseKeys.includes(key)) {
       throw new Error(`Unknown phase key ${key}; supported phases are ${phaseKeys.join(', ')}`)
     }
   }
 }
-const skipped = {}
-const models = {}
-const efforts = {}
-const promptParts = {}
+const defaultModels = { explore: 'haiku', plan: 'sonnet' }
 for (const key of phaseKeys) {
-  const skip = skipsInput[key]
+  const skip = skipped[key]
   if (skip !== undefined && typeof skip !== 'boolean') {
     throw new Error(`Provide skips.${key} as a boolean`)
   }
-  const model = modelsInput[key]
+  const model = models[key]
   if (model !== undefined && (typeof model !== 'string' || !model.trim())) {
     throw new Error(`Provide models.${key} as a nonempty model selector string`)
   }
-  const effort = effortsInput[key]
+  const effort = efforts[key]
   if (effort !== undefined && (typeof effort !== 'string' || !effort.trim())) {
     throw new Error(`Provide efforts.${key} as a nonempty effort string`)
   }
-  const part = partsInput[key]
+  const part = promptParts[key]
   if (part !== undefined && (typeof part !== 'string' || !part.trim())) {
     throw new Error(`Provide promptParts.${key} as a nonempty instruction string`)
   }
-  skipped[key] = skip === true
-  models[key] = model
-  efforts[key] = effort
-  promptParts[key] = part ?? ''
 }
-if (modelsInput.verify !== undefined && (typeof modelsInput.verify !== 'string' || !modelsInput.verify.trim())) {
-  throw new Error('Provide models.verify as a nonempty model selector string')
+const maxFixRounds = input.maxFixRounds === undefined ? defaultFixRounds : input.maxFixRounds
+if (!Number.isSafeInteger(maxFixRounds) || maxFixRounds < 0 || maxFixRounds > 3) {
+  throw new Error('Provide maxFixRounds as an integer from 0 through 3')
 }
-models.verify = modelsInput.verify
-if (effortsInput.verify !== undefined && (typeof effortsInput.verify !== 'string' || !effortsInput.verify.trim())) {
-  throw new Error('Provide efforts.verify as a nonempty effort string')
-}
-efforts.verify = effortsInput.verify
-let maxFixRounds = defaultFixRounds
-if (input.maxFixRounds !== undefined) {
-  if (!Number.isSafeInteger(input.maxFixRounds) || input.maxFixRounds < 0 || input.maxFixRounds > 3) {
-    throw new Error('Provide maxFixRounds as an integer from 0 through 3')
-  }
-  maxFixRounds = input.maxFixRounds
-}
-const compose = (...parts) => parts.filter(part => part.trim()).join('\n\n')
+const compose = (...parts) => parts.filter(part => part?.trim()).join('\n\n')
+
+// Graph contracts and dispatch
 const graph = { nodes: [], edges: [] }
 const activeNodes = Object.fromEntries(phaseKeys.map(key => [key, key]))
 const phaseRecords = {}
 const operations = {
   scope: ['Separate disjoint scopes', 'delivery scope owner', 'read-only', ['task'], ['scopes', 'evidence']],
-  explore: ['Explore owned scopes', 'scope explorers', 'read-only', ['scopes'], ['explorations', 'evidence']],
-  plan: ['Define disjoint units', 'delivery planner', 'read-only', ['scopes', 'explorations'], ['units', 'evidence']],
+  explore: ['Explore owned scopes', 'scope explorers', 'read-only', ['scopes'], ['explorations', 'evidence', 'optional stopReason']],
+  plan: ['Decide whether implementation is needed', 'delivery planner', 'read-only', ['scopes', 'explorations'], ['units', 'evidence', 'optional stopReason']],
   implement: ['Implement owned units', 'unit workers', 'edit owned paths; commit unit branches; no push', ['units', 'explorations', 'candidateBranch'], ['unitResults', 'checks', 'resources']],
   integrate: ['Merge named unit branches', 'integration owner', 'merge named branches; check combined candidate; no push', ['unitResults'], ['candidate branch', 'combined checks', 'resources']],
   sweep: ['Scan the named candidate for exposures', 'exposure explorer', 'read-only', ['candidate branch'], ['exposures', 'evidence']],
@@ -117,11 +96,6 @@ const operations = {
 for (const key of phaseKeys) {
   const [operation, owner, authority, inputs, outputs] = operations[key]
   graph.nodes.push({ key, operation, prerequisites: [], inputs, outputs, owner, authority, completionEvidence: [], status: 'pending', reason: null })
-}
-const nodeFor = key => graph.nodes.find(node => node.key === key)
-const connect = (from, to, type = 'result', condition = null) => {
-  graph.edges.push({ from, to, type, condition })
-  nodeFor(to).prerequisites.push(from)
 }
 connect('scope', 'explore')
 connect('scope', 'plan')
@@ -136,298 +110,38 @@ connect('integrate', 'publish', 'condition', 'units.length > 1')
 connect('sweep', 'publish')
 connect('publish', 'review')
 nodeFor('scope').inputs = { task, baseBranch }
-const edgeRequired = edge => edge.condition === null || (edge.condition === '!skips.explore' ? !skipped.explore : nodeFor('plan').completionEvidence.at(-1)?.result?.units?.length > 1 || skipped.integrate)
-const incompletePredecessor = key => graph.edges.find(edge => edge.to === activeNodes[key] && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')?.from
-const setOutcome = (key, status, reason, result = null) => {
-  const node = nodeFor(key)
-  node.status = status
-  node.reason = reason ?? null
-  node.completionEvidence.push({ status, reason: reason ?? null, result })
-}
-const recordPhase = (key, status, reason, result = null) => {
-  phaseRecords[key] = { reason: reason ?? null, status, title: phaseTitles[key] }
-  setOutcome(activeNodes[key], status, reason, result)
-}
-const graphPosition = key => {
-  const node = nodeFor(key)
-  return [
-    `Graph position: ${node.key}; owner: ${node.owner}; authority: ${node.authority}.`,
-    `Prerequisites: ${node.prerequisites.length === 0 ? 'none' : node.prerequisites.map(parent => `${parent}=${nodeFor(parent).status}`).join('; ')}.`,
-    `Inputs: ${Array.isArray(node.inputs.contract) ? node.inputs.contract.join(', ') : Object.keys(node.inputs.contract).join(', ')}.`,
-    `Predecessor results: ${JSON.stringify(node.inputs.predecessors)}.`,
-    `Outputs consumed downstream: ${node.outputs.join(', ')}.`,
-    node.ownership === undefined ? '' : `Owned ${node.ownership.kind}: ${JSON.stringify(node.ownership.value)}.`
-  ].filter(Boolean).join('\n')
-}
-const runAgent = async (prompt, options) => {
-  const key = options.label.startsWith('explore:') || options.label.startsWith('implement:') || options.label.startsWith('verify-findings:') ? options.label : activeNodes[options.phase.toLowerCase()]
-  const node = nodeFor(key)
-  const predecessor = graph.edges.find(edge => edge.to === key && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')
-  if (predecessor !== undefined) {
-    return { error: `Required graph predecessor ${predecessor.from} is incomplete` }
-  }
-  node.inputs = { contract: node.inputs, predecessors: Object.fromEntries(node.prerequisites.map(parent => [parent, nodeFor(parent).completionEvidence.at(-1)?.result ?? null])) }
-  node.status = 'running'
-  return agent(compose(graphPosition(key), prompt), options).then(
-    result => ({ result }),
-    error => ({ error: String(error instanceof Error ? error.message : error) })
-  )
-}
+
+// Shared prompt context
 const taskPart = `Delivery goal: ${task}`
 const basePart = baseBranch ? `Base branch: ${baseBranch}` : 'Base branch: the repository default branch'
 const issuePart = issue ? `Linked issue reference: ${issue}` : ''
 const readOnlyPart = 'This stage is read-only, so change nothing and publish nothing.'
-const canonicalPath = path => {
-  if (typeof path !== 'string' || path.trim().length === 0 || path.includes('\0')) {
-    return null
-  }
-  const normalized = path.trim().replace(/\\/g, '/')
-  if (normalized.startsWith('/') || /^[a-zA-Z]:/.test(normalized)) {
-    return null
-  }
-  const segments = []
-  for (const segment of normalized.split('/')) {
-    if (segment === '' || segment === '.') {
-      continue
-    }
-    if (segment === '..') {
-      if (segments.pop() === undefined) {
-        return null
-      }
-      continue
-    }
-    segments.push(segment)
-  }
-  return segments.length > 0 ? segments.join('/') : null
-}
-const ownsPath = (owned, path) => path === owned || path.startsWith(`${owned}/`)
-const checkEntries = checks =>
-  Array.isArray(checks) &&
-  checks.every(check =>
-    typeof check?.command === 'string' &&
-    check.command.trim().length > 0 &&
-    ['failed', 'passed', 'skipped'].includes(check?.status))
-const checksPassed = checks =>
-  checkEntries(checks) && checks.length > 0 && checks.every(check => check.status === 'passed')
 
+// Delivery decisions
 phase('Scope')
-log('Separating the delivery goal into scopes')
-const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compose(
-  'Separate the delivery goal into disjoint exploration scopes for this repository.',
-  taskPart,
-  basePart,
-  'Resolve the actual publication base branch name, using the repository default when no base was supplied, and report it as baseBranch.',
-  `Return between 1 and ${maxScopes} scopes that together cover the whole goal.`,
-  'Give each scope a short unique key, a one-sentence description, and the repository paths it owns.',
-  'Express every path relative to the repository root, for example plugins/foo. Absolute paths are rejected.',
-  'Couple paths into one scope only where the goal itself requires it.',
-  readOnlyPart,
-  promptParts.scope
-), {
-  agentType: 'Explore',
-  label: 'scope',
-  ...(models.scope === undefined ? {} : { model: models.scope }),
-  ...(efforts.scope === undefined ? {} : { effort: efforts.scope }),
-  phase: 'Scope',
-  schema: {
-    properties: {
-      baseBranch: { type: 'string' },
-      evidence: { type: 'string' },
-      scopes: {
-        items: {
-          properties: {
-            description: { type: 'string' },
-            key: { type: 'string' },
-            paths: { items: { type: 'string' }, type: 'array' }
-          },
-          required: ['description', 'key', 'paths'],
-          type: 'object'
-        },
-        type: 'array'
-      }
-    },
-    required: ['baseBranch', 'evidence', 'scopes'],
-    type: 'object'
-  }
-})
-const scopeList = Array.isArray(scopeAttempt.result?.scopes) ? scopeAttempt.result.scopes : []
-const scopeNames = scopeList.map(scope => (typeof scope?.key === 'string' ? scope.key.trim() : ''))
-const resolvedBase = typeof scopeAttempt.result?.baseBranch === 'string' ? scopeAttempt.result.baseBranch.trim() : ''
-const scopeShape =
-  resolvedBase.length > 0 && (!baseBranch || resolvedBase === baseBranch) &&
-  typeof scopeAttempt.result?.evidence === 'string' &&
-  scopeAttempt.result.evidence.trim().length > 0 &&
-  scopeList.length >= 1 &&
-  scopeList.length <= maxScopes &&
-  scopeNames.every(name => name.length > 0) &&
-  new Set(scopeNames).size === scopeNames.length &&
-  scopeList.every(scope =>
-    typeof scope?.description === 'string' &&
-    scope.description.trim().length > 0 &&
-    Array.isArray(scope.paths) &&
-    scope.paths.length > 0 &&
-    scope.paths.every(path => typeof path === 'string' && path.trim().length > 0) &&
-    scope.paths.every(path => canonicalPath(path) !== null))
-const scopes = scopeShape
-  ? scopeList.map(scope => ({ ...scope, paths: scope.paths.map(canonicalPath) }))
-  : []
-if (skipped.scope) {
-  recordPhase('scope', 'skipped', 'Explicit dispatch skip, so scope separation did not run')
-} else if (scopeAttempt.error !== undefined) {
-  recordPhase('scope', 'failed', `Scope agent failed: ${scopeAttempt.error}`)
-} else if (!scopeShape) {
-  recordPhase('scope', 'failed', `Scope result is missing, malformed, duplicated, or outside 1 through ${maxScopes} scopes`)
-} else {
-  recordPhase('scope', 'completed', null, { baseBranch: resolvedBase, scopes, evidence: scopeAttempt.result.evidence })
-}
+const { scopes, resolvedBase, checkoutParts } = await separateScopes()
+const canonicalPath = path => relativePath(path, checkoutParts)
 
 phase('Explore')
-let explorations = []
-if (incompletePredecessor('explore') !== undefined) {
-  recordPhase('explore', 'skipped', 'Required Scope predecessor is incomplete')
-} else if (skipped.explore) {
-  recordPhase('explore', 'skipped', 'Explicit dispatch skip, so parallel exploration did not run')
-} else {
-  log(`Exploring ${scopes.length} scope${scopes.length === 1 ? '' : 's'} in parallel`)
-  for (const scope of scopes) {
-    graph.nodes.push({ ...nodeFor('explore'), key: `explore:${scope.key}`, prerequisites: [], owner: `explorer:${scope.key}`, ownership: { kind: 'scope', value: scope }, inputs: { scope, task }, status: 'pending', completionEvidence: [] })
-    connect('scope', `explore:${scope.key}`)
-    connect(`explore:${scope.key}`, 'explore')
-  }
-  const attempts = await parallel(scopes.map(scope => () =>
-    runAgent(compose(
-      `Explore the repository for scope ${scope.key} only.`,
-      `Scope description: ${scope.description}`,
-      `Scope paths: ${scope.paths.join(', ')}`,
-      taskPart,
-      'Report the current behavior in these paths, the consumers a change would affect, and the concrete risks.',
-      'Other explorers own the other scopes, so stay inside this scope.',
-      readOnlyPart,
-      promptParts.explore
-    ), {
-      agentType: 'Explore',
-      label: `explore:${scope.key}`,
-      model: models.explore ?? 'haiku',
-      ...(efforts.explore === undefined ? {} : { effort: efforts.explore }),
-      phase: 'Explore',
-      schema: {
-        properties: {
-          evidence: { type: 'string' },
-          risks: { items: { type: 'string' }, type: 'array' },
-          summary: { type: 'string' }
-        },
-        required: ['evidence', 'risks', 'summary'],
-        type: 'object'
-      }
-    }).then(attempt => ({ attempt, key: scope.key }))
-  ))
-  const exploreFailures = []
-  explorations = []
-  for (const item of attempts) {
-    if (item === null) {
-      exploreFailures.push('an explorer returned no result')
-    } else if (item.attempt.error !== undefined) {
-      setOutcome(`explore:${item.key}`, 'failed', item.attempt.error)
-      exploreFailures.push(`${item.key}: ${item.attempt.error}`)
-    } else {
-      const result = item.attempt.result
-      const shape =
-        typeof result?.summary === 'string' && result.summary.trim().length > 0 &&
-        Array.isArray(result?.risks) && result.risks.every(risk => typeof risk === 'string') &&
-        typeof result?.evidence === 'string' && result.evidence.trim().length > 0
-      if (shape) {
-        setOutcome(`explore:${item.key}`, 'completed', null, result)
-        explorations.push({ evidence: result.evidence, key: item.key, risks: result.risks, summary: result.summary })
-      } else {
-        setOutcome(`explore:${item.key}`, 'failed', 'result is missing or malformed', result)
-        exploreFailures.push(`${item.key}: result is missing or malformed`)
-      }
-    }
-  }
-  if (exploreFailures.length > 0) {
-    explorations = []
-    recordPhase('explore', 'failed', exploreFailures.join('; '))
-  } else {
-    recordPhase('explore', 'completed', null, { explorations })
-  }
+const explorations = await exploreScopes()
+const scopePathsResolved = checkoutParts !== null || scopes.every(scope => scope.paths.every(path => !isExternal(path)))
+const noWorkInScope = item => typeof item.stopReason === 'string' && item.stopReason.trim() && item.risks.length === 0
+if (scopePathsResolved && explorations.length > 0 && explorations.length === scopes.length && explorations.every(noWorkInScope)) {
+  const evidence = explorations.map(({ key, stopReason, evidence }) => ({ key, reason: stopReason, evidence }))
+  return stopAfter('explore', 'Every scope reported that no work remains.', evidence)
 }
 
 phase('Plan')
-let units = []
-if (incompletePredecessor('plan') !== undefined) {
-  recordPhase('plan', 'skipped', 'Required Explore predecessor is incomplete')
-} else if (skipped.plan) {
-  recordPhase('plan', 'skipped', 'Explicit dispatch skip, so planning did not run')
-} else {
-  const planAttempt = await runAgent(compose(
-    'Plan the implementation for the delivery goal.',
-    readOnlyPart,
-    taskPart,
-    `Decide whether the goal needs one work unit or several disjoint work units, and define at most ${unitCap} units.`,
-    'Use separate units only when parallel ownership or context size requires them, and prefer the fewest units that cover the goal.',
-    `Scopes and exploration findings: ${JSON.stringify({
-      explorations,
-      scopes: scopes.map(scope => ({ description: scope.description, key: scope.key, paths: scope.paths }))
-    })}`,
-    'Give each unit a short key and owned paths. Its instructions must tell the implementer which behavior to deliver, which constraints to preserve, and what result the checks should show.',
-    'Express every path relative to the repository root, for example plugins/foo. Absolute paths are rejected.',
-    'List each owned path once, and share no owned path between units.',
-    promptParts.plan
-  ), {
-    label: 'plan',
-    ...(models.plan === undefined ? {} : { model: models.plan }),
-    ...(efforts.plan === undefined ? {} : { effort: efforts.plan }),
-    phase: 'Plan',
-    schema: {
-      properties: {
-        evidence: { type: 'string' },
-        units: {
-          items: {
-            properties: {
-              instructions: { type: 'string' },
-              key: { type: 'string' },
-              paths: { items: { type: 'string' }, type: 'array' }
-            },
-            required: ['instructions', 'key', 'paths'],
-            type: 'object'
-          },
-          type: 'array'
-        }
-      },
-      required: ['evidence', 'units'],
-      type: 'object'
-    }
-  })
-  const unitList = Array.isArray(planAttempt.result?.units) ? planAttempt.result.units : []
-  const unitNames = unitList.map(unit => (typeof unit?.key === 'string' ? unit.key.trim() : ''))
-  const ownedPaths = unitList.flatMap(unit =>
-    Array.isArray(unit?.paths) && unit.paths.length > 0 ? unit.paths.map(canonicalPath) : [null])
-  const planShape =
-    typeof planAttempt.result?.evidence === 'string' &&
-    planAttempt.result.evidence.trim().length > 0 &&
-    unitList.length >= 1 &&
-    unitList.length <= unitCap &&
-    unitNames.every(name => name.length > 0) &&
-    new Set(unitNames).size === unitNames.length &&
-    ownedPaths.every(path => path !== null) &&
-    new Set(ownedPaths).size === ownedPaths.length &&
-    ownedPaths.every((path, index) =>
-      ownedPaths.every((other, otherIndex) =>
-        otherIndex === index ||
-        (other !== path && !other.startsWith(`${path}/`) && !path.startsWith(`${other}/`)))) &&
-    unitList.every(unit =>
-      typeof unit?.instructions === 'string' &&
-      unit.instructions.trim().length > 0 &&
-      Array.isArray(unit.paths) &&
-      unit.paths.length > 0)
-  if (planAttempt.error !== undefined) {
-    recordPhase('plan', 'failed', `Plan agent failed: ${planAttempt.error}`)
-  } else if (!planShape) {
-    recordPhase('plan', 'failed', `Plan result is missing, malformed, duplicated, unsafe or overlapping in unit ownership, or outside 1 through ${unitCap} units`)
-  } else {
-    units = unitList.map(unit => ({ instructions: unit.instructions, key: unit.key, paths: unit.paths.map(canonicalPath) }))
-    recordPhase('plan', 'completed', null, { units, evidence: planAttempt.result.evidence })
-  }
+const plan = await planDelivery()
+if (plan?.stopReason) {
+  return stopAfter('plan', plan.stopReason, [{ key: 'plan', evidence: plan.evidence }])
+}
+const units = plan?.units ?? []
+const externalUnits = units.filter(unit => unit.paths.some(isExternal))
+if (externalUnits.length > 0) {
+  const reason = 'Continue external work at its owning location before claiming Git delivery.'
+  const evidence = externalUnits.map(({ key, paths }) => ({ key, paths, evidence: plan.evidence }))
+  return stopAfter('plan', reason, evidence, { kind: 'handoff', units })
 }
 for (const unit of units) {
   graph.nodes.push({ ...nodeFor('implement'), key: `implement:${unit.key}`, prerequisites: [], owner: `worker:${unit.key}`, ownership: { kind: 'unit', value: unit }, inputs: { unit, candidateBranch }, status: 'pending', completionEvidence: [] })
@@ -435,12 +149,452 @@ for (const unit of units) {
   connect(`implement:${unit.key}`, 'implement')
 }
 const split = units.length > 1
-log(split ? 'The plan split the work into parallel units' : 'The plan defined a single work unit')
-const explorationsFor = unit => {
+if (units.length > 0) {
+  log(split ? 'The plan split the work into parallel units' : 'The plan defined a single work unit')
+}
+
+phase('Implement')
+let unitResults = []
+const attemptLedger = []
+if (graph.edges.some(edge => edge.to === activeNodes.implement && !edge.from.startsWith('implement:') && nodeFor(edge.from).status !== 'completed')) {
+  recordPhase('implement', 'skipped', 'Required Plan predecessor is incomplete')
+} else if (skipped.implement) {
+  recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
+} else if (!candidateBranch) {
+  recordPhase('implement', 'failed', 'Provide the named task candidate as a nonempty args.candidateBranch string, because implementation cannot verify a worktree starting reference without it')
+} else if (candidateBranch === resolvedBase) {
+  recordPhase('implement', 'failed', 'The task candidate cannot equal the base branch')
+} else {
+  log(split ? 'Implementing the planned units in parallel' : 'Implementing the planned unit')
+  const implementState = await dispatchImplementation(units, null, '', candidateBranch)
+  recordPhase('implement', implementState.status, implementState.reason, implementState)
+  unitResults = implementState.unitResults
+  retainAttempts(implementState.attemptResources, attemptLedger)
+}
+
+phase('Integrate')
+let integrationState
+if (incompletePredecessor('integrate') !== undefined) {
+  integrationState = { reason: 'Implementation did not complete', status: 'skipped' }
+} else if (skipped.integrate) {
+  integrationState = { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
+} else if (graph.edges.some(edge => edge.to === activeNodes.integrate && edge.type === 'condition' && !edgeRequired(edge))) {
+  integrationState = { branch: unitResults[0].branch, reason: 'The plan defines a single work unit, so no cross-unit integration is required', status: 'skipped' }
+} else {
+  log('Integrating the named unit branches into the task branch')
+  integrationState = await dispatchIntegration(unitResults, candidateBranch)
+}
+recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
+applyLedger(integrationState, attemptLedger)
+
+phase('Sweep')
+let sweepState
+if (incompletePredecessor('sweep') !== undefined) {
+  sweepState = { reason: `Required ${phaseTitles[incompletePredecessor('sweep')]} predecessor is incomplete`, status: 'skipped' }
+} else if (skipped.sweep) {
+  sweepState = { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
+} else {
+  log('Sweeping the change for environment exposures')
+  sweepState = await dispatchSweep(integrationState.branch)
+}
+recordPhase('sweep', sweepState.status, sweepState.reason, sweepState)
+
+phase('Publish')
+let postedUrl = null
+let publishState = await runPublish(sweepState, unitResults, integrationState, null)
+recordPhase('publish', publishState.status, publishState.reason, publishState)
+if (publishState.status === 'completed') {
+  postedUrl = publishState.url
+}
+
+phase('Review')
+let reviewState
+if (skipped.review) {
+  reviewState = { reason: 'Explicit dispatch skip, so independent review did not run', status: 'skipped' }
+} else if (incompletePredecessor('review') !== undefined) {
+  reviewState = { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
+} else {
+  log('Reviewing the posted candidate')
+  reviewState = await dispatchReview(unitResults, integrationState, publishState, 0)
+}
+recordPhase('review', reviewState.status, reviewState.reason, reviewState)
+
+// Repair only the owners of blocking findings, then review the updated request.
+const reviewHistory = [reviewState]
+let roundsUsed = 0
+while (
+  reviewState.status === 'completed' &&
+  reviewState.verdict === 'fix-required' &&
+  roundsUsed < maxFixRounds &&
+  !skipped.implement &&
+  phaseRecords.plan.status === 'completed'
+) {
+  const unmatched = reviewState.findings.filter(finding => units.filter(unit => unit.paths.some(path => ownsPath(path, finding.file))).length !== 1)
+  if (unmatched.length > 0) {
+    reviewState = { ...reviewState, reason: 'Review findings do not map to exactly one owned unit', status: 'failed' }
+    recordPhase('review', reviewState.status, reviewState.reason, reviewState)
+    break
+  }
+  const targets = units.filter(unit => reviewState.findings.some(finding => unit.paths.some(path => ownsPath(path, finding.file))))
+  roundsUsed += 1
+  const candidateName = integrationState.branch
+  for (const key of ['implement', 'integrate', 'sweep', 'publish', 'review']) {
+    const previous = nodeFor(activeNodes[key])
+    activeNodes[key] = `${key}:fix-${roundsUsed}`
+    graph.nodes.push({ ...previous, key: activeNodes[key], prerequisites: [], inputs: operations[key][3], status: 'pending', reason: null, completionEvidence: [] })
+  }
+  connect('plan', activeNodes.implement)
+  connect(`review${roundsUsed === 1 ? '' : `:fix-${roundsUsed - 1}`}`, activeNodes.implement)
+  connect(activeNodes.implement, activeNodes.integrate)
+  connect('plan', activeNodes.integrate)
+  connect(activeNodes.implement, activeNodes.sweep)
+  connect(activeNodes.integrate, activeNodes.sweep)
+  connect(activeNodes.implement, activeNodes.publish)
+  connect(activeNodes.integrate, activeNodes.publish)
+  connect(activeNodes.sweep, activeNodes.publish)
+  connect(activeNodes.publish, activeNodes.review)
+  phase('Implement')
+  const fixState = await dispatchImplementation(targets, reviewState.findings, `:fix-${roundsUsed}`, candidateName)
+  recordPhase('implement', fixState.status, fixState.reason, fixState)
+  retainAttempts(fixState.attemptResources, attemptLedger)
+  const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
+  unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
+  if (fixState.status !== 'completed') {
+    integrationState = { reason: 'Implementation did not complete', status: 'skipped' }
+    sweepState = { reason: 'Required Integration predecessor is incomplete', status: 'skipped' }
+    publishState = { reason: 'Implementation did not complete, so publication is blocked', status: 'skipped' }
+    reviewState = { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
+    for (const [key, state] of Object.entries({ integrate: integrationState, sweep: sweepState, publish: publishState, review: reviewState })) {
+      recordPhase(key, state.status, state.reason, state)
+    }
+    break
+  }
+  phase('Integrate')
+  integrationState = skipped.integrate
+    ? { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
+    : await dispatchIntegration(unitResults, candidateName)
+  recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
+  applyLedger(integrationState, attemptLedger)
+  phase('Sweep')
+  sweepState = incompletePredecessor('sweep') !== undefined
+    ? { reason: `Required ${phaseTitles[incompletePredecessor('sweep')]} predecessor is incomplete`, status: 'skipped' }
+    : skipped.sweep
+    ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
+    : await dispatchSweep(integrationState.branch)
+  recordPhase('sweep', sweepState.status, sweepState.reason, sweepState)
+  phase('Publish')
+  publishState = await runPublish(sweepState, unitResults, integrationState, postedUrl)
+  recordPhase('publish', publishState.status, publishState.reason, publishState)
+  if (publishState.status === 'completed') {
+    postedUrl = publishState.url
+  }
+  phase('Review')
+  reviewState = incompletePredecessor('review') === undefined
+    ? await dispatchReview(unitResults, integrationState, publishState, roundsUsed)
+    : { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
+  reviewHistory.push(reviewState)
+  recordPhase('review', reviewState.status, reviewState.reason, reviewState)
+}
+if (reviewState.status === 'completed' && reviewState.verdict === 'fix-required') {
+  recordPhase('review', 'completed', `Verdict fix-required after ${roundsUsed} of ${maxFixRounds} fix rounds`, reviewState)
+}
+for (const node of graph.nodes) {
+  if (node.status === 'running') {
+    setOutcome(node.key, 'failed', 'The dispatched node returned no accepted result')
+  } else if (node.status === 'pending') {
+    setOutcome(node.key, 'skipped', 'A required predecessor or dispatch skip prevented this node from running')
+  }
+}
+const complete =
+  phaseKeys.every(key => nodeFor(activeNodes[key]).status === 'completed' ||
+    (key === 'explore' && skipped.explore && nodeFor(activeNodes[key]).status === 'skipped') ||
+    (nodeFor(activeNodes[key]).status === 'skipped' && !skipped[key] &&
+      graph.edges.some(edge => edge.to === activeNodes[key] && edge.type === 'condition' && !edgeRequired(edge)) &&
+      incompletePredecessor(key) === undefined)) &&
+  reviewState.verdict === 'pass'
+return finish({
+  complete, units, unitResults, resources: attemptLedger, roundsUsed, reviewHistory,
+  integration: integrationState, review: reviewState, sweep: sweepState,
+  publish: postedUrl === null ? null : { url: postedUrl, ...(nodeFor(activeNodes.publish).status === 'completed' ? { action: publishState.action, evidence: publishState.evidence } : {}) }
+})
+
+// Both terminal paths return the same graph and result shape.
+function stopAfter(key, reason, evidence, { kind = 'no-change', units = [] } = {}) {
+  const earlyExit = { kind, phase: phaseTitles[key], reason, evidence }
+  const skippedStage = { status: 'skipped', reason: `${earlyExit.phase}: ${reason}` }
+  for (const remaining of phaseKeys.slice(phaseKeys.indexOf(key) + 1)) {
+    recordPhase(remaining, skippedStage.status, skippedStage.reason)
+  }
+  return finish({ complete: kind === 'no-change', earlyExit, units, integration: skippedStage, review: skippedStage })
+}
+
+function finish({
+  complete, integration, review, earlyExit = null, publish = null, sweep = null,
+  units = [], unitResults = [], resources = [], roundsUsed = 0, reviewHistory = []
+}) {
+  const phaseEvidence = phaseKeys.map(key => phaseRecords[key])
+  if (phaseEvidence.some(record => record?.status === undefined)) {
+    throw new Error('Phase evidence is incomplete')
+  }
+  return {
+    complete, earlyExit, graph, phaseEvidence, scopes, explorations, variant,
+    split: units.length > 1,
+    units: units.map(unit => ({
+      branch: unitResults.find(result => result.key === unit.key)?.branch ?? null,
+      key: unit.key,
+      paths: unit.paths
+    })),
+    resources, integration, publish, review, reviewHistory,
+    exposures: sweep?.exposures ?? [],
+    sweepEvidence: sweep?.evidence ?? null,
+    fixRounds: { max: maxFixRounds, used: roundsUsed }
+  }
+}
+
+// Phase implementations
+async function separateScopes() {
+  log('Separating the delivery goal into scopes')
+  const scopeAttempt = skipped.scope ? { skippedRun: true } : await runAgent(compose(
+    'Separate the delivery goal into disjoint exploration scopes for this repository.',
+    taskPart,
+    basePart,
+    'Report the actual base branch and the original checkout root from git rev-parse --show-toplevel so parent-relative paths can be compared across scopes.',
+    `Return between 1 and ${maxScopes} scopes that together cover the whole goal.`,
+    'Give each scope a short unique key, a one-sentence description, and the repository paths it owns.',
+    'Express paths relative to the original repository root, including ../shared for an authorized sibling directory.',
+    'Couple paths into one scope only where the goal itself requires it.',
+    readOnlyPart,
+    promptParts.scope
+  ), {
+    agentType: 'Explore',
+    label: 'scope',
+    ...(efforts.scope === undefined ? {} : { effort: efforts.scope }),
+    phase: 'Scope',
+    schema: {
+      properties: {
+        baseBranch: { type: 'string' },
+        checkoutRoot: { type: 'string' },
+        evidence: { type: 'string' },
+        scopes: {
+          items: {
+            properties: {
+              description: { type: 'string' },
+              key: { type: 'string' },
+              paths: { items: { type: 'string' }, type: 'array' }
+            },
+            required: ['description', 'key', 'paths'],
+            type: 'object'
+          },
+          type: 'array'
+        }
+      },
+      required: ['baseBranch', 'evidence', 'scopes'],
+      type: 'object'
+    }
+  })
+  const scopeList = Array.isArray(scopeAttempt.result?.scopes) ? scopeAttempt.result.scopes : []
+  const checkout = scopeAttempt.result?.checkoutRoot
+  const root = typeof checkout === 'string' ? checkout.trim().replace(/\\/g, '/') : ''
+  const absoluteRoot = /^(?:[A-Za-z]:\/|\/)/.test(root)
+  const checkoutParts = absoluteRoot ? root.replace(/^(?:[A-Za-z]:|\/\/[^/]+\/[^/]+)/, '').split('/').filter(Boolean) : null
+  const normalizedScopes = scopeList.map(scope => ({
+    ...scope,
+    paths: Array.isArray(scope?.paths) ? scope.paths.map(path => relativePath(path, checkoutParts)) : []
+  }))
+  const scopeNames = scopeList.map(scope => (typeof scope?.key === 'string' ? scope.key.trim() : ''))
+  const resolvedBase = typeof scopeAttempt.result?.baseBranch === 'string' ? scopeAttempt.result.baseBranch.trim() : ''
+  const scopeShape =
+    resolvedBase.length > 0 && (!baseBranch || resolvedBase === baseBranch) &&
+    typeof scopeAttempt.result?.evidence === 'string' &&
+    scopeAttempt.result.evidence.trim().length > 0 &&
+    scopeList.length >= 1 &&
+    scopeList.length <= maxScopes &&
+    scopeNames.every(name => name.length > 0) &&
+    new Set(scopeNames).size === scopeNames.length &&
+    normalizedScopes.every(scope =>
+      typeof scope?.description === 'string' &&
+      scope.description.trim().length > 0 &&
+      Array.isArray(scope.paths) &&
+      scope.paths.length > 0 &&
+      scope.paths.every(path => path !== null)) &&
+    normalizedScopes.every((scope, index) => normalizedScopes.slice(index + 1).every(other =>
+      scope.paths.every(path => other.paths.every(peer => !ownsPath(path, peer) && !ownsPath(peer, path)))))
+  const scopes = scopeShape ? normalizedScopes : []
+  if (skipped.scope) {
+    recordPhase('scope', 'skipped', 'Explicit dispatch skip, so scope separation did not run')
+  } else if (scopeAttempt.error !== undefined) {
+    recordPhase('scope', 'failed', `Scope agent failed: ${scopeAttempt.error}`)
+  } else if (!scopeShape) {
+    recordPhase('scope', 'failed', `Scope result is missing, malformed, duplicated, or outside 1 through ${maxScopes} scopes`)
+  } else {
+    recordPhase('scope', 'completed', null, { baseBranch: resolvedBase, scopes, evidence: scopeAttempt.result.evidence })
+  }
+  return { scopes, resolvedBase, checkoutParts }
+}
+
+async function exploreScopes() {
+  if (incompletePredecessor('explore') !== undefined) {
+    recordPhase('explore', 'skipped', 'Required Scope predecessor is incomplete')
+  } else if (skipped.explore) {
+    recordPhase('explore', 'skipped', 'Explicit dispatch skip, so parallel exploration did not run')
+  } else {
+    log(`Exploring ${scopes.length} scope${scopes.length === 1 ? '' : 's'} in parallel`)
+    for (const scope of scopes) {
+      graph.nodes.push({ ...nodeFor('explore'), key: `explore:${scope.key}`, prerequisites: [], owner: `explorer:${scope.key}`, ownership: { kind: 'scope', value: scope }, inputs: { scope, task }, status: 'pending', completionEvidence: [] })
+      connect('scope', `explore:${scope.key}`)
+      connect(`explore:${scope.key}`, 'explore')
+    }
+    const attempts = await parallel(scopes.map(scope => () =>
+      runAgent(compose(
+        `Explore the repository for scope ${scope.key} only.`,
+        `Scope description: ${scope.description}`,
+        `Scope paths: ${scope.paths.join(', ')}`,
+        taskPart,
+        'Set stopReason only when the evidence shows this scope needs no further action for the requested goal. Leave it unset if a requested deliverable or a cross-scope question remains.',
+        'Report the current behavior in these paths, the consumers a change would affect, and the concrete risks.',
+        'Other explorers own the other scopes, so stay inside this scope.',
+        readOnlyPart,
+        promptParts.explore
+      ), {
+        agentType: 'Explore',
+        label: `explore:${scope.key}`,
+        ...(efforts.explore === undefined ? {} : { effort: efforts.explore }),
+        phase: 'Explore',
+        schema: {
+          properties: {
+            evidence: { type: 'string' },
+            risks: { items: { type: 'string' }, type: 'array' },
+            stopReason: { type: 'string' },
+            summary: { type: 'string' }
+          },
+          required: ['evidence', 'risks', 'summary'],
+          type: 'object'
+        }
+      }).then(attempt => ({ attempt, key: scope.key }))
+    ))
+    const exploreFailures = []
+    const explorations = []
+    for (const item of attempts) {
+      if (item === null) {
+        exploreFailures.push('an explorer returned no result')
+      } else if (item.attempt.error !== undefined) {
+        setOutcome(`explore:${item.key}`, 'failed', item.attempt.error)
+        exploreFailures.push(`${item.key}: ${item.attempt.error}`)
+      } else {
+        const result = item.attempt.result
+        const shape =
+          typeof result?.summary === 'string' && result.summary.trim().length > 0 &&
+          Array.isArray(result?.risks) && result.risks.every(risk => typeof risk === 'string') &&
+          typeof result?.evidence === 'string' && result.evidence.trim().length > 0
+        if (shape) {
+          setOutcome(`explore:${item.key}`, 'completed', null, result)
+          const { evidence, risks, stopReason, summary } = result
+          explorations.push({ key: item.key, evidence, risks, summary, ...(stopReason === undefined ? {} : { stopReason }) })
+        } else {
+          setOutcome(`explore:${item.key}`, 'failed', 'result is missing or malformed', result)
+          exploreFailures.push(`${item.key}: result is missing or malformed`)
+        }
+      }
+    }
+    if (exploreFailures.length > 0) {
+      recordPhase('explore', 'failed', exploreFailures.join('; '))
+    } else {
+      recordPhase('explore', 'completed', null, { explorations })
+      return explorations
+    }
+  }
+  return []
+}
+
+async function planDelivery() {
+  if (incompletePredecessor('plan') !== undefined) {
+    recordPhase('plan', 'skipped', 'Required Explore predecessor is incomplete')
+  } else if (skipped.plan) {
+    recordPhase('plan', 'skipped', 'Explicit dispatch skip, so planning did not run')
+  } else {
+    const planAttempt = await runAgent(compose(
+      'Decide from the evidence whether this goal still needs work.',
+      'If the goal is already satisfied, the reported problem is invalid, or no action is warranted, return an empty units array, a specific stopReason, and supporting evidence. Missing information alone does not justify stopping.',
+      'When work remains, omit stopReason.',
+      readOnlyPart,
+      taskPart,
+      `Decide whether the goal needs one work unit or several disjoint work units, and define at most ${unitCap} units.`,
+      'Use separate units only when parallel ownership or context size requires them, and prefer the fewest units that cover the goal.',
+      'Give each unit a short key and owned paths. Its instructions must tell the implementer which behavior to deliver, which constraints to preserve, and what result the checks should show.',
+      'Express paths relative to the original repository root, including ../shared for an authorized sibling directory.',
+      'List each owned path once, and share no owned path between units.',
+      promptParts.plan
+    ), {
+      label: 'plan',
+      ...(efforts.plan === undefined ? {} : { effort: efforts.plan }),
+      phase: 'Plan',
+      schema: {
+        properties: {
+          evidence: { type: 'string' },
+          stopReason: { type: 'string' },
+          units: {
+            items: {
+              properties: {
+                instructions: { type: 'string' },
+                key: { type: 'string' },
+                paths: { items: { type: 'string' }, type: 'array' }
+              },
+              required: ['instructions', 'key', 'paths'],
+              type: 'object'
+            },
+            type: 'array'
+          }
+        },
+        required: ['evidence', 'units'],
+        type: 'object'
+      }
+    })
+    const unitList = Array.isArray(planAttempt.result?.units) ? planAttempt.result.units : []
+    const unitNames = unitList.map(unit => (typeof unit?.key === 'string' ? unit.key.trim() : ''))
+    const ownedPaths = unitList.flatMap(unit =>
+      Array.isArray(unit?.paths) && unit.paths.length > 0 ? unit.paths.map(canonicalPath) : [null])
+    const { evidence, stopReason } = planAttempt.result ?? {}
+    const hasEvidence = typeof evidence === 'string' && evidence.trim().length > 0
+    const planShape =
+      hasEvidence && stopReason === undefined &&
+      unitList.length >= 1 &&
+      unitList.length <= unitCap &&
+      unitNames.every(name => name.length > 0) &&
+      new Set(unitNames).size === unitNames.length &&
+      ownedPaths.every(path => path !== null) &&
+      new Set(ownedPaths).size === ownedPaths.length &&
+      ownedPaths.every((path, index) =>
+        ownedPaths.every((other, otherIndex) =>
+          otherIndex === index ||
+          (!ownsPath(path, other) && !ownsPath(other, path)))) &&
+      unitList.every(unit =>
+        typeof unit?.instructions === 'string' &&
+        unit.instructions.trim().length > 0 &&
+        Array.isArray(unit.paths) &&
+        unit.paths.length > 0)
+    if (planAttempt.error !== undefined) {
+      recordPhase('plan', 'failed', `Plan agent failed: ${planAttempt.error}`)
+    } else if (hasEvidence && typeof stopReason === 'string' && stopReason.trim() && Array.isArray(planAttempt.result.units) && unitList.length === 0) {
+      const decision = { units: [], stopReason, evidence }
+      recordPhase('plan', 'completed', null, decision)
+      return decision
+    } else if (!planShape) {
+      recordPhase('plan', 'failed', `Expected an evidence-backed stop or a plan with 1 through ${unitCap} disjoint, valid work units`)
+    } else {
+      const units = unitList.map(unit => ({ instructions: unit.instructions, key: unit.key, paths: unit.paths.map(canonicalPath) }))
+      const decision = { units, evidence }
+      recordPhase('plan', 'completed', null, decision)
+      return decision
+    }
+  }
+  return null
+}
+
+function explorationsFor(unit) {
   const matches = explorations.filter(exploration => {
     const scope = scopes.find(entry => entry.key === exploration.key)
     return scope !== undefined && scope.paths.some(owned =>
-      unit.paths.some(path => path === owned || path.startsWith(`${owned}/`) || owned.startsWith(`${path}/`)))
+      unit.paths.some(path => ownsPath(owned, path) || ownsPath(path, owned)))
   })
   if (matches.length === 0) {
     log(`Unit ${unit.key} matches no exploration scope, so it receives every exploration result`)
@@ -448,14 +602,14 @@ const explorationsFor = unit => {
   }
   return matches
 }
-const dispatchImplementation = async (targets, findings, roundLabel, requiredStart) => {
+
+async function dispatchImplementation(targets, findings, roundLabel, requiredStart) {
   for (const unit of targets) {
     const key = `implement:${unit.key}${roundLabel}`
     if (nodeFor(key) === undefined) {
       graph.nodes.push({ ...nodeFor('implement'), key, prerequisites: [], owner: `worker:${unit.key}`, ownership: { kind: 'unit', value: unit }, inputs: {}, status: 'pending', completionEvidence: [] })
       connect('plan', key)
       connect(`review${roundsUsed === 1 ? '' : `:fix-${roundsUsed - 1}`}`, key)
-      connect(`verify-findings:${roundsUsed}`, key)
       connect(key, activeNodes.implement)
     }
     nodeFor(key).inputs = { unit, explorations: explorationsFor(unit), requiredStart, findings }
@@ -464,7 +618,6 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     const options = {
       isolation: 'worktree',
       label: `implement:${unit.key}${roundLabel}`,
-      ...(models.implement === undefined ? {} : { model: models.implement }),
       ...(efforts.implement === undefined ? {} : { effort: efforts.implement }),
       phase: 'Implement',
       schema: {
@@ -529,7 +682,7 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
         typeof result?.evidence === 'string' && result.evidence.trim().length > 0
       const problems = []
       if (!ownershipHeld) {
-        problems.push('changed files fall outside the owned paths or are not safe repository-relative paths')
+        problems.push('changed files are malformed or outside the assigned paths')
       }
       if (!checksPassed(result?.checks)) {
         problems.push('required checks are missing or did not all pass')
@@ -568,7 +721,8 @@ const dispatchImplementation = async (targets, findings, roundLabel, requiredSta
     ? { attemptResources, reason: failures.join('; '), status: 'failed', unitResults }
     : { attemptResources, reason: null, status: 'completed', unitResults }
 }
-const dispatchIntegration = async (currentUnits, destination) => {
+
+async function dispatchIntegration(currentUnits, destination) {
   const attempt = await runAgent(compose(
     `Integrate into the authorized destination: ${destination}.`,
     `Base branch: ${resolvedBase}`,
@@ -583,7 +737,6 @@ const dispatchIntegration = async (currentUnits, destination) => {
     promptParts.integrate
   ), {
     label: 'integrate',
-    ...(models.integrate === undefined ? {} : { model: models.integrate }),
     ...(efforts.integrate === undefined ? {} : { effort: efforts.integrate }),
     phase: 'Integrate',
     schema: {
@@ -676,26 +829,28 @@ const dispatchIntegration = async (currentUnits, destination) => {
   }
   return { branch: result.branch, changedFiles: result.changedFiles, checks: result.checks, conflicts: result.conflicts, evidence: result.evidence, reason: null, resources, status: 'completed' }
 }
-const retainAttempts = (attemptResources, attemptLedger) => {
+
+function retainAttempts(attemptResources, attemptLedger) {
   attemptResources.forEach(resource => {
-    const existing = attemptLedger.find(entry => entry.key === resource.key && entry.branch === resource.branch)
-    if (existing === undefined) {
+    const index = attemptLedger.findIndex(entry => entry.key === resource.key && entry.branch === resource.branch)
+    if (index === -1) {
       attemptLedger.push(resource)
     } else {
-      existing.startRef = resource.startRef
-      existing.state = resource.state
+      attemptLedger[index] = resource
     }
   })
 }
-const applyLedger = (integrationState, attemptLedger) => {
+
+function applyLedger(integrationState, attemptLedger) {
   integrationState.resources?.forEach(resource => {
-    const entry = attemptLedger.find(candidate => candidate.key === resource.key && candidate.branch === resource.branch)
-    if (entry !== undefined) {
-      entry.state = resource.state
+    const index = attemptLedger.findIndex(candidate => candidate.key === resource.key && candidate.branch === resource.branch)
+    if (index !== -1) {
+      attemptLedger[index] = { ...attemptLedger[index], state: resource.state }
     }
   })
 }
-const dispatchSweep = async candidate => {
+
+async function dispatchSweep(candidate) {
   const attempt = await runAgent(compose(
     'Run a quick environment-exposure sweep over the integrated change only.',
     `Base branch: ${resolvedBase}`,
@@ -710,7 +865,6 @@ const dispatchSweep = async candidate => {
   ), {
     agentType: 'Explore',
     label: 'sweep',
-    ...(models.sweep === undefined ? {} : { model: models.sweep }),
     ...(efforts.sweep === undefined ? {} : { effort: efforts.sweep }),
     phase: 'Sweep',
     schema: {
@@ -749,7 +903,8 @@ const dispatchSweep = async candidate => {
   }
   return { evidence: result.evidence, exposures: result.exposures, reason: null, status: 'completed' }
 }
-const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
+
+async function dispatchPublish(currentUnits, integrationState, priorUrl) {
   const attempt = await runAgent(compose(
     'Publish the named candidate branch for review.',
     taskPart,
@@ -770,7 +925,6 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
     promptParts.publish
   ), {
     label: 'publish',
-    ...(models.publish === undefined ? {} : { model: models.publish }),
     ...(efforts.publish === undefined ? {} : { effort: efforts.publish }),
     phase: 'Publish',
     schema: {
@@ -799,7 +953,8 @@ const dispatchPublish = async (currentUnits, integrationState, priorUrl) => {
   }
   return { action: result.action, evidence: result.evidence, reason: null, status: 'completed', url: result.url }
 }
-const dispatchReview = async (currentUnits, integrationState, publishState) => {
+
+async function dispatchReview(currentUnits, integrationState, publishState, round) {
   const attempt = await runAgent(compose(
     'Independently review the complete current change for the delivery goal.',
     `Candidate branch: ${integrationState.branch}.`,
@@ -818,14 +973,13 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
     })}`,
     `Review the posted candidate at ${publishState.url}, including its request description.`,
     'Inspect the change and the affected consumers beyond the changed lines.',
-    'Report concrete findings with file locations and realistic failure scenarios, separating new defects from pre-existing issues.',
-    'Return verdict fix-required only for findings that block acceptance, correctness, safety, or required checks.',
+    'For each blocking finding, cite code, a requirement, or a safe reproduction in its detail and describe the realistic failure scenario.',
+    'Distinguish new defects from pre-existing issues. Return fix-required only for supported findings that block acceptance, correctness, safety, or required checks.',
     'Return an empty findings list with verdict pass when no actionable defect remains.',
     readOnlyPart,
     promptParts.review
   ), {
     label: 'review',
-    ...(models.review === undefined ? {} : { model: models.review }),
     ...(efforts.review === undefined ? {} : { effort: efforts.review }),
     phase: 'Review',
     schema: {
@@ -865,47 +1019,11 @@ const dispatchReview = async (currentUnits, integrationState, publishState) => {
   if (!shape) {
     return { evidence: result?.evidence ?? null, findings: result?.findings ?? null, reason: result?.verdict === 'fix-required' && Array.isArray(result?.findings) && result.findings.length === 0 ? 'Review verdict fix-required has no findings' : 'Review result is missing or malformed', status: 'failed', verdict: result?.verdict ?? null }
   }
-  return { evidence: result.evidence, findings: result.findings, reason: null, status: 'completed', verdict: result.verdict }
+  const findings = result.findings.map((finding, index) => ({ ...finding, id: `review-${round + 1}-finding-${index + 1}` }))
+  return { evidence: result.evidence, findings, reason: null, status: 'completed', verdict: result.verdict }
 }
-const verifyFindings = async (review, integration, publication, round) => {
-  if (review.status !== 'completed' || review.verdict === 'pass') {
-    return review
-  }
-  const findings = review.findings.map((finding, index) => ({ ...finding, id: `review-${round + 1}-finding-${index + 1}` }))
-  setOutcome(activeNodes.review, review.status, review.reason, review)
-  const key = `verify-findings:${round + 1}`
-  graph.nodes.push({ key, operation: 'Verify review findings', prerequisites: [], inputs: { findings, candidate: integration.branch, publication }, outputs: ['dispositions', 'confirmed findings', 'evidence'], owner: 'independent finding verifier', authority: 'read-only', completionEvidence: [], status: 'pending', reason: null })
-  connect(activeNodes.review, key)
-  const attempt = await runAgent(compose(
-    'Independently verify each review finding against source and requirements. Do not fix or modify anything.',
-    'Refute a finding whose failure scenario cannot realistically occur.',
-    'For runtime findings, execute a safe reproduction when available and report the command, expected result, and observed result; otherwise cite source or requirement evidence.',
-    taskPart,
-    `Base branch: ${resolvedBase}`,
-    issuePart,
-    `Candidate branch: ${integration.branch}; posted request: ${publication.url}`,
-    `Review evidence and findings: ${JSON.stringify({ evidence: review.evidence, findings })}`,
-    'Return exactly one disposition per finding with its id, status confirmed, refuted, or unverified, and nonempty evidence.',
-    readOnlyPart,
-    promptParts.review
-  ), { label: `verify-findings:${round + 1}`, ...(models.verify === undefined ? {} : { model: models.verify }), ...(efforts.verify === undefined ? {} : { effort: efforts.verify }), phase: 'Verify', schema: {
-    properties: { dispositions: { items: { properties: { id: { type: 'string' }, status: { enum: ['confirmed', 'refuted', 'unverified'], type: 'string' }, evidence: { type: 'string' } }, required: ['id', 'status', 'evidence'], type: 'object' }, type: 'array' } },
-    required: ['dispositions'], type: 'object'
-  } })
-  const dispositions = attempt.result?.dispositions
-  const valid = Array.isArray(dispositions) && dispositions.length === findings.length &&
-    dispositions.every(item => findings.some(finding => finding.id === item?.id) &&
-      ['confirmed', 'refuted', 'unverified'].includes(item?.status) && typeof item?.evidence === 'string' && item.evidence.trim()) &&
-    new Set(dispositions.map(item => item.id)).size === findings.length
-  if (attempt.error !== undefined || !valid || dispositions.some(item => item.status === 'unverified')) {
-    setOutcome(key, 'failed', 'Finding verification failed or remains unresolved', { dispositions: dispositions ?? null, error: attempt.error ?? null })
-    return { ...review, findings, verification: { dispositions: dispositions ?? null, error: attempt.error ?? null }, reason: 'Finding verification failed or remains unresolved', status: 'failed' }
-  }
-  setOutcome(key, 'completed', null, { dispositions })
-  const confirmed = findings.filter(finding => dispositions.some(item => item.id === finding.id && item.status === 'confirmed'))
-  return { ...review, findings, confirmed, verification: { dispositions }, accepted: confirmed.length === 0 }
-}
-const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) => {
+
+async function runPublish(sweepState, currentUnits, integrationState, priorUrl) {
   if (skipped.publish) {
     return { reason: 'Explicit dispatch skip, so publication did not run', status: 'skipped' }
   }
@@ -928,190 +1046,112 @@ const runPublish = async (sweepState, currentUnits, integrationState, priorUrl) 
   return dispatchPublish(currentUnits, integrationState, priorUrl)
 }
 
-phase('Implement')
-let unitResults = []
-const attemptLedger = []
-if (graph.edges.some(edge => edge.to === activeNodes.implement && !edge.from.startsWith('implement:') && nodeFor(edge.from).status !== 'completed')) {
-  recordPhase('implement', 'skipped', 'Required Plan predecessor is incomplete')
-} else if (skipped.implement) {
-  recordPhase('implement', 'skipped', 'Explicit dispatch skip, so source changes did not run')
-} else if (!candidateBranch) {
-  recordPhase('implement', 'failed', 'Provide the named task candidate as a nonempty args.candidateBranch string, because implementation cannot verify a worktree starting reference without it')
-} else if (candidateBranch === resolvedBase) {
-  recordPhase('implement', 'failed', 'The task candidate cannot equal the base branch')
-} else {
-  log(split ? 'Implementing the planned units in parallel' : 'Implementing the planned unit')
-  const implementState = await dispatchImplementation(units, null, '', candidateBranch)
-  recordPhase('implement', implementState.status, implementState.reason, implementState)
-  unitResults = implementState.unitResults
-  retainAttempts(implementState.attemptResources, attemptLedger)
+// Graph dispatch, path ownership, and check evidence
+function nodeFor(key) {
+  return graph.nodes.find(node => node.key === key)
 }
-let integrationState = null
-phase('Integrate')
-if (incompletePredecessor('integrate') !== undefined) {
-  integrationState = { reason: 'Implementation did not complete', status: 'skipped' }
-} else if (skipped.integrate) {
-  integrationState = { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
-} else if (graph.edges.some(edge => edge.to === activeNodes.integrate && edge.type === 'condition' && !edgeRequired(edge))) {
-  integrationState = { branch: unitResults[0].branch, reason: 'The plan defines a single work unit, so no cross-unit integration is required', status: 'skipped' }
-} else {
-  log('Integrating the named unit branches into the task branch')
-  integrationState = await dispatchIntegration(unitResults, candidateBranch)
+
+function connect(from, to, type = 'result', condition = null) {
+  graph.edges.push({ from, to, type, condition })
+  nodeFor(to).prerequisites.push(from)
 }
-recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
-applyLedger(integrationState, attemptLedger)
-let sweepState = null
-phase('Sweep')
-if (incompletePredecessor('sweep') !== undefined) {
-  sweepState = { reason: `Required ${phaseTitles[incompletePredecessor('sweep')]} predecessor is incomplete`, status: 'skipped' }
-} else if (skipped.sweep) {
-  sweepState = { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
-} else {
-  log('Sweeping the change for environment exposures')
-  sweepState = await dispatchSweep(integrationState.branch)
+
+function edgeRequired(edge) {
+  return edge.condition === null || (edge.condition === '!skips.explore' ? !skipped.explore : nodeFor('plan').completionEvidence.at(-1)?.result?.units?.length > 1 || skipped.integrate)
 }
-recordPhase('sweep', sweepState.status, sweepState.reason, sweepState)
-let publishState = null
-let postedUrl = null
-phase('Publish')
-publishState = await runPublish(sweepState, unitResults, integrationState, null)
-recordPhase('publish', publishState.status, publishState.reason, publishState)
-if (publishState.status === 'completed') {
-  postedUrl = publishState.url
+
+function incompletePredecessor(key) {
+  return graph.edges.find(edge => edge.to === activeNodes[key] && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')?.from
 }
-let reviewState = null
-phase('Review')
-if (skipped.review) {
-  reviewState = { reason: 'Explicit dispatch skip, so independent review did not run', status: 'skipped' }
-} else if (incompletePredecessor('review') !== undefined) {
-  reviewState = { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
-} else {
-  log('Reviewing the posted candidate')
-  reviewState = await dispatchReview(unitResults, integrationState, publishState)
+
+function setOutcome(key, status, reason, result = null) {
+  const node = nodeFor(key)
+  node.status = status
+  node.reason = reason ?? null
+  node.completionEvidence.push({ status, reason: reason ?? null, result })
 }
-reviewState = await verifyFindings(reviewState, integrationState, publishState, 0)
-recordPhase('review', reviewState.status, reviewState.reason, reviewState)
-const reviewHistory = [reviewState]
-let roundsUsed = 0
-while (
-  reviewState.status === 'completed' &&
-  reviewState.verdict === 'fix-required' &&
-  reviewState.confirmed?.length > 0 &&
-  roundsUsed < maxFixRounds &&
-  !skipped.implement &&
-  phaseRecords.plan.status === 'completed'
-) {
-  const unmatched = reviewState.confirmed.filter(finding => units.filter(unit => unit.paths.some(path => ownsPath(path, finding.file))).length !== 1)
-  if (unmatched.length > 0) {
-    reviewState = { ...reviewState, reason: 'Confirmed findings do not map to exactly one owned unit', status: 'failed' }
-    recordPhase('review', reviewState.status, reviewState.reason)
-    break
+
+function recordPhase(key, status, reason, result = null) {
+  phaseRecords[key] = { reason: reason ?? null, status, title: phaseTitles[key] }
+  setOutcome(activeNodes[key], status, reason, result)
+}
+
+function graphPosition(key) {
+  const node = nodeFor(key)
+  return [
+    `Graph position: ${node.key}; owner: ${node.owner}; authority: ${node.authority}.`,
+    `Prerequisites: ${node.prerequisites.length === 0 ? 'none' : node.prerequisites.map(parent => `${parent}=${nodeFor(parent).status}`).join('; ')}.`,
+    `Inputs: ${Array.isArray(node.inputs.contract) ? node.inputs.contract.join(', ') : Object.keys(node.inputs.contract).join(', ')}.`,
+    `Predecessor results: ${JSON.stringify(node.inputs.predecessors)}.`,
+    `Outputs consumed downstream: ${node.outputs.join(', ')}.`,
+    node.ownership === undefined ? '' : `Owned ${node.ownership.kind}: ${JSON.stringify(node.ownership.value)}.`
+  ].filter(Boolean).join('\n')
+}
+
+async function runAgent(prompt, options) {
+  const phaseKey = options.phase.toLowerCase()
+  const key = options.label.includes(':') ? options.label : activeNodes[phaseKey]
+  const node = nodeFor(key)
+  const predecessor = graph.edges.find(edge => edge.to === key && edgeRequired(edge) && nodeFor(edge.from).status !== 'completed')
+  if (predecessor !== undefined) {
+    return { error: `Required graph predecessor ${predecessor.from} is incomplete` }
   }
-  const targets = units.filter(unit => reviewState.confirmed.some(finding => unit.paths.some(path => ownsPath(path, finding.file))))
-  roundsUsed += 1
-  const candidateName = integrationState.branch
-  for (const key of ['implement', 'integrate', 'sweep', 'publish', 'review']) {
-    const previous = nodeFor(activeNodes[key])
-    activeNodes[key] = `${key}:fix-${roundsUsed}`
-    graph.nodes.push({ ...previous, key: activeNodes[key], prerequisites: [], inputs: operations[key][3], status: 'pending', reason: null, completionEvidence: [] })
+  const requestedModel = models[phaseKey] ?? defaultModels[phaseKey]
+  const defaultSource = requestedModel === undefined ? 'host' : 'workflow-default'
+  node.inputs = {
+    contract: node.inputs,
+    predecessors: Object.fromEntries(node.prerequisites.map(parent => [parent, nodeFor(parent).completionEvidence.at(-1)?.result ?? null])),
+    modelSelection: { requestedModel: requestedModel ?? null, source: models[phaseKey] === undefined ? defaultSource : 'argument' }
   }
-  connect('plan', activeNodes.implement)
-  connect(`review${roundsUsed === 1 ? '' : `:fix-${roundsUsed - 1}`}`, activeNodes.implement)
-  connect(`verify-findings:${roundsUsed}`, activeNodes.implement)
-  connect(activeNodes.implement, activeNodes.integrate)
-  connect('plan', activeNodes.integrate)
-  connect(activeNodes.implement, activeNodes.sweep)
-  connect(activeNodes.integrate, activeNodes.sweep)
-  connect(activeNodes.implement, activeNodes.publish)
-  connect(activeNodes.integrate, activeNodes.publish)
-  connect(activeNodes.sweep, activeNodes.publish)
-  connect(activeNodes.publish, activeNodes.review)
-  phase('Implement')
-  const fixState = await dispatchImplementation(targets, reviewState.confirmed, `:fix-${roundsUsed}`, candidateName)
-  recordPhase('implement', fixState.status, fixState.reason, fixState)
-  retainAttempts(fixState.attemptResources, attemptLedger)
-  const repairedByKey = new Map(fixState.unitResults.map(unit => [unit.key, unit]))
-  unitResults = unitResults.map(unit => repairedByKey.get(unit.key) ?? unit)
-  if (fixState.status !== 'completed') {
-    integrationState = { reason: 'Implementation did not complete', status: 'skipped' }
-    sweepState = { reason: 'Required Integration predecessor is incomplete', status: 'skipped' }
-    publishState = { reason: 'Implementation did not complete, so publication is blocked', status: 'skipped' }
-    reviewState = { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
-    for (const [key, state] of Object.entries({ integrate: integrationState, sweep: sweepState, publish: publishState, review: reviewState })) {
-      recordPhase(key, state.status, state.reason, state)
+  node.status = 'running'
+  return agent(compose(graphPosition(key), prompt), requestedModel === undefined ? options : { ...options, model: requestedModel }).then(
+    result => ({ result }),
+    error => ({ error: String(error instanceof Error ? error.message : error) })
+  )
+}
+
+function relativePath(path, checkoutParts) {
+  if (typeof path !== 'string' || path.trim().length === 0 || path.includes('\0')) {
+    return null
+  }
+  const normalized = path.trim().replace(/\\/g, '/')
+  if (normalized.startsWith('/') || /^[a-zA-Z]:/.test(normalized)) {
+    return null
+  }
+  const segments = [...(checkoutParts ?? [])]
+  for (const segment of normalized.split('/')) {
+    if (segment === '..' && segments.length > 0 && segments.at(-1) !== '..') {
+      segments.pop()
+    } else if (segment !== '' && segment !== '.' && !(segment === '..' && checkoutParts !== null)) {
+      segments.push(segment)
     }
-    break
   }
-  phase('Integrate')
-  integrationState = skipped.integrate
-    ? { reason: 'Explicit dispatch skip, so worktree integration did not run', status: 'skipped' }
-    : await dispatchIntegration(unitResults, candidateName)
-  recordPhase('integrate', integrationState.status, integrationState.reason, integrationState)
-  applyLedger(integrationState, attemptLedger)
-  phase('Sweep')
-  sweepState = incompletePredecessor('sweep') !== undefined
-    ? { reason: `Required ${phaseTitles[incompletePredecessor('sweep')]} predecessor is incomplete`, status: 'skipped' }
-    : skipped.sweep
-    ? { reason: 'Explicit dispatch skip, so the exposure sweep did not run', status: 'skipped' }
-    : await dispatchSweep(integrationState.branch)
-  recordPhase('sweep', sweepState.status, sweepState.reason, sweepState)
-  phase('Publish')
-  publishState = await runPublish(sweepState, unitResults, integrationState, postedUrl)
-  recordPhase('publish', publishState.status, publishState.reason, publishState)
-  if (publishState.status === 'completed') {
-    postedUrl = publishState.url
+  const anchor = checkoutParts ?? []
+  let common = 0
+  while (common < anchor.length && anchor[common] === segments[common]) {
+    common += 1
   }
-  phase('Review')
-  reviewState = incompletePredecessor('review') === undefined
-    ? await dispatchReview(unitResults, integrationState, publishState)
-    : { reason: 'Required Publish predecessor is incomplete, so there is no posted request to review', status: 'skipped' }
-  reviewState = await verifyFindings(reviewState, integrationState, publishState, roundsUsed)
-  reviewHistory.push(reviewState)
-  recordPhase('review', reviewState.status, reviewState.reason, reviewState)
+  return [...anchor.slice(common).map(() => '..'), ...segments.slice(common)].join('/') || null
 }
-if (reviewState.status === 'completed' && reviewState.verdict === 'fix-required' && !reviewState.accepted) {
-  recordPhase('review', 'completed', `Verdict fix-required after ${roundsUsed} of ${maxFixRounds} fix rounds`, reviewState)
+
+function isExternal(path) {
+  return path === '..' || path.startsWith('../')
 }
-for (const node of graph.nodes) {
-  if (node.status === 'running') {
-    setOutcome(node.key, 'failed', 'The dispatched node returned no accepted result')
-  } else if (node.status === 'pending') {
-    setOutcome(node.key, 'skipped', 'A required predecessor or dispatch skip prevented this node from running')
+
+function ownsPath(owned, path) {
+  if (owned.split('/').every(segment => segment === '..')) {
+    const parent = `${owned}/..`
+    return path !== parent && !path.startsWith(`${parent}/`)
   }
+  return path === owned || path.startsWith(`${owned}/`)
 }
-const phaseEvidence = phaseKeys.map(key => phaseRecords[key])
-if (
-  phaseEvidence.length !== phaseKeys.length ||
-  phaseEvidence.some(record => record?.status === undefined)
-) {
-  throw new Error('Phase evidence is incomplete')
+
+function checkEntries(checks) {
+  return Array.isArray(checks) && checks.every(check =>
+    typeof check?.command === 'string' && check.command.trim().length > 0 &&
+    ['failed', 'passed', 'skipped'].includes(check?.status))
 }
-const complete =
-  phaseKeys.every(key => nodeFor(activeNodes[key]).status === 'completed' ||
-    (key === 'explore' && skipped.explore && nodeFor(activeNodes[key]).status === 'skipped') ||
-    (nodeFor(activeNodes[key]).status === 'skipped' && !skipped[key] &&
-      graph.edges.some(edge => edge.to === activeNodes[key] && edge.type === 'condition' && !edgeRequired(edge)) &&
-      incompletePredecessor(key) === undefined)) &&
-  (phaseRecords.review.status !== 'completed' || (reviewState.verdict === 'pass' || reviewState.accepted === true))
-return {
-  complete,
-  explorations,
-  exposures: sweepState.exposures ?? [],
-  sweepEvidence: sweepState.evidence ?? null,
-  fixRounds: { max: maxFixRounds, used: roundsUsed },
-  graph,
-  integration: integrationState,
-  phaseEvidence,
-  publish: postedUrl === null ? null : { url: postedUrl, ...(nodeFor(activeNodes.publish).status === 'completed' ? { action: publishState.action, evidence: publishState.evidence } : {}) },
-  resources: attemptLedger,
-  review: reviewState,
-  reviewHistory,
-  scopes,
-  split,
-  units: units.map(unit => ({
-    branch: unitResults.find(result => result.key === unit.key)?.branch ?? null,
-    key: unit.key,
-    paths: unit.paths
-  })),
-  variant
+
+function checksPassed(checks) {
+  return checkEntries(checks) && checks.length > 0 && checks.every(check => check.status === 'passed')
 }

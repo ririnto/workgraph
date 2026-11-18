@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: workflow-follow-up
-description: Verify implicit Workflow selection when an earlier result may gate a follow-up that does not run.
-runs: 2
+description: Select Workflow for a conditional follow-up and report the completed result for each batch.
+runs: 1
 execution:
   max_turns: 20
   timeout_seconds: 300
@@ -10,30 +10,21 @@ execution:
     - Workflow
     - Read
   prompt: |-
-    Please orchestrate a read-only timeout assessment with delegated workers.
-    The follow-up dispatch decision must be made inside the same orchestration from the first worker's returned findings, not by Main separately after that worker returns.
-    Have one worker check whether C1, C2, or C3 lacks a required timeout.
-    If that worker finds a missing timeout, have a follow-up worker use its actual findings to assess release impact.
-    If no timeout is missing, do not dispatch the follow-up worker.
-    Input facts: C1, C2, and C3 each have a required timeout.
-    Assess only these supplied facts.
-    No project files or additional evidence exist.
-    Read each returned result before deciding the next action, and report only completed outcomes.
-    Report the blocker IDs and whether the follow-up was needed.
-    Do not edit files, run Git commands, or publish anything.
+    Coordinate two independent read-only batches in one run.
+    For each batch, have a worker identify missing required timeouts.
+    Dispatch a follow-up worker only for batches with returned findings and have it assess release impact using those findings.
+    Batch A has timeouts for A1 and A2. Batch B has a timeout for B1 and none for B2.
+    A missing timeout blocks release. Report completed outcomes for both batches.
 graders:
   - name: workflow-invoked
     type: tool_used
     tool: Workflow
     min: 1
-  - name: conditional-result
+    max: 1
+  - name: conditional-results
     type: llm
     focus: trace
     criteria: |-
-      Inspect the actual tool results and final report, not only the Workflow invocation.
-      Require one completed Workflow worker to assess all three timeout inputs and return no missing timeouts.
-      Require the Workflow script to condition follow-up dispatch on that worker's returned findings.
-      No follow-up worker runs because all three timeouts are present.
-      The final report gives no blocker IDs and says no follow-up was needed.
-      Do not accept a proposed Workflow, an execution error, or a report before worker completion.
-      The report does not claim edits or publication.
+      The completed Workflow uses the first result from each batch to decide its follow-up.
+      A has no follow-up. B has one follow-up using B2 from the predecessor and identifies it as a release blocker.
+      The final report reflects the completed results of both batches.

@@ -80,7 +80,7 @@ Inspect the affected rendered context when the changed property needs further ev
 
 Follow the [evaluation reporting requirements](README.md#development) for repeated behavioral runs, individual outcomes, and limited smoke checks.
 
-For Workflow invocation changes, run `PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 2 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
+For Workflow invocation changes, run `PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 1 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
 This behavioral check uses real agents and requires a host with Workflow enabled.
 Keep evaluation reports local and outside the repository with `--output-dir`.
 Inspect tool results because an attempted invocation alone does not prove successful execution.

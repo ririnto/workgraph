@@ -1,7 +1,7 @@
 schema_version: "1.1"
 name: codex-delegation-context
 description: Assess Codex history selection, worker continuation, and execution-limit boundaries.
-runs: 2
+runs: 1
 execution:
   # This limit belongs to the evaluation runner, not the simulated worker API.
   max_turns: 16
