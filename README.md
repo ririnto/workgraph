@@ -237,3 +237,10 @@ The [source review](docs/research.md#codex-native-hook-discovery-and-trust) reco
 A working-branch push reaches installed users only when their marketplace source tracks that branch.
 Follow the authorized repository release process to update the distribution branch.
 Use the matching [host adapter](#install) for installed-plugin updates and fresh-session checks.
+
+### ChatGPT account releases
+
+Use `.chatgpt-plugin/plugin.json` as the root `plugin.json` in a ChatGPT upload archive.
+Include the shared `skills/` tree and its referenced files when preparing a complete package.
+The account manifest uses a three-part semantic version.
+Increment it for an account release and preserve the existing account attribution when updating through Plugin Creator.
