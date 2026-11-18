@@ -23,7 +23,7 @@ The plugin exposes each workflow by its metadata name.
 
 ```js
 Workflow({
-  name: 'workgraph:delivery',
+  name: 'workgraph:adaptive-delivery',
   args: {
     task: 'Fix the parser bug and verify the original trigger.',
     baseBranch: 'main',
@@ -78,7 +78,7 @@ For example, the following arguments start agent work at Explore.
 
 ```js
 Workflow({
-  name: 'workgraph:delivery',
+  name: 'workgraph:adaptive-delivery',
   args: {
     task: 'Fix the parser’s handling of escaped quotes.',
     baseBranch: 'main',
