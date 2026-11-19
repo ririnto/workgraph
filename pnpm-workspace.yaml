@@ -16,4 +16,4 @@ catalog:
   oxlint-tsgolint: ^7.0.2007
   pnpm: ^12.21.0
   typescript: ^7.0.2
-  ultracite: ^8.2.0
+  ultracite: ^8.2.1
