@@ -9,6 +9,7 @@ export default defineConfig({
   extends: [core],
   ignorePatterns: [...(core.ignorePatterns ?? []), "workflows/*.js"],
   jsPlugins: ["./plugins/tsdoc-plugin.ts"],
+  options: { typeAware: true },
   rules: {
     "tsdoc/require-export-tsdoc": "deny"
   }
