@@ -38,6 +38,9 @@ Propagate rejections to the caller or handle them explicitly without ignoring th
 Preserve parallel execution when needed, using an explicit error-handling path such as a non-ignoring `catch`.
 Do not use an empty `catch` or catch and ignore errors.
 
+Prefer `await` to promise chaining for sequential work.
+Use `try` and `catch` for local rejection handling when they preserve the required error boundary.
+
 ## Traversal
 
 Use iterative traversal or an explicit work list when input depth can exceed the stack.
