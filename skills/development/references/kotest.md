@@ -10,6 +10,9 @@ Keep stateful fixtures scoped to their required lifecycle.
 
 ## Kotest assertions
 
+Use `shouldNotBeNull()` and `shouldBeTrue()` for null and Boolean assertions in place of `requireNotNull`, `checkNotNull`, `require`, `check`, or safe-call substitutes.
+Use `shouldBeTypeOf` or `shouldBeInstanceOf` in place of `as` casts.
+
 Use soft assertions when the test requires aggregated failures rather than fail-fast behavior.
 For soft assertions with a shared subject, use `assertSoftly(subject)`.
 Use `assertSoftly { ... }` when the group has no common receiver.

@@ -39,7 +39,7 @@ Preserve parallel execution when needed, using an explicit error-handling path s
 Do not use an empty `catch` or catch and ignore errors.
 
 Prefer `await` to promise chaining for sequential work.
-Use `try` and `catch` for local rejection handling when they preserve the required error boundary.
+Prefer `await` with `try` and `catch` to `Promise.catch` when that structure preserves the required error boundary.
 
 ## Traversal
 
