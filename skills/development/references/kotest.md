@@ -13,6 +13,10 @@ Keep stateful fixtures scoped to their required lifecycle.
 Use `shouldNotBeNull()` and `shouldBeTrue()` for null and Boolean assertions in place of `requireNotNull`, `checkNotNull`, `require`, `check`, or safe-call substitutes.
 Use `shouldBeTypeOf` or `shouldBeInstanceOf` in place of `as` casts.
 
+Wrap only the smallest expression under test in broad exception assertions such as `shouldThrowAny` and `shouldNotThrowAny`.
+Keep whole test bodies and larger blocks outside these assertions.
+For example, `shouldNotThrowAny { parser.parse(input) }` shows that parsing must complete without throwing.
+
 Use soft assertions when the test requires aggregated failures rather than fail-fast behavior.
 For soft assertions with a shared subject, use `assertSoftly(subject)`.
 Use `assertSoftly { ... }` when the group has no common receiver.
