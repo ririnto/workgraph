@@ -156,8 +156,9 @@ pnpm run check
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
 The pre-commit hook checks the staged diff for whitespace errors and conflict markers.
 The pre-push hook runs the full repository check before publication.
-`pnpm run check:ultracite-types` runs type-aware rules on JavaScript and TypeScript files across the repository, excluding generated files and the host workflow DSL.
-`pnpm run check:types` checks the configured JavaScript and TypeScript files with TypeScript and JSDoc.
+`pnpm run check:ultracite` checks formatting and runs lint rules, including type-aware rules on JavaScript and TypeScript files.
+Type-aware lint excludes generated files and the host workflow DSL.
+`pnpm run check:typescript` checks the configured JavaScript and TypeScript files with TypeScript and JSDoc.
 TypeScript uses the includes and exclusions in `tsconfig.json`, while Ultracite also applies its preset and Git ignores.
 `pnpm run check:production-audit` runs `pnpm audit --prod` to inspect production dependencies.
 The manifest currently declares none.
