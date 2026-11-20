@@ -31,8 +31,8 @@ Before publication, review the complete diff for unsupported guards, dead compat
 
 | Language | Source | Reference |
 | --- | --- | --- |
-| Java | `.java` | [Java](references/java.md) |
-| Kotlin | `.kt`, `.kts` | [Kotlin](references/kotlin.md) |
+| Java | `.java` | [Java and Kotlin](references/java-kotlin.md) |
+| Kotlin | `.kt`, `.kts` | [Java and Kotlin](references/java-kotlin.md) |
 | TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` | [JS/TS](references/js-ts.md) |
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JS/TS](references/js-ts.md) |
 | Python | `.py` | [Python](references/python.md) |
@@ -114,11 +114,11 @@ For lint rules or fixes, read [lint rule guidance](references/lint-rules.md).
 
 ## Verification
 
-Identify the target, trigger, input, and observable expected outcome.
-Use public interfaces at the lowest layer exercising the failure.
-Use process or application checks for behavior direct calls cannot establish.
-Reuse existing checks that exercise the changed behavior.
-Add or extend a test only for a requested or required case, or a realistic regression the existing suite would miss.
+Identify the target, trigger, input, and expected observable result.
+Check the lowest public interface that exercises the failure.
+Use process or app checks when direct calls cannot show the behavior.
+Reuse checks that exercise the change.
+Add or extend tests only for requested or required cases or realistic regressions the suite misses.
 Reserve source-shape assertions for explicit structural contracts.
 Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
 Remove redundant or low-value tests, fixtures, and runs within scope, preserving relevant failure coverage.
@@ -126,9 +126,12 @@ Preserve security, external-input, and data-integrity coverage without test-coun
 Use repeatable inputs for stateful failures.
 Consider model checking when consequential transitions or interleavings remain untested by examples.
 Stop when required checks and changed risks have sufficient evidence.
-Record commands, setup, exit status, failures, and raw results separately from interpretation.
-For visual changes, compare a render at the intended display size with the supplied reference or project design.
-For interactive changes, exercise the requested action and observe the result on the target surface.
+Wait for long-running checks in the tool's blocking mode.
+Use `gh run watch --exit-status` for CI, `gh pr checks --watch` for PR checks, or the tool's wait flag when available.
+Do not loop snapshot commands such as `gh run view` or `glab ci status` on a timer.
+Record commands, setup, exit status, failures, and raw results apart from interpretation.
+Compare visual changes at the intended size with the supplied reference or design.
+Exercise interactive changes on the target surface and observe the result.
 Keep traces or screenshots when needed.
 Before optimizing slow checks, measure them and report conditions, durations, and preserved coverage.
 Leave execution, formal proof, native activation, and model adherence unverified without direct evidence.
