@@ -2,7 +2,7 @@ import type { Rule } from "markdownlint";
 
 /** Preserve comments consumed by Markdown tooling or carrying legal metadata. */
 const reservedComment =
-  /^(?:markdownlint-(?:disable(?:-line|-next-line)?|enable|capture|restore|configure)\b|prettier-ignore(?:-start|-end)?\b|SPDX-License-Identifier:|copyright\b|@license\b)/iu;
+  /^(?:markdownlint-(?:disable(?:-line|-next-line)?|enable|capture|restore|configure)\b|prettier-ignore(?:-start|-end)?\b|SPDX-(?:License-Identifier|FileCopyrightText):|copyright\b[ \t]*:?[ \t]*(?:[0-9]{4}\b|©|\(c\))|©|@license\b)/iu;
 
 /** Check parsed Markdown comments and leave code examples, directives, and approved markers intact. */
 const rule: Rule = {

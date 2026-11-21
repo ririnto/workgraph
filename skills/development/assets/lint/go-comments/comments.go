@@ -32,7 +32,7 @@ func (plugin) GetLoadMode() string {
 }
 
 // These forms are consumed by Go, existing lint tools, or legal tooling.
-var reserved = regexp.MustCompile(`^(?://(?:go:generate[ \t]|line[ \t]|nolint(?:[: \t]|$)|lint:(?:ignore|file-ignore)[ \t])|/\*line[ \t]|(?://|/\*)[ \t\r\n*]*(?:SPDX-License-Identifier:|(?i:copyright)\b))`)
+var reserved = regexp.MustCompile(`^(?://(?:go:generate[ \t]|line[ \t]|nolint(?:[: \t]|$)|lint:(?:ignore|file-ignore)[ \t])|/\*line[ \t]|(?://|/\*)[ \t\r\n*!]*(?i:SPDX-(?:License-Identifier|FileCopyrightText):|copyright\b[ \t]*:?[ \t]*(?:[0-9]{4}\b|©|\(c\))|©))`)
 
 func run(pass *analysis.Pass) (any, error) {
 	for _, file := range pass.Files {

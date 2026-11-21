@@ -357,7 +357,7 @@ await test("body-comment lint reports loose comments once and honors language ma
   const matching = `const makeLabels = (lengthLimit = 6) => {
   const names = [" North "];
   return names.map((value) => {
-    // Normalize whitespace before truncating the label.
+    // Copyright workaround needed.
     /*
      * Leave the old trimming path here.
      * Copyright appears after the first content line.
@@ -375,6 +375,12 @@ const makeLabels = (lengthLimit = 6) => {
   /** Prefixes are measured after trimming the name. */
   const names = [" North "];
   /* SPDX-License-Identifier: MIT */
+  /* SPDX-FileCopyrightText: 2026 Example Authors */
+  /* Copyright (C) Example Authors */
+  /* © 2026 Example Authors */
+  /**
+   * Copyright 2026 Example Authors
+   */
   /**
    * @license Example copyright notice.
    */
@@ -443,7 +449,7 @@ await test("local Markdown comments config checks hidden notes and preserves lit
       [
         "# Rejected",
         "",
-        "<!-- Remove after migration. -->",
+        "<!-- Copyright workaround needed. -->",
         "",
         "A hidden <!-- dead --> path.",
         "",
@@ -460,6 +466,16 @@ await test("local Markdown comments config checks hidden notes and preserves lit
         "# Accepted",
         "",
         "<!-- SPDX-License-Identifier: MIT -->",
+        "",
+        "<!-- SPDX-FileCopyrightText: 2026 Example Authors -->",
+        "",
+        "<!-- Copyright (C) Example Authors -->",
+        "",
+        "<!-- © 2026 Example Authors -->",
+        "",
+        "<!--",
+        "Copyright 2026 Example Authors",
+        "-->",
         "",
         "<!-- markdownlint-disable-next-line MD013 -->",
         "Example: `<!-- inline example -->`.",

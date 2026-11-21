@@ -22,6 +22,14 @@ class CommentRules : RuleSetProviderV3(RuleSetId("comments")) {
 private class NoBodyComments :
     Rule(RuleId("comments:no-body-comments"), About()),
     RuleAutocorrectApproveHandler {
+    private companion object {
+        val legalMarker: Regex =
+            Regex(
+                """^(?:SPDX-(?:License-Identifier|FileCopyrightText):|copyright\b[ \t]*:?[ \t]*(?:[0-9]{4}\b|©|\(c\))|©)""",
+                RegexOption.IGNORE_CASE,
+            )
+    }
+
     override fun beforeVisitChildNodes(
         node: ASTNode,
         emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> AutocorrectDecision,
@@ -36,8 +44,7 @@ private class NoBodyComments :
             return
         }
         if (
-            text.startsWith("SPDX-License-Identifier:") ||
-            text.startsWith("Copyright ", ignoreCase = true) ||
+            legalMarker.containsMatchIn(text) ||
             text.startsWith("language=") ||
             text.startsWith("noinspection ") ||
             text.startsWith("region ") ||

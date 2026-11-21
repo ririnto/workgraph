@@ -60,5 +60,6 @@ For a scoped boundary, prove the prohibited use fails inside it and the authoriz
 Offer automatic fixes only when evaluation, side effects, and program behavior remain unchanged.
 Verify formatter idempotence and convergence between rule fixes and formatting.
 Preserve required checks and directives during rollout.
+The comment rules recognize leading SPDX identifiers, the `©` symbol, and `Copyright` followed by a year, `©`, or `(c)`.
 Review whether a remaining explanation documents a needed contract or excuses a workaround.
 Leave behavioral and intent checks with their [verification owner](runtime-formal-evidence.md).

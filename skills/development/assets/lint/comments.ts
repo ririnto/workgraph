@@ -2,7 +2,7 @@ import type { Context, ESTree, Plugin } from "@oxlint/plugins";
 
 /** Identify tool directives and license markers whose text has a separate consumer. */
 const reservedComment =
-  /^\s*(?:[*!]\s*)*(?:@ts-(?:check|nocheck|ignore|expect-error)\b|(?:eslint|oxlint)-(?:disable(?:-line|-next-line)?|enable)\b|eslint(?:-env)?\s|globals?\s|(?:oxfmt|prettier)-ignore\b|(?:c8|istanbul|v8) ignore\b|[#@]\s*source(?:Mapping)?URL=|[#@]__(?:PURE|NO_SIDE_EFFECTS)__\b|@(?:license|preserve|vite-ignore)\b|webpack(?:ChunkName|Mode|Ignore|Include|Exclude|Prefetch|Preload|FetchPriority|Exports)\s*:|SPDX-License-Identifier:|copyright\b)/iu;
+  /^\s*(?:[*!]\s*)*(?:@ts-(?:check|nocheck|ignore|expect-error)\b|(?:eslint|oxlint)-(?:disable(?:-line|-next-line)?|enable)\b|eslint(?:-env)?\s|globals?\s|(?:oxfmt|prettier)-ignore\b|(?:c8|istanbul|v8) ignore\b|[#@]\s*source(?:Mapping)?URL=|[#@]__(?:PURE|NO_SIDE_EFFECTS)__\b|@(?:license|preserve|vite-ignore)\b|webpack(?:ChunkName|Mode|Ignore|Include|Exclude|Prefetch|Preload|FetchPriority|Exports)\s*:|SPDX-(?:License-Identifier|FileCopyrightText):|copyright\b[ \t]*:?[ \t]*(?:[0-9]{4}\b|©|\(c\))|©)/iu;
 
 /**
  * Report comments outside their declaration or tooling contract.
