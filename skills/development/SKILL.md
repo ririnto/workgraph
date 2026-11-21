@@ -149,4 +149,4 @@ Record commands, setup, exit codes, failures, and raw results apart from analysi
 Measure slow checks before optimization and report conditions, durations, and preserved coverage.
 Require direct evidence for execution, formal proof, native activation, and model adherence claims.
 Report required checks blocked by the host.
-Read [runtime and formal evidence](references/runtime-formal-evidence.md) for visual or interactive changes, invariants, or release checks.
+Read [runtime and formal evidence](references/runtime-formal-evidence.md) for visual work, user flows, invariants, or release checks.
