@@ -27,6 +27,7 @@ const staged = run(
   ["diff", "--cached", "--name-only", "-z", "--no-renames"],
   true
 ).split("\0");
+const stagedPackage = staged.includes("package.json");
 const checks = [
   "check:issue-forms",
   "check:markdownlint-cli2",
@@ -40,7 +41,7 @@ for (const { patterns, check, test } of [
   { patterns: ["**/*.{go,mod,sum}", ".golangci.yaml"], check: "check:go" },
   { patterns: ["**/*.{kt,kts}", ".editorconfig"], check: "check:kotlin" },
   { patterns: [".husky/*", "**/*.sh", ".editorconfig"], check: "check:shell" },
-  { patterns: [".github/workflows/*.yaml"], check: "check:workflows" },
+  { patterns: [".github/workflows/*.{yaml,yml}"], check: "check:workflows" },
   {
     patterns: ["hooks/**", "skills/**", "**/plugin.json"],
     test: "hooks/*.test.mjs"
@@ -71,6 +72,7 @@ for (const { patterns, check, test } of [
   }
 ]) {
   if (
+    (stagedPackage && check !== undefined) ||
     staged.some((filename) =>
       patterns.some((pattern) => path.matchesGlob(filename, pattern))
     )
