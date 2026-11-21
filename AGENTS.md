@@ -5,7 +5,9 @@ Explicit user requirements take priority over project defaults within host and s
 
 ## Instruction ownership
 
-- Put contributor conventions and checks here, consumer procedures in `skills/`, and user-facing host setup, invocation, and updates in `docs/harness/`.
+- Document contributor conventions, exceptions, and checks that repository files and tooling do not make clear on their own.
+  Link longer procedures where the relevant work first needs them.
+  Put consumer procedures in `skills/` and user-facing host setup, invocation, and updates in `docs/harness/`.
 - Keep each role body self-contained and host-neutral.
   Put native mechanics and execution timing in the selected role's host reference.
   Main's references own orchestration and model guidance.

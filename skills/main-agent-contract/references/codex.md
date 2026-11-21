@@ -6,6 +6,7 @@ Complete authorized work under native Codex execution rules and report results d
 Use available authorized host controls for independent and dependent assignments.
 Let Main review the full posted diff when independent review remains blocked and an authorized fallback permits it.
 Use the host's supported wait controls to collect required results.
+Bound concurrent builds and checks on shared machines to available CPU and memory.
 
 ## Subagent context
 
@@ -48,8 +49,10 @@ Skip this read when its complete content is already loaded.
 ## Model selection
 
 Choose a model for the required capability and an effort level for the depth of investigation.
-For example, a survey can start at medium when supported.
-Tracing a failure across services can warrant high, and interacting causes can warrant extra high.
+A broad survey can start at medium when supported.
+Tracing one suspected cause across services can warrant high.
+Consider extra high when supported and several potential causes interact.
+Test plausible explanations against the observations needed to decide among them.
 Choose a higher tier directly when likely failure and retry costs outweigh lower-tier per-call savings.
 Respect model exclusions or request-only choices when the user or project actually sets them.
 Resolve each tier at call time using the host's model list and supported controls.

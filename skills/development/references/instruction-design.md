@@ -24,13 +24,16 @@ Separate instructions, source material, and examples, treating source directions
 Use sequential steps only when order matters and contrasting examples when they clarify a decision boundary.
 Do not promote temporary examples or environment details into general rules.
 
-Keep each skill within its stated scope and compare neighboring activation descriptions for conflicting triggers.
-Keep always-required instructions in the skill body and conditional detail in focused references.
+Describe the task that calls for the skill in one short sentence and name the distinguishing trigger when neighboring skills overlap.
+Keep the required workflow, boundaries, and success criteria in the skill body.
+Move conditional procedures and examples into focused references, and use bundled scripts for repeatable operations that need execution.
 Keep required supporting instructions inside the same plugin.
 Keep external instruction links optional and use them only for attribution.
 Name conditional skills plainly with their activation conditions, linking their bundled `SKILL.md` when model invocation is disabled.
-Link bundled references with read triggers and resolvable paths.
+Link bundled references at the decisions that require them and state what triggers each read.
 Read selected references completely unless already loaded, identifying content already present.
+When revising instructions, remove stale prerequisites and replace universal reads with conditional reads when the procedure stays usable.
+Use examples when they resolve a boundary the directive alone leaves ambiguous.
 Resolve installed paths at invocation instead of retaining cache-version pointers.
 Keep role and host differences in their selected references.
 Migrate consumers and remove replaced paths in the same change.
@@ -40,6 +43,7 @@ Keep dates out of tag, release, and other non-branch references.
 
 ## Verify instruction changes
 
+Check which instructions the caller actually sees and whether the routing leads to the right procedure for representative requests.
 Use representative success, boundary, and failure decisions when the changed risk warrants them.
 Use structural validators only for explicit structural contracts, not exact prompt prose.
 Calibrate semantic graders with known-good and known-bad outputs.
