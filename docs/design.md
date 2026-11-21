@@ -333,6 +333,7 @@ The rule requires multiline TSDoc for supported exported TypeScript declarations
 It does not check class-expression members through direct exported variable declarations.
 The preset's `no-inline-comments` rule checks trailing comments.
 The Development skill's [comment rule asset](../skills/development/assets/lint/function-comments.ts) checks standalone line comments in function bodies.
+Other projects [copy and own the lint template](../skills/development/references/lint-rules.md#adopt-a-lint-asset) in their own repositories.
 Function-body spacing and the usefulness of a comment remain written conventions.
 The repository's tooling tests verify the configured diagnostics and formatter behavior.
 JavaScript parameter and return annotations and type imports follow the official preset defaults.
