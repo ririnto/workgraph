@@ -58,6 +58,8 @@ const baseBranch =
   typeof input.baseBranch === "string" ? input.baseBranch.trim() : "";
 const candidateBranch =
   typeof input.candidateBranch === "string" ? input.candidateBranch.trim() : "";
+const repository =
+  typeof input.repository === "string" ? input.repository.trim() : "";
 const settingsMap = (value, name) => {
   if (value === undefined || value === null) {
     return {};
@@ -68,6 +70,7 @@ const settingsMap = (value, name) => {
   return value;
 };
 const skipped = settingsMap(input.skips, "args.skips");
+const needsBase = skipped.implement !== true || baseBranch !== "";
 const models = settingsMap(input.models, "args.models");
 const efforts = settingsMap(input.efforts, "args.efforts");
 const promptParts = settingsMap(input.promptParts, "args.promptParts");
@@ -130,14 +133,14 @@ const operations = {
     "delivery scope owner",
     "read-only",
     ["task"],
-    ["scopes", "evidence"]
+    ["baseBranch", "scopes", "evidence", "source"]
   ],
   explore: [
-    "Explore owned scopes",
-    "scope explorers",
-    "read-only",
-    ["scopes"],
-    ["explorations", "evidence", "optional stopReason"]
+    "Join scope exploration results",
+    "workflow coordinator",
+    "accept evidence only",
+    ["scopes", "scopeAttempts"],
+    ["explorations"]
   ],
   plan: [
     "Decide whether implementation is needed",
@@ -147,39 +150,56 @@ const operations = {
     ["units", "evidence", "optional stopReason"]
   ],
   implement: [
-    "Implement owned units",
-    "unit workers",
-    "edit owned paths; commit unit branches; no push",
-    ["units", "explorations", "candidateBranch"],
-    ["unitResults", "checks", "resources"]
+    "Join implementation results",
+    "workflow coordinator",
+    "accept evidence only",
+    ["units", "unitAttempts"],
+    ["unitResults", "attemptResources"]
   ],
   integrate: [
     "Merge named unit branches",
     "integration owner",
     "merge named branches; check combined candidate; no push",
-    ["unitResults"],
-    ["candidate branch", "combined checks", "resources"]
+    ["destination", "destinationStart", "baseBranch", "unitResources"],
+    ["branch", "startCommit", "commit", "checks", "resources"]
   ],
   sweep: [
     "Scan the named candidate for exposures",
     "exposure explorer",
     "read-only",
-    ["candidate branch"],
-    ["exposures", "evidence"]
+    ["baseBranch", "candidate"],
+    ["commit", "baseCommit", "coverage", "exposures", "evidence"]
   ],
   publish: [
     "Publish the named candidate",
     "publication owner",
     "publish authorized PR/MR; no merge",
-    ["unitResults", "integration", "exposures", "issue"],
-    ["request URL", "action", "evidence"]
+    [
+      "repository",
+      "candidate",
+      "baseBranch",
+      "baseCommit",
+      "checks",
+      "priorUrl",
+      "issue"
+    ],
+    [
+      "url",
+      "repository",
+      "headBranch",
+      "baseBranch",
+      "commit",
+      "baseCommit",
+      "action",
+      "evidence"
+    ]
   ],
   review: [
     "Independently review the posted candidate",
     "independent reviewer",
     "read-only",
-    ["request URL", "unitResults", "integration"],
-    ["verdict", "findings", "evidence"]
+    ["publication", "candidate", "checks"],
+    ["commit", "baseCommit", "coverage", "verdict", "findings", "evidence"]
   ]
 };
 for (const key of phaseKeys) {
@@ -204,12 +224,26 @@ connect("plan", "implement");
 connect("implement", "integrate");
 connect("plan", "integrate", "condition", "units.length > 1");
 connect("implement", "sweep");
-connect("integrate", "sweep", "condition", "units.length > 1");
+connect(
+  "integrate",
+  "sweep",
+  "condition",
+  "units.length > 1 || skips.integrate"
+);
 connect("implement", "publish");
-connect("integrate", "publish", "condition", "units.length > 1");
+connect(
+  "integrate",
+  "publish",
+  "condition",
+  "units.length > 1 || skips.integrate"
+);
 connect("sweep", "publish");
 connect("publish", "review");
-nodeFor("scope").inputs = { task, baseBranch };
+nodeFor("scope").inputs = {
+  task,
+  baseBranch,
+  suppliedScope: input.scope !== undefined
+};
 
 // Shared prompt context
 const taskPart = `Delivery goal: ${task}`;
@@ -271,20 +305,6 @@ if (externalUnits.length > 0) {
   }));
   return stopAfter("plan", reason, evidence, { kind: "handoff", units });
 }
-for (const unit of units) {
-  graph.nodes.push({
-    ...nodeFor("implement"),
-    key: `implement:${unit.key}`,
-    prerequisites: [],
-    owner: `worker:${unit.key}`,
-    ownership: { kind: "unit", value: unit },
-    inputs: { unit, candidateBranch },
-    status: "pending",
-    completionEvidence: []
-  });
-  connect("plan", `implement:${unit.key}`);
-  connect(`implement:${unit.key}`, "implement");
-}
 const split = units.length > 1;
 if (units.length > 0) {
   log(
@@ -297,14 +317,7 @@ if (units.length > 0) {
 phase("Implement");
 let unitResults = [];
 const attemptLedger = [];
-if (
-  graph.edges.some(
-    (edge) =>
-      edge.to === activeNodes.implement &&
-      !edge.from.startsWith("implement:") &&
-      nodeFor(edge.from).status !== "completed"
-  )
-) {
+if (incompletePredecessor("implement") !== undefined) {
   recordPhase(
     "implement",
     "skipped",
@@ -338,7 +351,8 @@ if (
     units,
     null,
     "",
-    candidateBranch
+    candidateBranch,
+    null
   );
   recordPhase(
     "implement",
@@ -378,7 +392,11 @@ if (incompletePredecessor("integrate") !== undefined) {
   };
 } else {
   log("Integrating the named unit branches into the task branch");
-  integrationState = await dispatchIntegration(unitResults, candidateBranch);
+  integrationState = await dispatchIntegration(
+    unitResults,
+    candidateBranch,
+    unitResults[0].startCommit
+  );
 }
 recordPhase(
   "integrate",
@@ -387,6 +405,7 @@ recordPhase(
   integrationState
 );
 applyLedger(integrationState, attemptLedger);
+let candidate = acceptedCandidate(integrationState);
 
 phase("Sweep");
 let sweepState;
@@ -402,7 +421,7 @@ if (incompletePredecessor("sweep") !== undefined) {
   };
 } else {
   log("Sweeping the change for environment exposures");
-  sweepState = await dispatchSweep(integrationState.branch);
+  sweepState = await dispatchSweep(candidate);
 }
 recordPhase("sweep", sweepState.status, sweepState.reason, sweepState);
 
@@ -412,6 +431,7 @@ let publishState = await runPublish(
   sweepState,
   unitResults,
   integrationState,
+  candidate,
   null
 );
 recordPhase("publish", publishState.status, publishState.reason, publishState);
@@ -437,6 +457,7 @@ if (skipped.review) {
   reviewState = await dispatchReview(
     unitResults,
     integrationState,
+    candidate,
     publishState,
     0
   );
@@ -453,7 +474,35 @@ while (
   !skipped.implement &&
   phaseRecords.plan.status === "completed"
 ) {
-  const unmatched = reviewState.findings.filter(
+  const verificationKey = `verify-findings:${roundsUsed + 1}`;
+  const verification = await verifyFindings(
+    verificationKey,
+    reviewState,
+    candidate,
+    publishState
+  );
+  reviewState = { ...reviewState, verification };
+  reviewHistory[roundsUsed] = reviewState;
+  if (verification.status !== "completed") {
+    reviewState = {
+      ...reviewState,
+      reason: verification.reason,
+      status: "failed"
+    };
+    recordPhase("review", reviewState.status, reviewState.reason, reviewState);
+    break;
+  }
+  const confirmed = verification.confirmed;
+  if (confirmed.length === 0) {
+    recordPhase(
+      "review",
+      "completed",
+      "Independent verification refuted every finding",
+      reviewState
+    );
+    break;
+  }
+  const unmatched = confirmed.filter(
     (finding) =>
       units.filter((unit) =>
         unit.paths.some((path) => ownsPath(path, finding.file))
@@ -462,19 +511,19 @@ while (
   if (unmatched.length > 0) {
     reviewState = {
       ...reviewState,
-      reason: "Review findings do not map to exactly one owned unit",
+      reason: "Confirmed findings do not map to exactly one owned unit",
       status: "failed"
     };
     recordPhase("review", reviewState.status, reviewState.reason, reviewState);
     break;
   }
   const targets = units.filter((unit) =>
-    reviewState.findings.some((finding) =>
+    confirmed.some((finding) =>
       unit.paths.some((path) => ownsPath(path, finding.file))
     )
   );
   roundsUsed += 1;
-  const candidateName = integrationState.branch;
+  const repairBase = candidate;
   for (const key of ["implement", "integrate", "sweep", "publish", "review"]) {
     const previous = nodeFor(activeNodes[key]);
     activeNodes[key] = `${key}:fix-${roundsUsed}`;
@@ -489,10 +538,7 @@ while (
     });
   }
   connect("plan", activeNodes.implement);
-  connect(
-    `review${roundsUsed === 1 ? "" : `:fix-${roundsUsed - 1}`}`,
-    activeNodes.implement
-  );
+  connect(verificationKey, activeNodes.implement);
   connect(activeNodes.implement, activeNodes.integrate);
   connect("plan", activeNodes.integrate);
   connect(activeNodes.implement, activeNodes.sweep);
@@ -504,9 +550,10 @@ while (
   phase("Implement");
   const fixState = await dispatchImplementation(
     targets,
-    reviewState.findings,
+    confirmed,
     `:fix-${roundsUsed}`,
-    candidateName
+    repairBase.branch,
+    verificationKey
   );
   recordPhase("implement", fixState.status, fixState.reason, fixState);
   retainAttempts(fixState.attemptResources, attemptLedger);
@@ -548,7 +595,11 @@ while (
         reason: "Explicit dispatch skip, so worktree integration did not run",
         status: "skipped"
       }
-    : await dispatchIntegration(unitResults, candidateName);
+    : await dispatchIntegration(
+        unitResults,
+        repairBase.branch,
+        repairBase.commit
+      );
   recordPhase(
     "integrate",
     integrationState.status,
@@ -556,6 +607,7 @@ while (
     integrationState
   );
   applyLedger(integrationState, attemptLedger);
+  candidate = acceptedCandidate(integrationState);
   phase("Sweep");
   sweepState =
     incompletePredecessor("sweep") !== undefined
@@ -568,13 +620,14 @@ while (
             reason: "Explicit dispatch skip, so the exposure sweep did not run",
             status: "skipped"
           }
-        : await dispatchSweep(integrationState.branch);
+        : await dispatchSweep(candidate);
   recordPhase("sweep", sweepState.status, sweepState.reason, sweepState);
   phase("Publish");
   publishState = await runPublish(
     sweepState,
     unitResults,
     integrationState,
+    candidate,
     postedUrl
   );
   recordPhase(
@@ -592,6 +645,7 @@ while (
       ? await dispatchReview(
           unitResults,
           integrationState,
+          candidate,
           publishState,
           roundsUsed
         )
@@ -605,7 +659,8 @@ while (
 }
 if (
   reviewState.status === "completed" &&
-  reviewState.verdict === "fix-required"
+  reviewState.verdict === "fix-required" &&
+  reviewState.verification?.confirmed?.length !== 0
 ) {
   recordPhase(
     "review",
@@ -645,7 +700,9 @@ const complete =
             !edgeRequired(edge)
         ) &&
         incompletePredecessor(key) === undefined)
-  ) && reviewState.verdict === "pass";
+  ) &&
+  (reviewState.verdict === "pass" ||
+    reviewState.verification?.confirmed?.length === 0);
 return finish({
   complete,
   units,
@@ -711,7 +768,13 @@ function finish({
   return {
     complete,
     earlyExit,
-    graph,
+    graph: {
+      nodes: graph.nodes,
+      edges: graph.edges.map((edge) => ({
+        ...edge,
+        required: edgeRequired(edge)
+      }))
+    },
     phaseEvidence,
     scopes,
     explorations,
@@ -770,20 +833,17 @@ async function separateScopes() {
   const scopeNames = scopeList.map((scope) =>
     typeof scope?.key === "string" ? scope.key.trim() : ""
   );
-  const reportedBase =
-    supplied && scopeAttempt.result?.baseBranch === undefined
-      ? baseBranch
-      : scopeAttempt.result?.baseBranch;
+  const reportedBase = scopeAttempt.result?.baseBranch ?? baseBranch;
   const resolvedBase =
     typeof reportedBase === "string" ? reportedBase.trim() : "";
   const scopeShape =
-    resolvedBase.length > 0 &&
+    (!needsBase || resolvedBase.length > 0) &&
     (!baseBranch || resolvedBase === baseBranch) &&
     typeof scopeAttempt.result?.evidence === "string" &&
     scopeAttempt.result.evidence.trim().length > 0 &&
     scopeList.length >= 1 &&
     scopeList.length <= maxScopes &&
-    scopeNames.every((name) => name.length > 0) &&
+    scopeNames.every((name) => name.length > 0 && !name.includes(":")) &&
     new Set(scopeNames).size === scopeNames.length &&
     normalizedScopes.every(
       (scope) =>
@@ -819,7 +879,7 @@ async function separateScopes() {
       "completed",
       supplied ? "Used scope supplied by Main" : null,
       {
-        baseBranch: resolvedBase,
+        baseBranch: resolvedBase || null,
         scopes,
         evidence: scopeAttempt.result.evidence,
         source: supplied ? "argument" : "agent"
@@ -835,8 +895,12 @@ async function dispatchScope() {
     compose(
       "Separate the delivery goal into disjoint exploration scopes for this repository.",
       taskPart,
-      basePart,
-      "Report the actual base branch and the original checkout root from git rev-parse --show-toplevel so parent-relative paths can be compared across scopes.",
+      needsBase
+        ? basePart
+        : "This run only needs a plan, and Main supplied no base. Scope the provided sources without Git metadata lookups.",
+      needsBase
+        ? "Report the requested or discovered base branch. If external paths are in scope, report the original checkout root so parent-relative paths can be compared."
+        : "Leave the base branch unset. Report the original checkout root only if known and needed to compare parent-relative paths.",
       `Return between 1 and ${maxScopes} scopes that together cover the whole goal.`,
       "Give each scope a short unique key, a one-sentence description, and the repository paths it owns.",
       "Express paths relative to the original repository root, including ../shared for an authorized sibling directory.",
@@ -867,7 +931,7 @@ async function dispatchScope() {
             type: "array"
           }
         },
-        required: ["baseBranch", "evidence", "scopes"],
+        required: [...(needsBase ? ["baseBranch"] : []), "evidence", "scopes"],
         type: "object"
       }
     }
@@ -895,10 +959,13 @@ async function exploreScopes() {
       graph.nodes.push({
         ...nodeFor("explore"),
         key: `explore:${scope.key}`,
+        operation: "Explore one scope",
         prerequisites: [],
         owner: `explorer:${scope.key}`,
+        authority: "read assigned scope; no writes",
         ownership: { kind: "scope", value: scope },
         inputs: { scope, task },
+        outputs: ["summary", "risks", "evidence", "optional stopReason"],
         status: "pending",
         completionEvidence: []
       });
@@ -943,9 +1010,11 @@ async function exploreScopes() {
     );
     const exploreFailures = [];
     const explorations = [];
-    for (const item of attempts) {
+    for (const [index, item] of attempts.entries()) {
       if (item === null) {
-        exploreFailures.push("an explorer returned no result");
+        const key = scopes[index].key;
+        setOutcome(`explore:${key}`, "failed", "Explorer returned no result");
+        exploreFailures.push(`${key}: explorer returned no result`);
       } else if (item.attempt.error !== undefined) {
         setOutcome(`explore:${item.key}`, "failed", item.attempt.error);
         exploreFailures.push(`${item.key}: ${item.attempt.error}`);
@@ -980,21 +1049,24 @@ async function exploreScopes() {
       }
     }
     if (exploreFailures.length > 0) {
-      recordPhase("explore", "failed", exploreFailures.join("; "));
+      recordPhase("explore", "failed", exploreFailures.join("; "), {
+        explorations
+      });
     } else {
       recordPhase("explore", "completed", null, { explorations });
-      return explorations;
     }
+    return explorations;
   }
   return [];
 }
 
 async function planDelivery() {
-  if (incompletePredecessor("plan") !== undefined) {
+  const predecessor = incompletePredecessor("plan");
+  if (predecessor !== undefined) {
     recordPhase(
       "plan",
       "skipped",
-      "Required Explore predecessor is incomplete"
+      `Required ${phaseTitles[predecessor]} predecessor is incomplete`
     );
   } else if (skipped.plan) {
     recordPhase(
@@ -1003,6 +1075,7 @@ async function planDelivery() {
       "Explicit dispatch skip, so planning did not run"
     );
   } else {
+    nodeFor("plan").inputs = { scopes, explorations };
     const planAttempt = await runAgent(
       compose(
         "Decide from the evidence whether this goal still needs work.",
@@ -1010,6 +1083,8 @@ async function planDelivery() {
         "When work remains, omit stopReason.",
         readOnlyPart,
         taskPart,
+        `Scope results: ${JSON.stringify(scopes)}`,
+        `Exploration results: ${JSON.stringify(explorations)}`,
         `Decide whether the goal needs one work unit or several disjoint work units, and define at most ${unitCap} units.`,
         "Use separate units only when parallel ownership or context size requires them, and prefer the fewest units that cover the goal.",
         "Give each unit a short key and owned paths. Its instructions must tell the implementer which behavior to deliver, which constraints to preserve, and what result the checks should show.",
@@ -1062,7 +1137,7 @@ async function planDelivery() {
       stopReason === undefined &&
       unitList.length >= 1 &&
       unitList.length <= unitCap &&
-      unitNames.every((name) => name.length > 0) &&
+      unitNames.every((name) => name.length > 0 && !name.includes(":")) &&
       new Set(unitNames).size === unitNames.length &&
       ownedPaths.every((path) => path !== null) &&
       new Set(ownedPaths).size === ownedPaths.length &&
@@ -1098,10 +1173,24 @@ async function planDelivery() {
         "failed",
         `Expected an evidence-backed stop or a plan with 1 through ${unitCap} disjoint, valid work units`
       );
+    } else if (
+      input.scope !== undefined &&
+      !ownedPaths.every((path) =>
+        scopes.some((scope) =>
+          scope.paths.some((owned) => ownsPath(owned, path))
+        )
+      )
+    ) {
+      recordPhase(
+        "plan",
+        "failed",
+        "Planned paths exceed the scope supplied by Main",
+        { ownedPaths, evidence }
+      );
     } else {
       const units = unitList.map((unit) => ({
         instructions: unit.instructions,
-        key: unit.key,
+        key: unit.key.trim(),
         paths: unit.paths.map(canonicalPath)
       }));
       const decision = { units, evidence };
@@ -1113,7 +1202,7 @@ async function planDelivery() {
 }
 
 function explorationsFor(unit) {
-  const matches = explorations.filter((exploration) => {
+  return explorations.filter((exploration) => {
     const scope = scopes.find((entry) => entry.key === exploration.key);
     return (
       scope !== undefined &&
@@ -1124,47 +1213,68 @@ function explorationsFor(unit) {
       )
     );
   });
-  if (matches.length === 0) {
-    log(
-      `Unit ${unit.key} matches no exploration scope, so it receives every exploration result`
-    );
-    return explorations;
-  }
-  return matches;
 }
 
 async function dispatchImplementation(
   targets,
   findings,
   roundLabel,
-  requiredStart
+  requiredStart,
+  verificationKey
 ) {
+  const expectedStart =
+    verificationKey === null
+      ? null
+      : nodeFor(verificationKey).completionEvidence.at(-1).result.commit;
   for (const unit of targets) {
     const key = `implement:${unit.key}${roundLabel}`;
-    if (nodeFor(key) === undefined) {
-      graph.nodes.push({
-        ...nodeFor("implement"),
-        key,
-        prerequisites: [],
-        owner: `worker:${unit.key}`,
-        ownership: { kind: "unit", value: unit },
-        inputs: {},
-        status: "pending",
-        completionEvidence: []
-      });
-      connect("plan", key);
-      connect(`review${roundsUsed === 1 ? "" : `:fix-${roundsUsed - 1}`}`, key);
-      connect(key, activeNodes.implement);
+    graph.nodes.push({
+      ...nodeFor(activeNodes.implement),
+      key,
+      operation: "Implement one owned unit",
+      prerequisites: [],
+      owner: `worker:${unit.key}`,
+      authority:
+        "edit owned paths in an isolated worktree; commit owned branch; no push",
+      ownership: { kind: "unit paths", value: unit.paths },
+      inputs: {
+        unit,
+        explorations: explorationsFor(unit),
+        requiredStart,
+        startCommit: expectedStart,
+        findings:
+          findings?.filter((finding) =>
+            unit.paths.some((path) => ownsPath(path, finding.file))
+          ) ?? null
+      },
+      outputs: [
+        "branch",
+        "commit",
+        "startRef",
+        "startCommit",
+        "changedFiles",
+        "checks",
+        "diffSummary",
+        "evidence"
+      ],
+      completionEvidence: []
+    });
+    connect("plan", key);
+    if (verificationKey !== null) {
+      connect(verificationKey, key);
     }
-    nodeFor(key).inputs = {
-      unit,
-      explorations: explorationsFor(unit),
-      requiredStart,
-      findings
-    };
+    for (const item of nodeFor(key).inputs.explorations) {
+      connect(`explore:${item.key}`, key);
+    }
+    connect(key, activeNodes.implement);
   }
   const results = await parallel(
     targets.map((unit) => () => {
+      const {
+        explorations: unitExplorations,
+        findings: unitFindings,
+        startCommit
+      } = nodeFor(`implement:${unit.key}${roundLabel}`).inputs;
       const options = {
         isolation: "worktree",
         label: `implement:${unit.key}${roundLabel}`,
@@ -1175,6 +1285,7 @@ async function dispatchImplementation(
         schema: {
           properties: {
             branch: { type: "string" },
+            commit: { type: "string" },
             changedFiles: { items: { type: "string" }, type: "array" },
             checks: {
               items: {
@@ -1192,15 +1303,18 @@ async function dispatchImplementation(
             },
             diffSummary: { type: "string" },
             evidence: { type: "string" },
-            startRef: { type: "string" }
+            startRef: { type: "string" },
+            startCommit: { type: "string" }
           },
           required: [
             "branch",
+            "commit",
             "changedFiles",
             "checks",
             "diffSummary",
             "evidence",
-            "startRef"
+            "startRef",
+            "startCommit"
           ],
           type: "object"
         }
@@ -1210,16 +1324,19 @@ async function dispatchImplementation(
           `Implement delivery work unit ${unit.key}.`,
           `Owned paths: ${unit.paths.join(", ")}`,
           `Unit instructions: ${unit.instructions}`,
-          findings === null
+          unitFindings === null
             ? ""
-            : `Fix these review findings inside your owned paths: ${JSON.stringify(findings.filter((finding) => unit.paths.some((path) => ownsPath(path, finding.file))))}`,
-          `Relevant exploration: ${JSON.stringify(explorationsFor(unit))}`,
+            : `Fix these review findings inside your owned paths: ${JSON.stringify(unitFindings)}`,
+          `Relevant exploration: ${JSON.stringify(unitExplorations)}`,
           "You run in an isolated worktree that may start from the remote default branch, so verify its starting reference before editing.",
           `Required starting reference: ${requiredStart}. Synchronize to it before editing when it does not match, and report the reference you verified.`,
+          startCommit === null
+            ? ""
+            : `Start from the reviewed commit ${startCommit}. Refuse a moved starting ref and report the full resolved startCommit.`,
           `Create a new branch named for unit ${unit.key}${roundLabel ? `-fix-${roundsUsed}` : ""} from the required starting reference, and commit your changes there with a descriptive subject. Do not commit directly to the starting branch.`,
           "Edit only files inside your owned paths, and report every changed file as a repository-relative path.",
           "Run the narrowest relevant checks and report each command with status passed, failed, or skipped.",
-          "Report the branch you committed to, the verified starting reference, the changed files, and the checks.",
+          "Report the branch, full commit ID covered by the checks, the verified starting reference and its full startCommit, the changed files, and the checks.",
           "Do not rewrite existing commits, do not push, and do not publish.",
           promptParts.implement
         ),
@@ -1230,9 +1347,28 @@ async function dispatchImplementation(
   const failures = [];
   const unitResults = [];
   const attemptResources = [];
-  for (const item of results) {
+  const branchClaims = new Map();
+  for (const entry of [
+    ...attemptLedger,
+    ...results.flatMap((item) =>
+      typeof item?.attempt.result?.branch === "string"
+        ? [{ branch: item.attempt.result.branch.trim(), key: item.key }]
+        : []
+    )
+  ]) {
+    const owners = branchClaims.get(entry.branch) ?? new Set();
+    owners.add(entry.key);
+    branchClaims.set(entry.branch, owners);
+  }
+  for (const [index, item] of results.entries()) {
     if (item === null) {
-      failures.push("an implementation agent returned no result");
+      const key = targets[index].key;
+      setOutcome(
+        `implement:${key}${roundLabel}`,
+        "failed",
+        "Implementation agent returned no result"
+      );
+      failures.push(`${key}: implementation agent returned no result`);
     } else if (item.attempt.error !== undefined) {
       setOutcome(
         `implement:${item.key}${roundLabel}`,
@@ -1256,12 +1392,16 @@ async function dispatchImplementation(
         result.branch.trim().length > 0 &&
         result.branch.trim() !== resolvedBase &&
         result.branch.trim() !== requiredStart &&
-        result.startRef === requiredStart;
+        result.branch.trim() === result.branch &&
+        result.startRef === requiredStart &&
+        isCommit(result.startCommit) &&
+        (expectedStart === null || result.startCommit === expectedStart);
       const evidenceHeld =
         typeof result?.diffSummary === "string" &&
         result.diffSummary.trim().length > 0 &&
         typeof result?.evidence === "string" &&
-        result.evidence.trim().length > 0;
+        result.evidence.trim().length > 0 &&
+        isCommit(result.commit);
       const problems = [];
       if (!ownershipHeld) {
         problems.push(
@@ -1278,6 +1418,12 @@ async function dispatchImplementation(
       }
       if (!evidenceHeld) {
         problems.push("result is missing or malformed");
+      }
+      if (
+        typeof result?.branch === "string" &&
+        branchClaims.get(result.branch.trim())?.size > 1
+      ) {
+        problems.push("unit branch is claimed by more than one unit");
       }
       if (
         typeof result?.branch === "string" &&
@@ -1305,15 +1451,20 @@ async function dispatchImplementation(
           branch: result.branch,
           changedFiles,
           checks: result.checks,
+          commit: result.commit,
           diffSummary: result.diffSummary,
           evidence: result.evidence,
           key: item.key,
+          startCommit: result.startCommit,
           startRef: result.startRef
         });
       } else {
         failures.push(`${item.key}: ${problems.join(", ")}`);
       }
     }
+  }
+  if (new Set(unitResults.map(({ startCommit }) => startCommit)).size > 1) {
+    failures.push("Unit worktrees used different starting commits");
   }
   return failures.length > 0
     ? {
@@ -1325,18 +1476,37 @@ async function dispatchImplementation(
     : { attemptResources, reason: null, status: "completed", unitResults };
 }
 
-async function dispatchIntegration(currentUnits, destination) {
+async function dispatchIntegration(
+  currentUnits,
+  destination,
+  destinationStart
+) {
+  const unitResources = currentUnits.map((unit) => ({
+    ...unit,
+    paths: units.find((plan) => plan.key === unit.key).paths
+  }));
+  const node = nodeFor(activeNodes.integrate);
+  node.inputs = {
+    destination,
+    destinationStart,
+    baseBranch: resolvedBase,
+    unitResources
+  };
+  node.ownership = { kind: "candidate branch", value: destination };
   const attempt = await runAgent(
     compose(
       `Integrate into the authorized destination: ${destination}.`,
+      `Expected destination commit before writing: ${destinationStart}.`,
       `Base branch: ${resolvedBase}`,
-      `Unit resources: ${JSON.stringify(currentUnits.map((unit) => ({ ...unit, paths: units.find((plan) => plan.key === unit.key).paths })))}`,
+      `Unit resources: ${JSON.stringify(unitResources)}`,
       "Before writing, verify the actual checkout, destination, resolved base, branch protections, and named unit branches. Refuse a protected destination or one equal to the base.",
+      "Verify each unit branch resolves to its accepted commit before merging. Refuse any changed unit ref.",
+      "Verify the destination still resolves to the expected commit before writing and report the actual startCommit. Leave a moved or partially integrated destination for Main to reconcile.",
       "Inspect each unit branch by its own changes since its merge base with the destination, as `git diff <destination>...<unit branch>` reports them, including both sides of renames, deletions, and symlinks. Refuse unrelated changes and conflicts outside the responsible unit paths.",
       "Do not judge a unit by a direct comparison with the current destination, because the destination advances as other units integrate and their files would appear deleted. A unit branch the destination already contains has no new changes, so report it merged without merging it again.",
       "Merge only the named branches into the exact destination. Report all changed paths and actual diff evidence, including conflict resolutions. Report unresolved conflicts instead of forcing a merge.",
       "Run the relevant checks on the combined candidate and report each command with status passed, failed, or skipped.",
-      "Report the final task branch name and the state of every named unit resource.",
+      "Report the final task branch name, the full combined commit ID covered by the checks, and the state of every named unit resource.",
       "Commit the merged result on the task branch, do not push, and do not publish.",
       promptParts.integrate
     ),
@@ -1347,6 +1517,7 @@ async function dispatchIntegration(currentUnits, destination) {
       schema: {
         properties: {
           branch: { type: "string" },
+          commit: { type: "string" },
           changedFiles: { items: { type: "string" }, type: "array" },
           checks: {
             items: {
@@ -1365,6 +1536,7 @@ async function dispatchIntegration(currentUnits, destination) {
           conflicts: { items: { type: "string" }, type: "array" },
           evidence: { type: "string" },
           merged: { type: "boolean" },
+          startCommit: { type: "string" },
           resources: {
             items: {
               properties: {
@@ -1383,11 +1555,13 @@ async function dispatchIntegration(currentUnits, destination) {
         },
         required: [
           "branch",
+          "commit",
           "changedFiles",
           "checks",
           "conflicts",
           "evidence",
           "merged",
+          "startCommit",
           "resources"
         ],
         type: "object"
@@ -1416,6 +1590,7 @@ async function dispatchIntegration(currentUnits, destination) {
     currentKeys.every((key) => namedKeys.includes(key));
   const shape =
     result?.branch === destination &&
+    result.startCommit === destinationStart &&
     Array.isArray(result?.changedFiles) &&
     result.changedFiles.every((file) => {
       const path = canonicalPath(file);
@@ -1443,7 +1618,8 @@ async function dispatchIntegration(currentUnits, destination) {
     checks: Array.isArray(result?.checks) ? result.checks : [],
     conflicts: Array.isArray(result?.conflicts) ? result.conflicts : [],
     evidence: result?.evidence ?? null,
-    resources: consistent ? resources : []
+    resources: consistent ? resources : [],
+    startCommit: result?.startCommit ?? null
   };
   if (attempt.error !== undefined) {
     return {
@@ -1456,7 +1632,7 @@ async function dispatchIntegration(currentUnits, destination) {
     return {
       ...retained,
       reason:
-        "Integration result is missing, malformed, or does not exactly account for every named unit branch",
+        "Integration result is missing, malformed, or does not account for the destination start and every named unit branch",
       status: "failed"
     };
   }
@@ -1477,12 +1653,12 @@ async function dispatchIntegration(currentUnits, destination) {
       status: "failed"
     };
   }
-  if (!checksPassed(result.checks)) {
+  if (!checksPassed(result.checks) || !isCommit(result.commit)) {
     return {
       ...retained,
       branch: result.branch,
       reason:
-        "Required checks on the combined candidate are missing or did not all pass",
+        "Required checks or the checked commit on the combined candidate are missing or invalid",
       status: "failed"
     };
   }
@@ -1490,10 +1666,12 @@ async function dispatchIntegration(currentUnits, destination) {
     branch: result.branch,
     changedFiles: result.changedFiles,
     checks: result.checks,
+    commit: result.commit,
     conflicts: result.conflicts,
     evidence: result.evidence,
     reason: null,
     resources,
+    startCommit: result.startCommit,
     status: "completed"
   };
 }
@@ -1523,17 +1701,29 @@ function applyLedger(integrationState, attemptLedger) {
   });
 }
 
+function acceptedCandidate(state) {
+  if (state.status === "completed") {
+    return { branch: state.branch, commit: state.commit };
+  }
+  return state.status === "skipped" && state.branch !== undefined
+    ? { branch: state.branch, commit: unitResults[0].commit }
+    : null;
+}
+
 async function dispatchSweep(candidate) {
+  nodeFor(activeNodes.sweep).inputs = { baseBranch: resolvedBase, candidate };
   const attempt = await runAgent(
     compose(
       "Run a quick environment-exposure sweep over the integrated change only.",
       `Base branch: ${resolvedBase}`,
-      `Candidate branch: ${candidate}`,
+      `Candidate branch: ${candidate.branch}`,
+      `Checked candidate commit: ${candidate.commit}`,
       "Inspect this named branch, not the coordinator checkout.",
-      "Inspect the candidate branch diff against the base branch and its checkout untracked files, and read only those files.",
+      "Resolve both branch refs. Refuse a candidate whose tip differs from the checked commit. Inspect the diff at those commits and the candidate checkout's untracked files, and read only those files.",
       "Flag credentials, tokens, private hostnames, absolute home paths, session identifiers, and private environment details.",
       "For each exposure, give the file, kind, and enough redacted detail to locate it. Omit the sensitive value.",
-      "Report an empty list when the change is clean.",
+      "Report the full candidate and base commit IDs actually scanned and an empty list when the change is clean.",
+      "Report coverage complete only after inspecting the whole diff and checking the candidate worktrees for untracked files. Use incomplete and explain if any required source is inaccessible.",
       readOnlyPart,
       promptParts.sweep
     ),
@@ -1544,6 +1734,9 @@ async function dispatchSweep(candidate) {
       phase: "Sweep",
       schema: {
         properties: {
+          baseCommit: { type: "string" },
+          commit: { type: "string" },
+          coverage: { enum: ["complete", "incomplete"], type: "string" },
           evidence: { type: "string" },
           exposures: {
             items: {
@@ -1558,13 +1751,15 @@ async function dispatchSweep(candidate) {
             type: "array"
           }
         },
-        required: ["evidence", "exposures"],
+        required: ["baseCommit", "commit", "coverage", "evidence", "exposures"],
         type: "object"
       }
     }
   );
   const result = attempt.result;
   const shape =
+    result?.commit === candidate.commit &&
+    isCommit(result?.baseCommit) &&
     typeof result?.evidence === "string" &&
     result.evidence.trim().length > 0 &&
     Array.isArray(result?.exposures) &&
@@ -1581,41 +1776,82 @@ async function dispatchSweep(candidate) {
     return { reason: `Sweep agent failed: ${attempt.error}`, status: "failed" };
   }
   if (!shape) {
-    return { reason: "Sweep result is missing or malformed", status: "failed" };
+    return {
+      reason:
+        "Sweep result is missing, malformed, or covers a different candidate commit",
+      status: "failed"
+    };
   }
   return {
+    baseCommit: result.baseCommit,
+    commit: result.commit,
+    coverage: result.coverage,
     evidence: result.evidence,
     exposures: result.exposures,
-    reason: null,
-    status: "completed"
+    reason:
+      result.coverage === "complete"
+        ? null
+        : "Sweep did not cover the required sources",
+    status: result.coverage === "complete" ? "completed" : "failed"
   };
 }
 
-async function dispatchPublish(currentUnits, integrationState, priorUrl) {
+async function dispatchPublish(
+  currentUnits,
+  integrationState,
+  candidate,
+  sweepState,
+  priorUrl
+) {
+  const change = {
+    combinedChecks:
+      integrationState.status === "completed"
+        ? integrationState.checks
+        : "not required",
+    units: currentUnits.map(({ branch, changedFiles, checks, key }) => ({
+      branch,
+      changedFiles,
+      checks,
+      key
+    }))
+  };
+  const node = nodeFor(activeNodes.publish);
+  node.inputs = {
+    repository,
+    candidate,
+    baseBranch: resolvedBase,
+    baseCommit: sweepState.baseCommit,
+    change,
+    priorUrl,
+    issue
+  };
+  node.ownership = {
+    kind: "publication",
+    value: {
+      repository,
+      branch: candidate.branch,
+      base: resolvedBase,
+      priorUrl
+    }
+  };
   const attempt = await runAgent(
     compose(
       "Publish the named candidate branch for review.",
       taskPart,
+      `Authorized repository: ${repository}`,
       `Base branch: ${resolvedBase}`,
-      `Candidate branch: ${integrationState.branch}`,
-      `Before pushing, verify the actual candidate and resolved base refs, confirm the candidate is not the base, and check branch protections. Refuse a protected candidate or one equal to the base. Expected base branch: ${resolvedBase}.`,
-      "Push and create or update the review request for this exact candidate branch.",
+      `Candidate branch: ${candidate.branch}`,
+      `Scanned commits: ${JSON.stringify({ candidate: candidate.commit, base: sweepState.baseCommit })}`,
+      "Before pushing, verify the actual push remote and request repository match the authorized repository. Verify the local candidate ref and the destination's base ref are still at the scanned commits, confirm the candidate is not the base, and check branch protections. Refuse any mismatch, fork, or protected candidate.",
+      "Push only the scanned candidate commit and create or update the request for the exact head and base branches. Read back the posted repository, head and base branches, and head and base commits, and report what the destination actually shows.",
       issuePart,
       priorUrl === null
         ? ""
         : `Update the existing open request at ${priorUrl} with the fixed change instead of creating another request.`,
-      `Change summary: ${JSON.stringify({
-        combinedChecks:
-          integrationState !== null && integrationState.status === "completed"
-            ? integrationState.checks
-            : "not required",
-        units: currentUnits.map((unit) => ({
-          branch: unit.branch,
-          changedFiles: unit.changedFiles,
-          checks: unit.checks,
-          key: unit.key
-        }))
-      })}`,
+      priorUrl === null
+        ? ""
+        : "Verify the existing request's repository and head and base branches before writing.",
+      `Change summary: ${JSON.stringify(change)}`,
       "Create a review request using an authorized interface supported by the destination.",
       "Reuse the existing open request for this branch instead of creating a duplicate.",
       "Describe the change, the per-unit and combined checks that ran, and the remaining limits, and keep private environment details out of the request.",
@@ -1629,16 +1865,47 @@ async function dispatchPublish(currentUnits, integrationState, priorUrl) {
       schema: {
         properties: {
           action: { enum: ["created", "updated"], type: "string" },
+          baseCommit: { type: "string" },
+          baseBranch: { type: "string" },
+          commit: { type: "string" },
           evidence: { type: "string" },
+          headBranch: { type: "string" },
+          repository: { type: "string" },
           url: { type: "string" }
         },
-        required: ["action", "evidence", "url"],
+        required: [
+          "action",
+          "baseBranch",
+          "baseCommit",
+          "commit",
+          "evidence",
+          "headBranch",
+          "repository",
+          "url"
+        ],
         type: "object"
       }
     }
   );
   const result = attempt.result;
+  const observed =
+    result === null || typeof result !== "object"
+      ? null
+      : {
+          action: result.action ?? null,
+          baseBranch: result.baseBranch ?? null,
+          baseCommit: result.baseCommit ?? null,
+          commit: result.commit ?? null,
+          headBranch: result.headBranch ?? null,
+          repository: result.repository ?? null,
+          url: result.url ?? null
+        };
   const shape =
+    result?.commit === candidate.commit &&
+    result?.baseCommit === sweepState.baseCommit &&
+    result?.repository === repository &&
+    result?.headBranch === candidate.branch &&
+    result?.baseBranch === resolvedBase &&
     typeof result?.evidence === "string" &&
     result.evidence.trim().length > 0 &&
     typeof result?.url === "string" &&
@@ -1652,7 +1919,9 @@ async function dispatchPublish(currentUnits, integrationState, priorUrl) {
   }
   if (!shape) {
     return {
-      reason: "Publish result is missing or malformed",
+      observed,
+      reason:
+        "Publish result is missing, malformed, or does not match the authorized repository, refs, and scanned commits",
       status: "failed"
     };
   }
@@ -1661,6 +1930,7 @@ async function dispatchPublish(currentUnits, integrationState, priorUrl) {
     (result.url !== priorUrl || result.action !== "updated")
   ) {
     return {
+      observed,
       reason:
         "Publication did not update the previously posted request, so publication is blocked",
       status: "failed"
@@ -1668,8 +1938,13 @@ async function dispatchPublish(currentUnits, integrationState, priorUrl) {
   }
   return {
     action: result.action,
+    baseBranch: result.baseBranch,
+    baseCommit: result.baseCommit,
+    commit: result.commit,
     evidence: result.evidence,
+    headBranch: result.headBranch,
     reason: null,
+    repository: result.repository,
     status: "completed",
     url: result.url
   };
@@ -1678,36 +1953,42 @@ async function dispatchPublish(currentUnits, integrationState, priorUrl) {
 async function dispatchReview(
   currentUnits,
   integrationState,
+  candidate,
   publishState,
   round
 ) {
+  const change = {
+    integration: {
+      branch: integrationState.branch,
+      checks: integrationState.checks ?? [],
+      status: integrationState.status
+    },
+    units: currentUnits.map(({ branch, changedFiles, checks, key }) => ({
+      branch,
+      changedFiles,
+      checks,
+      key
+    }))
+  };
+  nodeFor(activeNodes.review).inputs = {
+    candidate,
+    baseBranch: resolvedBase,
+    publication: publishState,
+    change
+  };
   const attempt = await runAgent(
     compose(
       "Independently review the complete current change for the delivery goal.",
-      `Candidate branch: ${integrationState.branch}.`,
+      `Candidate branch: ${candidate.branch}.`,
       taskPart,
       `Base branch: ${resolvedBase}`,
       issuePart,
-      `Change summary: ${JSON.stringify({
-        integration:
-          integrationState === null
-            ? "not required"
-            : {
-                branch: integrationState.branch,
-                checks: Array.isArray(integrationState.checks)
-                  ? integrationState.checks
-                  : [],
-                status: integrationState.status
-              },
-        units: currentUnits.map((unit) => ({
-          branch: unit.branch,
-          changedFiles: unit.changedFiles,
-          checks: unit.checks,
-          key: unit.key
-        }))
-      })}`,
+      `Change summary: ${JSON.stringify(change)}`,
       `Review the posted candidate at ${publishState.url}, including its request description.`,
+      `Posted commits to verify: ${JSON.stringify({ candidate: publishState.commit, base: publishState.baseCommit })}`,
+      "Read back the request's actual head and base commits. Review this exact diff and report the full commit IDs inspected. If they differ from the expected commits, do not claim a passing review.",
       "Inspect the change and the affected consumers beyond the changed lines.",
+      "Report coverage complete only when the whole posted diff and affected consumers needed for the review were inspected. Use incomplete and explain any missing required coverage.",
       "For each blocking finding, cite code, a requirement, or a safe reproduction in its detail and describe the realistic failure scenario.",
       "Distinguish new defects from pre-existing issues. Return fix-required only for supported findings that block acceptance, correctness, safety, or required checks.",
       "Return an empty findings list with verdict pass when no actionable defect remains.",
@@ -1720,6 +2001,9 @@ async function dispatchReview(
       phase: "Review",
       schema: {
         properties: {
+          baseCommit: { type: "string" },
+          commit: { type: "string" },
+          coverage: { enum: ["complete", "incomplete"], type: "string" },
           evidence: { type: "string" },
           findings: {
             items: {
@@ -1735,12 +2019,22 @@ async function dispatchReview(
           },
           verdict: { enum: ["fix-required", "pass"], type: "string" }
         },
-        required: ["evidence", "findings", "verdict"],
+        required: [
+          "baseCommit",
+          "commit",
+          "coverage",
+          "evidence",
+          "findings",
+          "verdict"
+        ],
         type: "object"
       }
     }
   );
   const result = attempt.result;
+  const commitsMatch =
+    result?.commit === publishState.commit &&
+    result?.baseCommit === publishState.baseCommit;
   const shape =
     typeof result?.evidence === "string" &&
     result.evidence.trim().length > 0 &&
@@ -1762,7 +2056,7 @@ async function dispatchReview(
       status: "failed"
     };
   }
-  if (!shape) {
+  if (!shape || !commitsMatch) {
     return {
       evidence: result?.evidence ?? null,
       findings: result?.findings ?? null,
@@ -1771,7 +2065,7 @@ async function dispatchReview(
         Array.isArray(result?.findings) &&
         result.findings.length === 0
           ? "Review verdict fix-required has no findings"
-          : "Review result is missing or malformed",
+          : "Review result is missing, malformed, or covers a different posted diff",
       status: "failed",
       verdict: result?.verdict ?? null
     };
@@ -1781,18 +2075,125 @@ async function dispatchReview(
     id: `review-${round + 1}-finding-${index + 1}`
   }));
   return {
+    baseCommit: result.baseCommit,
+    commit: result.commit,
+    coverage: result.coverage,
     evidence: result.evidence,
     findings,
-    reason: null,
-    status: "completed",
+    reason:
+      result.coverage === "complete"
+        ? null
+        : "Review did not cover the required sources",
+    status: result.coverage === "complete" ? "completed" : "failed",
     verdict: result.verdict
   };
+}
+
+async function verifyFindings(key, review, candidate, publication) {
+  graph.nodes.push({
+    key,
+    operation: "Independently verify candidate findings",
+    prerequisites: [],
+    inputs: { candidate, publication, findings: review.findings },
+    outputs: ["commit", "baseCommit", "dispositions", "confirmed"],
+    owner: "independent finding verifier",
+    authority: "read the posted diff and affected source; no writes",
+    completionEvidence: [],
+    status: "pending",
+    reason: null
+  });
+  connect(activeNodes.review, key);
+  connect(activeNodes.publish, key);
+  const attempt = await runAgent(
+    compose(
+      "Independently check the review findings against the posted source and the delivery goal. Treat each finding as a claim to verify.",
+      taskPart,
+      `Posted request and expected commits: ${JSON.stringify({ url: publication.url, commit: publication.commit, baseCommit: publication.baseCommit })}`,
+      `Review findings: ${JSON.stringify(review.findings)}`,
+      "Inspect the exact diff and relevant consumers. Report the candidate and base commits you inspected and one disposition per ID with concrete evidence. Use unverified when the relevant source or facts are unavailable.",
+      readOnlyPart
+    ),
+    {
+      agentType: "Explore",
+      label: key,
+      ...(efforts.review === undefined ? {} : { effort: efforts.review }),
+      phase: "Review",
+      schema: {
+        properties: {
+          baseCommit: { type: "string" },
+          commit: { type: "string" },
+          dispositions: {
+            type: "array",
+            items: {
+              properties: {
+                id: { type: "string" },
+                status: {
+                  enum: ["confirmed", "refuted", "unverified"],
+                  type: "string"
+                },
+                evidence: { type: "string" }
+              },
+              required: ["id", "status", "evidence"],
+              type: "object"
+            }
+          }
+        },
+        required: ["baseCommit", "commit", "dispositions"],
+        type: "object"
+      }
+    }
+  );
+  const dispositions = attempt.result?.dispositions;
+  const byId = new Map();
+  if (Array.isArray(dispositions)) {
+    for (const item of dispositions) {
+      if (
+        ["confirmed", "refuted"].includes(item?.status) &&
+        typeof item?.evidence === "string" &&
+        item.evidence.trim() &&
+        !byId.has(item.id)
+      ) {
+        byId.set(item.id, item);
+      }
+    }
+  }
+  const valid =
+    attempt.result?.commit === candidate.commit &&
+    attempt.result.baseCommit === publication.baseCommit &&
+    Array.isArray(dispositions) &&
+    dispositions.length === review.findings.length &&
+    review.findings.every(({ id }) => byId.has(id));
+  const state = valid
+    ? {
+        status: "completed",
+        reason: null,
+        commit: attempt.result.commit,
+        baseCommit: attempt.result.baseCommit,
+        dispositions,
+        confirmed: review.findings
+          .filter(({ id }) => byId.get(id).status === "confirmed")
+          .map((finding) => ({
+            ...finding,
+            verificationEvidence: byId.get(finding.id).evidence
+          }))
+      }
+    : {
+        status: "failed",
+        reason:
+          attempt.error === undefined
+            ? "Finding verification is missing, contradictory, or unresolved"
+            : `Finding verifier failed: ${attempt.error}`,
+        dispositions: dispositions ?? null
+      };
+  setOutcome(key, state.status, state.reason, state);
+  return state;
 }
 
 async function runPublish(
   sweepState,
   currentUnits,
   integrationState,
+  candidate,
   priorUrl
 ) {
   if (skipped.publish) {
@@ -1821,8 +2222,21 @@ async function runPublish(
       status: "skipped"
     };
   }
+  if (!repository) {
+    return {
+      reason:
+        "Publication requires the authorized repository as args.repository",
+      status: "failed"
+    };
+  }
   log("Publishing the task branch");
-  return dispatchPublish(currentUnits, integrationState, priorUrl);
+  return dispatchPublish(
+    currentUnits,
+    integrationState,
+    candidate,
+    sweepState,
+    priorUrl
+  );
 }
 
 // Graph dispatch, path ownership, and check evidence
@@ -1836,13 +2250,25 @@ function connect(from, to, type = "result", condition = null) {
 }
 
 function edgeRequired(edge) {
-  return (
-    edge.condition === null ||
-    (edge.condition === "!skips.explore"
-      ? !skipped.explore
-      : nodeFor("plan").completionEvidence.at(-1)?.result?.units?.length > 1 ||
-        skipped.integrate)
-  );
+  switch (edge.condition) {
+    case null:
+      return true;
+    case "!skips.explore":
+      return !skipped.explore;
+    case "units.length > 1":
+      return (
+        (nodeFor("plan").completionEvidence.at(-1)?.result?.units?.length ??
+          0) > 1
+      );
+    case "units.length > 1 || skips.integrate":
+      return (
+        skipped.integrate === true ||
+        (nodeFor("plan").completionEvidence.at(-1)?.result?.units?.length ??
+          0) > 1
+      );
+    default:
+      throw new Error(`Unknown graph edge condition: ${edge.condition}`);
+  }
 }
 
 function incompletePredecessor(key) {
@@ -1876,7 +2302,6 @@ function graphPosition(key) {
     `Graph position: ${node.key}; owner: ${node.owner}; authority: ${node.authority}.`,
     `Prerequisites: ${node.prerequisites.length === 0 ? "none" : node.prerequisites.map((parent) => `${parent}=${nodeFor(parent).status}`).join("; ")}.`,
     `Inputs: ${Array.isArray(node.inputs.contract) ? node.inputs.contract.join(", ") : Object.keys(node.inputs.contract).join(", ")}.`,
-    `Predecessor results: ${JSON.stringify(node.inputs.predecessors)}.`,
     `Outputs consumed downstream: ${node.outputs.join(", ")}.`,
     node.ownership === undefined
       ? ""
@@ -1908,12 +2333,6 @@ async function runAgent(prompt, options) {
     requestedModel === undefined ? "host" : "workflow-default";
   node.inputs = {
     contract: node.inputs,
-    predecessors: Object.fromEntries(
-      node.prerequisites.map((parent) => [
-        parent,
-        nodeFor(parent).completionEvidence.at(-1)?.result ?? null
-      ])
-    ),
     modelSelection: {
       requestedModel: requestedModel ?? null,
       source: models[phaseKey] === undefined ? defaultSource : "argument"
@@ -1930,6 +2349,12 @@ async function runAgent(prompt, options) {
     (error) => ({
       error: String(error instanceof Error ? error.message : error)
     })
+  );
+}
+
+function isCommit(value) {
+  return (
+    typeof value === "string" && /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(value)
   );
 }
 
