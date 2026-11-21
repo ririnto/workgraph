@@ -1,5 +1,36 @@
 # JavaScript and TypeScript
 
+## TypeScript project configuration
+
+For each source extension already eligible in the project, use these four `include` patterns, replacing `E` with that extension.
+
+- `**/*.E`
+- `**/.*/**/*.E`
+- `**/.*.E`
+- `**/.*/**/.*.E`
+
+The recursive dotfile pattern covers root dotfiles.
+Keep the existing project roots and compiler boundaries.
+Exclude only paths verified to contain non-source material for that project.
+Check TypeScript's wildcard behavior with the project's compiler version.
+The hidden-directory patterns explicitly match one hidden directory segment.
+Check paths with multiple hidden directory segments separately when they are in scope.
+Imports and references can bring files into the program even when the include patterns do not select them as roots.
+
+Capture the compiler's root selection and actual program membership before and after each configuration change.
+Use `tsc --showConfig` and `tsc --listFilesOnly` with the project's config and compiler version, or equivalent compiler evidence for that version.
+Probe ordinary files and dotfiles at the root, under ordinary directories, and under hidden directories.
+Include ordinary subdirectories of hidden directories and hidden directories below ordinary directories.
+Check for newly selected generated files and metadata.
+Account for every membership difference and preserve prior membership apart from intended new eligible inputs.
+
+Keep the fewest configuration files that preserve the existing contracts.
+Combine check and build settings only when verification establishes that both entry points retain their prior behavior.
+Use `extends` for shared settings when toolchain or workspace entry points require separate configs.
+Document the contract that requires each distinct profile.
+Compare emitted files and their paths for each build entry point, including checks that must emit no files.
+Run the existing hooks and CI checks without weakening test, security, or output guarantees.
+
 ## Declaration documentation
 
 For JavaScript, use multiline JSDoc for exported declarations, re-exports, default exports, and public class members, including constructors.
