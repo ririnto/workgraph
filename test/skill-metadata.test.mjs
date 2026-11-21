@@ -13,7 +13,7 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { validateSkillContent } from "./validation/skill-metadata.mjs";
+import { validateSkillContent } from "../scripts/skill-metadata.mjs";
 
 const skillContent = (
   fields = "name: sample-skill\ndescription: Use for the sample task.\ndisable-model-invocation: true",
@@ -30,9 +30,9 @@ const metadataFixture = (t) => {
   });
   const root = path.join(temporary, "plugin");
   const source = fileURLToPath(
-    new URL("validation/skill-metadata.mjs", import.meta.url)
+    new URL("../scripts/skill-metadata.mjs", import.meta.url)
   );
-  const entrypoint = path.join(root, "test/validation/skill-metadata.mjs");
+  const entrypoint = path.join(root, "scripts/skill-metadata.mjs");
   mkdirSync(path.dirname(entrypoint), { recursive: true });
   cpSync(source, entrypoint);
   symlinkSync(

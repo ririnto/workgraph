@@ -241,7 +241,7 @@ const validateMarketplace = (root, name, marketplace, codex) => {
 };
 
 const run = () => {
-  const root = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
+  const root = realpathSync(fileURLToPath(new URL("../", import.meta.url)));
   for (const filename of ["plugin.json", "hooks.json", "hooks/hooks.json"]) {
     if (lstatSync(path.join(root, filename), { throwIfNoEntry: false })) {
       throw new Error(
