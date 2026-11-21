@@ -233,7 +233,7 @@ await test("box drawing rule covers all Markdown with first UTF-16 match and no 
 /** @param {import("node:test").TestContext} t Test that owns the fixture. */
 const createUltraciteFixture = async (t) => {
   const root = path.resolve(import.meta.dirname, "..");
-  const directory = await mkdtemp(path.join(tmpdir(), "workgraph-ultracite-"));
+  const directory = await mkdtemp(path.join(tmpdir(), "ultracite-fixture-"));
   t.after(async () => {
     await rm(directory, { force: true, recursive: true });
   });
@@ -349,16 +349,11 @@ export { Store as Again };
 
 await test("function-body comment lint reports standalone comments once and honors language matching and ignores", async (t) => {
   const directory = await createUltraciteFixture(t);
-  const matchingFiles = [
-    "js",
-    "jsx",
-    "mjs",
-    "cjs",
-    "ts",
-    "tsx",
-    "mts",
-    "cts"
-  ].map((extension) => `matching.${extension}`);
+  const extensions = ["js", "jsx", "mjs", "cjs", "ts", "tsx", "mts", "cts"];
+  const matchingFiles = extensions.map((extension) => `matching.${extension}`);
+  const nonmatchingFiles = extensions.map(
+    (extension) => `nonmatching.${extension}`
+  );
   const matching = `const makeLabels = (lengthLimit = 6) => {
   const names = [" North "];
   return names.map((value) => {
@@ -370,16 +365,8 @@ await test("function-body comment lint reports standalone comments once and hono
 
 makeLabels();
 `;
-  await mkdir(path.join(directory, "workflows"));
-  await Promise.all(
-    [...matchingFiles, "workflows/ignored.js"].map(async (file) => {
-      await writeFile(path.join(directory, file), matching);
-    })
-  );
-  await writeFile(
-    path.join(directory, "nonmatching.ts"),
-    `// Module-level comment.
-const makeLabels = (lengthLimit = 6): string[] => {
+  const nonmatching = `// Module-level comment.
+const makeLabels = (lengthLimit = 6) => {
   /** Prefixes are measured after trimming the name. */
   const names = [" North "];
   // c8 ignore next
@@ -387,11 +374,21 @@ const makeLabels = (lengthLimit = 6): string[] => {
 };
 
 makeLabels();
-`
+`;
+  await mkdir(path.join(directory, "workflows"));
+  await Promise.all(
+    [...matchingFiles, ...nonmatchingFiles, "workflows/ignored.js"].map(
+      async (file) => {
+        await writeFile(
+          path.join(directory, file),
+          file.startsWith("nonmatching.") ? nonmatching : matching
+        );
+      }
+    )
   );
   const { diagnostics, status } = runUltraciteFixture(directory, [
     ...matchingFiles,
-    "nonmatching.ts",
+    ...nonmatchingFiles,
     "workflows/ignored.js"
   ]);
   assert.equal(status, 1);
@@ -401,7 +398,7 @@ makeLabels();
     assert.ok(isObject(entry));
     assert.equal(
       entry.code,
-      "workgraph-comments(no-function-body-line-comments)"
+      "function-comments(no-function-body-line-comments)"
     );
     reportedFiles.add(entry.filename);
   }

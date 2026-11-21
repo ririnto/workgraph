@@ -2,7 +2,7 @@
 
 ## Function-body line comments
 
-Use the [local copy setup](lint-rules.md#adopt-a-lint-asset) to enable `workgraph-comments/no-function-body-line-comments` for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
+Use the [local copy setup](lint-rules.md#adopt-a-lint-asset) to enable `function-comments/no-function-body-line-comments` for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
 Ultracite and Oxlint apply the consuming project's configured ignores.
 The rule matches standalone `//` comments inside function bodies, including methods and block-bodied callbacks.
 It leaves block comments, declaration comments outside function bodies, and recognized directives and license text to the existing checks.

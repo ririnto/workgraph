@@ -10,10 +10,10 @@ Make rules AST-aware and preserve literals, comments, and automatic semicolon in
 
 ## Adopt a lint asset
 
-Treat each Workgraph lint asset as a template owned by the project that adopts it.
+Treat each lint asset as a template owned by the project that adopts it.
 Copy the [function-body comment rule](../assets/lint/function-comments.ts) into the consuming repository, such as `lint/function-comments.ts`, and retain the [MIT license notice](../../../LICENSE) with the copy.
 Commit the copy and register it by a path relative to the consuming project's Oxlint config.
-Keep Workgraph URLs, package references, and shared filesystem paths out of lint configuration and dependencies.
+Keep references to the template source's URLs, packages, and shared filesystem paths out of lint configuration and dependencies.
 Update the committed copy through that project's normal review process.
 
 Use the project's local Oxlint and Ultracite tooling, with `@oxlint/plugins` as a development dependency for type checking the template.
@@ -32,7 +32,7 @@ export default defineConfig({
     {
       files: ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
       rules: {
-        "workgraph-comments/no-function-body-line-comments": "deny"
+        "function-comments/no-function-body-line-comments": "deny"
       }
     }
   ]
@@ -47,7 +47,6 @@ Keep the project's formatter and existing checks enabled.
 
 Choose API and module boundaries that make recurring mistakes hard to express.
 Apply restrictions on React effects, browser timers, and Electron process imports where the project defines the corresponding lifecycle or process boundaries.
-Workgraph has no React or Electron application boundaries.
 Review whether an explanation describes a contract or merely justifies a workaround.
 Use runtime checks, property tests, or formal verification when the risk requires evidence that source lint cannot provide.
 

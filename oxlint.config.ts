@@ -2,7 +2,7 @@ import { defineConfig } from "oxlint";
 import core from "ultracite/oxlint/core";
 
 /**
- * Extend the official preset with Workgraph's contributor checks.
+ * Extend the official preset with local lint rules.
  */
 export default defineConfig({
   env: core.env,
@@ -17,7 +17,7 @@ export default defineConfig({
     {
       files: ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
       rules: {
-        "workgraph-comments/no-function-body-line-comments": "deny"
+        "function-comments/no-function-body-line-comments": "deny"
       }
     }
   ],
