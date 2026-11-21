@@ -16,8 +16,7 @@ Read [Kotest](references/kotest.md) for specs or assertions.
 
 Identify contracts, consumers, exclusions, and acceptance evidence before editing.
 Read [instruction design](references/instruction-design.md) for agent instructions.
-Inspect affected code until evidence supports the smallest safe change.
-Stay in scope.
+Use evidence from affected code to choose the smallest safe change within scope.
 Keep required checks.
 
 | Outcome | Playbook |
@@ -49,13 +48,17 @@ Limit style cleanup to the external contribution diff unless authorized to expan
 Preserve declared runtime, toolchain, public contracts, and required failure behavior.
 Keep required effects, resource lifetimes, and interfaces in transformations.
 Test via production interfaces without exposing internals or adding test-only hooks.
-Replace superseded code and consumers together.
-Remove obsolete paths.
-Revise or remove code rules at their source.
-Add no opposing rules.
-Avoid copying nearby workarounds.
-Use suitable official SDK or framework properties directly.
-Skip duplicate input checks when the operation's rejection meets the contract.
+
+Separate tests, Storybook stories, and other non-production code from production sources.
+Use standard ecosystem paths.
+Move misplaced files within the task that added them.
+For unclear paths, consult official guidance and record the reason.
+
+Replace superseded code and consumers together and remove obsolete paths.
+Revise or remove code rules at their source without adding opposing rules.
+Avoid copying workarounds.
+Use suitable official SDK or framework properties.
+Skip duplicate checks when the operation rejects input as required.
 Prefer immutable bindings and minimal mutable state.
 Subject to configured lint, inline single-use variables and keep single-use logic inline.
 When inlining, preserve observable effects, resource lifetimes, evaluation contracts, and required interfaces.
@@ -66,9 +69,9 @@ Indentation width follows the project's configured formatter or convention.
 
 ### Keep design proportional
 
-Prefer existing interfaces, direct data flow, and native commands and help over wrappers or custom usage.
+Prefer existing interfaces, direct data flow, native commands, and built-in help.
 Keep required targets explicit.
-Add abstractions, dependencies, or fallbacks only for concrete unmet needs.
+Add abstractions, dependencies, or fallbacks only for unmet needs.
 Skip unrealistic edge cases in code and tests.
 Revisit data and ownership before adding complexity.
 
@@ -77,7 +80,7 @@ Revisit data and ownership before adding complexity.
 Prefer native named captures, backreferences, and replacement references if the engine and interface support them.
 Use positional groups if required.
 Use supported forms if names are unavailable.
-Prefer a clearer existing parser or literal operation without needless wrappers.
+Prefer a clearer parser or literal operation without needless wrappers.
 Array indexing alone does not access regex captures.
 
 ## Documentation and comments
@@ -90,7 +93,7 @@ Remove stale workaround comments in changed code.
 
 ## Side-effect boundaries
 
-Verify preserved or accepted new behavior in authorized changes with targeted evidence.
+Verify preserved or approved new behavior with targeted evidence.
 Use prose when automation cannot preserve the contract.
 Report material behavior changes and remaining uncertainty.
 
@@ -116,12 +119,12 @@ Keep integrity checks, lockfile fields, signatures, and checksums.
 
 ## Automation
 
-Fix recurring data ownership and interface defects first.
+Fix recurring ownership and interface defects first.
 Use existing types, schemas, lint, or build checks for mechanical requirements.
 Keep judgment in prose without duplicating executable checks.
 Keep lint and formatter choices when adding guidance or filling config gaps.
 Use project commands for routine local and CI work.
-Keep supported automation declarative.
+Use declarative automation where supported.
 Use the project language only for substantial logic existing tools lack.
 
 Read [lint rule guidance](references/lint-rules.md) for lint rules or fixes.
@@ -130,24 +133,25 @@ Read [lint rule guidance](references/lint-rules.md) for lint rules or fixes.
 
 Identify the target, trigger, input, and expected observable result.
 Check the lowest public interface that exercises the failure.
-Use process or app checks when direct calls cannot show the behavior.
+Use process or app checks when direct calls cannot show behavior.
 Reuse checks that exercise the change.
-Add or extend tests only for requested or required cases or realistic regressions the suite misses.
+Add tests or extend coverage only for requests, requirements, or realistic uncovered regressions.
 Reserve source-shape assertions for explicit structural contracts.
 Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
 Remove redundant or low-value tests, fixtures, and runs within scope, preserving relevant failure coverage.
-Preserve security, external-input, and data-integrity coverage without test-count or coverage-percentage targets.
+Preserve security, external-input, and data-integrity coverage without count or percentage targets.
 Use repeatable inputs for stateful failures.
 Consider model checking when consequential transitions or interleavings remain untested by examples.
-Stop when required checks and changed risks have sufficient evidence.
-Wait for long-running checks in the tool's blocking mode.
-Use `gh run watch --exit-status` for CI, `gh pr checks --watch` for PR checks, or the tool's wait flag when available.
-Do not loop snapshot commands such as `gh run view` or `glab ci status` on a timer.
-Record commands, setup, exit status, failures, and raw results apart from interpretation.
-Compare visual changes at the intended size with the supplied reference or design.
-Exercise interactive changes on the target surface and observe the result.
+Stop when evidence covers required checks and changed risks.
+Wait in blocking mode.
+Use `gh run watch --exit-status`, `gh pr checks --watch`, or the tool's wait flag when available.
+Do not poll snapshots such as `gh run view` or `glab ci status`.
+Record commands, setup, exit codes, failures, and raw results apart from analysis.
+Compare visuals at intended size with the reference or design.
+Run interactive changes on the target surface and observe results.
 Keep traces or screenshots when needed.
-Before optimizing slow checks, measure them and report conditions, durations, and preserved coverage.
-Leave execution, formal proof, native activation, and model adherence unverified without direct evidence.
+Measure slow checks before optimization and report conditions, durations, and preserved coverage.
+Require direct evidence for execution, formal proof, native activation, and model adherence claims.
 Report required checks blocked by the host.
-Keep a feature map beside verification instructions only for recurring reporting or navigation needs, and update affected entries.
+Keep a feature map beside verification instructions only for recurring reporting or navigation.
+Update affected entries.
