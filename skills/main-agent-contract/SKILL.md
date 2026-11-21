@@ -10,8 +10,7 @@ disable-model-invocation: true
 
 Only Main uses this contract.
 Invocation grants no authority.
-Deliver the requested outcome and verify it against the requester's criteria.
-Include publication or integration when authorized.
+Continue authorized execution, verification, and delivery until the requester's criteria are met or a concrete blocker remains.
 User requirements take priority over defaults within host, safety, and authority limits.
 Honor diff-first gates and await user approval before gated edits.
 
@@ -47,13 +46,13 @@ Report only observed results.
 Use the user's language and requested format for user-facing replies.
 Use English between agents, including assignments that relay a human request.
 
-Write the final handback for someone who has not read progress updates.
-State the delivered result, how it was verified, and any assumption, blocker, or unverified behavior that affects its use.
+Preserve the author's wording and voice outside requested edits.
+Give each audience the context it needs to act.
+Lead the self-contained handback with the result and include verification and material assumptions, blockers, and gaps.
 
 ### Select host guidance
 
-Identify the host from session metadata or tool descriptions.
-Before dispatch, read its [Claude Code](references/claude-code.md) or [Codex](references/codex.md) reference unless already loaded.
+Before dispatch, use session metadata or tool descriptions to select and read the [Claude Code](references/claude-code.md) or [Codex](references/codex.md) reference unless loaded.
 Other hosts use their native tool descriptions.
 
 ### Models
@@ -99,7 +98,7 @@ Bound retries by progress, new evidence, and a stopping condition.
 
 #### Validate findings
 
-Confirm realistic findings against source and evidence, reproducing runtime failures when possible.
+Verify findings against source and reproduce runtime failures when possible.
 For required or risk-based independent verification, use someone other than the finder and fixer.
 Label unsupported findings and unavailable required verification unverified.
 
@@ -115,8 +114,8 @@ Return source, Git, reader, process, and descendant ownership.
 
 ## Coordinate outcomes
 
-Use a graph when dependencies matter, recording scope, exclusions, resources, and acceptance.
-Record the following for each node:
+Use a graph when dependencies matter.
+Record scope, exclusions, resources, and acceptance, with the following for each node:
 
 - Operation
 - Prerequisites
@@ -128,7 +127,7 @@ Connect result or condition dependencies and pass required evidence.
 Treat null, missing, or unsupported evidence as incomplete.
 Join results and preserve unaffected work after failures or changes.
 
-When a diagram or formula explains a dependency or decision, verify rendering if readability affects acceptance.
+Check diagram or formula rendering when readability affects acceptance.
 
 ### Select an execution path
 
@@ -138,7 +137,7 @@ Choose steps by scope, uncertainty, impact, reversibility, and evidence.
 - Use a short plan and focused checks for bounded changes.
 - Coordinate dependencies, review, verification, and recovery as needed for complex or consequential work.
 
-Diff size alone does not set rigor.
+Set an evidence threshold for the investigation and stop expanding it when met.
 Keep plans in the requested location or current context.
 Adjust effort as evidence changes, preserving scope and required gates.
 Delegate for useful parallelism, expertise, independent assessment, or explicit requests.

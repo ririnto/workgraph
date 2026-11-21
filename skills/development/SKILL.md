@@ -16,7 +16,7 @@ Read [Kotest](references/kotest.md) for specs or assertions.
 
 Identify contracts, consumers, exclusions, and acceptance evidence before editing.
 Read [instruction design](references/instruction-design.md) for agent instructions.
-Find a practice and its owner in the [engineering rule map](references/engineering-rule-map.md).
+For shared rules, read the [engineering rule map](references/engineering-rule-map.md).
 Use evidence from affected code to choose the smallest safe change within scope.
 Keep required checks.
 
@@ -131,7 +131,9 @@ Read [React and Electron boundaries](references/react-electron.md) for effects, 
 Identify the target, trigger, input, and expected observable result.
 Check the lowest public interface that exercises the failure.
 Use process or app checks when direct calls cannot show behavior.
-Reuse checks that exercise the change.
+Reuse existing checks that exercise the change.
+Use representative inputs or an isolated local fixture when needed to observe the result.
+Fix observed in-scope failures and rerun the affected checks.
 Add tests or extend coverage only for requests, requirements, or realistic uncovered regressions.
 Reserve source-shape assertions for explicit structural contracts.
 Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
@@ -144,10 +146,7 @@ Wait in blocking mode.
 Use `gh run watch --exit-status`, `gh pr checks --watch`, or the tool's wait flag when available.
 Do not poll snapshots such as `gh run view` or `glab ci status`.
 Record commands, setup, exit codes, failures, and raw results apart from analysis.
-Compare visuals at intended size with the reference or design.
-Run interactive changes on the target surface and observe results.
-Keep traces or screenshots when needed.
 Measure slow checks before optimization and report conditions, durations, and preserved coverage.
 Require direct evidence for execution, formal proof, native activation, and model adherence claims.
 Report required checks blocked by the host.
-Read [runtime and formal evidence](references/runtime-formal-evidence.md) for user flows, invariants, or release checks.
+Read [runtime and formal evidence](references/runtime-formal-evidence.md) for visual work, user flows, invariants, or release checks.

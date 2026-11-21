@@ -14,6 +14,11 @@ Reuse testable driver operations across runs.
 Keep repeatable setup, commands, and results beside the evidence used in review.
 Choose screenshots or recordings for visible behavior and traces for timing, event order, and diagnostics.
 
+Compare the rendered result at its intended size against the supplied reference or project design.
+Refine the result when the comparison reveals a mismatch within scope.
+Exercise affected interactions on the target surface and check their visible results.
+Keep traces or screenshots when needed for review.
+
 ## Invariants and generated actions
 
 Use TLA+ with a model checker such as TLC for flows whose correctness depends on state transitions or interleavings.
