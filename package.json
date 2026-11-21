@@ -20,7 +20,7 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@oxc-project/types": "catalog:",
+    "@oxlint/plugins": "catalog:",
     "@tsconfig/node-lts": "catalog:",
     "@types/node": "catalog:",
     "husky": "catalog:",

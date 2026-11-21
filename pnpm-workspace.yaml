@@ -2,7 +2,7 @@ allowBuilds:
   pnpm: true
 
 catalog:
-  "@oxc-project/types": ^0.158.0
+  "@oxlint/plugins": ^1.94.0
   "@tsconfig/node-lts": ^24.0.1
   "@types/node": ^24.19.2
   husky: ^9.1.7
