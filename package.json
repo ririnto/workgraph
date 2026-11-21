@@ -12,6 +12,7 @@
     "check:skill-metadata": "node test/validation/skill-metadata.mjs",
     "check:typescript": "tsc --noEmit",
     "check:ultracite": "ultracite check",
+    "test:hooks": "node --test hooks/*.test.mjs",
     "fix": "run-p fix:*",
     "fix:markdownlint-cli2": "markdownlint-cli2 --fix",
     "fix:ultracite": "ultracite fix",
