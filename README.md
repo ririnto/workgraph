@@ -172,6 +172,7 @@ It remains a forward-looking check when the project adds production dependencies
 Follow the auto-injected repository guidance for contributor conventions and validation commands.
 Follow [CONTRIBUTING.md](CONTRIBUTING.md) for issue, commit, and pull request formats.
 The [tooling design](docs/design.md#validation-and-tooling) explains lint ownership, supported prose diagnostics, validation gates, and CI coverage.
+The [lint standards map](docs/lint-standards.md) lists the effective checks and the behavior they cover.
 Executable rules and tooling configuration remain separate from consumer guidance.
 
 The workspace scopes patched KaTeX to micromark-extension-math, whose declared range still permits only the affected series.
