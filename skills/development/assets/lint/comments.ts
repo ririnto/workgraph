@@ -18,6 +18,7 @@ export default {
           ReturnType<typeof sourceCode.getCommentsInside>[number]
         >();
         const documentation = new Set<number>();
+        const checkModuleScope = context.options[0] === true;
         return {
           "FunctionDeclaration, FunctionExpression, ArrowFunctionExpression"(
             node: ESTree.Node
@@ -33,15 +34,35 @@ export default {
               }
             }
           },
-          "VariableDeclaration, FunctionDeclaration, ClassDeclaration, MethodDefinition, Property, PropertyDefinition, AccessorProperty, TSInterfaceDeclaration, TSTypeAliasDeclaration, TSEnumDeclaration, TSEnumMember, TSModuleDeclaration, TSDeclareFunction, TSMethodSignature, TSPropertySignature"(
+          "VariableDeclaration, FunctionDeclaration, ClassDeclaration, MethodDefinition, Property, PropertyDefinition, AccessorProperty, TSInterfaceDeclaration, TSTypeAliasDeclaration, TSEnumDeclaration, TSEnumMember, TSModuleDeclaration, TSDeclareFunction, TSMethodSignature, TSPropertySignature, ExportDefaultDeclaration, ExportNamedDeclaration"(
             node: ESTree.Node
           ) {
+            if (
+              !checkModuleScope &&
+              (node.type === "ExportDefaultDeclaration" ||
+                node.type === "ExportNamedDeclaration")
+            ) {
+              return;
+            }
             const comment = sourceCode.getCommentsBefore(node).at(-1);
             if (comment?.type === "Block" && comment.value.startsWith("*")) {
               documentation.add(comment.start);
             }
           },
           "Program:exit"() {
+            if (checkModuleScope) {
+              for (const comment of sourceCode.getAllComments()) {
+                if (
+                  !candidates.has(comment.start) &&
+                  comment.type !== "Shebang" &&
+                  !/^\s*(?:\*\s*@(?:typedef|callback|import)\b|\/\s*<(?:reference|amd-module|amd-dependency)\b)/u.test(
+                    comment.value
+                  )
+                ) {
+                  candidates.set(comment.start, comment);
+                }
+              }
+            }
             for (const [start, comment] of candidates) {
               if (
                 !documentation.has(start) &&
@@ -61,6 +82,7 @@ export default {
           removeComment:
             "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration."
         },
+        schema: [{ type: "boolean" }],
         type: "suggestion"
       }
     }

@@ -9,14 +9,22 @@ import { test } from "node:test";
 import { lint } from "markdownlint/sync";
 
 import noEmDash from "../rules/no-em-dash.ts";
+import noRelativeSkillLinks from "../rules/no-relative-skill-links.ts";
 import proseFormat from "../rules/prose-format.ts";
+import skillFrontmatter from "../rules/skill-frontmatter.ts";
 import tableSeparators from "../rules/table-separators.ts";
 
-/** @param {unknown} value Parsed JSON value. @returns {value is Record<string, unknown>} Whether the value is an object. */
+/**
+ * @param {unknown} value Parsed JSON value.
+ * @returns {value is Record<string, unknown>} Whether the value is an object.
+ */
 const isObject = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
-/** @param {unknown} value Parsed JSON value. @returns {value is unknown[]} Whether the value is an array. */
+/**
+ * @param {unknown} value Parsed JSON value.
+ * @returns {value is unknown[]} Whether the value is an array.
+ */
 const isArray = (value) => Array.isArray(value);
 
 await test("Git hooks invoke pnpm directly and propagate its status", async () => {
@@ -114,6 +122,76 @@ await test("em-dash rule checks prose and preserves code and links", () => {
   );
 });
 
+await test("skill links preserve bundled links and flag external relative targets", () => {
+  const filename = "skills/sample/references/guide.md";
+  const errors =
+    lint({
+      config: { default: false, "docs/no-relative-skill-links": true },
+      customRules: [noRelativeSkillLinks],
+      strings: {
+        [filename]: [
+          "# Guide",
+          "",
+          "[Bundled](../SKILL.md#usage)",
+          "[External](https://example.com/skills/another/SKILL.md)",
+          "[Outside](../../../examples/skill/%53KILL.md?view=1)",
+          "",
+          "[outside]: ../../../examples/other/SKILL.md",
+          "",
+          "> [Quoted](../../../examples/quoted/SKILL.md)",
+          "",
+          "> [!NOTE]",
+          "> [Alert](../../../examples/alert/SKILL.md)"
+        ].join("\n")
+      }
+    })[filename] ?? [];
+  assert.deepEqual(
+    errors.map(({ lineNumber }) => lineNumber),
+    [5, 7, 12]
+  );
+});
+
+await test("skill frontmatter validates bundled YAML mappings with no fix", () => {
+  const errors = lint({
+    config: { default: false, "docs/skill-frontmatter": true },
+    customRules: [skillFrontmatter],
+    strings: {
+      "examples/outside/SKILL.md": "# External example\n",
+      "skills/alias/SKILL.md":
+        "---\nname: &name alias\nmetadata:\n  short: *name\n---\n# Alias\n",
+      "skills/duplicate/SKILL.md":
+        "---\nname: duplicate\nname: other\n---\n# Duplicate\n",
+      "skills/missing/SKILL.md": "# Missing\n",
+      "skills/sequence/SKILL.md": "---\n- sequence\n---\n# Sequence\n",
+      "skills/unresolved/SKILL.md": "---\nname: *missing\n---\n# Unresolved\n"
+    }
+  });
+  assert.deepEqual(
+    Object.entries(errors).map(([name, findings]) => [
+      name,
+      findings.map(({ errorDetail, fixInfo, lineNumber }) => [
+        lineNumber,
+        errorDetail,
+        fixInfo
+      ])
+    ]),
+    [
+      ["examples/outside/SKILL.md", []],
+      ["skills/alias/SKILL.md", []],
+      [
+        "skills/duplicate/SKILL.md",
+        [[3, "Expected valid YAML with unique keys and defined aliases.", null]]
+      ],
+      ["skills/missing/SKILL.md", [[1, "Expected YAML frontmatter.", null]]],
+      ["skills/sequence/SKILL.md", [[1, "Expected a YAML mapping.", null]]],
+      [
+        "skills/unresolved/SKILL.md",
+        [[2, "Expected valid YAML with unique keys and defined aliases.", null]]
+      ]
+    ]
+  );
+});
+
 await test("table separator traversal handles deeply nested blockquotes", () => {
   const quote = "> ".repeat(2000);
   const source = [
@@ -201,7 +279,7 @@ await test("box drawing rule covers all Markdown with first UTF-16 match and no 
     assert.deepEqual(
       [
         ...diagnostics.matchAll(
-          /fixture\.md:(?<line>\d+):(?<column>\d+) error docs\/no-box-drawing /gu
+          /fixture\.md:(?<line>\d+):(?<column>\d+) error search-replace /gu
         )
       ].map(({ groups }) => {
         assert.ok(groups);
@@ -230,7 +308,10 @@ await test("box drawing rule covers all Markdown with first UTF-16 match and no 
   }
 });
 
-/** @param {import("node:test").TestContext} t Test that owns the fixture. */
+/**
+ * @param {import("node:test").TestContext} t Test that owns the fixture.
+ * @returns {Promise<string>} Directory with the real Ultracite configuration.
+ */
 const createUltraciteFixture = async (t) => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(path.join(tmpdir(), "ultracite-fixture-"));
@@ -259,6 +340,7 @@ const createUltraciteFixture = async (t) => {
 /**
  * @param {string} directory Fixture checkout.
  * @param {string[]} files Paths to check.
+ * @returns {{diagnostics: unknown[], status: number | null}} Lint diagnostics and exit status.
  */
 const runUltraciteFixture = (directory, files) => {
   const result = spawnSync(
@@ -286,6 +368,44 @@ const runUltraciteFixture = (directory, files) => {
   assert.ok(isArray(output.diagnostics));
   return { diagnostics: output.diagnostics, status: result.status };
 };
+
+await test("Ultracite checks function spacing and adjacent node:test registrations", async (t) => {
+  const directory = await createUltraciteFixture(t);
+  const nonmatching =
+    'import { describe, test } from "node:test";\n\ndescribe("suite", () => {\n  test("one", () => {});\n\n  test("two", () => {});\n});\n';
+  const matching = nonmatching
+    .replace('test("one", () => {});\n\n', 'test("one", () => {});\n')
+    .replace(
+      'test("two", () => {});',
+      'test("two", () => {\n    const count = 1;\n\n    console.info(count);\n  });'
+    );
+  await Promise.all([
+    writeFile(path.join(directory, "nonmatching.test.mjs"), nonmatching),
+    writeFile(path.join(directory, "matching.test.mjs"), matching)
+  ]);
+  const rules = new Set([
+    "test-style(no-blank-lines-in-functions)",
+    "test-style(sibling-test-spacing)"
+  ]);
+  for (const { filename, expected } of [
+    { filename: "matching.test.mjs", expected: [...rules] },
+    { filename: "nonmatching.test.mjs", expected: [] }
+  ]) {
+    const { diagnostics } = runUltraciteFixture(directory, [filename]);
+    assert.deepEqual(
+      diagnostics
+        .flatMap((entry) =>
+          isObject(entry) &&
+          typeof entry.code === "string" &&
+          rules.has(entry.code)
+            ? [entry.code]
+            : []
+        )
+        .toSorted(),
+      expected
+    );
+  }
+});
 
 await test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
   const directory = await createUltraciteFixture(t);
@@ -347,14 +467,15 @@ export { Store as Again };
   ]);
 });
 
-await test("body-comment lint reports loose comments once and honors language matching and ignores", async (t) => {
+await test("comment lint reports loose body and module comments once and honors language matching and ignores", async (t) => {
   const directory = await createUltraciteFixture(t);
   const extensions = ["js", "jsx", "mjs", "cjs", "ts", "tsx", "mts", "cts"];
   const matchingFiles = extensions.map((extension) => `matching.${extension}`);
   const nonmatchingFiles = extensions.map(
     (extension) => `nonmatching.${extension}`
   );
-  const matching = `const makeLabels = (lengthLimit = 6) => {
+  const matching = `// Unattached module comment.
+const makeLabels = (lengthLimit = 6) => {
   const names = [" North "];
   return names.map((value) => {
     // Copyright workaround needed.
@@ -370,7 +491,7 @@ await test("body-comment lint reports loose comments once and honors language ma
 
 makeLabels();
 `;
-  const nonmatching = `// Module-level comment.
+  const nonmatching = `/** @typedef {string[]} Labels */
 const makeLabels = (lengthLimit = 6) => {
   /** Prefixes are measured after trimming the name. */
   const names = [" North "];
@@ -418,7 +539,7 @@ makeLabels();
   assert.deepEqual(
     reportedFiles.toSorted((a, b) => String(a).localeCompare(String(b))),
     matchingFiles
-      .flatMap((file) => [file, file, file, file])
+      .flatMap((file) => [file, file, file, file, file])
       .toSorted((a, b) => a.localeCompare(b))
   );
 });
@@ -533,7 +654,10 @@ await test("local Markdown comments config checks hidden notes and preserves lit
 /** @typedef {{key: string, branch: unknown, paths: unknown} & Record<string, unknown>} WorkflowUnit */
 /** @typedef {{complete: boolean, earlyExit: unknown, split: boolean, graph: {nodes: WorkflowNode[], edges: WorkflowEdge[]}, phaseEvidence: PhaseEvidence[], resources: WorkflowResource[], units: WorkflowUnit[], review: Record<string, unknown>, reviewHistory: Record<string, unknown>[], integration: Record<string, unknown>, fixRounds: {max: number, used: number}, publish: unknown, explorations: unknown[], sweepEvidence: unknown}} WorkflowResult */
 
-/** @param {unknown} value Workflow node. @returns {value is WorkflowNode} Whether the node has the fields used by the tests. */
+/**
+ * @param {unknown} value Workflow node.
+ * @returns {value is WorkflowNode} Whether the node has the fields used by the tests.
+ */
 const isWorkflowNode = (value) =>
   isObject(value) &&
   typeof value.key === "string" &&
@@ -544,7 +668,10 @@ const isWorkflowNode = (value) =>
   isArray(value.completionEvidence) &&
   value.completionEvidence.every((item) => isObject(item) && "result" in item);
 
-/** @param {unknown} value Workflow edge. @returns {value is WorkflowEdge} Whether the edge has the fields used by the tests. */
+/**
+ * @param {unknown} value Workflow edge.
+ * @returns {value is WorkflowEdge} Whether the edge has the fields used by the tests.
+ */
 const isWorkflowEdge = (value) =>
   isObject(value) &&
   typeof value.from === "string" &&
@@ -606,7 +733,10 @@ const assertWorkflowResult = (value) => {
   assert.ok(isArray(value.explorations));
 };
 
-/** @param {string} file Workflow source path. */
+/**
+ * @param {string} file Workflow source path.
+ * @returns {Function} Callable workflow sample.
+ */
 const compileWorkflowSource = (file) => {
   /** @type {unknown} */
   const prototype = Object.getPrototypeOf(async () => {});
@@ -631,15 +761,28 @@ const compileWorkflowSource = (file) => {
 };
 /** @typedef {{phase: string, label: string, agentType?: unknown, effort?: unknown, isolation?: unknown, model?: unknown}} AgentOptions */
 
-/** @param {Record<string, (options: AgentOptions) => unknown>} table Phase handlers. @returns {(options: AgentOptions) => unknown} Agent handler. */
-const dispatchTable = (table) => (options) => {
-  const entry = table[options.phase];
-  if (entry === undefined) {
-    throw new Error(`unexpected phase ${options.phase}`);
-  }
-  return entry(options);
+/**
+ * @param {Record<string, (options: AgentOptions) => unknown>} table Phase handlers.
+ * @returns {(options: AgentOptions) => unknown} Agent handler.
+ */
+const dispatchTable = (table) => {
+  /**
+   * @param {AgentOptions} options Agent dispatch options.
+   * @returns {unknown} Payload for the requested phase.
+   */
+  const dispatch = (options) => {
+    const entry = table[options.phase];
+    if (entry === undefined) {
+      throw new Error(`unexpected phase ${options.phase}`);
+    }
+    return entry(options);
+  };
+  return dispatch;
 };
-/** @param {...unknown} payloads Responses to return in order. */
+/**
+ * @param {...unknown} payloads Responses to return in order.
+ * @returns {() => unknown} Function returning the next response.
+ */
 const sequence = (...payloads) => {
   let served = 0;
   return () => {
@@ -648,12 +791,21 @@ const sequence = (...payloads) => {
     return payload;
   };
 };
-/** @param {string} file Workflow source. @param {Record<string, unknown>} args Workflow input. @param {(options: AgentOptions) => unknown} payloadFor Agent response factory. */
+/**
+ * @param {string} file Workflow source.
+ * @param {Record<string, unknown>} args Workflow input.
+ * @param {(options: AgentOptions) => unknown} payloadFor Agent response factory.
+ * @returns {Promise<{calls: {agentType: unknown, effort: unknown, effortProvided: boolean, isolation: unknown, label: string, model: unknown, modelProvided: boolean, phase: string, prompt: string}[], result: WorkflowResult}>} Workflow outcome and observed agent calls.
+ */
 const runWorkflowSample = async (file, args, payloadFor) => {
   /** @type {{agentType: unknown, effort: unknown, effortProvided: boolean, isolation: unknown, label: string, model: unknown, modelProvided: boolean, phase: string, prompt: string}[]} */
   const calls = [];
   const environment = {
-    /** @param {string} prompt Agent prompt. @param {AgentOptions} options Agent dispatch options. */
+    /**
+     * @param {string} prompt Agent prompt.
+     * @param {AgentOptions} options Agent dispatch options.
+     * @returns {Promise<unknown>} Simulated agent payload.
+     */
     agent: async (prompt, options) => {
       calls.push({
         agentType: options.agentType,
@@ -674,7 +826,10 @@ const runWorkflowSample = async (file, args, payloadFor) => {
     },
     budget: { remaining: () => Infinity, spent: () => 0, total: null },
     log: () => null,
-    /** @param {(() => Promise<unknown>)[]} thunks Work items. */
+    /**
+     * @param {(() => Promise<unknown>)[]} thunks Work items.
+     * @returns {Promise<unknown[]>} Completed work in invocation order.
+     */
     parallel: async (thunks) =>
       await Promise.all(thunks.map(async (thunk) => await thunk())),
     phase: () => null,
@@ -745,7 +900,10 @@ const simpleRepair = {
   branch: "unit-u1-fix",
   startRef: "unit-u1"
 };
-/** @param {AgentOptions} options Agent dispatch options. */
+/**
+ * @param {AgentOptions} options Agent dispatch options.
+ * @returns {typeof simpleImplement} Implementation payload for the selected unit.
+ */
 const splitImplement = (options) => {
   const secondUnit = options.label.startsWith("implement:u2");
   const repair = options.label.includes(":fix-");
@@ -763,14 +921,20 @@ const splitImplement = (options) => {
     startRef: "task-branch"
   };
 };
-/** @param {AgentOptions} options Agent dispatch options. */
+/**
+ * @param {AgentOptions} options Agent dispatch options.
+ * @returns {typeof simpleImplement} Implementation payload with the selected starting ref.
+ */
 const wrongStart = (options) => {
   const result = splitImplement(options);
   return options.label.includes(":fix-")
     ? { ...result, startRef: "wrong-ref" }
     : result;
 };
-/** @param {AgentOptions} options Agent dispatch options. */
+/**
+ * @param {AgentOptions} options Agent dispatch options.
+ * @returns {typeof simpleImplement} Implementation payload with a failed repair when requested.
+ */
 const failedRepair = (options) =>
   options.label.includes(":fix-")
     ? {
@@ -779,7 +943,10 @@ const failedRepair = (options) =>
         checks: [{ command: "check-failed", status: "failed" }]
       }
     : splitImplement(options);
-/** @param {AgentOptions} options Agent dispatch options. */
+/**
+ * @param {AgentOptions} options Agent dispatch options.
+ * @returns {typeof simpleImplement} Implementation payload for the current attempt.
+ */
 const multiRound = (options) => {
   if (options.label.includes(":fix-1")) {
     return { ...splitImplement(options), branch: "unit-u1-r1" };
@@ -2212,7 +2379,10 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
       for (const value of [description, evidence]) {
         assert.equal(plan.prompt.split(value).length - 1, 1);
       }
-      /** @param {string} text Prompt section. */
+      /**
+       * @param {string} text Prompt section.
+       * @returns {string[]} Labels of calls containing the complete prompt section.
+       */
       const owns = (text) =>
         calls
           .filter((call) => call.prompt.split("\n\n").includes(text))

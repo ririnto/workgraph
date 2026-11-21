@@ -17,11 +17,17 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-/** @param {unknown} value Parsed JSON value. @returns {value is Record<string, unknown>} Whether the value is an object. */
+/**
+ * @param {unknown} value Parsed JSON value.
+ * @returns {value is Record<string, unknown>} Whether the value is an object.
+ */
 const isObject = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
-/** @param {string} text JSON document. @returns {Record<string, unknown>} Parsed object. */
+/**
+ * @param {string} text JSON document.
+ * @returns {Record<string, unknown>} Parsed object.
+ */
 const parseObject = (text) => {
   /** @type {unknown} */
   const value = JSON.parse(text);
@@ -43,7 +49,11 @@ const roleFiles = roles.flatMap(([, name]) => [
   `${name}/SKILL.md`,
   ...hosts.map((host) => `${name}/references/${hostReferenceFiles[host]}`)
 ]);
-/** @param {string[]} args Hook arguments. @param {string} scriptPath Hook script path. */
+/**
+ * @param {string[]} args Hook arguments.
+ * @param {string} scriptPath Hook script path.
+ * @returns {import("node:child_process").SpawnSyncReturns<string>} Hook exit status and output.
+ */
 const runHook = (args, scriptPath = script) =>
   spawnSync(process.execPath, [scriptPath, ...args], {
     cwd: tmpdir(),
@@ -51,7 +61,11 @@ const runHook = (args, scriptPath = script) =>
     timeout: 5000
   });
 
-/** @param {string} command Hook command. @param {NodeJS.ProcessEnv} env Hook environment overrides. */
+/**
+ * @param {string} command Hook command.
+ * @param {NodeJS.ProcessEnv} env Hook environment overrides.
+ * @returns {import("node:child_process").SpawnSyncReturns<string>} Hook exit status and output.
+ */
 const runConfiguredHook = (command, env) =>
   spawnSync(command, {
     cwd: tmpdir(),
@@ -61,7 +75,10 @@ const runConfiguredHook = (command, env) =>
     timeout: 5000
   });
 
-/** @param {import("node:test").TestContext} t Test lifecycle. */
+/**
+ * @param {import("node:test").TestContext} t Test lifecycle.
+ * @returns {string} Root of the relocated plugin.
+ */
 const copyPlugin = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph skills "));
   t.after(() => {
@@ -83,7 +100,13 @@ const copyPlugin = (t) => {
   return root;
 };
 
-/** @param {unknown} output Hook output. @param {string} event Hook event. @param {string} host Execution host. @param {string} rootSkills Skill root. @param {string} body Expected body. */
+/**
+ * @param {unknown} output Hook output.
+ * @param {string} event Hook event.
+ * @param {string} host Execution host.
+ * @param {string} rootSkills Skill root.
+ * @param {string} body Expected body.
+ */
 const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
   assert.ok(isObject(output));
   assert.ok(isObject(output.hookSpecificOutput));
@@ -146,7 +169,11 @@ const assertOutput = (output, event, host, rootSkills = skills, body = "") => {
   }
 };
 
-/** @param {import("node:child_process").SpawnSyncReturns<string>} result Hook process result. @param {string} file Skill file. @param {string} detail Expected error. */
+/**
+ * @param {import("node:child_process").SpawnSyncReturns<string>} result Hook process result.
+ * @param {string} file Skill file.
+ * @param {string} detail Expected error.
+ */
 const assertFileFailure = (result, file, detail) => {
   assert.equal(result.status, 1, result.stderr);
   assert.equal(result.stdout, "");
@@ -156,7 +183,10 @@ const assertFileFailure = (result, file, detail) => {
   );
 };
 
-/** @param {string} target Missing file path. */
+/**
+ * @param {string} target Missing file path.
+ * @returns {string} Expected filesystem diagnostic.
+ */
 const missingFileDetail = (target) =>
   `ENOENT: no such file or directory, lstat '${path.join(realpathSync(path.dirname(target)), path.basename(target))}'`;
 const emptyFileDetail =

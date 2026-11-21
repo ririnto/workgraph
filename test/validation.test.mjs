@@ -58,7 +58,10 @@ body:
       required: true
 `;
 
-/** @param {import("node:test").TestContext} t Test lifecycle. */
+/**
+ * @param {import("node:test").TestContext} t Test lifecycle.
+ * @returns {string} Root of the relocated validators.
+ */
 const copyValidation = (t) => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-validation-"));
   t.after(() => {
@@ -74,7 +77,11 @@ const copyValidation = (t) => {
   return root;
 };
 
-/** @param {string} root Plugin root. @param {string} filename Validation entrypoint. */
+/**
+ * @param {string} root Plugin root.
+ * @param {string} filename Validation entrypoint.
+ * @returns {import("node:child_process").SpawnSyncReturns<string>} Validator exit status and output.
+ */
 const runValidation = (root, filename) => {
   const result = spawnSync(
     process.execPath,
@@ -157,7 +164,10 @@ await test("issue form command reports invalid input and duplicate names from di
   );
 });
 
-/** @param {import("node:test").TestContext} t Test lifecycle. */
+/**
+ * @param {import("node:test").TestContext} t Test lifecycle.
+ * @returns {string} Root of the relocated plugin.
+ */
 const copyPluginPackage = (t) => {
   const root = copyValidation(t);
   for (const filename of [

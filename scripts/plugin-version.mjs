@@ -25,11 +25,17 @@ const metadataFields = [
 ];
 const nativeFields = new Set(["$schema", ...metadataFields, "skills", "hooks"]);
 
-/** @param {unknown} value Input value. @returns {value is Record<string, unknown>} Whether the value is a JSON object. */
+/**
+ * @param {unknown} value Input value.
+ * @returns {value is Record<string, unknown>} Whether the value is a JSON object.
+ */
 const isObject = (value) =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
-/** @param {unknown} value Input value. @returns {value is unknown[]} Whether the value is an array. */
+/**
+ * @param {unknown} value Input value.
+ * @returns {value is unknown[]} Whether the value is an array.
+ */
 const isArray = (value) => Array.isArray(value);
 
 /**
@@ -104,7 +110,13 @@ export const validateOmittedManifestVersions = (
   }
 };
 
-/** @param {string} root Plugin root. @param {unknown} value Declared path. @param {string} label Diagnostic label. @param {"file" | "directory"} kind Expected path kind. */
+/**
+ * @param {string} root Plugin root.
+ * @param {unknown} value Declared path.
+ * @param {string} label Diagnostic label.
+ * @param {"file" | "directory"} kind Expected path kind.
+ * @returns {string} Canonical path inside the package.
+ */
 const bundledPath = (root, value, label, kind) => {
   if (
     typeof value !== "string" ||
@@ -135,7 +147,11 @@ const bundledPath = (root, value, label, kind) => {
   return resolved;
 };
 
-/** @param {string} root Plugin root. @param {string} filename Manifest path. */
+/**
+ * @param {string} root Plugin root.
+ * @param {string} filename Manifest path.
+ * @returns {Record<string, unknown>} Parsed manifest.
+ */
 const readManifest = (root, filename) => {
   /** @type {unknown} */
   const manifest = JSON.parse(
@@ -147,7 +163,10 @@ const readManifest = (root, filename) => {
   return manifest;
 };
 
-/** @param {Record<string, unknown>} manifest Manifest data. @param {string} host Host name. */
+/**
+ * @param {Record<string, unknown>} manifest Manifest data.
+ * @param {string} host Host name.
+ */
 const validateNativeManifest = (manifest, host) => {
   if (host !== "Claude" && Object.hasOwn(manifest, "$schema")) {
     throw new Error(`${host} native manifest must omit the schema field.`);
@@ -191,7 +210,12 @@ const validateNativeManifest = (manifest, host) => {
   }
 };
 
-/** @param {string} root Plugin root. @param {string} name Catalog label. @param {Record<string, unknown>} marketplace Catalog data. @param {Record<string, unknown>} codex Native manifest. */
+/**
+ * @param {string} root Plugin root.
+ * @param {string} name Catalog label.
+ * @param {Record<string, unknown>} marketplace Catalog data.
+ * @param {Record<string, unknown>} codex Native manifest.
+ */
 const validateMarketplace = (root, name, marketplace, codex) => {
   if (
     marketplace.name !== codex.name ||
