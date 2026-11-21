@@ -7,7 +7,15 @@ Default new portable scripts to POSIX `sh` unless the contract requires another 
 Use Bash-specific syntax only under a Bash shebang and its supported version.
 Quote expansions unless the shell syntax or required splitting calls for another form.
 Forward arguments with `"$@"`.
+Use POSIX test syntax in conditionals, such as `if [ "$x" = "$y" ]; then` for string equality.
 Preserve required exit status and meet functional requirements when changing conditional forms.
+
+## Inline variables
+
+Apply the [shared rule on single-use variables](../SKILL.md#shared-code-style) to shell assignments.
+Before inlining a command substitution, check evaluation order, exit status, and `errexit` behavior.
+A receiving command can mask a failure that a standalone assignment would return.
+Keep the assignment if inlining changes required behavior.
 
 ## Format embedded shell
 
@@ -18,9 +26,6 @@ Preserve the YAML block form and use the project's configured formatter or inden
 
 Check failures that change the result and keep diagnostics visible.
 Rely on the caller's existing failure propagation when it already preserves the required exit behavior.
-Before inlining a command substitution, check evaluation order, exit status, and `errexit` behavior.
-A receiving command can mask a failure that a standalone assignment would return.
-Keep the assignment if inlining changes required behavior.
 Add shell error modes only where the command sequence needs them, rather than prepending them to every command.
 Use an explicit `if ...; then` statement for shell validation and error-handling branches.
 Do not express these branches as short-circuit command chains such as `[ "$fail" -eq 0 ] || exit 1`, `[ ... ] || { ...; }`, or `command && action`.
@@ -31,6 +36,11 @@ Preserve command errors and diagnostic output.
 An explicit command option such as `curl -o /dev/null` is allowed when discarding the response body to retrieve only the HTTP status.
 Add output only when it supplies information the command's own diagnostics do not provide.
 Use `if command; then` instead of testing `$?` after intervening work.
+
+## Print messages
+
+Prefer `echo` for simple messages.
+Use `printf` for formatted output or text that can start with a hyphen or contain backslashes.
 
 ## Use eval safely
 
