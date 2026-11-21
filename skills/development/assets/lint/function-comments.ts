@@ -8,7 +8,7 @@ const reservedComment =
  * Check standalone line comments in JavaScript and TypeScript function bodies.
  */
 export default {
-  meta: { name: "workgraph-comments" },
+  meta: { name: "function-comments" },
   rules: {
     "no-function-body-line-comments": {
       create(context: Context) {
