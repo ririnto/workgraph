@@ -51,6 +51,7 @@ Exclude generated and vendored material from mechanical prose edits.
 - Use no trailing commas in TypeScript.
 - Use `.yaml` for maintained YAML files unless the consumer requires another exact filename.
 - Use block sequences except for an explicit empty sequence.
+- Keep repository shell scripts in POSIX `sh` with the `.editorconfig` two-space indentation, formatted with `shfmt` and checked with `shellcheck`.
 
 ## Tests
 
@@ -64,7 +65,7 @@ For Workgraph contributor pull-request reviews, follow the scoped policy in [doc
 
 ## Validation
 
-Keep development validation gates in `test/validation/` and their Node tests in `test/`.
+Keep development validation gates in `scripts/` and their Node tests in `test/`.
 Select the narrowest applicable read-only gate.
 
 - Use `pnpm run check:markdownlint-cli2` for prose-only changes.

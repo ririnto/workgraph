@@ -177,7 +177,7 @@ export const validateIssueForms = (forms) => {
 };
 
 const run = () => {
-  const root = fileURLToPath(new URL("../../", import.meta.url));
+  const root = fileURLToPath(new URL("../", import.meta.url));
   const directory = path.join(root, ".github/ISSUE_TEMPLATE");
   const files = readdirSync(directory, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith(".yaml"))

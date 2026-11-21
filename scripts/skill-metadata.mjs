@@ -178,7 +178,7 @@ const bundledPath = (root, source) => {
 };
 
 const run = () => {
-  const root = realpathSync(fileURLToPath(new URL("../../", import.meta.url)));
+  const root = realpathSync(fileURLToPath(new URL("../", import.meta.url)));
   const skillsRoot = bundledPath(root, "skills");
   const skills = readdirSync(skillsRoot, { withFileTypes: true })
     .filter(

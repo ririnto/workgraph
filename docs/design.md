@@ -340,12 +340,12 @@ The repository's tooling tests verify the configured diagnostics and formatter b
 JavaScript parameter and return annotations and type imports follow the official preset defaults.
 Markdownlint checks relative links, heading fragments, and table separators through the adopted rules.
 
-Development validation gates live in `test/validation/`, with their Node tests in `test/`.
-The issue-form gate, `test/validation/issue-forms.mjs`, parses `.github/ISSUE_TEMPLATE/*.yaml` with markdownlint-cli2's public YAML parser.
+Development validation gates live in `scripts/`, with their Node tests in `test/`.
+The issue-form gate, `scripts/issue-forms.mjs`, parses `.github/ISSUE_TEMPLATE/*.yaml` with markdownlint-cli2's public YAML parser.
 It validates nonempty top-level `name` and `description` strings, a nonempty body, and field IDs and labels.
 It also checks unique chooser names, field IDs, and labels, plus GitHub's field ID character rules.
 Local validation covers this repository's form subset and does not establish GitHub's live chooser recognition.
-The package gate, `test/validation/plugin-version.mjs`, checks all four native manifests and the host catalogs from its module location.
+The package gate, `scripts/plugin-version.mjs`, checks all four native manifests and the host catalogs from its module location.
 The version check validates the following:
 
 - The complete `yyyy.MM.dd.seq` string

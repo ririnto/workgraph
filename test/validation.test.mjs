@@ -14,8 +14,8 @@ import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { validateIssueFormContent } from "./validation/issue-forms.mjs";
-import { validatePluginVersions } from "./validation/plugin-version.mjs";
+import { validateIssueFormContent } from "../scripts/issue-forms.mjs";
+import { validatePluginVersions } from "../scripts/plugin-version.mjs";
 
 const repositoryRoot = new URL("../", import.meta.url);
 const validIssueForm = `name: Bug report
@@ -64,11 +64,9 @@ const copyValidation = (t) => {
   t.after(() => {
     rmSync(root, { force: true, recursive: true });
   });
-  cpSync(
-    new URL("validation/", import.meta.url),
-    path.join(root, "test/validation"),
-    { recursive: true }
-  );
+  cpSync(new URL("../scripts/", import.meta.url), path.join(root, "scripts"), {
+    recursive: true
+  });
   symlinkSync(
     fileURLToPath(new URL("../node_modules", import.meta.url)),
     path.join(root, "node_modules")
@@ -80,7 +78,7 @@ const copyValidation = (t) => {
 const runValidation = (root, filename) => {
   const result = spawnSync(
     process.execPath,
-    [path.join(root, "test/validation", filename)],
+    [path.join(root, "scripts", filename)],
     {
       cwd: tmpdir(),
       encoding: "utf-8",
@@ -499,7 +497,7 @@ await test("validation entrypoints execute from unrelated directories through re
     ]
   ]) {
     const source = fileURLToPath(
-      new URL(`validation/${filename}`, import.meta.url)
+      new URL(`../scripts/${filename}`, import.meta.url)
     );
     const alias = path.join(root, filename);
     symlinkSync(source, alias, "file");
