@@ -10,7 +10,14 @@ Use only in Codex within cleanup authority, through authorized owners and suppor
 
 ## Authority
 
-Before cleanup, record IDs, owners, allowed operations, before-state, preservation needs/references, and protected IDs in the owner's private temporary receipt.
+Before cleanup, record the following in the owner's private temporary receipt:
+
+- IDs and owners
+- Allowed operations
+- Before-state
+- Preservation needs and references
+- Protected IDs
+
 Keep archive, permanent deletion, attachment retirement, and physical removal as distinct scopes.
 Require explicit human authority for permanent deletion of the exact scope.
 Honor tool-required action-time confirmations.

@@ -209,7 +209,14 @@ Assignments carry Workgraph model choices and acceptance requirements, and the h
 ## Compose work through the host
 
 Workgraph keeps goal definition, scope, authority, acceptance evidence, and dynamic graph planning in the main session.
-Each node describes a bounded operation, decision, or check with required inputs, expected outputs, owner, authority, and completion evidence.
+Each node describes a bounded operation, decision, or check and records the following:
+
+- Required inputs
+- Expected outputs
+- Owner
+- Authority
+- Completion evidence
+
 Edges identify results or conditions that gate later nodes, not execution order alone.
 The main session starts ready independent nodes in parallel, serializes actual conflicting writes, and joins only required predecessor results.
 Independent native Task Mains can change overlapping logical sources in separate native worktrees.
@@ -336,7 +343,15 @@ It validates nonempty top-level `name` and `description` strings, a nonempty bod
 It also checks unique chooser names, field IDs, and labels, plus GitHub's field ID character rules.
 Local validation covers this repository's form subset and does not establish GitHub's live chooser recognition.
 The package gate, `test/validation/plugin-version.mjs`, checks all four native manifests and the host catalogs from its module location.
-It checks the complete `yyyy.MM.dd.seq` string, real calendar dates, padded positive sequences, matching plugin names, bundled paths, and release parity.
+The version check validates the following:
+
+- The complete `yyyy.MM.dd.seq` string
+- Real calendar dates
+- Padded positive sequences
+- Matching plugin names
+- Bundled paths
+- Release parity
+
 It rejects the root portable manifest and generic hook files that would shadow or cross native host boundaries.
 `test/validation.test.mjs` exercises valid and invalid forms, package paths, and release versions through exact diagnostics.
 `test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, the complete-file UTF-8 prompt boundary, and relocated execution.

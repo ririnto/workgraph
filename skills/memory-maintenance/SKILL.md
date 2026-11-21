@@ -22,7 +22,14 @@ Follow cross-links needed to interpret the proposed change within authorized rea
 Do not infer facts from filenames or expand this review into unrelated transcripts, credentials, or private logs.
 If required context is unavailable, report the missing source and defer the affected memory change.
 
-Compare the proposed change with existing facts, preferences, dates, duplicates, conflicts, and superseding instructions.
+Compare the proposed change against the following:
+
+- Existing facts and preferences
+- Dates
+- Duplicates
+- Conflicts
+- Superseding instructions
+
 Resolve precedence using current direct instructions and the contracts that own the facts.
 Distinguish historical observations from current state and authority.
 Preserve unresolved uncertainty rather than inventing a resolution.

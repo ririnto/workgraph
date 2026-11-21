@@ -22,7 +22,14 @@ The bundled [adaptive delivery workflow](../../../workflows/delivery.js) records
 
 ## Readiness and transitions
 
-Before starting a node, confirm its accepted inputs, owner, authority, tools, paths, and branch.
+Before starting a node, confirm the following:
+
+- Accepted inputs
+- Owner and authority
+- Tools
+- Paths
+- Branch
+
 Follow Main Agent Contract for graph readiness, dependencies, ownership, and result acceptance.
 Select needed nodes for each domain rather than copying the whole delivery graph across every domain and phase.
 Main assesses review findings against their evidence and can use Plan to revise ownership or scope.

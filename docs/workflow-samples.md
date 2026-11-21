@@ -166,11 +166,25 @@ The scope, exploration, and sweep stages run with the built-in read-only Explore
 ## Executed graph
 
 The result includes `graph.nodes` and `graph.edges` using the [Main contract's graph vocabulary](../skills/main-agent-contract/SKILL.md#coordinate-outcomes) and [dependency design](design.md#compose-work-through-the-host).
-Each node records `key`, `operation`, `prerequisites`, `inputs`, `outputs`, `owner`, `authority`, `completionEvidence`, `status`, and `reason`.
+Each node records these fields:
+
+| Purpose | Fields |
+| --- | --- |
+| Identity and operation | `key`, `operation` |
+| Dependencies and data | `prerequisites`, `inputs`, `outputs` |
+| Responsibility and authority | `owner`, `authority` |
+| Outcome | `completionEvidence`, `status`, `reason` |
+
 Result edges require accepted predecessor evidence, and condition edges evaluate the unit count or the explicit exploration choice.
 Readiness derives from these edges rather than phase order alone.
 Scope explorers, unit workers, and repair attempts retain their own node records.
-Every dispatch receives a graph-position block with prerequisite statuses, predecessor results, input contracts, downstream outputs, and its owned unit or scope when applicable.
+Every dispatch receives a graph-position block with the following:
+
+- Prerequisite statuses
+- Predecessor results
+- Input contracts
+- Downstream outputs
+- Its owned unit or scope, when applicable
 
 ## Skip, failure, and recovery
 

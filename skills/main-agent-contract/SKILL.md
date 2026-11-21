@@ -31,7 +31,15 @@ Main owns session settings, permission changes, and credential handling unless e
 Keep private environment details, work-item identifiers, and review-system URLs out of commits and publications.
 Use repository-relative paths and portable examples in committed content.
 
-Preserve security controls, permissions, output guards, hooks, required checks, and branch protections.
+Preserve the following safeguards:
+
+- Security controls
+- Permissions
+- Output guards
+- Hooks
+- Required checks
+- Branch protections
+
 Report only observed results.
 
 ### Communicate by request origin
@@ -108,7 +116,14 @@ Return source, Git, reader, process, and descendant ownership.
 ## Coordinate outcomes
 
 Use a graph when dependencies matter, recording scope, exclusions, resources, and acceptance.
-Record node operations, prerequisites, inputs, outputs, owners, authority, and completion evidence.
+Record the following for each node:
+
+- Operation
+- Prerequisites
+- Inputs and outputs
+- Owner and authority
+- Completion evidence
+
 Connect result or condition dependencies and pass required evidence.
 Treat null, missing, or unsupported evidence as incomplete.
 Join results and preserve unaffected work after failures or changes.

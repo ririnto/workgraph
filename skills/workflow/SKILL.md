@@ -54,7 +54,14 @@ If the tool is unavailable, return to [Main's Claude Code selection rules](../ma
 ## Read-only design
 
 For a design request, establish the task, requirements, constraints, and relevant sources before developing a candidate.
-Describe components, interfaces, data flow, decisions and alternatives, failure behavior, evidence, and assumptions.
+Describe the following:
+
+- Components and interfaces
+- Data flow
+- Decisions and alternatives
+- Failure behavior
+- Evidence and assumptions
+
 Map each requirement to the proposed design and propose representative regression and evaluation cases with observable outcomes.
 Distinguish repository evidence from inference and proposed checks from executed checks.
 Challenge the candidate against each requirement, interface, realistic failure mode, test claim, and open question.
