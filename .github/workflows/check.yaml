@@ -49,6 +49,7 @@ jobs:
           8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  actionlint_1.7.12_linux_amd64.tar.gz
           CHECKSUMS
           chmod +x ktlint
+          GOBIN="$bin" go install go.uber.org/nilaway/cmd/nilaway@v0.0.0-20260918162853-acb8859b9031
           tar --strip-components=1 -xf golangci-lint-2.15.0-linux-amd64.tar.gz golangci-lint-2.15.0-linux-amd64/golangci-lint
           tar -xf actionlint_1.7.12_linux_amd64.tar.gz actionlint
           printf '%s\n' "$bin" >> "$GITHUB_PATH"

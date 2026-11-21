@@ -345,7 +345,8 @@ Markdownlint checks relative links, heading fragments, prose, and table separato
 Its skill rules check bundled frontmatter and require external skills to use names or published URLs.
 Relative paths to bundled skills remain valid.
 ShellCheck and shfmt check the Husky scripts.
-ktlint and golangci-lint check the bundled Kotlin and Go assets.
+ktlint checks the bundled Kotlin asset.
+golangci-lint and NilAway check the bundled Go asset.
 actionlint checks GitHub Actions workflows.
 
 Development validation gates live in `scripts/`, with their Node tests in `test/`.
