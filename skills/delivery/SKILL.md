@@ -76,6 +76,7 @@ Inspect flagged content and remove exposure before pushing.
 ## Retain validation evidence
 
 Summarize commands, outcomes, coverage, limits, and unverified behavior in authorized PR/MR text without raw logs by default.
+For automated release checks and fix delivery, use the [release verification procedure](../development/references/runtime-formal-evidence.md#release-triggered-verification) when planning dependent checks and fixes.
 
 ## Review and publish
 

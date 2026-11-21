@@ -1,0 +1,10 @@
+{
+  "config": {
+    "comments/no-hidden-notes": true,
+    "MD053": {
+      "ignored_definitions": []
+    }
+  },
+  "customRules": ["./lint/markdown-comments.ts"],
+  "globs": ["**/*.md"]
+}

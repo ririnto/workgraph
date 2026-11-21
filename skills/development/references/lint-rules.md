@@ -1,65 +1,64 @@
 # Lint rule guidance
 
-For authorized lint setup, select tools compatible with the project's language, runtime, and requirements.
-
-When lint automation is authorized, prefer built-in rules and supported configuration before custom rules.
-Add a custom rule only for a demonstrated recurring failure that existing tools cannot prevent.
-Verify tool-version support and realistic exceptions before adding it.
-Scope rules through existing file or module boundaries when those boundaries carry the requirement.
-Make rules AST-aware and preserve literals, comments, and automatic semicolon insertion where applicable.
+Choose tools compatible with the project's language, runtime, and supported versions.
+Make valid use the default through API and module design first.
+Prefer built-in rules and supported configuration for remaining mechanical checks.
+Add a custom rule when it prevents a recurring violation the existing checks miss.
+Scope the check to the syntax and paths that express the requirement.
+Include a diagnostic that names the violated boundary and how to fix the cause.
+Once the check prevents new violations, migrate existing occurrences within scope and remove the obsolete path.
 
 ## Adopt a lint asset
 
-Treat each lint asset as a template owned by the project that adopts it.
-Copy the [function-body comment rule](../assets/lint/function-comments.ts) into the consuming repository, such as `lint/function-comments.ts`, and retain the [MIT license notice](../../../LICENSE) with the copy.
-Commit the copy and register it by a path relative to the consuming project's Oxlint config.
-Keep references to the template source's URLs, packages, and shared filesystem paths out of lint configuration and dependencies.
-Update the committed copy through that project's normal review process.
+Copy the selected assets into the consuming repository and retain the [MIT license notice](../../../LICENSE).
+Register local files by paths relative to the consumer's own configuration.
+Update copies through that project's normal review.
+Merge the supplied rule settings with the project's existing checks and formatter.
+Run the consumer's normal lint command on representative matching and non-matching cases.
+Use the project's own tool dependencies and versions.
 
-Use the project's local Oxlint and Ultracite tooling, with `@oxlint/plugins` as a development dependency for type checking the template.
-The following example shows the configuration for a project that already uses the Ultracite core preset.
-In an existing config, add the local plugin and the applicable file overrides alongside the project's presets, plugins, rules, and ignores.
+### Oxlint
 
-```ts
-import { defineConfig } from "oxlint";
-import core from "ultracite/oxlint/core";
+Copy [comments.ts](../assets/lint/comments.ts) as `lint/comments.ts`.
+Register `./lint/comments.ts` in `jsPlugins` and enable `comments/no-body-comments` in the appropriate file overrides.
+Add `@oxlint/plugins` as a development dependency if the consumer type-checks the asset.
+For matching and exceptions, see [JavaScript](lint-javascript.md) and [TypeScript](lint-typescript.md).
+For restricted React effects and timers, use the [product override](react-electron.md#react-effects) where the project has a named integration owner.
 
-export default defineConfig({
-  env: core.env,
-  extends: [core],
-  jsPlugins: ["./lint/function-comments.ts"],
-  overrides: [
-    {
-      files: ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
-      rules: {
-        "function-comments/no-function-body-line-comments": "deny"
-      }
-    }
-  ]
-});
-```
+### ktlint
 
-Use the file matching and examples for [JavaScript](lint-javascript.md) and [TypeScript](lint-typescript.md).
-Run the consuming project's normal lint command against the copied asset with both matching and non-matching examples.
-Keep the project's formatter and existing checks enabled.
+Copy the [ktlint editor settings](../assets/lint/kotlin.editorconfig) into the project's `.editorconfig` under `[*.{kt,kts}]`.
+Copy `ktlint-comments/src/main` from the lint assets into a consumer-owned Kotlin/JVM ruleset module and keep its [service provider entry](../assets/lint/ktlint-comments/src/main/resources/META-INF/services/com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3).
+Compile against `com.pinterest.ktlint:ktlint-cli-ruleset-core`, `com.pinterest.ktlint:ktlint-rule-engine-core`, and the Kotlin compiler embeddable version used by the selected ktlint release.
+Use compile-only dependencies so the runtime owns those libraries.
+Build a JAR with the service provider entry and load it through the project's ktlint Gradle integration or `ktlint --ruleset=lint/comments.jar '**/*.kt' '**/*.kts'`.
+See [Kotlin lint](lint-kotlin.md) for the match boundaries.
 
-## Keep context-dependent guidance in prose
+### golangci-lint
 
-Choose API and module boundaries that make recurring mistakes hard to express.
-Apply restrictions on React effects, browser timers, and Electron process imports where the project defines the corresponding lifecycle or process boundaries.
-Review whether an explanation describes a contract or merely justifies a workaround.
-Use runtime checks, property tests, or formal verification when the risk requires evidence that source lint cannot provide.
+Merge the [golangci-lint v2 config](../assets/lint/golangci-lint.yaml) into the project's own `.golangci.yaml`.
+The Go package loader selects `.go` source under the requested modules and active build tags.
+Copy [the build config](../assets/lint/custom-gcl.yml) to `.custom-gcl.yml` and the [plugin module](../assets/lint/go-comments/go.mod) to `lint/go-comments/` with its source and sums.
+Use the golangci-lint version in the build config and an appropriate Go toolchain.
+Run `golangci-lint custom` from the consumer root and use `./custom-gcl run --config .golangci.yaml ./...` for the adopted checks.
+Keep built-in defaults and consumer settings enabled when registering the module plugin.
+Rebuild and verify the plugin when upgrading the toolchain or linter.
+See [Go lint](lint-go.md) for the check boundaries and examples.
+
+### markdownlint-cli2
+
+Copy [markdown-comments.ts](../assets/lint/markdown-comments.ts) as `lint/markdown-comments.ts`.
+Merge the [Markdown config](../assets/lint/markdownlint-cli2.jsonc) into the consumer's `.markdownlint-cli2.jsonc`.
+Keep the consumer's `**/*.md` paths and existing ignores.
+Load the TypeScript rule with a Node runtime that supports type stripping and a compatible local `markdownlint-cli2`.
+See [Markdown lint](lint-markdown.md) for the check boundaries.
 
 ## Validate lint rules
 
-Use small positive and negative fixtures for intended matches and realistic exceptions.
-Reuse adopted rule coverage instead of retesting the tool's implementation.
+Run read-only lint on small matching cases and realistic preserved cases.
+For a scoped boundary, prove the prohibited use fails inside it and the authorized use passes from the allowed entry.
 Offer automatic fixes only when evaluation, side effects, and program behavior remain unchanged.
 Verify formatter idempotence and convergence between rule fixes and formatting.
-Stage separately authorized rules on representative source before enabling them across the project.
-Start with read-only checks and review their reports before any safe-fix rollout.
-Do not add suppressions, disable rules, or weaken checks to make a rollout pass.
-
-If a rule cannot detect violations safely, do not add it.
-If only its automatic fix is unsafe, omit the fix and retain only a proven safe diagnostic.
-Validate scheduling, control flow, and lifecycle effects before offering automatic fixes that change them.
+Preserve required checks and directives during rollout.
+Review whether a remaining explanation documents a needed contract or excuses a workaround.
+Leave behavioral and intent checks with their [verification owner](runtime-formal-evidence.md).

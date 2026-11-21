@@ -55,6 +55,7 @@ See the official [tool dependency guidance](https://go.dev/doc/modules/managing-
 When the repository already uses golangci-lint or the user authorizes adopting it, use golangci-lint for Go linting.
 
 Prefer built-in linters before custom extensions.
+For dead paths and body comments, see the [adoptable Go lint checks](lint-go.md).
 Use its module plugin system for custom linters because golangci-lint recommends it over Go plugins.
 
 Separately from tool dependency management, check whether golangci-lint's build Go version supports the project's Go version.

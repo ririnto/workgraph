@@ -332,9 +332,10 @@ Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
 The rule requires multiline TSDoc for supported exported TypeScript declarations, including public and protected members of exported class declarations.
 It does not check class-expression members through direct exported variable declarations.
 The preset's `no-inline-comments` rule checks trailing comments.
-The [comment rule template](../skills/development/assets/lint/function-comments.ts) provides `function-comments/no-function-body-line-comments`.
+The [comment rule template](../skills/development/assets/lint/comments.ts) provides `comments/no-body-comments`.
 Each consuming project [maintains its own copy](../skills/development/references/lint-rules.md#adopt-a-lint-asset).
-Function-body spacing and the usefulness of a comment remain written conventions.
+The rule checks line and block comment placement in function bodies.
+The usefulness of retained comments remains a review decision.
 The repository's tooling tests verify the configured diagnostics and formatter behavior.
 JavaScript parameter and return annotations and type imports follow the official preset defaults.
 Markdownlint checks relative links, heading fragments, and table separators through the adopted rules.

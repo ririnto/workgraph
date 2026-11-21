@@ -347,7 +347,7 @@ export { Store as Again };
   ]);
 });
 
-await test("function-body comment lint reports standalone comments once and honors language matching and ignores", async (t) => {
+await test("body-comment lint reports loose comments once and honors language matching and ignores", async (t) => {
   const directory = await createUltraciteFixture(t);
   const extensions = ["js", "jsx", "mjs", "cjs", "ts", "tsx", "mts", "cts"];
   const matchingFiles = extensions.map((extension) => `matching.${extension}`);
@@ -358,8 +358,13 @@ await test("function-body comment lint reports standalone comments once and hono
   const names = [" North "];
   return names.map((value) => {
     // Normalize whitespace before truncating the label.
+    /*
+     * Leave the old trimming path here.
+     * Copyright appears after the first content line.
+     */
     const label = value.trim();
-    return label.slice(0, lengthLimit);
+    /** Unattached note about the return. */
+    return label.slice(0, lengthLimit); // Stale note.
   });
 };
 
@@ -369,8 +374,16 @@ makeLabels();
 const makeLabels = (lengthLimit = 6) => {
   /** Prefixes are measured after trimming the name. */
   const names = [" North "];
-  // c8 ignore next
-  return names.map((value) => value.trim().slice(0, lengthLimit));
+  /* SPDX-License-Identifier: MIT */
+  /**
+   * @license Example copyright notice.
+   */
+  /* c8 ignore next */
+  return names.map((value) => {
+    /** Bound used by the external protocol. */
+    const limit = lengthLimit;
+    return value.trim().slice(0, limit);
+  });
 };
 
 makeLabels();
@@ -392,17 +405,108 @@ makeLabels();
     "workflows/ignored.js"
   ]);
   assert.equal(status, 1);
-  assert.equal(diagnostics.length, matchingFiles.length);
-  const reportedFiles = new Set();
-  for (const entry of diagnostics) {
+  const reportedFiles = diagnostics.flatMap((entry) => {
     assert.ok(isObject(entry));
-    assert.equal(
-      entry.code,
-      "function-comments(no-function-body-line-comments)"
-    );
-    reportedFiles.add(entry.filename);
-  }
-  assert.deepEqual(reportedFiles, new Set(matchingFiles));
+    return entry.code === "comments(no-body-comments)" ? [entry.filename] : [];
+  });
+  assert.deepEqual(
+    reportedFiles.toSorted((a, b) => String(a).localeCompare(String(b))),
+    matchingFiles
+      .flatMap((file) => [file, file, file, file])
+      .toSorted((a, b) => a.localeCompare(b))
+  );
+});
+
+await test("local Markdown comments config checks hidden notes and preserves literals and markers", async (t) => {
+  const root = path.resolve(import.meta.dirname, "..");
+  const directory = await mkdtemp(path.join(tmpdir(), "markdown-comments-"));
+  t.after(async () => {
+    await rm(directory, { force: true, recursive: true });
+  });
+  const assets = path.join(root, "skills/development/assets/lint");
+  await mkdir(path.join(directory, "lint"));
+  await Promise.all([
+    cp(
+      path.join(assets, "markdownlint-cli2.jsonc"),
+      path.join(directory, ".markdownlint-cli2.jsonc")
+    ),
+    cp(
+      path.join(assets, "markdown-comments.ts"),
+      path.join(directory, "lint/markdown-comments.ts")
+    ),
+    symlink(
+      path.join(root, "node_modules"),
+      path.join(directory, "node_modules")
+    ),
+    writeFile(
+      path.join(directory, "rejected.md"),
+      [
+        "# Rejected",
+        "",
+        "<!-- Remove after migration. -->",
+        "",
+        "A hidden <!-- dead --> path.",
+        "",
+        "> <!-- Old",
+        "> branch. -->",
+        "",
+        "[//]: # (Hidden note)",
+        ""
+      ].join("\n")
+    ),
+    writeFile(
+      path.join(directory, "accepted.md"),
+      [
+        "# Accepted",
+        "",
+        "<!-- SPDX-License-Identifier: MIT -->",
+        "",
+        "<!-- markdownlint-disable-next-line MD013 -->",
+        "Example: `<!-- inline example -->`.",
+        "",
+        "```html",
+        "<!-- fenced example -->",
+        "```",
+        ""
+      ].join("\n")
+    )
+  ]);
+  const command = path.join(
+    root,
+    "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs"
+  );
+  const accepted = spawnSync(
+    process.execPath,
+    [command, "--no-globs", "accepted.md"],
+    {
+      cwd: directory,
+      encoding: "utf-8"
+    }
+  );
+  assert.ifError(accepted.error);
+  assert.equal(accepted.status, 0, accepted.stderr);
+  const rejected = spawnSync(
+    process.execPath,
+    [command, "--no-globs", "rejected.md"],
+    {
+      cwd: directory,
+      encoding: "utf-8"
+    }
+  );
+  assert.ifError(rejected.error);
+  assert.equal(rejected.status, 1, rejected.stderr);
+  assert.deepEqual(
+    rejected.stderr
+      .trim()
+      .split("\n")
+      .map((line) => line.split(" ").slice(0, 3)),
+    [
+      ["rejected.md:3", "error", "comments/no-hidden-notes"],
+      ["rejected.md:5", "error", "comments/no-hidden-notes"],
+      ["rejected.md:7", "error", "comments/no-hidden-notes"],
+      ["rejected.md:10:1", "error", "MD053/link-image-reference-definitions"]
+    ]
+  );
 });
 
 /** @typedef {{result: unknown} & Record<string, unknown>} CompletionEvidence */

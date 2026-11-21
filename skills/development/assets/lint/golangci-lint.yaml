@@ -1,0 +1,15 @@
+version: "2"
+linters:
+  enable:
+    - comments
+    - gocritic
+    - unused
+  settings:
+    custom:
+      comments:
+        type: module
+        description: Report loose comments in function bodies
+    gocritic:
+      enabled-checks:
+        - commentedOutCode
+        - commentedOutImport
