@@ -5,7 +5,10 @@
 Use Main's accepted node contracts and dependencies as script inputs.
 Encode accepted dependencies in Workflow control flow, not progress labels.
 Pass each agent its accepted inputs, bounded task, authority, and output evidence contract.
-Pass each dependent call only the predecessor results it needs.
+Name the result each successor consumes and the predicate that makes a conditional edge required.
+Pass the relevant fields of accepted predecessor results, with their source identity when needed, instead of serializing the complete graph or every predecessor payload into agent prompts.
+Represent a fan-out join separately from its workers when the join validates completeness, ownership, or a shared acceptance condition.
+Keep the writer for each path, worktree, branch, and external record explicit through joins and retries.
 Let the earliest stage with sufficient evidence finish a no-change task and record its reason, evidence, and skipped successors.
 When findings are missing, inconclusive, or cover only part of the task, carry that uncertainty forward.
 Do not assume local variables, progress labels, phases, or agent context transfer between calls.
@@ -97,6 +100,8 @@ Treat malformed result values as incomplete evidence.
 Do not filter required results by truthiness to turn failures into success.
 Distinguish a valid empty result, such as `{ findings: [] }`, from a failed or missing result.
 Validate every required result before starting its dependent stage.
+Check that joined results account for each expected input and agree on shared ownership and acceptance conditions.
+Keep accepted sibling results and identify the missing or failed input when a required join fails.
 A malformed JSON Schema can fail before the agent runs.
 A required name missing from a schema's `properties` may not fail as expected.
 Treat schema validation as a format check, not proof of acceptance.
@@ -116,6 +121,7 @@ Throw when required work cannot continue and no explicit empty-input path is val
 When an empty input is valid, run the later phase and record why it had no items.
 
 Record explicit phase outcomes such as `completed`, `skipped`, or `failed` with a reason.
+Record why a condition made a predecessor unnecessary when its successor can proceed.
 A skipped required phase must fail the final acceptance check.
 Return success only when every required phase has validated completion evidence.
 Validate returned outcomes against a script-local list matching the declared phases before returning success.
@@ -167,3 +173,5 @@ Preserve their prompts, options, labels, and arguments when accepted inputs rema
 Edit the stored script and pass `scriptPath` with `resumeFromRunId` to append needed stages and reuse valid completed calls.
 Inspect actual native cache-hit evidence before claiming reuse.
 A cache hit avoids repeated work but does not prove acceptance.
+Before replaying a writer or a successor that relies on cached evidence, reconcile the live refs, worktrees, resource ownership, and external effects against the accepted attempt.
+Pass changed external state through the affected calls' actual inputs, then rerun affected checks and dependent decisions while retaining unaffected evidence.

@@ -26,6 +26,7 @@ Workflow({
   name: 'workgraph:adaptive-delivery',
   args: {
     task: 'Fix the parser bug and verify the original trigger.',
+    repository: 'github.com/example/project',
     baseBranch: 'main',
     candidateBranch: 'task/fix-parser',
     issue: '#12'
@@ -37,6 +38,7 @@ Workflow({
 Workflow({
   args: {
     task: 'Fix the parser bug and verify the original trigger.',
+    repository: 'github.com/example/project',
     baseBranch: 'main',
     candidateBranch: 'task/fix-parser',
     issue: '#12'
@@ -61,6 +63,7 @@ That procedure describes requirement coverage, challenge, verification selected 
 | `task` | Required nonempty string holding the delivery goal. |
 | `scope` | Optional scope from Main. Supplying it bypasses the Scope agent. |
 | `issue` | Optional nonempty issue reference included in the publication and review prompts. |
+| `repository` | Required before publication. Use the authorized repository's canonical host and project path, such as `github.com/example/project`. |
 | `baseBranch` | Optional base branch string resolved during scope and used by downstream prompts, defaulting to the repository's default branch. |
 | `candidateBranch` | Required before any implementation dispatch, naming the task branch the worker must verify as its starting reference and the exact integration destination for several units. |
 | `skips` | Optional object of boolean phase flags that skip dispatch without waiving required acceptance. |
@@ -81,6 +84,7 @@ Workflow({
   name: 'workgraph:adaptive-delivery',
   args: {
     task: 'Fix the parser’s handling of escaped quotes.',
+    repository: 'github.com/example/project',
     baseBranch: 'main',
     candidateBranch: 'task/fix-parser',
     skips: { scope: true },
@@ -94,6 +98,7 @@ Workflow({
 
 A valid `scope` is sufficient even when `skips.scope` is omitted.
 The graph records Scope as completed with `source: "argument"` and runs the same ownership checks used for agent output.
+A plan that needs paths outside the supplied scope requires Main to revise that scope before workers start.
 Skipping Scope without supplying its result leaves its successors blocked.
 
 ## Phases
@@ -112,7 +117,9 @@ flowchart TD
     G --> W
     W -->|Clean| U[Publish]
     U --> R[Review]
-    R -->|Fix within budget| I
+    R -->|Blockers within repair budget| V[Verify findings]
+    V -->|Confirmed and owned| I
+    V -->|All refuted| D
     R -->|Pass| D[Reviewed request]
 ```
 
@@ -121,20 +128,22 @@ flowchart TD
 | Scope | The delivery goal and optional base branch. | The resolved base branch and disjoint scopes with keys, descriptions, and owned paths. |
 | Explore | One scope per explorer. | Per-scope summary, risks, evidence, and an optional reason to stop. |
 | Plan | The scopes and any exploration findings with evidence. | Work units with disjoint owned paths and instructions, or an evidence-backed reason to stop. |
-| Implement | One unit per agent, with any matching exploration. | Owned-path changed files, the unit branch with its verified start, and checks that all passed. |
-| Integrate | All accepted unit results after implementation completes. | For several units or a repair, named unit branches merged, their resource states, and combined-candidate checks. |
+| Implement | One unit per agent, with any matching exploration. | Owned-path changed files, verified starting ref and commit, checked unit commit, and checks that all passed. |
+| Integrate | Authorized destination and expected starting commit, with all accepted unit branches and commits. | For several units or a repair, named unit branches merged, their resource states, and checks on the combined candidate commit. |
 | Integrate | All accepted unit results after implementation completes. | For one initial unit, a conditional skip and the accepted unit branch. |
-| Sweep | The branch diff and untracked files only. | Exposure list that is empty when the change is clean. |
-| Publish | Completed implementation, completed or conditionally unnecessary integration, a clean sweep, the change summary, and any issue reference. | PR or MR URL with a created or updated action. |
-| Review | The change summary, integration outcome, and posted request URL. | Verdict with concrete findings and evidence. |
+| Sweep | The checked candidate commit, base branch, and candidate checkout's untracked files. | Candidate and base commits inspected, coverage, and an exposure list that is empty when the change is clean. |
+| Publish | Authorized repository, checked candidate and base commits, clean sweep, change summary, and any issue reference. | PR or MR URL with a created or updated action and readback of the posted repository, branches, and commits. |
+| Review | The change summary and posted request with its accepted candidate and base commits. | Observed commits, coverage, verdict, concrete findings, and evidence. |
+| Finding verification | The posted diff and the review's findings with their IDs. | Observed commits and an independently supported disposition for every finding. |
 
 Implementation runs every unit in its own isolated native worktree, including a single-unit plan.
 Each isolated worker verifies its worktree starts from the named task candidate before editing and synchronizes first when it does not.
 Implementation requires `args.candidateBranch` to name the task candidate, which stays distinct from the publication base branch.
 A missing candidate fails implementation before dispatch, so no editor edits from an unverified worktree start.
-Scope resolves the base identity even when `args.baseBranch` is omitted, and implementation rejects a reported unit branch equal to that base.
+Scope resolves the base identity for a delivery run even when `args.baseBranch` is omitted, and implementation rejects a reported unit branch equal to that base.
+When implementation is explicitly skipped and Main supplies no base, Scope can record `baseBranch: null` and pass its source evidence to Plan without requiring Git metadata.
 The publisher verifies actual refs and branch protections before pushing, because reported names alone do not establish Git state.
-A repair round carries the current accepted candidate as its required starting reference.
+A repair round carries the reviewed candidate branch and commit as its required starting point.
 Express owned paths relative to the original checkout, including authorized parent or sibling paths such as `../shared`.
 The same normalized paths govern exploration, ownership, changed files, and review findings.
 Scope reports the original checkout root so local aliases such as `../project/src` and `src` resolve to the same owner when the checkout is named `project`.
@@ -143,8 +152,11 @@ If implementation needs external paths, the run returns `complete: false`, `earl
 Main can continue at each owning location and publish Git changes in the repository that contains them.
 Checks report explicit passed, failed, or skipped statuses, and a gate passes only when every required check passed.
 Each implementation worker is instructed to commit to a branch named for its unit, so the result records a reported branch even when its checks fail, while a failed or missing worker result can leave the branch identity unknown.
+Claims by different units to the same branch block the implementation join even when their files are disjoint.
+Unit results must agree on the starting commit used for the same implementation attempt.
 Integration receives the named candidate and each planned unit path.
-It checks the destination, resolved base, protections, and actual branch diffs before writing.
+It checks the destination, resolved base, protections, unit commits, and actual branch diffs before writing.
+Integration checks the expected destination start before changing the task ref and returns a moved destination to Main for reconciliation.
 Each unit is judged by its own changes since its merge base with the destination, because the destination advances as other units integrate.
 A direct comparison with the advanced destination would show another unit's integrated files as deletions and could reject a valid unit or repair.
 A retained unit branch that the destination already contains has no new changes and reports as merged.
@@ -157,10 +169,14 @@ A consistent partial failure keeps its reported states, and a completed merge wi
 For one accepted unit, integration records `skipped` with the reason that no cross-unit integration is required, and the accepted unit branch becomes the candidate for sweep, publication, and review.
 Its resource stays `implemented`, not `merged`, because no merge occurred.
 Publication always precedes review, and review requires the request posted by the completed publication phase.
+Sweep, publication readback, and review must name the commits they covered.
+A sweep with incomplete diff or untracked-file coverage blocks publication, and incomplete review coverage blocks acceptance.
+A mismatch leaves the stage failed and its dependent stages unaccepted.
 Publication and review receive the per-unit checks and the combined-candidate checks.
 A fix round integrates the repaired unit branches into the original posted candidate, updates the same request, replaces only the repaired units' results by key, and reviews the candidate again.
 The result retains the last posted URL if a later attempt fails, while phase status records the failure.
 Accepted publication evidence remains in the graph.
+A rejected publication readback also retains any observed request identity for recovery.
 The scope, exploration, and sweep stages run with the built-in read-only Explore agent type, while review keeps the default agent and a read-only instruction.
 
 ## Executed graph
@@ -172,19 +188,23 @@ Each node records these fields:
 | --- | --- |
 | Identity and operation | `key`, `operation` |
 | Dependencies and data | `prerequisites`, `inputs`, `outputs` |
-| Responsibility and authority | `owner`, `authority` |
+| Responsibility and authority | `owner`, `authority`, `ownership` where assigned |
 | Outcome | `completionEvidence`, `status`, `reason` |
 
-Result edges require accepted predecessor evidence, and condition edges evaluate the unit count or the explicit exploration choice.
+Result edges require accepted predecessor evidence, and condition edges record their predicate and whether the run required it.
 Readiness derives from these edges rather than phase order alone.
-Scope explorers, unit workers, and repair attempts retain their own node records.
+Scope explorers and unit workers retain their own results alongside their coordinator joins.
+Finding verification and repair attempts retain their own node records.
 Every dispatch receives a graph-position block with the following:
 
 - Prerequisite statuses
-- Predecessor results
 - Input contracts
 - Downstream outputs
 - Its owned unit or scope, when applicable
+
+Stage prompts pass the predecessor fields the operation needs.
+Planning joins every required scope result.
+Workers receive one unit, matching exploration, and only the confirmed repair findings inside their paths.
 
 ## Skip, failure, and recovery
 
@@ -203,14 +223,17 @@ The one-unit conditional skip does not block delivery, while an explicit `skips.
 The run result returns the separated scopes, each explorer's summary, risks, and evidence, and the sweep evidence so Main can check predecessor results.
 The run result retains each branch identity reported by an implementation attempt and its recorded state, and superseded reported branches stay listed because the sample retires nothing.
 A retained resource never counts as passing evidence.
-A failed or missing predecessor skips its dependent phases instead of fabricating their results.
+A failed or missing predecessor skips its dependent phases, while successful sibling results remain available to Main.
 Review checks each blocking finding against source, requirements, or a safe reproduction and includes that evidence in its report.
-A `fix-required` verdict sends each finding directly to its owning unit, within `maxFixRounds`.
+A `fix-required` verdict within `maxFixRounds` starts a separate read-only verifier under Review progress.
+The verifier must account for every finding ID once and support its disposition with evidence from the same posted diff.
+Missing, conflicting, or unverified dispositions block repair and leave the run incomplete.
+An all-refuted result can finish without repair, with the original verdict and its verification both preserved.
 Set `maxFixRounds: 0` when Main needs to assess the findings or revise the plan before authorizing repairs.
-Main receives the verdict, evidence, and findings in `review` and each round's result in `reviewHistory`.
+Main receives the verdict, evidence, and findings in `review` and each round's result and any verification in `reviewHistory`.
 Each repair integrates into the posted candidate, then repeats the sweep, publication, and review.
 A fix round replaces the repaired units' results by key, so unaffected unit evidence stays while combined-candidate evidence is regenerated.
-A finding outside one unambiguous owned unit blocks the round for replanning.
+A confirmed finding outside one unambiguous owned unit blocks the round for replanning.
 
 ## Models and effort
 
@@ -228,7 +251,7 @@ The delivery sample accepts optional selectors by phase through `args.models` an
 | Review | Host selection | Assess the posted candidate and blocking findings. |
 
 An explicit selector in `args.models` takes precedence for that phase.
-Remove legacy `models.verify` and `efforts.verify` entries from saved arguments before starting a new run.
+Finding verification uses the Review model and effort selectors in a separate call with its own output contract.
 Omitted effort selectors use host configuration.
 Main selects overrides using its [Claude Code guidance](../skills/main-agent-contract/references/claude-code.md#model-selection).
 Claude Code applies its [workflow model policy](https://code.claude.com/docs/en/workflows) to the requested selector.
@@ -245,7 +268,7 @@ A changed candidate, destination, owned path, finding set, or verification contr
 Before resuming, check the live checkout, the named task and base branch refs, the toolchain configuration, and the posted request against what the recorded run used, because native cache keys carry none of that state.
 A changed input invalidates the affected cached calls, so pass the changed state through the affected prompts or arguments and expect those calls to re-run.
 Never reuse a sweep or a posted review for a changed accepted candidate, because the recorded evidence describes the earlier candidate.
-A repair round keeps the candidate branch name, so a repair sweep prompt can match an earlier one while the branch content differs.
-Continuation replays cached results without replaying their Git effects, so a cached sweep describes the candidate as it stood when that sweep first ran.
-A later round inside the same recorded run can advance the candidate, so the live branch can match the run's final state while an earlier cached sweep describes an earlier candidate.
-Before publishing from a resumed run, confirm that the gating sweep ran live against the current candidate, or change its inputs so it re-runs.
+The accepted commit enters the sweep, publication, review, and repair prompts, so a repair with a moved head does not reuse the earlier head's evidence.
+Continuation can still replay a result from before an external ref or worktree moved.
+Before resuming a writer, reconcile the recorded attempt with the actual Git and request state, including untracked files, partial merges, and any request already posted.
+Refresh affected inputs and rerun the checks or sweep when that state no longer matches the recorded evidence.

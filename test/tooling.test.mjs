@@ -766,16 +766,50 @@ const compileWorkflowSource = (file) => {
  * @returns {(options: AgentOptions) => unknown} Agent handler.
  */
 const dispatchTable = (table) => {
+  let lastReview = 0;
+  /** @type {string | null} */
+  let headBranch = null;
   /**
    * @param {AgentOptions} options Agent dispatch options.
    * @returns {unknown} Payload for the requested phase.
    */
   const dispatch = (options) => {
+    if (options.label.startsWith("verify-findings:")) {
+      return table.Verify === undefined
+        ? {
+            baseCommit: sampleBase,
+            commit: sampleCommit,
+            dispositions: Array.from({ length: lastReview }, (_, index) => ({
+              evidence: "independently checked",
+              id: `review-${options.label.split(":").at(-1)}-finding-${index + 1}`,
+              status: "confirmed"
+            }))
+          }
+        : table.Verify(options);
+    }
     const entry = table[options.phase];
     if (entry === undefined) {
       throw new Error(`unexpected phase ${options.phase}`);
     }
-    return entry(options);
+    const result = entry(options);
+    if (
+      ["Implement", "Integrate"].includes(options.phase) &&
+      isObject(result) &&
+      typeof result.branch === "string"
+    ) {
+      headBranch = result.branch;
+    }
+    if (options.phase === "Publish" && isObject(result)) {
+      return { headBranch, ...result };
+    }
+    if (
+      options.phase === "Review" &&
+      isObject(result) &&
+      isArray(result.findings)
+    ) {
+      lastReview = result.findings.length;
+    }
+    return result;
   };
   return dispatch;
 };
@@ -818,11 +852,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
         phase: options.phase,
         prompt
       });
-      const payload = payloadFor(options);
-      if (payload === null) {
-        throw new Error("agent failure");
-      }
-      return await Promise.resolve(payload);
+      return await Promise.resolve(payloadFor(options));
     },
     budget: { remaining: () => Infinity, spent: () => 0, total: null },
     log: () => null,
@@ -842,7 +872,7 @@ const runWorkflowSample = async (file, args, payloadFor) => {
   };
   /** @type {unknown} */
   const result = await Reflect.apply(compileWorkflowSource(file), undefined, [
-    args,
+    { repository: sampleRepository, ...args },
     environment.agent,
     environment.parallel,
     environment.pipeline,
@@ -859,6 +889,9 @@ const sampleRoot = path.resolve(import.meta.dirname, "..");
 const samplePaths = {
   delivery: path.join(sampleRoot, "workflows/delivery.js")
 };
+const sampleBase = "a".repeat(40);
+const sampleCommit = "b".repeat(40);
+const sampleRepository = "example.invalid/team/project";
 const scopeResult = {
   baseBranch: "main",
   evidence: "e",
@@ -891,8 +924,10 @@ const simpleImplement = {
   branch: "unit-u1",
   changedFiles: ["docs/guide.md"],
   checks: [{ command: "pnpm run check:markdownlint-cli2", status: "passed" }],
+  commit: sampleCommit,
   diffSummary: "d",
   evidence: "e",
+  startCommit: sampleCommit,
   startRef: "task-branch"
 };
 const simpleRepair = {
@@ -908,6 +943,7 @@ const splitImplement = (options) => {
   const secondUnit = options.label.startsWith("implement:u2");
   const repair = options.label.includes(":fix-");
   return {
+    ...simpleImplement,
     branch: secondUnit ? "unit-u2" : "unit-u1",
     changedFiles: secondUnit ? ["src/main.js"] : ["docs/guide.md"],
     checks: [
@@ -915,10 +951,7 @@ const splitImplement = (options) => {
         command: repair ? "check-u1-fixed" : `check-u${secondUnit ? 2 : 1}`,
         status: "passed"
       }
-    ],
-    diffSummary: "d",
-    evidence: "e",
-    startRef: "task-branch"
+    ]
   };
 };
 /**
@@ -960,9 +993,11 @@ const integrateResult = {
   branch: "task-branch",
   changedFiles: ["docs/guide.md", "src/main.js"],
   checks: [{ command: "pnpm run check", status: "passed" }],
+  commit: sampleCommit,
   conflicts: [],
   evidence: "e",
   merged: true,
+  startCommit: sampleCommit,
   resources: [
     { branch: "unit-u1", key: "u1", state: "merged" },
     { branch: "unit-u2", key: "u2", state: "merged" }
@@ -972,9 +1007,11 @@ const integrateSingle = {
   branch: "unit-u1",
   changedFiles: ["docs/guide.md"],
   checks: [{ command: "pnpm run check:test", status: "passed" }],
+  commit: sampleCommit,
   conflicts: [],
   evidence: "e",
   merged: true,
+  startCommit: sampleCommit,
   resources: [{ branch: "unit-u1-fix", key: "u1", state: "merged" }]
 };
 const integrateFirstRepair = {
@@ -991,23 +1028,35 @@ const integrateSecondRepair = {
     { branch: "unit-u2", key: "u2", state: "merged" }
   ]
 };
-const sweepResult = { evidence: "e", exposures: [] };
+const sweepResult = {
+  baseCommit: sampleBase,
+  commit: sampleCommit,
+  coverage: "complete",
+  evidence: "e",
+  exposures: []
+};
 const publishCreated = {
   action: "created",
+  baseBranch: "main",
+  baseCommit: sampleBase,
+  commit: sampleCommit,
   evidence: "e",
+  repository: sampleRepository,
   url: "https://example.invalid/pr/1"
 };
 const publishUpdated = {
-  action: "updated",
-  evidence: "e",
-  url: "https://example.invalid/pr/1"
+  ...publishCreated,
+  action: "updated"
 };
 const reviewFix = {
+  baseCommit: sampleBase,
+  commit: sampleCommit,
+  coverage: "complete",
   evidence: "e",
   findings: [{ detail: "d", file: "docs/guide.md", scenario: "s" }],
   verdict: "fix-required"
 };
-const reviewPass = { evidence: "e", findings: [], verdict: "pass" };
+const reviewPass = { ...reviewFix, findings: [], verdict: "pass" };
 
 await test("delivery preserves a posted request after repair failures", async () => {
   await Promise.all(
@@ -1502,7 +1551,7 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
     assert.deepEqual(result.fixRounds, { max: 1, used: 1 });
     assert.equal(phases.filter((phase) => phase === "Implement").length, 2);
     assert.equal(phases.filter((phase) => phase === "Publish").length, 2);
-    assert.equal(phases.filter((phase) => phase === "Review").length, 2);
+    assert.equal(calls.filter(({ label }) => label === "review").length, 2);
     assert.ok(phases.indexOf("Publish") < phases.indexOf("Review"));
     assert.ok(phases.lastIndexOf("Publish") < phases.lastIndexOf("Review"));
     assert.ok(
@@ -1573,6 +1622,7 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
         Integrate: () => integrateSingle,
         Plan: () => singleUnits,
         Publish: sequence(publishCreated, {
+          ...publishCreated,
           action: "created",
           evidence: "e",
           url: "https://example.invalid/pr/2"
@@ -1585,7 +1635,7 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
     const phases = calls.map((call) => call.phase);
     assert.equal(result.complete, false);
     assert.equal(phases.filter((phase) => phase === "Publish").length, 2);
-    assert.equal(phases.filter((phase) => phase === "Review").length, 1);
+    assert.equal(calls.filter(({ label }) => label === "review").length, 1);
     const publishRecord = result.phaseEvidence.find(
       (record) => record.title === "Publish"
     );
@@ -1661,7 +1711,7 @@ await test("delivery workflow samples preserve post-then-review ordering and hon
     assert.equal(phases.filter((phase) => phase === "Integrate").length, 2);
     assert.equal(phases.filter((phase) => phase === "Sweep").length, 2);
     assert.equal(phases.filter((phase) => phase === "Publish").length, 2);
-    assert.equal(phases.filter((phase) => phase === "Review").length, 2);
+    assert.equal(calls.filter(({ label }) => label === "review").length, 2);
     assert.ok(phases.indexOf("Publish") < phases.indexOf("Review"));
     assert.ok(phases.lastIndexOf("Publish") < phases.lastIndexOf("Review"));
     assert.equal(
@@ -1945,7 +1995,7 @@ await test("delivery workflow samples carry named candidates and per-key repair 
   assert.equal(result.complete, false);
   assert.equal(phases.filter((phase) => phase === "Implement").length, 3);
   assert.equal(phases.filter((phase) => phase === "Publish").length, 1);
-  assert.equal(phases.filter((phase) => phase === "Review").length, 1);
+  assert.equal(calls.filter(({ label }) => label === "review").length, 1);
   const implementRecord = result.phaseEvidence.find(
     (record) => record.title === "Implement"
   );
@@ -2193,7 +2243,9 @@ await test("delivery leaves findings outside unit ownership for replanning", asy
       );
       for (const phase of ["Implement", "Publish", "Review"]) {
         assert.equal(
-          unowned.calls.filter((call) => call.phase === phase).length,
+          unowned.calls.filter(
+            (call) => call.phase === phase && call.label !== "verify-findings:1"
+          ).length,
           1
         );
       }
@@ -2312,9 +2364,15 @@ await test("delivery samples append each phase's prompt part as its final sectio
           Sweep: () => sweepResult
         })
       );
+      const phaseCalls = calls.filter(
+        ({ label }) => label !== "verify-findings:1"
+      );
       assert.deepEqual(
-        calls.map(({ phase, prompt }) => [phase, prompt.split("\n\n").at(-1)]),
-        calls.map(({ phase }) => [phase, promptParts[phase.toLowerCase()]])
+        phaseCalls.map(({ phase, prompt }) => [
+          phase,
+          prompt.split("\n\n").at(-1)
+        ]),
+        phaseCalls.map(({ phase }) => [phase, promptParts[phase.toLowerCase()]])
       );
       await assert.rejects(
         runWorkflowSample(
@@ -2355,10 +2413,7 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
             ]
           }),
           Publish: sequence(publishCreated, publishUpdated),
-          Review: sequence(
-            { evidence: "e", findings: reviewed, verdict: "fix-required" },
-            reviewPass
-          ),
+          Review: sequence({ ...reviewFix, findings: reviewed }, reviewPass),
           Scope: () => ({
             ...scopeResult,
             checkoutRoot: "/workspace/project",
@@ -2396,7 +2451,9 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
       assert.deepEqual(
         owns("Linked issue reference: #1"),
         calls
-          .filter(({ phase }) => ["Publish", "Review"].includes(phase))
+          .filter(
+            ({ phase, label }) => phase === "Publish" || label === "review"
+          )
           .map(({ label }) => label)
       );
       const publishes = calls.filter(({ phase }) => phase === "Publish");
@@ -2410,7 +2467,13 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
         reviewed.map((finding, index) =>
           owns(
             `Fix these review findings inside your owned paths: ${JSON.stringify(
-              [{ ...finding, id: `review-1-finding-${index + 1}` }]
+              [
+                {
+                  ...finding,
+                  id: `review-1-finding-${index + 1}`,
+                  verificationEvidence: "independently checked"
+                }
+              ]
             )}`
           )
         ),
@@ -2550,8 +2613,248 @@ await test("delivery graph exposes node contracts and condition edges", async ()
       }
       assert.deepEqual(nodes.get("implement:u1:fix-1")?.prerequisites, [
         "plan",
-        "review"
+        "verify-findings:1",
+        "explore:s1"
+      ]);
+      assert.deepEqual(nodes.get("verify-findings:1")?.prerequisites, [
+        "review",
+        "publish"
       ]);
     })
+  );
+});
+
+await test("delivery retains an accepted sibling result when a required join fails", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: ({ label }) => (label === "explore:s1" ? exploreResult : null),
+      Scope: () => ({
+        ...scopeResult,
+        scopes: [
+          ...scopeResult.scopes,
+          { key: "s2", description: "source scope", paths: ["src"] }
+        ]
+      })
+    })
+  );
+  assert.equal(result.complete, false);
+  assert.deepEqual(
+    calls.map(({ label }) => label),
+    ["scope", "explore:s1", "explore:s2"]
+  );
+  assert.deepEqual(result.explorations, [{ ...exploreResult, key: "s1" }]);
+  assert.deepEqual(
+    result.graph.nodes
+      .filter(({ key }) => key.startsWith("explore:"))
+      .map(({ key, status }) => [key, status]),
+    [
+      ["explore:s1", "completed"],
+      ["explore:s2", "failed"]
+    ]
+  );
+});
+
+await test("delivery planning can proceed without a resolved Git base", async () => {
+  await Promise.all(
+    [false, true].map(async (planningOnly) => {
+      const { calls, result } = await runWorkflowSample(
+        samplePaths.delivery,
+        {
+          candidateBranch: "task-branch",
+          skips: { implement: planningOnly },
+          task: "t"
+        },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Plan: () => singleUnits,
+          Scope: () => ({ ...scopeResult, baseBranch: "" })
+        })
+      );
+      assert.equal(result.complete, false);
+      assert.deepEqual(
+        calls.map(({ label }) => label),
+        planningOnly ? ["scope", "explore:s1", "plan"] : ["scope"]
+      );
+      assert.equal(
+        result.graph.nodes.find(({ key }) => key === "plan")?.status,
+        planningOnly ? "completed" : "skipped"
+      );
+    })
+  );
+});
+
+await test("delivery cannot expand scope explicitly supplied by Main", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", scope: scopeResult, task: "t" },
+    dispatchTable({ Explore: () => exploreResult, Plan: () => splitUnits })
+  );
+  assert.equal(result.complete, false);
+  assert.deepEqual(
+    calls.map(({ label }) => label),
+    ["explore:s1", "plan"]
+  );
+  assert.equal(
+    result.graph.nodes.find(({ key }) => key === "plan")?.status,
+    "failed"
+  );
+});
+
+await test("delivery blocks the join when disjoint file owners report the same branch", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: (options) => ({
+        ...splitImplement(options),
+        branch: "shared-branch"
+      }),
+      Plan: () => splitUnits,
+      Scope: () => scopeResult
+    })
+  );
+  assert.equal(result.complete, false);
+  assert.deepEqual(
+    calls.map(({ label }) => label),
+    ["scope", "explore:s1", "plan", "implement:u1", "implement:u2"]
+  );
+  assert.deepEqual(
+    result.resources.map(({ state }) => state),
+    ["attempted", "attempted"]
+  );
+  assert.deepEqual(
+    result.units.map(({ branch }) => branch),
+    [null, null]
+  );
+});
+
+await test("delivery repair requires independent dispositions for the exact reviewed diff", async () => {
+  const dispositions = [
+    {
+      id: "review-1-finding-1",
+      status: "refuted",
+      evidence: "source evidence"
+    },
+    {
+      id: "review-1-finding-2",
+      status: "refuted",
+      evidence: "other source evidence"
+    }
+  ];
+  await Promise.all(
+    [
+      { dispositions, complete: true },
+      { dispositions: [dispositions[0]], complete: false },
+      { dispositions: [dispositions[0], dispositions[0]], complete: false },
+      {
+        dispositions: [
+          { ...dispositions[0], status: "unverified" },
+          dispositions[1]
+        ],
+        complete: false
+      },
+      { dispositions, commit: "c".repeat(40), complete: false }
+    ].map(async (verification) => {
+      const { calls, result } = await runWorkflowSample(
+        samplePaths.delivery,
+        { candidateBranch: "task-branch", task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: () => simpleImplement,
+          Plan: () => singleUnits,
+          Publish: () => publishCreated,
+          Review: () => ({
+            ...reviewFix,
+            findings: [
+              ...reviewFix.findings,
+              { ...reviewFix.findings[0], detail: "another claim" }
+            ]
+          }),
+          Scope: () => scopeResult,
+          Sweep: () => sweepResult,
+          Verify: () => ({
+            baseCommit: sampleBase,
+            commit: verification.commit ?? sampleCommit,
+            dispositions: verification.dispositions
+          })
+        })
+      );
+      assert.equal(result.complete, verification.complete);
+      assert.equal(result.fixRounds.used, 0);
+      assert.deepEqual(
+        calls.slice(-2).map(({ label }) => label),
+        ["review", "verify-findings:1"]
+      );
+      assert.equal(
+        result.graph.nodes.find(({ key }) => key === "verify-findings:1")
+          ?.status,
+        verification.complete ? "completed" : "failed"
+      );
+    })
+  );
+});
+
+await test("delivery refuses stale evidence before accepting each successor", async () => {
+  await Promise.all(
+    [
+      { stage: "sweep", sweep: { commit: "c".repeat(40) } },
+      { stage: "sweep", sweep: { coverage: "incomplete" } },
+      { stage: "publish", publish: { baseCommit: "c".repeat(40) } },
+      {
+        stage: "publish",
+        publish: { repository: "example.invalid/unapproved/fork" }
+      },
+      { stage: "review", review: { commit: "c".repeat(40) } },
+      { stage: "review", review: { coverage: "incomplete" } }
+    ].map(async ({ stage, sweep, publish, review }) => {
+      const { calls, result } = await runWorkflowSample(
+        samplePaths.delivery,
+        { candidateBranch: "task-branch", task: "t" },
+        dispatchTable({
+          Explore: () => exploreResult,
+          Implement: () => simpleImplement,
+          Plan: () => singleUnits,
+          Publish: () => ({ ...publishCreated, ...publish }),
+          Review: () => ({ ...reviewPass, ...review }),
+          Scope: () => scopeResult,
+          Sweep: () => ({ ...sweepResult, ...sweep })
+        })
+      );
+      assert.equal(result.complete, false);
+      assert.equal(calls.at(-1)?.label, stage);
+      const failed = result.graph.nodes.find(({ key }) => key === stage);
+      assert.equal(failed?.status, "failed");
+      if (stage === "publish") {
+        const outcome = failed.completionEvidence.at(-1)?.result;
+        assert.ok(isObject(outcome) && isObject(outcome.observed));
+        assert.equal(outcome.observed.url, publishCreated.url);
+        assert.equal(result.publish, null);
+      }
+    })
+  );
+});
+
+await test("delivery leaves a moved integration destination for reconciliation", async () => {
+  const { calls, result } = await runWorkflowSample(
+    samplePaths.delivery,
+    { candidateBranch: "task-branch", task: "t" },
+    dispatchTable({
+      Explore: () => exploreResult,
+      Implement: splitImplement,
+      Integrate: () => ({ ...integrateResult, startCommit: "c".repeat(40) }),
+      Plan: () => splitUnits,
+      Scope: () => scopeResult
+    })
+  );
+  assert.equal(result.complete, false);
+  assert.equal(calls.at(-1)?.label, "integrate");
+  assert.equal(result.integration.status, "failed");
+  assert.equal(result.integration.startCommit, "c".repeat(40));
+  assert.deepEqual(
+    result.resources.map(({ state }) => state),
+    ["implemented", "implemented"]
   );
 });
