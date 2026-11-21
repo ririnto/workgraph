@@ -49,10 +49,10 @@ Preserve declared runtime, toolchain, public contracts, and required failure beh
 Keep required effects, resource lifetimes, and interfaces in transformations.
 Test via production interfaces without exposing internals or adding test-only hooks.
 
-Separate tests, Storybook stories, and other non-production code from production sources.
-Use standard ecosystem paths.
-Move misplaced files within the task that added them.
-For unclear paths, consult official guidance and record the reason.
+Use standard ecosystem paths outside production for tests, Storybook stories, and other non-production code.
+Move misplaced files in their original task.
+For unclear paths, use official guidance and note why.
+Use `compose.yaml` for Docker Compose.
 
 Replace superseded code and consumers together and remove obsolete paths.
 Revise or remove code rules at their source without adding opposing rules.
