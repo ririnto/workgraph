@@ -1,0 +1,242 @@
+import type {
+  ESTree,
+  Context,
+  Plugin,
+  Rule,
+  Scope,
+  Span
+} from "@oxlint/plugins";
+
+type SourceRange = Pick<Span, "start" | "end">;
+
+type FunctionNode =
+  | (ESTree.Function & {
+      readonly type: "FunctionDeclaration" | "FunctionExpression";
+    })
+  | ESTree.ArrowFunctionExpression;
+
+const isFunctionNode = (node: ESTree.Node): node is FunctionNode =>
+  node.type === "FunctionDeclaration" ||
+  node.type === "FunctionExpression" ||
+  node.type === "ArrowFunctionExpression";
+
+const registrations = new Set([
+  "describe",
+  "test",
+  "it",
+  "suite",
+  "before",
+  "after",
+  "beforeEach",
+  "afterEach",
+  "beforeAll",
+  "afterAll"
+]);
+const frameworks = new Set(["node:test"]);
+
+const registrationCallee = (node: ESTree.Node): ESTree.Node | undefined => {
+  if (node.type === "CallExpression") {
+    let { callee } = node;
+    if (
+      callee.type === "CallExpression" &&
+      callee.callee.type === "MemberExpression" &&
+      !callee.callee.computed &&
+      callee.callee.property.type === "Identifier" &&
+      callee.callee.property.name === "each"
+    ) {
+      callee = callee.callee.object;
+    }
+    while (
+      callee.type === "MemberExpression" &&
+      !callee.computed &&
+      callee.property.type === "Identifier" &&
+      ["only", "skip", "todo"].includes(callee.property.name)
+    ) {
+      callee = callee.object;
+    }
+    return callee;
+  }
+  return undefined;
+};
+
+const registration = (
+  node: ESTree.Node,
+  context: Context
+): string | undefined => {
+  const callee = registrationCallee(node);
+  if (callee?.type === "Identifier") {
+    let scope: Scope | null = context.sourceCode.getScope(callee);
+    while (scope) {
+      const variable = scope.variables.find(({ name }) => name === callee.name);
+      if (variable) {
+        const definition =
+          variable.defs.length === 1 ? variable.defs[0] : undefined;
+        const specifier = definition?.node;
+        const source = definition?.parent;
+        if (
+          definition?.type === "ImportBinding" &&
+          specifier?.type === "ImportSpecifier" &&
+          source?.type === "ImportDeclaration" &&
+          frameworks.has(source.source.value) &&
+          specifier.imported.type === "Identifier" &&
+          registrations.has(specifier.imported.name)
+        ) {
+          return specifier.imported.name;
+        }
+        return undefined;
+      }
+      scope = scope.upper;
+    }
+  }
+  return undefined;
+};
+
+const siblingGaps = (node: ESTree.Node, context: Context): SourceRange[] => {
+  const { parent } = node;
+  const call = parent?.parent;
+  const suite =
+    node.type === "BlockStatement" &&
+    parent !== undefined &&
+    parent !== null &&
+    isFunctionNode(parent) &&
+    call?.type === "CallExpression" &&
+    call.arguments.includes(parent) &&
+    ["describe", "suite"].some((name) => name === registration(call, context));
+  const gaps: SourceRange[] = [];
+  if (node.type === "Program" || (node.type === "BlockStatement" && suite)) {
+    for (const [index, statement] of node.body.entries()) {
+      const previous = node.body[index - 1];
+      if (
+        previous?.type === "ExpressionStatement" &&
+        statement.type === "ExpressionStatement" &&
+        registration(previous.expression, context) !== undefined &&
+        registration(statement.expression, context) !== undefined
+      ) {
+        gaps.push({ end: statement.start, start: previous.end });
+      }
+    }
+  }
+  return gaps;
+};
+
+const noBlankLinesRule = {
+  create(context: Context) {
+    const reportedOffsets = new Set<number>();
+    const registrationGaps: SourceRange[] = [];
+    const inspectFunction = (node: ESTree.Node): void => {
+      if (isFunctionNode(node) && node.body?.type === "BlockStatement") {
+        const { body } = node;
+        const tokens = context.sourceCode.getTokens(body);
+        const comments = context.sourceCode.getCommentsInside(body);
+        const isProtected = (offset: number): boolean =>
+          tokens.some(({ start, end }) => start <= offset && offset < end) ||
+          comments.some(({ start, end }) => start <= offset && offset < end);
+        const firstStatementIndex = body.body.findIndex(
+          (element) =>
+            !("directive" in element && typeof element.directive === "string")
+        );
+        const exemptionStart =
+          firstStatementIndex > 0
+            ? body.body[firstStatementIndex - 1]?.end
+            : undefined;
+        const exemptionEnd =
+          firstStatementIndex > 0
+            ? body.body[firstStatementIndex]?.start
+            : undefined;
+        const isExempted = (offset: number): boolean =>
+          exemptionStart !== undefined &&
+          exemptionEnd !== undefined &&
+          exemptionStart <= offset &&
+          offset < exemptionEnd;
+        const bodyText = context.sourceCode.text.slice(body.start, body.end);
+        const blankLineOffsets = Array.from(
+          bodyText.matchAll(/^[^\S\r\n\u2028\u2029]*$/gmu),
+          ({ index }) => index
+        )
+          .filter((index): index is number => index !== undefined)
+          .filter(
+            (index) =>
+              !(bodyText[index - 1] === "\r" && bodyText[index] === "\n")
+          )
+          .map((index) => index + body.start)
+          .filter(
+            (offset) =>
+              !isProtected(offset) &&
+              !isExempted(offset) &&
+              !registrationGaps.some(
+                ({ start, end }) => start <= offset && offset < end
+              )
+          );
+        for (const offset of blankLineOffsets) {
+          if (!reportedOffsets.has(offset)) {
+            reportedOffsets.add(offset);
+            context.report({
+              loc: { start: context.sourceCode.getLocFromIndex(offset) },
+              messageId: "noBlankLines",
+              node
+            });
+          }
+        }
+      }
+    };
+    return {
+      "ArrowFunctionExpression:exit": inspectFunction,
+      BlockStatement: (node: ESTree.Node) => {
+        registrationGaps.push(...siblingGaps(node, context));
+      },
+      "FunctionDeclaration:exit": inspectFunction,
+      "FunctionExpression:exit": inspectFunction
+    };
+  },
+  meta: {
+    docs: {
+      description: "Disallow physical blank lines inside function bodies."
+    },
+    messages: {
+      noBlankLines: "Remove blank lines from function bodies."
+    },
+    type: "problem"
+  }
+} satisfies Rule;
+
+const siblingTestSpacingRule = {
+  create(context: Context) {
+    const inspect = (node: ESTree.Node): void => {
+      for (const gap of siblingGaps(node, context)) {
+        if (
+          /^\s*$/u.test(context.sourceCode.text.slice(gap.start, gap.end)) &&
+          context.sourceCode.text
+            .slice(gap.start, gap.end)
+            .split(/\r\n|[\n\r\u2028\u2029]/u).length !== 3
+        ) {
+          context.report({ messageId: "siblingSpacing", node });
+        }
+      }
+    };
+    return { BlockStatement: inspect, Program: inspect };
+  },
+  meta: {
+    docs: {
+      description:
+        "Require one blank line between proven sibling test registrations."
+    },
+    messages: {
+      siblingSpacing:
+        "Separate sibling tests and lifecycle registrations with one blank line."
+    },
+    type: "problem"
+  }
+} satisfies Rule;
+
+const plugin = {
+  meta: { name: "test-style" },
+  rules: {
+    "no-blank-lines-in-functions": noBlankLinesRule,
+    "sibling-test-spacing": siblingTestSpacingRule
+  }
+} satisfies Plugin;
+
+/**
+ * Adapt Sinon Harness spacing checks for Workgraph and node:test.
+ */
+export default plugin;

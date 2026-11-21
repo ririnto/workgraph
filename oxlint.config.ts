@@ -10,6 +10,7 @@ export default defineConfig({
   ignorePatterns: [...(core.ignorePatterns ?? []), "workflows/*.js"],
   jsPlugins: [
     "./plugins/tsdoc-plugin.ts",
+    "./plugins/spacing.ts",
     "./skills/development/assets/lint/comments.ts"
   ],
   options: { typeAware: true },
@@ -17,11 +18,29 @@ export default defineConfig({
     {
       files: ["**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
       rules: {
-        "comments/no-body-comments": "deny"
+        "comments/no-body-comments": ["error", true]
+      }
+    },
+    {
+      files: ["**/*.{js,jsx,mjs,cjs}"],
+      rules: {
+        "jsdoc/require-param": "deny",
+        "jsdoc/require-param-name": "deny",
+        "jsdoc/require-param-type": "deny",
+        "jsdoc/require-returns": "deny",
+        "jsdoc/require-returns-type": "deny"
       }
     }
   ],
   rules: {
-    "tsdoc/require-export-tsdoc": "deny"
+    "oxc/no-accumulating-spread": "deny",
+    "test-style/no-blank-lines-in-functions": "deny",
+    "test-style/sibling-test-spacing": "deny",
+    "tsdoc/require-export-tsdoc": "deny",
+    "typescript/consistent-type-imports": [
+      "error",
+      { fixStyle: "separate-type-imports", prefer: "type-imports" }
+    ],
+    "typescript/no-floating-promises": ["error", { ignoreVoid: false }]
   }
 });

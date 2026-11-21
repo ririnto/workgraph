@@ -147,6 +147,10 @@ For missing Codex hooks or update-time trust errors, follow [Confirm hook activa
 Use pnpm and the Node version range in `package.json` for development.
 Development tools require Node.js 24.22.3 or later within major version 24.
 Install the pnpm version declared in `package.json` before installing the pinned development tools.
+Install ktlint 1.8.0, golangci-lint 2.15.0, actionlint 1.7.12, ShellCheck, and shfmt for the native lint checks.
+Use a Java runtime compatible with ktlint and the Go version in the bundled Go module's `go.mod`.
+Install NilAway with the version used in the [check workflow](.github/workflows/check.yaml) and put the binary on `PATH`.
+Linux CI installs the same checkers before running `pnpm run check`.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -155,6 +159,7 @@ pnpm run check
 
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
 The pre-commit hook checks the staged diff for whitespace errors and conflict markers.
+It runs the repository's Markdown, TypeScript, lint, and metadata validators, then selects native linters and tests based on staged paths.
 The pre-push hook runs the full repository check before publication.
 `pnpm run check:ultracite` checks formatting and runs lint rules, including type-aware rules on JavaScript and TypeScript files.
 Type-aware lint excludes generated files and the host workflow DSL.

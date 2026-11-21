@@ -26,13 +26,13 @@ private class NoBodyComments :
         val legalMarker: Regex =
             Regex(
                 """^(?:SPDX-(?:License-Identifier|FileCopyrightText):|copyright\b[ \t]*:?[ \t]*(?:[0-9]{4}\b|©|\(c\))|©)""",
-                RegexOption.IGNORE_CASE,
+                RegexOption.IGNORE_CASE
             )
     }
 
     override fun beforeVisitChildNodes(
         node: ASTNode,
-        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> AutocorrectDecision,
+        emit: (offset: Int, errorMessage: String, canBeAutoCorrected: Boolean) -> AutocorrectDecision
     ) {
         val text =
             when (node.elementType) {
@@ -68,7 +68,7 @@ private class NoBodyComments :
             emit(
                 node.startOffset,
                 "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration.",
-                false,
+                false
             )
         }
     }

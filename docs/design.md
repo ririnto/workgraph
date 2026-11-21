@@ -335,10 +335,19 @@ The preset's `no-inline-comments` rule checks trailing comments.
 The [comment rule template](../skills/development/assets/lint/comments.ts) provides `comments/no-body-comments`.
 Each consuming project [maintains its own copy](../skills/development/references/lint-rules.md#adopt-a-lint-asset).
 The rule checks line and block comment placement in function bodies.
+The repository enables its module-scope option to check loose comments across source files.
 The usefulness of retained comments remains a review decision.
 The repository's tooling tests verify the configured diagnostics and formatter behavior.
-JavaScript parameter and return annotations and type imports follow the official preset defaults.
-Markdownlint checks relative links, heading fragments, and table separators through the adopted rules.
+The Oxlint config enables JavaScript JSDoc parameter and return tags and requires separate TypeScript type imports.
+Type-aware lint reports discarded promises even when the expression uses the `void` operator.
+Function bodies reject blank lines except where the test spacing rule requires one between adjacent `node:test` registrations.
+Markdownlint checks relative links, heading fragments, prose, and table separators.
+Its skill rules check bundled frontmatter and require external skills to use names or published URLs.
+Relative paths to bundled skills remain valid.
+ShellCheck and shfmt check the Husky scripts.
+ktlint checks the bundled Kotlin asset.
+golangci-lint and NilAway check the bundled Go asset.
+actionlint checks GitHub Actions workflows.
 
 Development validation gates live in `scripts/`, with their Node tests in `test/`.
 The issue-form gate, `scripts/issue-forms.mjs`, parses `.github/ISSUE_TEMPLATE/*.yaml` with markdownlint-cli2's public YAML parser.

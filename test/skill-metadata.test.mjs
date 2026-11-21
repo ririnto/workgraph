@@ -20,7 +20,10 @@ const skillContent = (
   body = "Run the sample task.\n"
 ) => `---\n${fields}\n---\n${body}`;
 
-/** @param {import("node:test").TestContext} t Test lifecycle. */
+/**
+ * @param {import("node:test").TestContext} t Test lifecycle.
+ * @returns {{entrypoint: string, root: string}} Relocated validator and plugin root.
+ */
 const metadataFixture = (t) => {
   const temporary = mkdtempSync(
     path.join(tmpdir(), "workgraph-skill-metadata-")
@@ -42,7 +45,11 @@ const metadataFixture = (t) => {
   return { entrypoint, root };
 };
 
-/** @param {string} filename Entrypoint. @param {string} diagnostic Expected stderr. @param {number} count Expected skill count. */
+/**
+ * @param {string} filename Entrypoint.
+ * @param {string} diagnostic Expected stderr.
+ * @param {number} count Expected skill count.
+ */
 const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
   const result = spawnSync(process.execPath, [filename], {
     cwd: tmpdir(),

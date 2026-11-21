@@ -12,16 +12,26 @@ import { fileURLToPath } from "node:url";
 import yamlParser from "markdownlint-cli2/parsers/yaml";
 
 const namePattern = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
-/** @param {unknown} value Input value. @returns {value is Record<string, unknown>} Whether the value is a plain mapping. */
+/**
+ * @param {unknown} value Input value.
+ * @returns {value is Record<string, unknown>} Whether the value is a plain mapping.
+ */
 const isMapping = (value) =>
   value !== null &&
   typeof value === "object" &&
   Object.getPrototypeOf(value) === Object.prototype;
-/** @param {unknown} value Input value. @returns {value is string} Whether the value is a non-empty string. */
+/**
+ * @param {unknown} value Input value.
+ * @returns {value is string} Whether the value is a non-empty string.
+ */
 const nonEmptyString = (value) =>
   typeof value === "string" && value.trim() !== "";
 
-/** @param {unknown} value Candidate name. @param {string} directoryName Parent directory name. @param {(message: string) => void} report Diagnostic sink. */
+/**
+ * @param {unknown} value Candidate name.
+ * @param {string} directoryName Parent directory name.
+ * @param {(message: string) => void} report Diagnostic sink.
+ */
 const validateName = (value, directoryName, report) => {
   if (!nonEmptyString(value)) {
     report("name must be a non-empty string.");
@@ -42,7 +52,10 @@ const validateName = (value, directoryName, report) => {
   }
 };
 
-/** @param {Record<string, unknown>} metadata Parsed metadata. @param {(message: string) => void} report Diagnostic sink. */
+/**
+ * @param {Record<string, unknown>} metadata Parsed metadata.
+ * @param {(message: string) => void} report Diagnostic sink.
+ */
 const validateFields = (metadata, report) => {
   /** @type {[string, number][]} */
   const fields = [
@@ -75,7 +88,10 @@ const validateFields = (metadata, report) => {
   }
 };
 
-/** @param {Record<string, unknown>} metadata Parsed metadata. @param {(message: string) => void} report Diagnostic sink. */
+/**
+ * @param {Record<string, unknown>} metadata Parsed metadata.
+ * @param {(message: string) => void} report Diagnostic sink.
+ */
 const validateInvocation = (metadata, report) => {
   /** @type {[string, (string | number | boolean)[], string][]} */
   const settings = [
@@ -163,7 +179,11 @@ export const validateSkillContent = (
   return errors;
 };
 
-/** @param {string} root Plugin root. @param {string} source Relative source path. */
+/**
+ * @param {string} root Plugin root.
+ * @param {string} source Relative source path.
+ * @returns {string} Canonical path inside the plugin root.
+ */
 const bundledPath = (root, source) => {
   const resolved = realpathSync(path.join(root, source));
   const relative = path.relative(root, resolved);

@@ -41,12 +41,17 @@ const rule: Rule = {
           }
           ({ parent } = parent);
         }
-        const index = token.text.indexOf("—");
-        if (prose && !excluded && index !== -1) {
-          onError({
-            lineNumber: token.startLine,
-            range: [token.startColumn + index, 1]
-          });
+        if (prose && !excluded) {
+          for (const [index, line] of token.text
+            .split(/\r\n|[\r\n]/u)
+            .entries()) {
+            for (const match of line.matchAll(/\u2014/gu)) {
+              onError({
+                lineNumber: token.startLine + index,
+                range: [(index === 0 ? token.startColumn : 1) + match.index, 1]
+              });
+            }
+          }
         }
       } else {
         pending.push(...token.children);
