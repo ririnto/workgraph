@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
-import { cp, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -230,14 +230,20 @@ await test("box drawing rule covers all Markdown with first UTF-16 match and no 
   }
 });
 
-await test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
+/** @param {import("node:test").TestContext} t Test that owns the fixture. */
+const createUltraciteFixture = async (t) => {
   const root = path.resolve(import.meta.dirname, "..");
-  const directory = await mkdtemp(path.join(tmpdir(), "workgraph-tsdoc-"));
+  const directory = await mkdtemp(path.join(tmpdir(), "workgraph-ultracite-"));
   t.after(async () => {
     await rm(directory, { force: true, recursive: true });
   });
   await Promise.all(
-    ["oxlint.config.ts", "oxfmt.config.ts", "plugins"].map(async (entry) => {
+    [
+      "oxlint.config.ts",
+      "oxfmt.config.ts",
+      "plugins",
+      "skills/development/assets/lint"
+    ].map(async (entry) => {
       await cp(path.join(root, entry), path.join(directory, entry), {
         recursive: true
       });
@@ -247,6 +253,42 @@ await test("TSDoc reports exposed TypeScript members once and excludes documente
     path.join(root, "node_modules"),
     path.join(directory, "node_modules")
   );
+  return directory;
+};
+
+/**
+ * @param {string} directory Fixture checkout.
+ * @param {string[]} files Paths to check.
+ */
+const runUltraciteFixture = (directory, files) => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      path.resolve(
+        import.meta.dirname,
+        "../node_modules/ultracite/dist/index.js"
+      ),
+      "check",
+      ...files,
+      "--format",
+      "json"
+    ],
+    { cwd: directory, encoding: "utf-8", timeout: 30_000 }
+  );
+  assert.ifError(result.error);
+  const start = result.stdout.search(/\{\s*"diagnostics"\s*:/u);
+  assert.notEqual(start, -1, result.stdout + result.stderr);
+  /** @type {unknown} */
+  const output = JSON.parse(
+    result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1)
+  );
+  assert.ok(isObject(output));
+  assert.ok(isArray(output.diagnostics));
+  return { diagnostics: output.diagnostics, status: result.status };
+};
+
+await test("TSDoc reports exposed TypeScript members once and excludes documented, private, and JavaScript members", async (t) => {
+  const directory = await createUltraciteFixture(t);
   await writeFile(
     path.join(directory, "source.ts"),
     `export class Store {
@@ -280,29 +322,11 @@ export { Store as Again };
     path.join(directory, "source.js"),
     "export class JavaScript { read() { return 1; } }\n"
   );
-  const result = spawnSync(
-    process.execPath,
-    [
-      path.join(root, "node_modules/ultracite/dist/index.js"),
-      "check",
-      "source.ts",
-      "source.js",
-      "--format",
-      "json"
-    ],
-    { cwd: directory, encoding: "utf-8", timeout: 30_000 }
-  );
-  assert.ifError(result.error);
-  assert.equal(result.status, 1, result.stderr);
-  const start = result.stdout.search(/\{\s*"diagnostics"\s*:/u);
-  assert.notEqual(start, -1, result.stdout);
-  /** @type {unknown} */
-  const output = JSON.parse(
-    result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1)
-  );
-  assert.ok(isObject(output));
-  assert.ok(isArray(output.diagnostics));
-  const { diagnostics } = output;
+  const { diagnostics, status } = runUltraciteFixture(directory, [
+    "source.ts",
+    "source.js"
+  ]);
+  assert.equal(status, 1);
   const messages = diagnostics.flatMap((entry) => {
     assert.ok(isObject(entry));
     assert.ok(typeof entry.code === "string");
@@ -321,6 +345,67 @@ export { Store as Again };
     'Missing TSDoc for exported public API property "status".',
     'Missing TSDoc for exported public API property "status".'
   ]);
+});
+
+await test("function-body comment lint reports standalone comments once and honors language matching and ignores", async (t) => {
+  const directory = await createUltraciteFixture(t);
+  const matchingFiles = [
+    "js",
+    "jsx",
+    "mjs",
+    "cjs",
+    "ts",
+    "tsx",
+    "mts",
+    "cts"
+  ].map((extension) => `matching.${extension}`);
+  const matching = `const makeLabels = (lengthLimit = 6) => {
+  const names = [" North "];
+  return names.map((value) => {
+    // Normalize whitespace before truncating the label.
+    const label = value.trim();
+    return label.slice(0, lengthLimit);
+  });
+};
+
+makeLabels();
+`;
+  await mkdir(path.join(directory, "workflows"));
+  await Promise.all(
+    [...matchingFiles, "workflows/ignored.js"].map(async (file) => {
+      await writeFile(path.join(directory, file), matching);
+    })
+  );
+  await writeFile(
+    path.join(directory, "nonmatching.ts"),
+    `// Module-level comment.
+const makeLabels = (lengthLimit = 6): string[] => {
+  /** Prefixes are measured after trimming the name. */
+  const names = [" North "];
+  // c8 ignore next
+  return names.map((value) => value.trim().slice(0, lengthLimit));
+};
+
+makeLabels();
+`
+  );
+  const { diagnostics, status } = runUltraciteFixture(directory, [
+    ...matchingFiles,
+    "nonmatching.ts",
+    "workflows/ignored.js"
+  ]);
+  assert.equal(status, 1);
+  assert.equal(diagnostics.length, matchingFiles.length);
+  const reportedFiles = new Set();
+  for (const entry of diagnostics) {
+    assert.ok(isObject(entry));
+    assert.equal(
+      entry.code,
+      "workgraph-comments(no-function-body-line-comments)"
+    );
+    reportedFiles.add(entry.filename);
+  }
+  assert.deepEqual(reportedFiles, new Set(matchingFiles));
 });
 
 /** @typedef {{result: unknown} & Record<string, unknown>} CompletionEvidence */

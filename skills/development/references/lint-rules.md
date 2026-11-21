@@ -8,6 +8,16 @@ Verify tool-version support and realistic exceptions before adding it.
 Scope rules through existing file or module boundaries when those boundaries carry the requirement.
 Make rules AST-aware and preserve literals, comments, and automatic semicolon insertion where applicable.
 
+For Workgraph source, see the function-body comment rule examples and file matching for [JavaScript](lint-javascript.md) and [TypeScript](lint-typescript.md).
+
+## Keep context-dependent guidance in prose
+
+Choose API and module boundaries that make recurring mistakes hard to express.
+Apply restrictions on React effects, browser timers, and Electron process imports where the project defines the corresponding lifecycle or process boundaries.
+Workgraph has no React or Electron application boundaries.
+Review whether an explanation describes a contract or merely justifies a workaround.
+Use runtime checks, property tests, or formal verification when the risk requires evidence that source lint cannot provide.
+
 ## Validate lint rules
 
 Use small positive and negative fixtures for intended matches and realistic exceptions.
