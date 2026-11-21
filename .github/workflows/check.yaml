@@ -39,4 +39,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version-file: package.json
-      - run: node --test hooks/*.test.mjs
+      - uses: pnpm/setup@v3
+        with:
+          install: false
+      - run: pnpm run test:hooks
