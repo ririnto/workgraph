@@ -1,37 +1,30 @@
-# JavaScript lint rule
+# JavaScript body comments
 
-## Function-body line comments
+Use the [local Oxlint setup](lint-rules.md#oxlint) to enable `comments/no-body-comments` for `**/*.js`, `**/*.jsx`, `**/*.mjs`, and `**/*.cjs`.
+The rule flags standalone and trailing line comments and block comments in block-bodied functions, methods, and callbacks.
+It preserves JSDoc attached to a supported declaration, recognized tool directives, and legal markers.
+Comments outside block-bodied functions remain subject to the consumer's existing checks.
+Use declaration documentation for genuine contracts and verify the consumer before moving or deleting a directive.
+The rule supplies diagnostics without editing source.
 
-Use the [local copy setup](lint-rules.md#adopt-a-lint-asset) to enable `function-comments/no-function-body-line-comments` for `**/*.js`, `**/*.jsx`, `**/*.mjs`, and `**/*.cjs`.
-Ultracite and Oxlint apply the consuming project's configured ignores.
-The rule matches standalone `//` comments inside function bodies, including methods and block-bodied callbacks.
-It leaves block comments, declaration comments outside function bodies, and recognized directives and license text to the existing checks.
-
-Matching example in `hooks/record.mjs`:
-
-```js
-const makeLabels = (lengthLimit = 6) => {
-  const names = [" North "];
-  return names.map((value) => {
-    // Normalize whitespace before truncating the label.
-    const label = value.trim();
-    return label.slice(0, lengthLimit);
-  });
-};
-
-makeLabels();
-```
-
-Non-matching example in `hooks/record.mjs`:
+Matching code in `render.mjs` has a loose block comment and a trailing workaround note.
 
 ```js
-/**
- * Truncate labels after trimming surrounding whitespace.
- */
-const makeLabels = (lengthLimit = 6) => {
-  const names = [" North "];
-  return names.map((value) => value.trim().slice(0, lengthLimit));
-};
-
-makeLabels();
+function render(label) {
+  /* Restore the old rendering path if this fails. */
+  return label.trim(); // Temporary fix.
+}
 ```
+
+The same file passes this rule with documentation on a declaration and a coverage directive used by the project.
+
+```js
+/** Returns the label without surrounding whitespace. */
+function render(label) {
+  /* c8 ignore next */
+  return label.trim();
+}
+```
+
+The rule checks placement and known syntax.
+Review whether declaration documentation conveys a real contract and whether remaining comments in other locations describe live behavior.

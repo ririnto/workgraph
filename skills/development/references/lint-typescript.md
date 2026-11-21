@@ -1,37 +1,25 @@
-# TypeScript lint rule
+# TypeScript body comments
 
-## Function-body line comments
+Use the [local Oxlint setup](lint-rules.md#oxlint) to enable `comments/no-body-comments` for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
+The [JavaScript placement and exceptions](lint-javascript.md) also apply to TypeScript.
+The rule recognizes TSDoc attached to local TypeScript declarations and existing TypeScript directives.
+Keep the project's independent rules for TSDoc quality and suppressions.
 
-Use the [local copy setup](lint-rules.md#adopt-a-lint-asset) to enable `function-comments/no-function-body-line-comments` for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
-Ultracite and Oxlint apply the consuming project's configured ignores.
-The rule matches standalone `//` comments inside function bodies, including methods and block-bodied callbacks.
-It leaves block comments, declaration comments outside function bodies, and recognized directives and license text to the existing checks.
-
-Matching example in `rules/normalize.ts`:
+Matching code in `session.ts` has an unattached block comment before a return statement.
 
 ```ts
-const makeLabels = (lengthLimit = 6): string[] => {
-  const names = [" North "];
-  return names.map((value) => {
-    // Normalize whitespace before truncating the label.
-    const label = value.trim();
-    return label.slice(0, lengthLimit);
-  });
-};
-
-makeLabels();
+function read(): string {
+  /** Keep this until the session layout changes. */
+  return "active";
+}
 ```
 
-Non-matching example in `rules/normalize.ts`:
+The same file passes this rule with a contract on a declaration.
 
 ```ts
-/**
- * Truncate labels after trimming surrounding whitespace.
- */
-const makeLabels = (lengthLimit = 6): string[] => {
-  const names = [" North "];
-  return names.map((value) => value.trim().slice(0, lengthLimit));
-};
-
-makeLabels();
+function read(): string {
+  /** Persisted status accepted by version one of the protocol. */
+  const status = "active";
+  return status;
+}
 ```

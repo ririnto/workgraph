@@ -687,6 +687,18 @@ Workgraph treats such transformations as behavior-sensitive changes requiring ta
 Her talk supplies no controlled Workgraph evaluation, proof of universal comment harm, or automatic-merge acceptance policy.
 Runtime observation does not establish formal correctness, and hook delivery does not establish model adherence.
 
+### All Code Is Slop (Except Mine)
+
+We reviewed the complete 17:31 presentation [All Code Is Slop (Except Mine)](https://ai.engineer/talks/O_zcc6Xl12g-all-code-is-slop-except-mine), a separate recording from the talk above.
+The organizer's [public transcript](https://ai.engineer/api/code/reading-download/transcripts/lauren-tan.md) uses the livestream time base.
+The [engineering rule map](../skills/development/references/engineering-rule-map.md) uses elapsed times in the talk and connects each adopted practice to its owning instruction or executable check.
+The examples inform these choices without supplying a Workgraph benchmark, a required merge rate, or authorization for automated publication.
+The [Bombadil manual](https://antithesishq.github.io/bombadil/browser/1.2-how-it-works.html) and [replay guidance](https://github.com/antithesishq/bombadil/blob/main/docs/manual/src/04-workflows.md) describe property checks, action generation, and recovery of failing traces.
+The [React effect guide](https://react.dev/learn/you-might-not-need-an-effect), [Electron process model](https://www.electronjs.org/docs/latest/tutorial/process-model), and [dependency-cruiser rules](https://github.com/sverweij/dependency-cruiser/blob/main/doc/rules-reference.md) informed the integration boundaries.
+We reviewed those maintained GitHub branches on 2026-11-21.
+
+### Multi-agent failure modes
+
 [Why Do Multi-Agent LLM Systems Fail?](https://arxiv.org/abs/2503.13657) introduces the MAST failure taxonomy.
 Its abstract groups failures into system design, inter-agent misalignment, and task verification.
 Workgraph addresses these categories through clear assignments, completion evidence, and bounded feedback loops.

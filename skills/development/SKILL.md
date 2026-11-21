@@ -16,6 +16,7 @@ Read [Kotest](references/kotest.md) for specs or assertions.
 
 Identify contracts, consumers, exclusions, and acceptance evidence before editing.
 Read [instruction design](references/instruction-design.md) for agent instructions.
+Find a practice and its owner in the [engineering rule map](references/engineering-rule-map.md).
 Use evidence from affected code to choose the smallest safe change within scope.
 Keep required checks.
 
@@ -89,7 +90,9 @@ Follow project doc and comment norms.
 Prefer explanatory names, types, and small functions.
 Comment on contracts and reasons code cannot express.
 Preserve declaration attachment, directives, licenses, and safety invariants.
-Remove stale workaround comments in changed code.
+Remove commented-out code, obsolete instructions, and comments that justify a workaround in changed files.
+Fix the cause or record an unresolved external constraint with its owner and evidence.
+When a correction applies only to the current case, keep its scope local.
 
 ## Side-effect boundaries
 
@@ -97,15 +100,7 @@ Verify preserved or approved new behavior with targeted evidence.
 Use prose when automation cannot preserve the contract.
 Report material behavior changes and remaining uncertainty.
 
-| Item | What to check |
-| --- | --- |
-| Comment changes | Directives, declaration attachment, tooling, public contracts, and safety information. |
-| Explanatory logging | Runtime effects, cost, and information exposure. |
-| Await instead of void | Scheduling, callback contracts, rejection handling, and cancellation. |
-| Early-exit inversion | Functional requirements, cleanup, cost, and security checks. |
-| Dependency changes | Resolution, runtime requirements, and supported APIs. |
-| Rule rollout | Target-specific classification and behavior. |
-| Structured validation identifiers | Keep observable diagnostics and error contracts, migrating consumers together if authorized. |
+Read [effect checks](references/side-effects.md) for changes to execution, directives, dependencies, or diagnostics.
 
 ## Dependency versions
 
@@ -126,8 +121,10 @@ Keep lint and formatter choices when adding guidance or filling config gaps.
 Use project commands for routine local and CI work.
 Use declarative automation where supported.
 Use the project language only for substantial logic existing tools lack.
+For recurring corrections, improve the design first and enforce what tools can check.
 
 Read [lint rule guidance](references/lint-rules.md) for lint rules or fixes.
+Read [React and Electron boundaries](references/react-electron.md) for effects, timers, or process imports.
 
 ## Verification
 
@@ -153,5 +150,4 @@ Keep traces or screenshots when needed.
 Measure slow checks before optimization and report conditions, durations, and preserved coverage.
 Require direct evidence for execution, formal proof, native activation, and model adherence claims.
 Report required checks blocked by the host.
-Keep a feature map beside verification instructions only for recurring reporting or navigation.
-Update affected entries.
+Read [runtime and formal evidence](references/runtime-formal-evidence.md) for user flows, invariants, or release checks.

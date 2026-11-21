@@ -1,0 +1,22 @@
+{
+  "forbidden": [
+    {
+      "name": "renderer-cannot-reach-main",
+      "comment": "Call the preload bridge or import shared contracts.",
+      "severity": "error",
+      "from": { "path": "^electron-renderer/" },
+      "to": { "path": "^electron-main/", "reachable": true }
+    },
+    {
+      "name": "main-cannot-reach-renderer",
+      "comment": "Move process-neutral contracts to shared modules.",
+      "severity": "error",
+      "from": { "path": "^electron-main/" },
+      "to": { "path": "^electron-renderer/", "reachable": true }
+    }
+  ],
+  "options": {
+    "tsConfig": { "fileName": "tsconfig.json" },
+    "tsPreCompilationDeps": true
+  }
+}
