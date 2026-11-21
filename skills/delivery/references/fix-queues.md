@@ -17,4 +17,12 @@ Confirm each issue's original acceptance on the authorized base before closing i
 Inspect relevant base source or run the required behavioral check because a merge and ref readback alone do not establish acceptance.
 Confirm an umbrella's own acceptance separately from its children.
 Keep issues open when acceptance is unmet or unverified, and report remaining criteria and their next owners.
-Report ready requests, merged items, acceptance evidence, closure states, blockers, owners, and remaining work.
+Report the following:
+
+- Ready requests
+- Merged items
+- Acceptance evidence
+- Closure states
+- Blockers
+- Owners
+- Remaining work
