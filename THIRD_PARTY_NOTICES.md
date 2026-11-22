@@ -51,7 +51,7 @@ Workgraph adapts those ideas without redistributing her video, slides, transcrip
 The [research notes](docs/research.md#lauren-tan-on-verification-and-agent-environments) distinguish practitioner examples from Workgraph evidence.
 
 We also reviewed Tan's [All Code Is Slop (Except Mine)](https://ai.engineer/talks/O_zcc6Xl12g-all-code-is-slop-except-mine).
-The [rule map](skills/development/references/engineering-rule-map.md) records the resulting Workgraph guidance with talk-relative timestamps.
+The [rule map](docs/research.md#engineering-rule-map) records the resulting Workgraph guidance with talk-relative timestamps.
 
 We also studied the original [cursor/plugins pstack](https://github.com/cursor/plugins/tree/main/pstack) on its `main` branch.
 Its MIT license credits Lauren Tan, copyright 2026.

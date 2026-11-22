@@ -82,11 +82,15 @@ Main loads [Delivery](../skills/delivery/SKILL.md) before repository edits, bran
 Main and Worker conditionally load Development and Memory Maintenance for tasks within those skills' scopes.
 Hooks inject only the selected role and host reference, leaving task skills, playbooks, and language references conditional.
 Consumer skills and their references stay inside this plugin so installation needs no other plugin.
-Development links directly to language references that combine source and tooling conventions.
+Development links to canonical language references and selects rule and verification procedures when the task calls for them.
 Its [instruction-design reference](../skills/development/references/instruction-design.md) owns agent-facing contracts and loading boundaries.
 Shared lint-rule procedures remain in a separate reference selected directly by Development.
 Skip retrieving conditional files whose complete content is already loaded.
 Workflow adds its operation to the Main session without repeating common role rules.
+
+Each worker uses the task skill and supporting resources needed for its [assignment](../skills/main-agent-contract/SKILL.md#assignments).
+The assignment retains resource ownership and required acceptance evidence.
+The [engineering rule map](research.md#engineering-rule-map) records source research outside the skill loading path.
 
 Main remains the entry point for complete authorized outcomes, including review, integration, readback, and cleanup.
 Delivery defines authorized Git operations and current-unit integration gates without enlarging host permissions.
