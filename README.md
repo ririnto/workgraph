@@ -150,7 +150,8 @@ The supported Node.js range remains in `engines.node`.
 Install the pnpm version declared in `package.json` before installing the pinned development tools.
 Install ktlint 1.8.0, golangci-lint 2.15.0, actionlint 1.7.12, and ShellCheck for the native lint checks.
 The shell format check runs the repository-managed shfmt Go tool.
-Use a Java runtime compatible with ktlint and the Go version in the bundled Go module's `go.mod`.
+Use JDK 21 or later and Gradle 9 to build and exercise the Kotlin ruleset with ktlint.
+Use the Go version in the bundled Go module's `go.mod`.
 Install NilAway with the version used in the [check workflow](.github/workflows/check.yaml) and put the binary on `PATH`.
 Linux CI installs the same checkers before running `pnpm run check`.
 

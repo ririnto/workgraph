@@ -914,7 +914,7 @@ Workgraph retains these limits when recommending safe automation.
 Check Kotlin compatibility, Java compilation, and lint-runtime requirements independently when choosing Gradle versions.
 Verify the target's supported combination instead of assuming the newest stable tool is compatible.
 Register custom rulesets with the consumer's ktlint runtime and prove native lint discovers them.
-Workgraph bundles language guidance only and does not install consumer rules, plugins, or hooks.
+Workgraph bundles language guidance and opt-in lint assets without installing consumer rules, plugins, or hooks.
 
 ### Rust guidance and checks
 
