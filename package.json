@@ -22,7 +22,7 @@
     "check:go": "cd skills/development/assets/lint/go-comments && golangci-lint run --config ../../../../../.golangci.yaml ./... && nilaway ./...",
     "check:kotlin": "ktlint \"skills/**/*.kt\" \"skills/**/*.kts\" && node scripts/check-ktlint-consumer.mjs",
     "check:shell": "run-s check:shell:format check:shell:lint",
-    "check:shell:format": "bash -c 'set -eo pipefail; git ls-files -z -- .husky/pre-commit .husky/pre-push \"*.sh\" | xargs -0 shfmt -i 2 -d --'",
+    "check:shell:format": "bash -c 'set -eo pipefail; git ls-files -z -- .husky/pre-commit .husky/pre-push \"*.sh\" | while IFS= read -r -d \"\" file; do printf \"../%s\\0\" \"$file\"; done | xargs -0 env GOWORK=off go -C tools tool shfmt -i 2 -d --'",
     "check:shell:lint": "bash -c 'set -eo pipefail; git ls-files -z -- .husky/pre-commit .husky/pre-push \"*.sh\" | xargs -0 shellcheck --'",
     "check:workflows": "actionlint"
   },
@@ -42,6 +42,13 @@
     "pnpm": "catalog:",
     "typescript": "catalog:",
     "ultracite": "catalog:"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.22.3",
+      "onFail": "download"
+    }
   },
   "engines": {
     "node": "^24.22.3"
