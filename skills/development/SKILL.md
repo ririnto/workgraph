@@ -2,6 +2,8 @@
 name: development
 description: Use for source work, application runs, behavior reproduction, or acceptance evidence.
 disable-model-invocation: true
+metadata:
+  workgraph-continuation: same-file
 ---
 
 # Development
@@ -10,7 +12,27 @@ Follow repository rules, lint, tools, and user choices within task authority, re
 For source, build, or tool changes, read matching playbooks and language references unless loaded.
 Read [Node.js](references/nodejs.md) for lint or dependency advisories.
 Read [control flow](references/control-flow.md) for new or changed loops.
-Read [Kotest](references/kotest.md) for specs or assertions.
+Read [Kotlin's Kotest guidance](references/kotlin.md#kotest) for specs or assertions.
+
+If the host supplies a bounded prefix, read the remaining portions of this same `SKILL.md` in bounded segments through end of file before applying Development.
+Continue any native read cursor for the same resource until exhausted.
+For file reads, use the resolved installed skill path and resume at the first unread byte or line.
+
+## Side-effect boundaries
+
+Verify preserved or approved new behavior with targeted evidence.
+Use prose when automation cannot preserve the contract.
+Report material behavior changes and remaining uncertainty.
+
+| Item | What to check |
+| --- | --- |
+| Comment changes | Directives, declaration attachment, tooling, public contracts, and safety information. |
+| Explanatory logging | Runtime effects, cost, and information exposure. |
+| Await instead of void | Scheduling, callback contracts, rejection handling, and cancellation. |
+| Early-exit inversion | Functional requirements, cleanup, cost, and security checks. |
+| Dependency changes | Resolution, runtime requirements, and supported APIs. |
+| Rule rollout | Target-specific classification and behavior. |
+| Structured validation identifiers | Keep observable diagnostics and error contracts, migrating consumers together if authorized. |
 
 ## Development lifecycle
 
@@ -31,7 +53,7 @@ Check the full diff for unsupported guards, dead compatibility paths, and unrela
 
 | Language | Source | Reference |
 | --- | --- | --- |
-| Java | `.java` | [Java and Kotlin](references/java-kotlin.md) |
+| Java | `.java` | [Java](references/java.md) |
 | Kotlin | `.kt`, `.kts` | [Kotlin](references/kotlin.md) |
 | TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` | [TypeScript](references/typescript.md) |
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JavaScript](references/javascript.md) |
@@ -88,19 +110,12 @@ Array indexing alone does not access regex captures.
 
 Follow project doc and comment norms.
 Prefer explanatory names, types, and small functions.
-Comment on contracts and reasons code cannot express.
+Add declaration prose for contracts or reasons that names, types, and small functions cannot express.
+Preserve documentation required by the project's API or tools.
 Preserve declaration attachment, directives, licenses, and safety invariants.
 Remove commented-out code, obsolete instructions, and comments that justify a workaround in changed files.
 Fix the cause or record an unresolved external constraint with its owner and evidence.
 When a correction applies only to the current case, keep its scope local.
-
-## Side-effect boundaries
-
-Verify preserved or approved new behavior with targeted evidence.
-Use prose when automation cannot preserve the contract.
-Report material behavior changes and remaining uncertainty.
-
-Read [effect checks](references/side-effects.md) for changes to execution, directives, dependencies, or diagnostics.
 
 ## Dependency versions
 
@@ -123,8 +138,19 @@ Use declarative automation where supported.
 Use the project language only for substantial logic existing tools lack.
 For recurring corrections, improve the design first and enforce what tools can check.
 
-Read [lint rule guidance](references/lint-rules.md) when selecting lint checks, adopting lint assets, or changing rules or fixes.
 Read [React and Electron boundaries](references/react-electron.md) for effects, timers, or process imports.
+
+### Select and adopt lint checks
+
+Choose compatible built-in rules before custom rules.
+Scope a custom rule to the recurring syntax or path it checks.
+Name the violation and its fix in the diagnostic.
+When the project adopts a rule, copy its linked assets into the consumer with their [MIT license notice](../../LICENSE) and any additional license and attribution.
+Register consumer-relative paths and merge the settings with existing checks and formatters.
+Use the consumer's own versions and read-only commands to verify matching and preserved cases.
+For scoped rules, check a violation inside the boundary and an allowed use outside it.
+Offer fixes only when they preserve behavior, effects, and directives.
+Verify repeated formatting and fixes converge.
 
 ## Verification
 

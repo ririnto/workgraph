@@ -1,0 +1,6 @@
+catalog:
+  "@oxlint/plugins": 1.94.0
+  eslint-plugin-regexp: 3.3.3
+  oxfmt: 0.78.0
+  oxlint: 1.94.0
+  ultracite: 8.3.0

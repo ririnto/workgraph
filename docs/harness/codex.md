@@ -96,8 +96,9 @@ The [skill map](../../README.md#skill-invocation) lists the remaining procedures
 
 Workgraph retains an 8,000-byte complete-file portability budget derived from Codex's reviewed portable-plugin selection path.
 The current native package does not select that portable path.
+Development may exceed the portability budget and requires complete same-file reads when a host supplies only a prefix.
 The [source review](../research.md#native-skill-selection) identifies the revision and this distinction.
-This host compatibility check does not truncate hook output or move required instructions into extra reads.
+The compatibility check does not truncate hook output.
 
 ## Update
 

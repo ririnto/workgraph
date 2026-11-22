@@ -7,7 +7,7 @@ Derive data during render, handle user actions in their event handlers, and use 
 Put remaining synchronization behind the integration API that owns setup, cleanup, and retries.
 Verify resubscription, stale results, unmount cleanup, and duplicate execution as applicable.
 
-For ESM product code with the automatic JSX runtime, merge the override from the local [Oxlint template](../assets/lint/react-product.ts) into the consumer's config.
+For ESM product code with the automatic JSX runtime, merge the override from the local [Oxlint template](../assets/nodejs/react/oxlint.config.ts) into the consumer's config.
 The override uses `eslint/no-restricted-imports` to reject named `useEffect` imports and default and namespace React imports that expose it.
 Use named imports for other React APIs and types.
 Use the project's React Hooks lint, such as `eslint-plugin-react-hooks`, in integration modules that own effects.
@@ -45,7 +45,7 @@ Expose process capabilities via a narrow preload bridge and IPC.
 Validate messages where they cross the boundary.
 Keep blocking main-process work out of the renderer and verify the affected user interaction through its normal entry point.
 
-Copy the [dependency-cruiser template](../assets/lint/electron-boundaries.json) into the consumer and merge its entries with existing rules.
+Copy the [dependency-cruiser template](../assets/nodejs/electron/.dependency-cruiser.json) into the consumer and merge its entries with existing rules.
 Set the actual main and renderer roots, include both roots and shared modules in the scan, and configure the TypeScript or bundler resolver used by the project.
 Install dependency-cruiser's supported TypeScript parser for TS sources and check the scan counts.
 The rules reject resolved direct and transitive imports between `electron-renderer/` and `electron-main/`, including via shared barrels and type-only edges.

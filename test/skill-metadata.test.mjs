@@ -215,6 +215,32 @@ await test("portable skill prompts fit Codex's complete-file byte budget", () =>
   }
 });
 
+await test("only Development can opt into a bounded same-file continuation", () => {
+  const fields =
+    "name: development\ndescription: Task.\ndisable-model-invocation: true";
+  const enabled = skillContent(
+    `${fields}\nmetadata:\n  workgraph-continuation: same-file`
+  );
+  const boundary = enabled + "x".repeat(16_000 - enabled.length);
+  assert.deepEqual(validateSkillContent(boundary, "development"), []);
+  assert.deepEqual(validateSkillContent(`${boundary}x`, "development"), [
+    "<skill>: Development must fit two 8000-byte skill segments."
+  ]);
+  const disabled = skillContent(fields, "x".repeat(8000));
+  assert.deepEqual(validateSkillContent(disabled, "development"), [
+    "<skill>: complete file must fit Codex's 8000-byte portable skill prompt limit."
+  ]);
+  assert.deepEqual(
+    validateSkillContent(
+      boundary.replace("name: development", "name: sample-skill"),
+      "sample-skill"
+    ),
+    [
+      "<skill>: complete file must fit Codex's 8000-byte portable skill prompt limit."
+    ]
+  );
+});
+
 await test("skill metadata rejects invalid optional field types", () => {
   for (const [extra, diagnostic] of [
     ["compatibility: false", "compatibility must be a non-empty string."],

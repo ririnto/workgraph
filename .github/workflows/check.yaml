@@ -24,17 +24,15 @@ jobs:
           cache: true
       - uses: actions/setup-go@v7
         with:
-          go-version-file: skills/development/assets/lint/go-comments/go.mod
+          go-version-file: skills/development/assets/golang/go-comments/go.mod
           cache-dependency-path: |-
-            skills/development/assets/lint/go-comments/go.sum
+            skills/development/assets/golang/go-comments/go.sum
             tools/go.sum
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v6
-        with:
-          gradle-version: "9.9.1"
       - name: Install native lint tools
         shell: bash
         run: |-
@@ -44,15 +42,12 @@ jobs:
           bin="${RUNNER_TEMP}/lint-bin"
           mkdir -p "$bin"
           cd "$bin"
-          curl -fsSLO https://github.com/pinterest/ktlint/releases/download/1.8.0/ktlint
           curl -fsSLO https://github.com/golangci/golangci-lint/releases/download/v2.15.0/golangci-lint-2.15.0-linux-amd64.tar.gz
           curl -fsSLO https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
           sha256sum -c <<'CHECKSUMS'
-          a3fd620207d5c40da6ca789b95e7f823c54e854b7fade7f613e91096a3706d75  ktlint
           9b7fe6a6bf6334b98decf8d86b11415ea7889afdabdd1959fdce23af2a9ebcea  golangci-lint-2.15.0-linux-amd64.tar.gz
           8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  actionlint_1.7.12_linux_amd64.tar.gz
           CHECKSUMS
-          chmod +x ktlint
           GOBIN="$bin" go install go.uber.org/nilaway/cmd/nilaway@v0.0.0-20260918162853-acb8859b9031
           tar --strip-components=1 -xf golangci-lint-2.15.0-linux-amd64.tar.gz golangci-lint-2.15.0-linux-amd64/golangci-lint
           tar -xf actionlint_1.7.12_linux_amd64.tar.gz actionlint

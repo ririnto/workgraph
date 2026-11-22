@@ -28,7 +28,6 @@ The [README](../README.md) guides plugin users, and each host adapter guides one
 | `skills/workflow/references/delivery.md` | Admitted Claude Code Main Agent building delivery graphs | The reference maps Delivery operations to node inputs and outputs. |
 | `skills/development/SKILL.md` | Agents doing source work | Agents load shared code defaults and select only matching playbooks and language references. |
 | `skills/development/playbooks/{feature,bug-fix,refactoring,performance}.md` | Lifecycle work | Each playbook owns its feature, bug-fix, refactoring, or performance procedure. |
-| `skills/development/references/lint-rules.md` | Agents configuring or assessing lint rules and fixes | Development selects shared rule selection, verification, and rollout guidance. |
 | `skills/memory-maintenance/SKILL.md` | Agents changing durable memory | Agents review relevant records and their index, covering the complete store for whole-store reconciliation. |
 | `skills/codex-scoped-cleanup/SKILL.md` | Codex agents retiring resources | Agents follow the complete owner-mediated lifecycle, scoped activity, preservation, and result verification procedure. |
 | `skills/codex-scoped-cleanup/references/native-attachments.md` | Codex agents changing Worktree Artifact connections | Agents follow connection inventory, removal, and recovery guidance for the selected scope. |
@@ -190,7 +189,9 @@ The hook cannot change those roles or fabricate native tool calls.
 It also cannot register a native invocation, install frontmatter hooks, or grant skill-scoped tool permissions.
 
 The reviewed Codex portable-plugin selection path truncates complete skill files after 8,000 UTF-8 bytes.
-Workgraph retains that complete-file portability budget, including frontmatter, while its current native manifest selects a different loading path.
+Workgraph retains that complete-file portability budget, including frontmatter, for skills other than Development.
+Development puts its side-effect checks and continuation instruction in the first segment and requires the rest of the same file before use.
+The native Codex manifest selects a different loading path that supplies the complete file.
 The [source review](research.md#native-skill-selection) records the reviewed branch and date and distinguishes this limit from metadata budgets and hook delivery.
 Hook output always retains complete selected files.
 
@@ -336,8 +337,8 @@ Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
 The rule requires multiline TSDoc for supported exported TypeScript declarations, including public and protected members of exported class declarations.
 It does not check class-expression members through direct exported variable declarations.
 The preset's `no-inline-comments` rule checks trailing comments.
-The [comment rule template](../skills/development/assets/lint/comments.ts) provides `comments/no-body-comments`.
-Each consuming project [maintains its own copy](../skills/development/references/lint-rules.md#adopt-a-lint-asset).
+The [comment rule template](../skills/development/assets/nodejs/comments/comments.ts) provides `comments/no-body-comments`.
+Each consuming project [maintains its own copy](../skills/development/SKILL.md#select-and-adopt-lint-checks).
 The rule checks line and block comment placement in function bodies.
 The repository enables its module-scope option to check loose comments across source files.
 The usefulness of retained comments remains a review decision.

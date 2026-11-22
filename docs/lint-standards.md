@@ -7,6 +7,7 @@ The checks below describe their enforceable scope.
 ## JavaScript and TypeScript
 
 [`check:ultracite`](../package.json) runs lint and formatter checks through Ultracite with type-aware lint enabled.
+The repository and example checks use their chosen root config and load portable groups only through explicit imports.
 The [lint configuration](../oxlint.config.ts) extends Ultracite core, adds local rules, and excludes the host workflow DSL from lint.
 The [formatter configuration](../oxfmt.config.ts) extends its own Ultracite preset, excludes Markdown, and sets `trailingComma` to `none`.
 The formatter still checks the workflow DSL.

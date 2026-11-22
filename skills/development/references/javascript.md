@@ -1,11 +1,66 @@
 # JavaScript
 
-For source conventions, read the [shared JavaScript and TypeScript guidance](js-ts.md).
-For an optional check on regexp captures, see the [scoped regexp rule](typescript.md#adopt-a-regexp-result-rule-for-javascript-and-typescript).
+## Code style
+
+Use `const` for bindings that do not change and `let` only when reassignment is required.
+Use braces for control-flow bodies, including multi-statement branches.
+Keep JSX expressions small and move non-trivial decisions into named functions or values.
+Use semantic elements before adding ARIA roles.
+
+## JavaScript runtime behavior
+
+Minimize `undefined` in new or changed code and prefer `null` when a value is needed.
+Do not require bulk conversion of existing `undefined` uses.
+Review behavior before changing constructs that depend on `undefined`, including default parameters and optional chaining.
+For null cleanup, early-return inversion, and discarded-call replacement, meet functional requirements without preserving existing evaluation order for its own sake.
+
+Remove unnecessary terminal `return undefined` statements when fallthrough preserves the return contract.
+Keep required early exits and inferred or declared return types.
+Preserve required exits, labels, `finally` behavior, loop effects, and async contracts.
+
+Review single-condition early returns for condition inversion and apply it when functional requirements and readability are satisfied.
+Keep guards where inversion would harm either.
+Within the requested change, replace `void` used solely to discard a function call with an appropriate form such as `await`.
+Preserve required callback return contracts, async signatures, and concurrency.
+Propagate rejections to the caller or handle them explicitly without ignoring them, including in background work.
+Preserve parallel execution when needed, using an explicit error-handling path such as a non-ignoring `catch`.
+Do not use an empty `catch` or catch and ignore errors.
+
+Prefer `await` to promise chaining for sequential work.
+Prefer `await` with `try` and `catch` to `Promise.catch` when that structure preserves the required error boundary.
+
+Use iterative traversal or an explicit work list when input depth can exceed the stack.
+
+## Declaration documentation
+
+Use [Development's shared comment guidance](../SKILL.md#documentation-and-comments) to decide whether a declaration needs prose.
+Preserve type information carried by JSDoc, including information consumed by TypeScript checkJs.
+Follow documented project API and tooling requirements for JSDoc, including required tags and formatting.
+
+## Adopt the Oxlint groups
+
+For a standalone project, copy the [Node example manifest](../assets/nodejs/package.json), [catalog](../assets/nodejs/pnpm-workspace.yaml), [lockfile](../assets/nodejs/pnpm-lock.yaml), [Oxlint config](../assets/nodejs/oxlint.config.ts), and [Oxfmt config](../assets/nodejs/oxfmt.config.ts) to the consumer root.
+Copy the [comment config](../assets/nodejs/comments/oxlint.config.ts) and [rule](../assets/nodejs/comments/comments.ts) into `comments/`.
+Copy the [regexp config](../assets/nodejs/regexp/oxlint.config.ts) into `regexp/` and the [JavaScript example](../assets/nodejs/src/render.mjs) and [TypeScript example](../assets/nodejs/src/session.ts) into `src/`.
+Run the commands from the consumer root with the Node runtime the project supports.
+
+```sh
+pnpm install --frozen-lockfile
+pnpm run check
+```
+
+For an existing project, extend its `oxlint.config.ts` with the selected config objects and keep its other rules and formatter.
+Keep each imported local config and the rule at its consumer-relative path.
+For comments alone, extend the existing config with the comment config.
+For comments and indexed named captures, extend it with both groups as in the composed example.
+Keep `eslint-plugin-regexp` only if the project opts into the regexp group.
+Adapt the file overrides and retain the project's other lint dependencies.
+Use the same project-owned `pnpm run check` locally, in hooks, and in CI.
+Let CI select pnpm from `packageManager` and provision Node where the project needs it.
 
 ## JavaScript body comments
 
-When the project adopts `comments/no-body-comments`, use the [local Oxlint setup](lint-rules.md#oxlint) for `**/*.js`, `**/*.jsx`, `**/*.mjs`, and `**/*.cjs`.
+Apply the [shared Oxlint comment configuration](../assets/nodejs/comments/oxlint.config.ts) to the project's `js`, `jsx`, `mjs`, and `cjs` paths when the project adopts it.
 The rule flags standalone and trailing line comments and block comments in block-bodied functions, methods, and callbacks.
 It preserves JSDoc attached to a supported declaration, recognized tool directives, and legal markers.
 Comments outside block-bodied functions remain subject to the consumer's existing checks.
@@ -21,10 +76,13 @@ function render(label) {
 }
 ```
 
-The same file passes this rule with documentation on a declaration and a coverage directive used by the project.
+The same file passes this rule with type information on the declaration and a coverage directive used by the project.
 
 ```js
-/** Returns the label without surrounding whitespace. */
+/**
+ * @param {string} label
+ * @returns {string}
+ */
 function render(label) {
   /* c8 ignore next */
   return label.trim();

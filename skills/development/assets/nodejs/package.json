@@ -1,0 +1,16 @@
+{
+  "name": "lint-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "ultracite check --disable-nested-config src"
+  },
+  "devDependencies": {
+    "@oxlint/plugins": "catalog:",
+    "eslint-plugin-regexp": "catalog:",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "ultracite": "catalog:"
+  },
+  "packageManager": "pnpm@12.21.0"
+}

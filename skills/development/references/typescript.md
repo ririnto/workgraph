@@ -1,10 +1,61 @@
-# TypeScript lint
+# TypeScript
 
-For source and compiler conventions, read the [shared JavaScript and TypeScript guidance](js-ts.md).
+## Project configuration
+
+For a new Node project with TypeScript, use the [TypeScript config example](../assets/typescript/tsconfig.json) with the [shared Node lint project](javascript.md#adopt-the-oxlint-groups).
+For an existing project, merge the relevant include patterns and keep its compiler options.
+
+For each source extension already eligible in the project, use these four `include` patterns, replacing `E` with that extension.
+
+- `**/*.E`
+- `**/.*/**/*.E`
+- `**/.*.E`
+- `**/.*/**/.*.E`
+
+The recursive dotfile pattern covers root dotfiles.
+Keep the existing project roots and compiler boundaries.
+Exclude only paths verified to contain non-source material for that project.
+Check TypeScript's wildcard behavior with the project's compiler version.
+The hidden-directory patterns explicitly match one hidden directory segment.
+Check paths with multiple hidden directory segments separately when they are in scope.
+Imports and references can bring files into the program even when the include patterns do not select them as roots.
+
+Capture the compiler's root selection and actual program membership before and after each configuration change.
+Use `tsc --showConfig` and `tsc --listFilesOnly` with the project's config and compiler version, or equivalent compiler evidence for that version.
+Probe ordinary files and dotfiles at the root, under ordinary directories, and under hidden directories.
+Include ordinary subdirectories of hidden directories and hidden directories below ordinary directories.
+Check for newly selected generated files and metadata.
+Account for every membership difference and preserve prior membership apart from intended new eligible inputs.
+
+Keep the fewest configuration files that preserve the existing contracts.
+Combine check and build settings only when verification establishes that both entry points retain their prior behavior.
+Use `extends` for shared settings when toolchain or workspace entry points require separate configs.
+Document the contract that requires each distinct profile.
+Compare emitted files and their paths for each build entry point, including checks that must emit no files.
+Run the existing hooks and CI checks without weakening test, security, or output guarantees.
+
+## Code style
+
+Use `const` for bindings that do not change and `let` only when reassignment is required.
+Use braces for every `if` and `else` branch, including guard returns.
+Use `readonly` for TypeScript properties and arrays that must not change.
+Preserve the binding's TypeScript type when inlining values.
+Keep JSX expressions small and move non-trivial decisions into named functions or values.
+Use semantic elements before adding ARIA roles.
+
+For values, exits, promises, and error boundaries, follow [JavaScript runtime behavior](javascript.md#javascript-runtime-behavior) and preserve TypeScript types.
+Use recursion only when the call bound is stack-safe and the recursive form is clearer.
+Keep unknown-depth or unbounded traversal iterative.
+
+## Declaration documentation
+
+Use [Development's shared comment guidance](../SKILL.md#documentation-and-comments) to decide whether a declaration needs prose.
+Follow documented project API and tooling requirements for TSDoc, including required tags and formatting.
 
 ## Body comments
 
-When the project adopts `comments/no-body-comments`, use the [local Oxlint setup](lint-rules.md#oxlint) for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
+When the project adopts body-comment checks, apply the [shared Oxlint comment configuration](../assets/nodejs/comments/oxlint.config.ts) to its `ts`, `tsx`, `mts`, and `cts` paths.
+Use the [frozen Ultracite example](javascript.md#adopt-the-oxlint-groups) to check both languages with one local installation.
 The [JavaScript placement and exceptions](javascript.md#javascript-body-comments) also apply to TypeScript.
 The rule recognizes TSDoc attached to local TypeScript declarations and existing TypeScript directives.
 Keep the project's independent rules for TSDoc quality and suppressions.
@@ -34,7 +85,8 @@ Use named fields in parser APIs and follow [Development's regex guidance](../SKI
 When the project opts into checking remaining indexed access, install a compatible version of `eslint-plugin-regexp` as a development dependency.
 Oxlint [tests this package for compatibility](https://oxc.rs/docs/guide/usage/linter/js-plugins.html#known-supported-eslint-plugins).
 Verify the selected plugin version with the project's Node and Oxlint versions.
-Merge the [scoped regexp config](../assets/typescript/oxlint-regexp.json) into the project's Oxlint config and adapt the override to the intended paths and exceptions.
+Extend the project's Oxlint config with the [scoped regexp config](../assets/nodejs/regexp/oxlint.config.ts) and adapt the override to the intended paths and exceptions.
+The [composed config](../assets/nodejs/oxlint.config.ts) loads it with the body-comment rule and the Ultracite preset.
 
 Use the consumer's read-only lint entry point, such as `pnpm exec ultracite check --type-aware`, on a matching and a passing case in each language.
 The [rule](https://ota-meshi.github.io/eslint-plugin-regexp/rules/prefer-result-array-groups.html) reports `[1]` in this example because it resolves the index to the named capture `id`.

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "nodenext",
+    "noEmit": true,
+    "strict": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/.*/**/*.ts",
+    "src/**/.*.ts",
+    "src/**/.*/**/.*.ts"
+  ]
+}

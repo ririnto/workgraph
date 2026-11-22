@@ -1,0 +1,9 @@
+version: "2"
+linters:
+  enable:
+    - comments
+  settings:
+    custom:
+      comments:
+        type: module
+        description: Report loose comments in function bodies

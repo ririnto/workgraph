@@ -2,74 +2,90 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import {
   cpSync,
+  mkdirSync,
   mkdtempSync,
   readFileSync,
   realpathSync,
-  rmSync,
-  writeFileSync
+  rmSync
 } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-const asset = path.resolve("skills/development/assets/lint/ktlint-comments");
-const version = spawnSync("ktlint", ["--version"], { encoding: "utf-8" });
-const ktlintVersion = /^ktlint version (?<version>\S+)$/u.exec(
-  version.stdout?.trim() ?? ""
-)?.groups?.version;
-assert.ifError(version.error);
-assert.equal(version.status, 0, version.stderr);
-assert.ok(
-  ktlintVersion !== undefined,
-  "Could not identify the consumer ktlint version."
-);
-
+const kotlin = path.resolve("skills/development/assets/kotlin");
+const fixtures = path.resolve("test/fixtures/ktlint");
 const consumer = realpathSync(
   mkdtempSync(path.join(tmpdir(), "workgraph-ktlint-consumer-"))
 );
-try {
-  const module = path.join(consumer, "lint");
-  for (const entry of [
-    "settings.gradle.kts",
-    "build.gradle.kts",
-    "gradle",
-    "src/main"
-  ]) {
-    cpSync(path.join(asset, entry), path.join(module, entry), {
-      recursive: true
-    });
-  }
-  const build = spawnSync(
-    "gradle",
-    ["--no-daemon", "-p", module, `-PktlintVersion=${ktlintVersion}`, "jar"],
-    { stdio: "inherit" }
-  );
-  assert.ifError(build.error);
-  assert.equal(build.status, 0, "The copied consumer ruleset did not build.");
-  cpSync(path.join(asset, "src/test/fixtures"), consumer, { recursive: true });
-  writeFileSync(
-    path.join(consumer, ".editorconfig"),
-    `root = true\n\n[*.kt]\nktlint_standard = disabled\n\n${readFileSync(path.join(asset, "../kotlin.editorconfig"), "utf-8")}`
-  );
-  const jar = path.join(module, "build/libs/workgraph-ktlint-comments.jar");
-  const unregistered = spawnSync("ktlint", ["--reporter=json", "Matching.kt"], {
+const module = path.join(consumer, "lint");
+const wrapper = path.join(module, "gradlew");
+const gradleArgs = ["--no-daemon", "--console=plain"];
+const checkTask = "ktlintMainSourceSetCheck";
+const report = path.join(
+  consumer,
+  "build/reports/ktlint",
+  checkTask,
+  `${checkTask}.json`
+);
+
+/**
+ * @param {string[]} args Gradle arguments.
+ * @param {number} status Expected Gradle exit status.
+ */
+const run = (args, status) => {
+  const result = spawnSync(wrapper, [...gradleArgs, ...args], {
     cwd: consumer,
     encoding: "utf-8"
   });
-  assert.ifError(unregistered.error);
-  assert.equal(unregistered.status, 0, unregistered.stderr);
-  assert.deepEqual(JSON.parse(unregistered.stdout), []);
-  const registered = spawnSync(
-    "ktlint",
-    ["--reporter=json", `--ruleset=${jar}`, "Matching.kt", "Preserved.kt"],
-    { cwd: consumer, encoding: "utf-8" }
+  assert.ifError(result.error);
+  assert.equal(result.status, status, result.stdout + result.stderr);
+};
+
+try {
+  mkdirSync(module);
+  for (const entry of [
+    "build.gradle.kts",
+    "gradle",
+    "gradlew",
+    "settings.gradle.kts",
+    "src/main"
+  ]) {
+    cpSync(path.join(kotlin, "ktlint", entry), path.join(module, entry), {
+      recursive: true
+    });
+  }
+  cpSync(
+    path.join(module, "gradle/libs.versions.toml"),
+    path.join(consumer, "gradle/libs.versions.toml")
   );
-  assert.ifError(registered.error);
-  assert.equal(registered.status, 1, registered.stderr);
+  for (const entry of ["build.gradle.kts", "settings.gradle.kts"]) {
+    cpSync(path.join(fixtures, entry), path.join(consumer, entry));
+  }
+  const sources = path.join(consumer, "src/main/kotlin");
+  const cases = ["Matching.kt", "Preserved.kt", "TrailingComma.kt"];
+  mkdirSync(sources, { recursive: true });
+  for (const file of cases) {
+    cpSync(path.join(fixtures, file), path.join(sources, file));
+  }
+  run(["-p", module, "jar"], 0);
+  run([checkTask], 1);
+  assert.partialDeepStrictEqual(JSON.parse(readFileSync(report, "utf-8")), [
+    {
+      file: path.join(sources, "TrailingComma.kt"),
+      errors: [{ rule: "standard:trailing-comma-on-declaration-site" }]
+    }
+  ]);
+  cpSync(
+    path.join(kotlin, ".editorconfig"),
+    path.join(consumer, ".editorconfig")
+  );
+  run([checkTask], 0);
+  assert.deepEqual(JSON.parse(readFileSync(report, "utf-8")), []);
+  run([checkTask, "-PuseLocalRules"], 1);
   const message =
     "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration.";
-  assert.deepEqual(JSON.parse(registered.stdout), [
+  assert.deepEqual(JSON.parse(readFileSync(report, "utf-8")), [
     {
-      file: path.join(consumer, "Matching.kt"),
+      file: path.join(sources, "Matching.kt"),
       errors: [
         {
           line: 2,
@@ -86,6 +102,15 @@ try {
       ]
     }
   ]);
+  for (const file of cases) {
+    assert.deepEqual(
+      readFileSync(path.join(sources, file)),
+      readFileSync(path.join(fixtures, file))
+    );
+  }
+  process.stdout.write(
+    "Gradle consumer discovered .editorconfig and the optional ruleset without changing source.\n"
+  );
 } finally {
   rmSync(consumer, { recursive: true });
 }

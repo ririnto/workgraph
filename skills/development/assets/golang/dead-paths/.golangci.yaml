@@ -1,0 +1,10 @@
+version: "2"
+linters:
+  enable:
+    - gocritic
+    - unused
+  settings:
+    gocritic:
+      enabled-checks:
+        - commentedOutCode
+        - commentedOutImport

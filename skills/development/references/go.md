@@ -65,7 +65,7 @@ Preserve independently required security and semantic checks.
 
 #### Go dead paths and comments
 
-When the project adopts the bundled Go lint checks, use the [local golangci-lint setup](lint-rules.md#golangci-lint).
+When the project adopts the bundled lint checks, use the [Go lint examples](#adopt-go-checks).
 Go's package loader uses build tags and module roots to select source.
 Run required configurations when build tags change the files being checked.
 
@@ -104,3 +104,27 @@ func Read() int {
     return 1
 }
 ```
+
+#### Adopt Go checks
+
+For a standalone example, copy the [application module](../assets/golang/example/go.mod), [source](../assets/golang/example/status.go), and [check script](../assets/golang/example/check.sh) to the consumer root.
+Copy the [tool module](../assets/golang/example/tools/go.mod) and [checksums](../assets/golang/example/tools/go.sum) into `tools/`.
+Copy the [dead-path configuration](../assets/golang/dead-paths/.golangci.yaml) to `.golangci.yaml`.
+Run `./check.sh` locally and in CI from the consumer root.
+The script uses the pinned golangci-lint and shfmt tools through [Go tool declarations](https://go.dev/ref/mod#go-mod-file-tool).
+The tool modfile keeps the app's dependency selection separate.
+
+For loose body comments, copy the [custom build configuration](../assets/golang/body-comments/.custom-gcl.yml) to the consumer root and copy the [module manifest](../assets/golang/go-comments/go.mod), [sums](../assets/golang/go-comments/go.sum), and [analyzer](../assets/golang/go-comments/comments.go) into `lint/go-comments/`.
+Use the [comments configuration](../assets/golang/body-comments/.golangci.yaml) as `.golangci.yaml` to check that group independently.
+To compose both groups or add one to an existing config, merge the selected `linters.enable` entries and `linters.settings` mappings with the consumer's settings.
+Keep the built-in defaults, file selection, and existing security checks.
+Build the custom binary with the pinned version in the build config and check the same module roots as CI.
+
+```sh
+go tool -modfile=tools/go.mod golangci-lint custom
+./custom-gcl run --config .golangci.yaml ./...
+go tool -modfile=tools/go.mod shfmt -i 2 -d check.sh
+```
+
+Rebuild and verify the custom binary when changing the Go toolchain or lint version.
+Follow golangci-lint's [tool usage recommendations](https://golangci-lint.run/docs/welcome/install/local/#go-tool-usage-recommendations) when integrating it with an existing tools module.

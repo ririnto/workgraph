@@ -119,6 +119,18 @@ const validateInvocation = (metadata, report) => {
 };
 
 /**
+ * @param {string} directoryName Name of the containing skill directory.
+ * @param {unknown} metadata Optional skill metadata map.
+ * @param {string} frontmatter Complete frontmatter.
+ * @returns {boolean} Whether Development declares its same-file continuation within the portable prompt.
+ */
+const supportsNativeContinuation = (directoryName, metadata, frontmatter) =>
+  directoryName === "development" &&
+  isMapping(metadata) &&
+  metadata["workgraph-continuation"] === "same-file" &&
+  Buffer.byteLength(frontmatter, "utf-8") < 8000;
+
+/**
  * Validate portable skill metadata and Workgraph's host invocation limits.
  * Preserve host extensions outside the checked fields.
  * @param {string} content Complete SKILL.md source.
@@ -137,25 +149,33 @@ export const validateSkillContent = (
   const report = (message) => {
     errors.push(`${source}: ${message}`);
   };
-  if (Buffer.byteLength(content, "utf-8") > 8000) {
-    report(
-      "complete file must fit Codex's 8000-byte portable skill prompt limit."
-    );
-  }
   const lines = content.replace(/^\uFEFF/u, "").split("\n");
   const closing = lines.findIndex(
     (line, index) => index > 0 && line.trim() === "---"
   );
+  const size = Buffer.byteLength(content, "utf-8");
+  const exceedsPortablePrompt = size > 8000;
   if (lines[0].trim() !== "---" || closing < 1) {
+    if (exceedsPortablePrompt) {
+      report(
+        "complete file must fit Codex's 8000-byte portable skill prompt limit."
+      );
+    }
     report("skill must start with closed YAML frontmatter.");
     return errors;
   }
   if (!lines.slice(closing + 1).some((line) => line.trim())) {
     report("skill body must contain text.");
   }
+  let hasNativeContinuation = false;
   try {
     const metadata = yamlParser(lines.slice(1, closing).join("\n"));
     if (isMapping(metadata)) {
+      hasNativeContinuation = supportsNativeContinuation(
+        directoryName,
+        metadata.metadata,
+        lines.slice(0, closing + 1).join("\n")
+      );
       validateName(metadata.name, directoryName, report);
       validateFields(metadata, report);
       validateInvocation(metadata, report);
@@ -175,6 +195,14 @@ export const validateSkillContent = (
         : null;
     const location = line === null ? source : `${source}:${line}`;
     errors.push(`${location}: frontmatter must contain valid YAML.`);
+  }
+  if (exceedsPortablePrompt && !hasNativeContinuation) {
+    errors.unshift(
+      `${source}: complete file must fit Codex's 8000-byte portable skill prompt limit.`
+    );
+  }
+  if (hasNativeContinuation && size > 16_000) {
+    report("Development must fit two 8000-byte skill segments.");
   }
   return errors;
 };

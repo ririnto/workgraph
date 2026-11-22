@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -323,7 +323,7 @@ const createUltraciteFixture = async (t) => {
       "oxlint.config.ts",
       "oxfmt.config.ts",
       "plugins",
-      "skills/development/assets/lint"
+      "skills/development/assets/nodejs/comments"
     ].map(async (entry) => {
       await cp(path.join(root, entry), path.join(directory, entry), {
         recursive: true
@@ -550,15 +550,11 @@ await test("local Markdown comments config checks hidden notes and preserves lit
   t.after(async () => {
     await rm(directory, { force: true, recursive: true });
   });
-  const assets = path.join(root, "skills/development/assets/lint");
+  const assets = path.join(root, "skills/development/assets/markdown");
   await mkdir(path.join(directory, "lint"));
   await Promise.all([
     cp(
-      path.join(assets, "markdownlint-cli2.jsonc"),
-      path.join(directory, ".markdownlint-cli2.jsonc")
-    ),
-    cp(
-      path.join(assets, "markdown-comments.ts"),
+      path.join(assets, "hidden-notes/lint/markdown-comments.ts"),
       path.join(directory, "lint/markdown-comments.ts")
     ),
     symlink(
@@ -612,38 +608,66 @@ await test("local Markdown comments config checks hidden notes and preserves lit
     root,
     "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs"
   );
-  const accepted = spawnSync(
-    process.execPath,
-    [command, "--no-globs", "accepted.md"],
-    {
-      cwd: directory,
-      encoding: "utf-8"
-    }
-  );
-  assert.ifError(accepted.error);
-  assert.equal(accepted.status, 0, accepted.stderr);
-  const rejected = spawnSync(
-    process.execPath,
-    [command, "--no-globs", "rejected.md"],
-    {
-      cwd: directory,
-      encoding: "utf-8"
-    }
-  );
-  assert.ifError(rejected.error);
-  assert.equal(rejected.status, 1, rejected.stderr);
-  assert.deepEqual(
-    rejected.stderr
-      .trim()
-      .split("\n")
-      .map((line) => line.split(" ").slice(0, 3)),
+  const groups = ["hidden-notes", "link-definitions"];
+  const [hiddenNotes, linkDefinitions] = groups.map((group) => {
+    /** @type {unknown} */
+    const config = JSON.parse(
+      readFileSync(
+        path.join(assets, group, ".markdownlint-cli2.jsonc"),
+        "utf-8"
+      )
+    );
+    assert.ok(isObject(config));
+    assert.ok(isObject(config.config));
+    return { ...config, config: config.config };
+  });
+  const hiddenDiagnostics = [
+    ["rejected.md:3", "error", "comments/no-hidden-notes"],
+    ["rejected.md:5", "error", "comments/no-hidden-notes"],
+    ["rejected.md:7", "error", "comments/no-hidden-notes"]
+  ];
+  const linkDiagnostic = [
+    "rejected.md:10:1",
+    "error",
+    "MD053/link-image-reference-definitions"
+  ];
+  for (const [config, expected] of [
+    [hiddenNotes, hiddenDiagnostics],
+    [linkDefinitions, [linkDiagnostic]],
     [
-      ["rejected.md:3", "error", "comments/no-hidden-notes"],
-      ["rejected.md:5", "error", "comments/no-hidden-notes"],
-      ["rejected.md:7", "error", "comments/no-hidden-notes"],
-      ["rejected.md:10:1", "error", "MD053/link-image-reference-definitions"]
+      {
+        ...hiddenNotes,
+        config: { ...hiddenNotes.config, ...linkDefinitions.config }
+      },
+      [...hiddenDiagnostics, linkDiagnostic]
     ]
-  );
+  ]) {
+    writeFileSync(
+      path.join(directory, ".markdownlint-cli2.jsonc"),
+      JSON.stringify(config)
+    );
+    const accepted = spawnSync(
+      process.execPath,
+      [command, "--no-globs", "accepted.md"],
+      { cwd: directory, encoding: "utf-8" }
+    );
+    assert.ifError(accepted.error);
+    assert.equal(accepted.status, 0, accepted.stderr);
+    const rejected = spawnSync(
+      process.execPath,
+      [command, "--no-globs", "rejected.md"],
+      { cwd: directory, encoding: "utf-8" }
+    );
+    assert.ifError(rejected.error);
+    assert.equal(rejected.status, 1, rejected.stderr);
+    assert.deepEqual(
+      rejected.stderr
+        .trim()
+        .split("\n")
+        .map((line) => line.split(" ").slice(0, 3)),
+      expected
+    );
+  }
 });
 
 /** @typedef {{result: unknown} & Record<string, unknown>} CompletionEvidence */

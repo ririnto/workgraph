@@ -2,7 +2,7 @@
 
 ## Markdown hidden notes
 
-When the project adopts the bundled Markdown lint checks, use the [local markdownlint-cli2 setup](lint-rules.md#markdownlint-cli2) for `**/*.md`.
+When the project adopts these checks, use the [Markdownlint CLI2 setup](#adopt-markdownlint-cli2-checks) for `**/*.md`.
 The `comments/no-hidden-notes` rule flags parsed block and inline HTML comments in Markdown, including comments nested in Markdown lists and quotes.
 It ignores fenced and inline code, recognized Markdownlint and Prettier directives, and legal markers.
 For a template or generated marker with an actual consumer, set `allowed` to the exact comment body in that directory's lint config.
@@ -26,6 +26,15 @@ Non-matching content uses a legal marker and displays a comment as a code exampl
 
 Use `<!-- sample -->` as the marker in examples.
 ```
+
+## Adopt Markdownlint CLI2 checks
+
+To check hidden HTML notes, copy the [hidden-notes configuration](../assets/markdown/hidden-notes/.markdownlint-cli2.jsonc) as `.markdownlint-cli2.jsonc` and the [TypeScript rule](../assets/markdown/hidden-notes/lint/markdown-comments.ts) as `lint/markdown-comments.ts`.
+Use the project's local Markdownlint CLI2 with a Node runtime that supports type stripping.
+To check unused and duplicate link definitions, copy the [link-definitions configuration](../assets/markdown/link-definitions/.markdownlint-cli2.jsonc) as `.markdownlint-cli2.jsonc`.
+For both checks, merge the `MD053` setting into the hidden-notes configuration.
+In an existing project, merge the selected `config` and `customRules` entries and preserve existing globs, ignores, and directives.
+Run `pnpm exec markdownlint-cli2` with the project's dependencies and a matching and a preserved Markdown file.
 
 ## Reuse a Markdownlint rule
 
