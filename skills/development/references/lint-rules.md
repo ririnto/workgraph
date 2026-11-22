@@ -22,7 +22,7 @@ Use the project's own tool dependencies and versions.
 Copy [comments.ts](../assets/lint/comments.ts) as `lint/comments.ts`.
 Register `./lint/comments.ts` in `jsPlugins` and enable `comments/no-body-comments` in the appropriate file overrides.
 Add `@oxlint/plugins` as a development dependency if the consumer type-checks the asset.
-For matching and exceptions, see [JavaScript](lint-javascript.md) and [TypeScript](lint-typescript.md).
+For matching and exceptions, see [JavaScript](javascript.md#javascript-body-comments) and [TypeScript](typescript.md#body-comments).
 For restricted React effects and timers, use the [product override](react-electron.md#react-effects) where the project has a named integration owner.
 
 ### ktlint
@@ -35,7 +35,7 @@ For example, run `gradle -p lint/ktlint-comments -PktlintVersion=<ktlint-version
 The module uses compile-only ktlint dependencies so the runtime owns those libraries.
 Load the JAR through the project's ktlint Gradle integration or `ktlint --ruleset=lint/ktlint-comments/build/libs/workgraph-ktlint-comments.jar '**/*.kt' '**/*.kts'`.
 No rule is installed by Workgraph.
-See [Kotlin lint](lint-kotlin.md) for the match boundaries.
+See [Kotlin lint](kotlin.md#kotlin-body-comments) for the match boundaries.
 
 ### golangci-lint
 
@@ -46,7 +46,7 @@ Use the golangci-lint version in the build config and an appropriate Go toolchai
 Run `golangci-lint custom` from the consumer root and use `./custom-gcl run --config .golangci.yaml ./...` for the adopted checks.
 Keep built-in defaults and consumer settings enabled when registering the module plugin.
 Rebuild and verify the plugin when upgrading the toolchain or linter.
-See [Go lint](lint-go.md) for the check boundaries and examples.
+See [Go lint](go.md#go-dead-paths-and-comments) for the check boundaries and examples.
 
 ### markdownlint-cli2
 
@@ -54,7 +54,7 @@ Copy [markdown-comments.ts](../assets/lint/markdown-comments.ts) as `lint/markdo
 Merge the [Markdown config](../assets/lint/markdownlint-cli2.jsonc) into the consumer's `.markdownlint-cli2.jsonc`.
 Keep the consumer's `**/*.md` paths and existing ignores.
 Load the TypeScript rule with a Node runtime that supports type stripping and a compatible local `markdownlint-cli2`.
-See [Markdown lint](lint-markdown.md) for the check boundaries.
+See [Markdown lint](markdown.md) for the check boundaries.
 
 ## Validate lint rules
 

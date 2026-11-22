@@ -1,9 +1,11 @@
 # TypeScript lint
 
+For source and compiler conventions, read the [shared JavaScript and TypeScript guidance](js-ts.md).
+
 ## Body comments
 
-Use the [local Oxlint setup](lint-rules.md#oxlint) to enable `comments/no-body-comments` for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
-The [JavaScript placement and exceptions](lint-javascript.md) also apply to TypeScript.
+When the project adopts `comments/no-body-comments`, use the [local Oxlint setup](lint-rules.md#oxlint) for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
+The [JavaScript placement and exceptions](javascript.md#javascript-body-comments) also apply to TypeScript.
 The rule recognizes TSDoc attached to local TypeScript declarations and existing TypeScript directives.
 Keep the project's independent rules for TSDoc quality and suppressions.
 
@@ -29,24 +31,10 @@ function read(): string {
 ## Adopt a regexp result rule for JavaScript and TypeScript
 
 Use named fields in parser APIs and follow [Development's regex guidance](../SKILL.md#extract-regex-matches) when reading captures directly.
-To check remaining indexed access, install a compatible version of `eslint-plugin-regexp` as a development dependency in the consuming project.
+When the project opts into checking remaining indexed access, install a compatible version of `eslint-plugin-regexp` as a development dependency.
 Oxlint [tests this package for compatibility](https://oxc.rs/docs/guide/usage/linter/js-plugins.html#known-supported-eslint-plugins).
 Verify the selected plugin version with the project's Node and Oxlint versions.
-Merge this fragment into the project's Oxlint config and adapt the override to the intended paths and exceptions.
-
-```json
-{
-  "jsPlugins": ["eslint-plugin-regexp"],
-  "overrides": [
-    {
-      "files": ["src/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
-      "rules": {
-        "regexp/prefer-result-array-groups": "error"
-      }
-    }
-  ]
-}
-```
+Merge the [scoped regexp config](../assets/typescript/oxlint-regexp.json) into the project's Oxlint config and adapt the override to the intended paths and exceptions.
 
 Use the consumer's read-only lint entry point, such as `pnpm exec ultracite check --type-aware`, on a matching and a passing case in each language.
 The [rule](https://ota-meshi.github.io/eslint-plugin-regexp/rules/prefer-result-array-groups.html) reports `[1]` in this example because it resolves the index to the named capture `id`.

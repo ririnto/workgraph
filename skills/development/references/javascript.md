@@ -1,6 +1,11 @@
-# JavaScript body comments
+# JavaScript
 
-Use the [local Oxlint setup](lint-rules.md#oxlint) to enable `comments/no-body-comments` for `**/*.js`, `**/*.jsx`, `**/*.mjs`, and `**/*.cjs`.
+For source conventions, read the [shared JavaScript and TypeScript guidance](js-ts.md).
+For an optional check on regexp captures, see the [scoped regexp rule](typescript.md#adopt-a-regexp-result-rule-for-javascript-and-typescript).
+
+## JavaScript body comments
+
+When the project adopts `comments/no-body-comments`, use the [local Oxlint setup](lint-rules.md#oxlint) for `**/*.js`, `**/*.jsx`, `**/*.mjs`, and `**/*.cjs`.
 The rule flags standalone and trailing line comments and block comments in block-bodied functions, methods, and callbacks.
 It preserves JSDoc attached to a supported declaration, recognized tool directives, and legal markers.
 Comments outside block-bodied functions remain subject to the consumer's existing checks.

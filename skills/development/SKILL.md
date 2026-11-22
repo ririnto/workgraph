@@ -33,9 +33,10 @@ Check the full diff for unsupported guards, dead compatibility paths, and unrela
 | Language | Source | Reference |
 | --- | --- | --- |
 | Java | `.java` | [Java and Kotlin](references/java-kotlin.md) |
-| Kotlin | `.kt`, `.kts` | [Java and Kotlin](references/java-kotlin.md) |
-| TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` | [JS/TS](references/js-ts.md) |
-| JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JS/TS](references/js-ts.md) |
+| Kotlin | `.kt`, `.kts` | [Kotlin](references/kotlin.md) |
+| TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` | [TypeScript](references/typescript.md) |
+| JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JavaScript](references/javascript.md) |
+| Markdown | `.md` | [Markdown](references/markdown.md) |
 | Python | `.py` | [Python](references/python.md) |
 | Go | `.go` | [Go](references/go.md) |
 | Rust | `.rs`, Cargo manifests, Rust toolchain and lint configuration | [Rust](references/rust.md) |

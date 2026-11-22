@@ -1,6 +1,8 @@
-# Markdown hidden notes
+# Markdown
 
-Use the [local markdownlint-cli2 setup](lint-rules.md#markdownlint-cli2) for `**/*.md`.
+## Markdown hidden notes
+
+When the project adopts the bundled Markdown lint checks, use the [local markdownlint-cli2 setup](lint-rules.md#markdownlint-cli2) for `**/*.md`.
 The `comments/no-hidden-notes` rule flags parsed block and inline HTML comments in Markdown, including comments nested in Markdown lists and quotes.
 It ignores fenced and inline code, recognized Markdownlint and Prettier directives, and legal markers.
 For a template or generated marker with an actual consumer, set `allowed` to the exact comment body in that directory's lint config.
@@ -27,7 +29,7 @@ Use `<!-- sample -->` as the marker in examples.
 
 ## Reuse a Markdownlint rule
 
-Use [Markdownlint CLI2 custom rules](https://github.com/DavidAnson/markdownlint-cli2#markdownlint-cli2jsonc) to load an external package from your project's development dependencies.
+When the project adopts an external rule, use [Markdownlint CLI2 custom rules](https://github.com/DavidAnson/markdownlint-cli2#markdownlint-cli2jsonc) to load it from the project's development dependencies.
 For example, [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) checks local paths and Markdown heading links.
 Install it with the project's package manager and merge this fragment into the intended directory's `.markdownlint-cli2.jsonc`.
 
