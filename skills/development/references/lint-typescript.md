@@ -1,4 +1,6 @@
-# TypeScript body comments
+# TypeScript lint
+
+## Body comments
 
 Use the [local Oxlint setup](lint-rules.md#oxlint) to enable `comments/no-body-comments` for `**/*.ts`, `**/*.tsx`, `**/*.mts`, and `**/*.cts`.
 The [JavaScript placement and exceptions](lint-javascript.md) also apply to TypeScript.
@@ -23,3 +25,43 @@ function read(): string {
   return status;
 }
 ```
+
+## Adopt a regexp result rule for JavaScript and TypeScript
+
+Use named fields in parser APIs and follow [Development's regex guidance](../SKILL.md#extract-regex-matches) when reading captures directly.
+To check remaining indexed access, install a compatible version of `eslint-plugin-regexp` as a development dependency in the consuming project.
+Oxlint [tests this package for compatibility](https://oxc.rs/docs/guide/usage/linter/js-plugins.html#known-supported-eslint-plugins).
+Verify the selected plugin version with the project's Node and Oxlint versions.
+Merge this fragment into the project's Oxlint config and adapt the override to the intended paths and exceptions.
+
+```json
+{
+  "jsPlugins": ["eslint-plugin-regexp"],
+  "overrides": [
+    {
+      "files": ["src/**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}"],
+      "rules": {
+        "regexp/prefer-result-array-groups": "error"
+      }
+    }
+  ]
+}
+```
+
+Use the consumer's read-only lint entry point, such as `pnpm exec ultracite check --type-aware`, on a matching and a passing case in each language.
+The [rule](https://ota-meshi.github.io/eslint-plugin-regexp/rules/prefer-result-array-groups.html) reports `[1]` in this example because it resolves the index to the named capture `id`.
+
+```js
+export const id = /item=(?<id>\d+)/u.exec("item=42")?.[1];
+```
+
+Use `.groups` for named captures.
+Index `[0]` holds the full regexp match and passes this rule, as does an ordinary array lookup.
+For a pattern you own, an outer named capture can expose the entire match as a named field.
+
+```js
+export const id = /item=(?<id>\d+)/u.exec("item=42")?.groups?.id;
+export const item = /(?<item>item=\d+)/u.exec("item=42")?.groups?.item;
+```
+
+Before adding a capture to an existing pattern, check numeric backreferences, positional consumers, and any API that exposes the match array.
