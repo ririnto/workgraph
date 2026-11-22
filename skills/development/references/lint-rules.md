@@ -28,10 +28,13 @@ For restricted React effects and timers, use the [product override](react-electr
 ### ktlint
 
 Copy the [ktlint editor settings](../assets/lint/kotlin.editorconfig) into the project's `.editorconfig` under `[*.{kt,kts}]`.
-Copy `ktlint-comments/src/main` from the lint assets into a consumer-owned Kotlin/JVM ruleset module and keep its [service provider entry](../assets/lint/ktlint-comments/src/main/resources/META-INF/services/com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3).
-Compile against `com.pinterest.ktlint:ktlint-cli-ruleset-core`, `com.pinterest.ktlint:ktlint-rule-engine-core`, and the Kotlin compiler embeddable version used by the selected ktlint release.
-Use compile-only dependencies so the runtime owns those libraries.
-Build a JAR with the service provider entry and load it through the project's ktlint Gradle integration or `ktlint --ruleset=lint/comments.jar '**/*.kt' '**/*.kts'`.
+Copy the [ruleset module](../assets/lint/ktlint-comments/build.gradle.kts) into the consuming repository with its source and the [service provider entry](../assets/lint/ktlint-comments/src/main/resources/META-INF/services/com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3).
+Use the module's Kotlin catalog or merge its plugin declaration into the consumer's existing catalog.
+Build it with the consumer's Gradle installation and pass the selected ktlint runtime version as `-PktlintVersion`.
+For example, run `gradle -p lint/ktlint-comments -PktlintVersion=<ktlint-version> jar`.
+The module uses compile-only ktlint dependencies so the runtime owns those libraries.
+Load the JAR through the project's ktlint Gradle integration or `ktlint --ruleset=lint/ktlint-comments/build/libs/workgraph-ktlint-comments.jar '**/*.kt' '**/*.kts'`.
+No rule is installed by Workgraph.
 See [Kotlin lint](lint-kotlin.md) for the match boundaries.
 
 ### golangci-lint
