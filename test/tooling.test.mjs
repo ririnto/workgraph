@@ -65,6 +65,8 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
   const cases = [
     ["skills/development/assets/golang/.custom-gcl.yml", "check:go"],
     ["skills/development/assets/golang/.golangci.yaml", "check:go"],
+    ["skills/development/assets/golang/example/.custom-gcl.yml", "check:go"],
+    ["go.work", "check:go"],
     [
       "skills/development/assets/kotlin/gradle/libs.versions.toml",
       "check:kotlin"

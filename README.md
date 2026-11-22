@@ -149,8 +149,10 @@ The managed development runtime uses the exact Node.js version in `devEngines.ru
 The supported Node.js range remains in `engines.node`.
 Install the pnpm version declared in `package.json` before installing the pinned development tools.
 Install ShellCheck for shell scripts and GitHub Actions workflow checks.
-Use the Go version in the [golangci-lint tool module](tools/golangci-lint/go.mod).
-The repository's [other Go tools](tools/go.mod) pin NilAway, actionlint, and shfmt separately from the analyzer and its runnable example.
+Use the Go version in the [repository module](go.mod), which declares golangci-lint, NilAway, actionlint, and shfmt.
+The [workspace](go.work) lets the repository run its linters from the separate [analyzer module](skills/development/assets/golang/go.mod).
+The [runnable example](skills/development/assets/golang/example/go.mod) declares its own tools for standalone use.
+The root module keeps the YAML parser version required by actionlint 1.7.12 until [actionlint supports the newer parser API](https://github.com/rhysd/actionlint/pull/735).
 Use JDK 21 or later and the bundled Gradle wrapper to lint the Kotlin build logic and check a fresh sample with the custom ruleset.
 Linux CI provisions the runtimes and ShellCheck, then runs the same `pnpm run check` command.
 

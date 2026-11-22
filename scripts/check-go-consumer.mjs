@@ -15,8 +15,8 @@ const consumer = mkdtempSync(path.join(tmpdir(), "workgraph-go-consumer-"));
 const example = path.join(consumer, "example");
 
 /**
- * @param {string} command Executable to run.
- * @param {string[]} args Command arguments.
+ * @param {string} command Go launcher or built sample linter.
+ * @param {string[]} args Arguments passed without shell expansion.
  * @param {string} cwd Directory for tool discovery.
  * @param {number} [status] Expected process exit.
  * @returns {string} Standard output.
@@ -33,24 +33,12 @@ const run = (command, args, cwd, status = 0) => {
 };
 
 try {
-  for (const entry of [
-    ".custom-gcl.yml",
-    ".golangci.yaml",
-    "comments.go",
-    "go.mod",
-    "go.sum",
-    "example"
-  ]) {
-    cpSync(path.join(asset, entry), path.join(consumer, entry), {
-      recursive: true
-    });
+  for (const entry of [".golangci.yaml", "comments.go", "go.mod", "go.sum"]) {
+    cpSync(path.join(asset, entry), path.join(consumer, entry));
   }
-  run(
-    "go",
-    ["tool", "-modfile=example/tools/go.mod", "golangci-lint", "custom"],
-    consumer
-  );
-  const command = path.join(consumer, "custom-gcl");
+  cpSync(path.join(asset, "example"), example, { recursive: true });
+  run("go", ["tool", "golangci-lint", "custom"], example);
+  const command = path.join(example, "custom-gcl");
   const report = path.join(consumer, "lint.json");
   const args = [
     "run",
@@ -79,11 +67,7 @@ try {
   const shell = '#!/bin/sh\nif true; then\n  printf "%s\\n" ok\nfi\n';
   writeFileSync(script, shell);
   assert.equal(
-    run(
-      "go",
-      ["tool", "-modfile=tools/go.mod", "shfmt", "-i", "2", "-d", "fixture.sh"],
-      example
-    ),
+    run("go", ["tool", "shfmt", "-i", "2", "-d", "fixture.sh"], example),
     ""
   );
   assert.equal(readFileSync(script, "utf-8"), shell);

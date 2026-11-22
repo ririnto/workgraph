@@ -41,9 +41,11 @@ for (const { patterns, check, test } of [
   {
     patterns: [
       "**/*.{go,mod,sum}",
+      "go.work",
       ".golangci.yaml",
       "skills/development/assets/golang/.golangci.yaml",
       "skills/development/assets/golang/.custom-gcl.yml",
+      "skills/development/assets/golang/example/.custom-gcl.yml",
       "scripts/check-go-consumer.mjs"
     ],
     check: "check:go"
@@ -71,11 +73,11 @@ for (const { patterns, check, test } of [
     check: "check:node-consumer"
   },
   {
-    patterns: [".husky/*", "**/*.sh", ".editorconfig", "tools/go.{mod,sum}"],
+    patterns: [".husky/*", "**/*.sh", ".editorconfig", "go.{mod,sum}"],
     check: "check:shell"
   },
   {
-    patterns: [".github/workflows/*.{yaml,yml}", "tools/go.{mod,sum}"],
+    patterns: [".github/workflows/*.{yaml,yml}", "go.{mod,sum}"],
     check: "check:workflows"
   },
   {

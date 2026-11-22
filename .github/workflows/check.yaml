@@ -24,12 +24,12 @@ jobs:
           cache: true
       - uses: actions/setup-go@v7
         with:
-          go-version-file: skills/development/assets/golang/example/tools/go.mod
+          go-version-file: go.mod
           cache-dependency-path: |-
+            go.sum
+            go.work.sum
             skills/development/assets/golang/go.sum
-            skills/development/assets/golang/example/tools/go.sum
-            tools/go.sum
-            tools/golangci-lint/go.sum
+            skills/development/assets/golang/example/go.sum
       - uses: actions/setup-java@v6
         with:
           distribution: temurin

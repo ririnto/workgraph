@@ -38,10 +38,8 @@ Use `t.Parallel()` for independent cases whose setup and shared resources permit
 ### Workspaces and tool dependencies
 
 Use `go.work` when repository modules need workspace coordination and the declared Go version supports it.
-Keep adopted Go tools and their versions in a repository-owned `go.mod` or dedicated modfile.
-Workspace coordination does not replace module ownership of tool dependencies.
-Manage and run tools using their owning module.
-Use an explicit `-modfile=<file>.mod` only outside workspace mode.
+Declare adopted tools and their versions in the Go project that uses them.
+A workspace can make the declared tools available when a check runs from another module in that workspace.
 
 For Go 1.24 or later, use `go get -tool <tool-package>@<version>` to record tool dependencies in the module file.
 Run them with `go tool <tool-package>`.
@@ -107,22 +105,22 @@ func Read() int {
 
 #### Adopt Go checks
 
-Copy the directory containing the [lint config](../assets/golang/.golangci.yaml), [custom build config](../assets/golang/.custom-gcl.yml), and [analyzer module](../assets/golang/go.mod).
-The runnable [example application](../assets/golang/example/go.mod) has its own [tool module](../assets/golang/example/tools/go.mod) and [checksums](../assets/golang/example/tools/go.sum).
-The separate tool modfile pins golangci-lint and shfmt without changing the application's dependency graph.
-From the copied root, build the custom binary with the declared tool and run it on the application.
+Copy the directory containing the [lint config](../assets/golang/.golangci.yaml) and [analyzer module](../assets/golang/go.mod), including its `example/` directory.
+The runnable [example application](../assets/golang/example/go.mod) declares golangci-lint and shfmt in its own module and includes their [checksums](../assets/golang/example/go.sum).
+Its [custom build config](../assets/golang/example/.custom-gcl.yml) resolves the analyzer one directory above the application.
+Build and run the custom linter from the copied application directory.
 
 ```sh
-go tool -modfile=example/tools/go.mod golangci-lint custom
 cd example
-../custom-gcl run --config ../.golangci.yaml ./...
+go tool golangci-lint custom
+./custom-gcl run --config ../.golangci.yaml ./...
+go tool shfmt -i 2 -d .
 ```
 
 In an existing project, merge the selected `linters.enable` entries and settings with the existing config.
 To adopt only the dead-path checks, keep `gocritic` and `unused` and run the project's declared golangci-lint directly.
 For body comments, copy the [analyzer source](../assets/golang/comments.go), module manifest, and [sums](../assets/golang/go.sum) into `lint/go-comments/`.
-Place the custom build config at the consumer root and set the plugin's `path` to `./lint/go-comments`.
+Place the [analyzer's custom build config](../assets/golang/.custom-gcl.yml) at the consumer root and set the plugin's `path` to `./lint/go-comments`.
 Keep the consumer's file selection and other checks.
 Use the same lint and read-only shfmt commands locally and in CI.
 Rebuild and verify the custom binary when changing the Go toolchain or lint version.
-Follow golangci-lint's [tool usage recommendations](https://golangci-lint.run/docs/welcome/install/local/#go-tool-usage-recommendations) when integrating it with an existing tools module.
