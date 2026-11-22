@@ -691,11 +691,40 @@ Runtime observation does not establish formal correctness, and hook delivery doe
 
 We reviewed the complete 17:31 presentation [All Code Is Slop (Except Mine)](https://ai.engineer/talks/O_zcc6Xl12g-all-code-is-slop-except-mine), a separate recording from the talk above.
 The organizer's [public transcript](https://ai.engineer/api/code/reading-download/transcripts/lauren-tan.md) uses the livestream time base.
-The [engineering rule map](../skills/development/references/engineering-rule-map.md) uses elapsed times in the talk and connects each adopted practice to its owning instruction or executable check.
+The [engineering rule map](#engineering-rule-map) uses elapsed times in the talk and connects each adopted practice to its owning instruction or executable check.
 The examples inform these choices without supplying a Workgraph benchmark, a required merge rate, or authorization for automated publication.
 The [Bombadil manual](https://antithesishq.github.io/bombadil/browser/1.2-how-it-works.html) and [replay guidance](https://github.com/antithesishq/bombadil/blob/main/docs/manual/src/04-workflows.md) describe property checks, action generation, and recovery of failing traces.
 The [React effect guide](https://react.dev/learn/you-might-not-need-an-effect), [Electron process model](https://www.electronjs.org/docs/latest/tutorial/process-model), and [dependency-cruiser rules](https://github.com/sverweij/dependency-cruiser/blob/main/doc/rules-reference.md) informed the integration boundaries.
 We reviewed those maintained GitHub branches on 2026-11-21.
+
+#### Engineering rule map
+
+This map records Workgraph's adaptations of Lauren Tan's [All Code Is Slop (Except Mine)](https://ai.engineer/talks/O_zcc6Xl12g-all-code-is-slop-except-mine).
+Times refer to elapsed time in the 17:31 talk.
+The examples and reported business metrics describe the speaker's environment.
+
+| Time | Practice | Owner or rule | Effect or evidence |
+| --- | --- | --- | --- |
+| 01:32–02:41 | Make correct behavior the default through API design, types, and module ownership. | [Development automation](../skills/development/SKILL.md#automation) | Shared interfaces prevent callers from reaching invalid states and retain only required effects. |
+| 02:09–03:21 | Prefer compiler, lint, and deterministic tests for corrections they can express. | [Lint rule guidance](../skills/development/references/lint-rules.md) | Local and CI commands report invalid syntax or behavior reproducibly. |
+| 02:09–02:41 | Use runtime and formal checks for properties and product intent, with prose for judgment. | [Development verification](../skills/development/SKILL.md#verification) and [instruction design](../skills/development/references/instruction-design.md) | Check actual transitions and effects, with human judgment for scope and meaning. |
+| 03:21–04:39, 08:54, 14:55–15:27 | Prevent new workarounds, migrate callers, and remove old patterns. | [Lint rule guidance](../skills/development/references/lint-rules.md) and [refactoring](../skills/development/playbooks/refactoring.md) | Remove examples agents could copy after preserving required behavior and resources through the replacement. |
+| 04:39–06:01 | Restrict product `useEffect` access and give synchronization an owner. | [React effects](../skills/development/references/react-electron.md#react-effects) and `eslint/no-restricted-imports` | Avoid effects for derivation and user actions, preserve subscription and cleanup behavior in the integration. |
+| 06:01–06:32 | Separate Electron main and renderer code in the directory and dependency graph. | [Electron process imports](../skills/development/references/react-electron.md#electron-process-imports) and the dependency-cruiser rules | Block resolved cross-process paths that can bring blocking work into the renderer. |
+| 06:32–07:12 | Remove workaround justifications in docs and keep case-specific corrections local. | [Documentation and comments](../skills/development/SKILL.md#documentation-and-comments), [instruction design](../skills/development/references/instruction-design.md), and `comments/no-hidden-notes` | Parsed hidden notes can be flagged mechanically, while visible prose and policy scope need review. |
+| 07:12–08:20 | Keep imperative timers out of product coordination. | [Scheduled work](../skills/development/references/react-electron.md#scheduled-work) and `eslint/no-restricted-globals` | Moving lifecycle work to its owner avoids repeated timer allocation and stale callbacks while preserving required timing. |
+| 07:44–08:54 | Remove body narration, commented-out code, and stale paths. | [Local lint assets](../skills/development/references/lint-rules.md#adopt-a-lint-asset), `comments/no-body-comments`, `comments:no-body-comments`, Go `comments`, `commentedOutCode`, `commentedOutImport`, `unused`, `standard:no-unused-imports`, and `MD053` | Syntax and dead-path checks flag concrete cases without editing code. |
+| 08:20–08:54 | Keep declaration contracts, consumed directives, legal text, and verified external constraints. | [Effect checks](../skills/development/references/side-effects.md) | Removing a directive can change lint, formatting, coverage, build output, or documentation, so preserve its actual consumer. |
+| 08:54–09:30 | Put the correct next action in lint messages. | [Lint rule guidance](../skills/development/references/lint-rules.md) | A diagnostic identifies the prohibited form and directs the author to the owning API, declaration, or cleanup. |
+| 09:30–10:01, 12:43 | Review acceptance artifacts that show what ran and what happened. | [Delivery evidence](../skills/delivery/SKILL.md#retain-validation-evidence) | Attach the relevant video, screenshot, trace, diagram, model check, or proof to support the behavior under review. |
+| 10:01–10:33 | Run the application and debug it through its real interfaces. | [Runtime verification](../skills/development/references/runtime-formal-evidence.md#runtime-verification) | Browser drivers or devtools can observe the actual UI, events, and performance. |
+| 10:01–10:33 | Maintain user-facing feature names and access paths for recurring verification. | [Runtime verification](../skills/development/references/runtime-formal-evidence.md#runtime-verification) | The feature map lets reviewers and drivers exercise the same intended flow. |
+| 10:33–11:06 | Reuse testable drivers and CLIs. | [Runtime verification](../skills/development/references/runtime-formal-evidence.md#runtime-verification) | Repeated runs share setup and actions and can reproduce findings. |
+| 10:33–11:37 | Model check concurrent flows and prove selected algorithm properties. | [Invariants and generated actions](../skills/development/references/runtime-formal-evidence.md#invariants-and-generated-actions) | TLA+ checks modeled transitions and Lean checks the stated theorem under its assumptions. |
+| 11:37–12:43 | Explore UI behaviors with generated actions and explicit properties. | [Invariants and generated actions](../skills/development/references/runtime-formal-evidence.md#invariants-and-generated-actions) | Bombadil checks properties on explored interactions and produces replay evidence for failures. |
+| 12:43–13:18 | Inspect statecharts beside visible runtime evidence. | [Invariants and generated actions](../skills/development/references/runtime-formal-evidence.md#invariants-and-generated-actions) | Reviewers can compare visible outcomes with expected states, guards, and failure transitions. |
+| 09:30, 14:55–16:20 | Require reliable checks before scaling automation. | [Release-triggered verification](../skills/development/references/runtime-formal-evidence.md#release-triggered-verification) | The deployment and integration policies retain their own acceptance and authority requirements. |
+| 16:20–16:56 | Trigger runtime exploration of the released build and route reproduced failures to fixes. | [Release-triggered verification](../skills/development/references/runtime-formal-evidence.md#release-triggered-verification) and [Delivery](../skills/delivery/SKILL.md#establish-merge-authority) | The release event identifies the build and retained evidence supports authorized fix publication and integration. |
 
 ### Multi-agent failure modes
 
@@ -720,6 +749,10 @@ Workgraph does not implement transactions, automatic compensation, or durable re
 We read Lauren Tan's articles [Coding is Dead, Long Live Engineering](https://x.com/poteto/article/2014823103239749881), [Loops You Can Trust](https://x.com/poteto/article/2069824386283319343), the pstack guide [part 1](https://x.com/poteto/article/2094457600259842065) and [part 2](https://x.com/poteto/article/2097732320606507506), and [Coding is dead, long live Coding](https://x.com/poteto/article/2103571281014861957).
 We also read the posts on [adversarial review](https://x.com/poteto/status/2117437607940681849) and [game development practice](https://x.com/poteto/status/2117043478140276847).
 These are practitioner reports, not controlled Workgraph evaluations.
+
+The installed pstack 0.15.46 package contains 58 `SKILL.md` entry points, two agent definitions, and a top-level `docs/` directory.
+Selected skills keep supporting references, scripts, and playbooks alongside their entry points.
+That layout provides a comparison for Workgraph's bundled references.
 
 | Lesson | Workgraph application |
 | --- | --- |
@@ -1078,6 +1111,10 @@ We use the invocation controls for [manual invocation](design.md#support-manual-
 The [Agent Skills specification](https://agentskills.io/specification) defines optional per-skill references and assets.
 The [Agent Skills best practices](https://agentskills.io/skill-creation/best-practices) recommend keeping core guidance inline and naming when to read a focused reference.
 We read the complete [combined Agent Skills source](https://agentskills.io/llms-full.txt) rather than a generated summary.
+Its discovery guidance builds a catalog from validated `name` and `description` fields in each skill root's `SKILL.md`.
+Activation supplies the selected `SKILL.md` instructions.
+The source says the model "loads specific files on demand" when those instructions reference material in `references/`, `assets/`, or `scripts/` by relative path.
+Workgraph applies that separation in its [conditional loading design](design.md#conditional-loading).
 A conditional delivery reference can reduce unrelated Workflow context, but no behavioral evaluation yet establishes that it improves model performance.
 Source and delivery checks cannot establish interactive invocation or model adherence.
 

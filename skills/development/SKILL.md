@@ -16,7 +16,6 @@ Read [Kotest](references/kotest.md) for specs or assertions.
 
 Identify contracts, consumers, exclusions, and acceptance evidence before editing.
 Read [instruction design](references/instruction-design.md) for agent instructions.
-For shared rules, read the [engineering rule map](references/engineering-rule-map.md).
 Use evidence from affected code to choose the smallest safe change within scope.
 Keep required checks.
 
@@ -124,7 +123,7 @@ Use declarative automation where supported.
 Use the project language only for substantial logic existing tools lack.
 For recurring corrections, improve the design first and enforce what tools can check.
 
-Read [lint rule guidance](references/lint-rules.md) for lint rules or fixes.
+Read [lint rule guidance](references/lint-rules.md) when selecting lint checks, adopting lint assets, or changing rules or fixes.
 Read [React and Electron boundaries](references/react-electron.md) for effects, timers, or process imports.
 
 ## Verification
@@ -150,4 +149,4 @@ Record commands, setup, exit codes, failures, and raw results apart from analysi
 Measure slow checks before optimization and report conditions, durations, and preserved coverage.
 Require direct evidence for execution, formal proof, native activation, and model adherence claims.
 Report required checks blocked by the host.
-Read [runtime and formal evidence](references/runtime-formal-evidence.md) for visual work, user flows, invariants, or release checks.
+Read [runtime and formal evidence](references/runtime-formal-evidence.md) for visual work, user flows, feature maps, invariants, or release checks.
