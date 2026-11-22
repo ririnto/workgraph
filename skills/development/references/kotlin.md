@@ -122,32 +122,19 @@ The standard ktlint rules can run independently.
 For an existing project, merge only the selected entries into its Kotlin section and retain its other rules and formatter settings.
 The [ktlint 1.8.0 documentation](https://github.com/ktlint/ktlint/blob/1.8.0/documentation/release-latest/docs/install/cli.md#rule-configuration-editorconfig) describes normal EditorConfig lookup.
 
-For body comments, copy the [ruleset build](../assets/kotlin/ktlint/build.gradle.kts), [settings](../assets/kotlin/ktlint/settings.gradle.kts), [catalog](../assets/kotlin/ktlint/gradle/libs.versions.toml), [wrapper](../assets/kotlin/ktlint/gradlew) with its [JAR](../assets/kotlin/ktlint/gradle/wrapper/gradle-wrapper.jar) and [properties](../assets/kotlin/ktlint/gradle/wrapper/gradle-wrapper.properties), and the complete `src/main` tree into `lint/`.
-Include the [provider resource](../assets/kotlin/ktlint/src/main/resources/META-INF/services/com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3), [MIT notice](../assets/kotlin/ktlint/LICENSE), [Apache-2.0 license](../assets/kotlin/ktlint/LICENSE-APACHE), and [attribution](../assets/kotlin/ktlint/NOTICE).
-Use JDK 21 or later and compare the module's engine pin with the consumer's engine version.
-The module uses compile-only ktlint dependencies so the consumer runtime owns those libraries.
-Build the JAR and lint the producer with its pinned wrapper.
+For a standalone project, copy the whole Kotlin sample from the directory containing its [root build](../assets/kotlin/build.gradle.kts).
+Include the [wrapper](../assets/kotlin/gradlew), the [default catalog](../assets/kotlin/gradle/libs.versions.toml), the [buildSrc build](../assets/kotlin/buildSrc/build.gradle.kts), and its complete sources and [provider registration](../assets/kotlin/buildSrc/src/main/resources/META-INF/services/com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3).
+Keep the bundled [MIT notice](../assets/kotlin/LICENSE), [Apache-2.0 license](../assets/kotlin/LICENSE-APACHE), and [attribution](../assets/kotlin/NOTICE).
+Use JDK 21 or later.
 
 ```sh
-./lint/gradlew -p lint ktlintCheck jar
+./gradlew ktlintCheck
 ```
 
-In a consumer that already applies the ktlint Gradle plugin, add the JAR to its lint runtime.
-
-```kotlin
-dependencies {
-    ktlintRuleset(files("lint/build/libs/lint-rules.jar"))
-}
-```
-
-Run the consumer's own `./gradlew ktlintCheck` before and after attaching the JAR.
-The standalone run applies the selected standard rules.
-The composed run adds custom diagnostics while retaining the standard rules.
-For a CLI consumer with ktlint 1.8.0, use normal config discovery and provide the JAR explicitly.
-
-```sh
-ktlint --ruleset=lint/build/libs/lint-rules.jar 'src/**/*.kt'
-```
+Gradle builds `buildSrc` before the sample and the root build adds its managed output to ktlint's worker classpath via `ktlintRuleset`.
+When merging into an existing Gradle project, keep its own catalog and settings, merge only the needed entries from the sample, and attach the ruleset via the existing plugin configuration.
+Compare the selected engine version with the ruleset's compile-only API dependencies.
+Run the consumer's normal lint command on conforming and violating sources.
 
 ## Kotlin body comments
 

@@ -11,7 +11,7 @@ export default defineConfig({
   jsPlugins: [
     "./plugins/tsdoc-plugin.ts",
     "./plugins/spacing.ts",
-    "./skills/development/assets/nodejs/comments/comments.ts"
+    "./skills/development/assets/nodejs/rules/comments.ts"
   ],
   options: { typeAware: true },
   overrides: [

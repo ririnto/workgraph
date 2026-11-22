@@ -7,7 +7,7 @@ Derive data during render, handle user actions in their event handlers, and use 
 Put remaining synchronization behind the integration API that owns setup, cleanup, and retries.
 Verify resubscription, stale results, unmount cleanup, and duplicate execution as applicable.
 
-For ESM product code with the automatic JSX runtime, merge the override from the local [Oxlint template](../assets/nodejs/react/oxlint.config.ts) into the consumer's config.
+For ESM product code with the automatic JSX runtime, extend the consumer's Oxlint config with the [React profile](../assets/nodejs/react.config.ts).
 The override uses `eslint/no-restricted-imports` to reject named `useEffect` imports and default and namespace React imports that expose it.
 Use named imports for other React APIs and types.
 Use the project's React Hooks lint, such as `eslint-plugin-react-hooks`, in integration modules that own effects.
@@ -45,9 +45,9 @@ Expose process capabilities via a narrow preload bridge and IPC.
 Validate messages where they cross the boundary.
 Keep blocking main-process work out of the renderer and verify the affected user interaction through its normal entry point.
 
-Copy the [dependency-cruiser template](../assets/nodejs/electron/.dependency-cruiser.json) into the consumer and merge its entries with existing rules.
+Copy the [Dependency Cruiser config](../assets/nodejs/.dependency-cruiser.json) into the consumer root and merge its entries with existing rules.
 Set the actual main and renderer roots, include both roots and shared modules in the scan, and configure the TypeScript or bundler resolver used by the project.
-Install dependency-cruiser's supported TypeScript parser for TS sources and check the scan counts.
+Install a TypeScript release supported by the project's Dependency Cruiser version and check its reported module count.
 The rules reject resolved direct and transitive imports between `electron-renderer/` and `electron-main/`, including via shared barrels and type-only edges.
 Use separate bridge and shared modules for permitted edges.
 If preload must access a process-specific helper, record the exact allowed bridge entry and edge in the consumer's graph rules and test both that edge and a forbidden renderer edge.

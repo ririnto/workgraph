@@ -1,13 +1,7 @@
 {
+  "extends": "@tsconfig/node-lts/tsconfig.json",
   "compilerOptions": {
-    "module": "nodenext",
-    "noEmit": true,
-    "strict": true
+    "noEmit": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/.*/**/*.ts",
-    "src/**/.*.ts",
-    "src/**/.*/**/.*.ts"
-  ]
+  "include": ["**/*.ts", "**/.*/**/*.ts", "**/.*.ts", "**/.*/**/.*.ts"]
 }

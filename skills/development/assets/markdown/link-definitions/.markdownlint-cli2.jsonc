@@ -1,4 +1,0 @@
-{
-  "config": { "MD053": { "ignored_definitions": [] } },
-  "globs": ["**/*.md"]
-}

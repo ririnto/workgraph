@@ -6,7 +6,8 @@ import {
   mkdtempSync,
   readFileSync,
   realpathSync,
-  rmSync
+  rmSync,
+  unlinkSync
 } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -16,8 +17,7 @@ const fixtures = path.resolve("test/fixtures/ktlint");
 const consumer = realpathSync(
   mkdtempSync(path.join(tmpdir(), "workgraph-ktlint-consumer-"))
 );
-const module = path.join(consumer, "lint");
-const wrapper = path.join(module, "gradlew");
+const wrapper = path.join(consumer, "gradlew");
 const gradleArgs = ["--no-daemon", "--console=plain"];
 const checkTask = "ktlintMainSourceSetCheck";
 const report = path.join(
@@ -28,11 +28,10 @@ const report = path.join(
 );
 
 /**
- * @param {string[]} args Gradle arguments.
  * @param {number} status Expected Gradle exit status.
  */
-const run = (args, status) => {
-  const result = spawnSync(wrapper, [...gradleArgs, ...args], {
+const run = (status) => {
+  const result = spawnSync(wrapper, [...gradleArgs, "ktlintCheck"], {
     cwd: consumer,
     encoding: "utf-8"
   });
@@ -41,33 +40,36 @@ const run = (args, status) => {
 };
 
 try {
-  mkdirSync(module);
   for (const entry of [
+    ".editorconfig",
     "build.gradle.kts",
+    "buildSrc/build.gradle.kts",
+    "buildSrc/settings.gradle.kts",
+    "buildSrc/src",
     "gradle",
     "gradlew",
     "settings.gradle.kts",
-    "src/main"
+    "src"
   ]) {
-    cpSync(path.join(kotlin, "ktlint", entry), path.join(module, entry), {
+    const target = path.join(consumer, entry);
+    mkdirSync(path.dirname(target), { recursive: true });
+    cpSync(path.join(kotlin, entry), target, {
       recursive: true
     });
   }
-  cpSync(
-    path.join(module, "gradle/libs.versions.toml"),
-    path.join(consumer, "gradle/libs.versions.toml")
-  );
-  for (const entry of ["build.gradle.kts", "settings.gradle.kts"]) {
-    cpSync(path.join(fixtures, entry), path.join(consumer, entry));
-  }
   const sources = path.join(consumer, "src/main/kotlin");
-  const cases = ["Matching.kt", "Preserved.kt", "TrailingComma.kt"];
-  mkdirSync(sources, { recursive: true });
-  for (const file of cases) {
-    cpSync(path.join(fixtures, file), path.join(sources, file));
-  }
-  run(["-p", module, "jar"], 0);
-  run([checkTask], 1);
+  cpSync(
+    path.join(fixtures, "TrailingComma.kt"),
+    path.join(sources, "TrailingComma.kt")
+  );
+  cpSync(
+    path.join(fixtures, "Preserved.kt"),
+    path.join(sources, "Preserved.kt")
+  );
+  run(0);
+  assert.deepEqual(JSON.parse(readFileSync(report, "utf-8")), []);
+  unlinkSync(path.join(consumer, ".editorconfig"));
+  run(1);
   assert.partialDeepStrictEqual(JSON.parse(readFileSync(report, "utf-8")), [
     {
       file: path.join(sources, "TrailingComma.kt"),
@@ -78,9 +80,8 @@ try {
     path.join(kotlin, ".editorconfig"),
     path.join(consumer, ".editorconfig")
   );
-  run([checkTask], 0);
-  assert.deepEqual(JSON.parse(readFileSync(report, "utf-8")), []);
-  run([checkTask, "-PuseLocalRules"], 1);
+  cpSync(path.join(fixtures, "Matching.kt"), path.join(sources, "Matching.kt"));
+  run(1);
   const message =
     "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration.";
   assert.deepEqual(JSON.parse(readFileSync(report, "utf-8")), [
@@ -102,14 +103,18 @@ try {
       ]
     }
   ]);
-  for (const file of cases) {
+  for (const file of ["Matching.kt", "Preserved.kt", "TrailingComma.kt"]) {
     assert.deepEqual(
       readFileSync(path.join(sources, file)),
       readFileSync(path.join(fixtures, file))
     );
   }
+  assert.deepEqual(
+    readFileSync(path.join(sources, "example/Labels.kt")),
+    readFileSync(path.join(kotlin, "src/main/kotlin/example/Labels.kt"))
+  );
   process.stdout.write(
-    "Gradle consumer discovered .editorconfig and the optional ruleset without changing source.\n"
+    "The copied Gradle sample discovered .editorconfig and its buildSrc ruleset without changing source.\n"
   );
 } finally {
   rmSync(consumer, { recursive: true });

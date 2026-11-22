@@ -337,7 +337,7 @@ Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
 The rule requires multiline TSDoc for supported exported TypeScript declarations, including public and protected members of exported class declarations.
 It does not check class-expression members through direct exported variable declarations.
 The preset's `no-inline-comments` rule checks trailing comments.
-The [comment rule template](../skills/development/assets/nodejs/comments/comments.ts) provides `comments/no-body-comments`.
+The [comment rule template](../skills/development/assets/nodejs/rules/comments.ts) provides `comments/no-body-comments`.
 Each consuming project [maintains its own copy](../skills/development/SKILL.md#select-and-adopt-lint-checks).
 The rule checks line and block comment placement in function bodies.
 The repository enables its module-scope option to check loose comments across source files.

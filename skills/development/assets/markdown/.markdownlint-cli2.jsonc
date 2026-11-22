@@ -1,0 +1,9 @@
+{
+  "config": {
+    "comments/no-hidden-notes": true,
+    "link-image-reference-definitions": { "ignored_definitions": [] }
+  },
+  "customRules": ["./rules/comments.ts"],
+  "globs": ["**/*.md"],
+  "ignores": ["**/node_modules/**"]
+}

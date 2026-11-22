@@ -148,17 +148,19 @@ Use pnpm and the Node version range in `package.json` for development.
 The managed development runtime uses the exact Node.js version in `devEngines.runtime`.
 The supported Node.js range remains in `engines.node`.
 Install the pnpm version declared in `package.json` before installing the pinned development tools.
-Install ktlint 1.8.0, golangci-lint 2.15.0, actionlint 1.7.12, and ShellCheck for the native lint checks.
-The shell format check runs the repository-managed shfmt Go tool.
-Use JDK 21 or later and Gradle 9 to build and exercise the Kotlin ruleset with ktlint.
-Use the Go version in the bundled Go module's `go.mod`.
-Install NilAway with the version used in the [check workflow](.github/workflows/check.yaml) and put the binary on `PATH`.
-Linux CI installs the same checkers before running `pnpm run check`.
+Install ShellCheck for shell scripts and GitHub Actions workflow checks.
+Use the Go version in the [golangci-lint tool module](tools/golangci-lint/go.mod).
+The repository's [other Go tools](tools/go.mod) pin NilAway, actionlint, and shfmt separately from the analyzer and its runnable example.
+Use JDK 21 or later and the bundled Gradle wrapper to lint the Kotlin build logic and check a fresh sample with the custom ruleset.
+Linux CI provisions the runtimes and ShellCheck, then runs the same `pnpm run check` command.
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm run check
+pnpm run validate:claude
 ```
+
+The Claude validation command uses the pinned CLI to check both the package directory and the native manifest.
 
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
 The pre-commit hook checks the staged diff for whitespace errors and conflict markers.

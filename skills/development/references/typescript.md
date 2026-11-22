@@ -2,7 +2,9 @@
 
 ## Project configuration
 
-For a new Node project with TypeScript, use the [TypeScript config example](../assets/typescript/tsconfig.json) with the [shared Node lint project](javascript.md#adopt-the-oxlint-groups).
+For a new Node project with TypeScript, copy the [TypeScript config example](../assets/typescript/tsconfig.json) over the `tsconfig.json` in the [shared Node lint project](javascript.md#adopt-the-oxlint-groups).
+It extends the catalog-owned Node LTS preset and includes TypeScript files anywhere in the project, including dotfiles and files in dot directories.
+Use `pnpm run check:typescript` for the separate type check and `pnpm run check` for type-aware linting of the sample's `src`.
 For an existing project, merge the relevant include patterns and keep its compiler options.
 
 For each source extension already eligible in the project, use these four `include` patterns, replacing `E` with that extension.
@@ -54,7 +56,7 @@ Follow documented project API and tooling requirements for TSDoc, including requ
 
 ## Body comments
 
-When the project adopts body-comment checks, apply the [shared Oxlint comment configuration](../assets/nodejs/comments/oxlint.config.ts) to its `ts`, `tsx`, `mts`, and `cts` paths.
+When the project adopts body-comment checks, apply the comment override from the [shared Oxlint config](../assets/nodejs/oxlint.config.ts) to its `ts`, `tsx`, `mts`, and `cts` paths.
 Use the [frozen Ultracite example](javascript.md#adopt-the-oxlint-groups) to check both languages with one local installation.
 The [JavaScript placement and exceptions](javascript.md#javascript-body-comments) also apply to TypeScript.
 The rule recognizes TSDoc attached to local TypeScript declarations and existing TypeScript directives.
@@ -85,8 +87,7 @@ Use named fields in parser APIs and follow [Development's regex guidance](../SKI
 When the project opts into checking remaining indexed access, install a compatible version of `eslint-plugin-regexp` as a development dependency.
 Oxlint [tests this package for compatibility](https://oxc.rs/docs/guide/usage/linter/js-plugins.html#known-supported-eslint-plugins).
 Verify the selected plugin version with the project's Node and Oxlint versions.
-Extend the project's Oxlint config with the [scoped regexp config](../assets/nodejs/regexp/oxlint.config.ts) and adapt the override to the intended paths and exceptions.
-The [composed config](../assets/nodejs/oxlint.config.ts) loads it with the body-comment rule and the Ultracite preset.
+Merge the regexp plugin and its override from the [shared Oxlint config](../assets/nodejs/oxlint.config.ts) and adapt the override to the intended paths and exceptions.
 
 Use the consumer's read-only lint entry point, such as `pnpm exec ultracite check --type-aware`, on a matching and a passing case in each language.
 The [rule](https://ota-meshi.github.io/eslint-plugin-regexp/rules/prefer-result-array-groups.html) reports `[1]` in this example because it resolves the index to the named capture `id`.

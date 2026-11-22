@@ -1,5 +1,0 @@
-{
-  "config": { "comments/no-hidden-notes": true },
-  "customRules": ["./lint/markdown-comments.ts"],
-  "globs": ["**/*.md"]
-}

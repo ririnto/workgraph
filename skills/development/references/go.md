@@ -107,24 +107,22 @@ func Read() int {
 
 #### Adopt Go checks
 
-For a standalone example, copy the [application module](../assets/golang/example/go.mod), [source](../assets/golang/example/status.go), and [check script](../assets/golang/example/check.sh) to the consumer root.
-Copy the [tool module](../assets/golang/example/tools/go.mod) and [checksums](../assets/golang/example/tools/go.sum) into `tools/`.
-Copy the [dead-path configuration](../assets/golang/dead-paths/.golangci.yaml) to `.golangci.yaml`.
-Run `./check.sh` locally and in CI from the consumer root.
-The script uses the pinned golangci-lint and shfmt tools through [Go tool declarations](https://go.dev/ref/mod#go-mod-file-tool).
-The tool modfile keeps the app's dependency selection separate.
-
-For loose body comments, copy the [custom build configuration](../assets/golang/body-comments/.custom-gcl.yml) to the consumer root and copy the [module manifest](../assets/golang/go-comments/go.mod), [sums](../assets/golang/go-comments/go.sum), and [analyzer](../assets/golang/go-comments/comments.go) into `lint/go-comments/`.
-Use the [comments configuration](../assets/golang/body-comments/.golangci.yaml) as `.golangci.yaml` to check that group independently.
-To compose both groups or add one to an existing config, merge the selected `linters.enable` entries and `linters.settings` mappings with the consumer's settings.
-Keep the built-in defaults, file selection, and existing security checks.
-Build the custom binary with the pinned version in the build config and check the same module roots as CI.
+Copy the directory containing the [lint config](../assets/golang/.golangci.yaml), [custom build config](../assets/golang/.custom-gcl.yml), and [analyzer module](../assets/golang/go.mod).
+The runnable [example application](../assets/golang/example/go.mod) has its own [tool module](../assets/golang/example/tools/go.mod) and [checksums](../assets/golang/example/tools/go.sum).
+The separate tool modfile pins golangci-lint and shfmt without changing the application's dependency graph.
+From the copied root, build the custom binary with the declared tool and run it on the application.
 
 ```sh
-go tool -modfile=tools/go.mod golangci-lint custom
-./custom-gcl run --config .golangci.yaml ./...
-go tool -modfile=tools/go.mod shfmt -i 2 -d check.sh
+go tool -modfile=example/tools/go.mod golangci-lint custom
+cd example
+../custom-gcl run --config ../.golangci.yaml ./...
 ```
 
+In an existing project, merge the selected `linters.enable` entries and settings with the existing config.
+To adopt only the dead-path checks, keep `gocritic` and `unused` and run the project's declared golangci-lint directly.
+For body comments, copy the [analyzer source](../assets/golang/comments.go), module manifest, and [sums](../assets/golang/go.sum) into `lint/go-comments/`.
+Place the custom build config at the consumer root and set the plugin's `path` to `./lint/go-comments`.
+Keep the consumer's file selection and other checks.
+Use the same lint and read-only shfmt commands locally and in CI.
 Rebuild and verify the custom binary when changing the Go toolchain or lint version.
 Follow golangci-lint's [tool usage recommendations](https://golangci-lint.run/docs/welcome/install/local/#go-tool-usage-recommendations) when integrating it with an existing tools module.

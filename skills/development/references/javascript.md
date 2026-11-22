@@ -39,28 +39,26 @@ Follow documented project API and tooling requirements for JSDoc, including requ
 
 ## Adopt the Oxlint groups
 
-For a standalone project, copy the [Node example manifest](../assets/nodejs/package.json), [catalog](../assets/nodejs/pnpm-workspace.yaml), [lockfile](../assets/nodejs/pnpm-lock.yaml), [Oxlint config](../assets/nodejs/oxlint.config.ts), and [Oxfmt config](../assets/nodejs/oxfmt.config.ts) to the consumer root.
-Copy the [comment config](../assets/nodejs/comments/oxlint.config.ts) and [rule](../assets/nodejs/comments/comments.ts) into `comments/`.
-Copy the [regexp config](../assets/nodejs/regexp/oxlint.config.ts) into `regexp/` and the [JavaScript example](../assets/nodejs/src/render.mjs) and [TypeScript example](../assets/nodejs/src/session.ts) into `src/`.
+For a standalone project, copy the Node sample directory containing its [manifest](../assets/nodejs/package.json), [catalog](../assets/nodejs/pnpm-workspace.yaml), [lockfile](../assets/nodejs/pnpm-lock.yaml), [Oxlint config](../assets/nodejs/oxlint.config.ts), [Oxfmt config](../assets/nodejs/oxfmt.config.ts), and [TypeScript project config](../assets/nodejs/tsconfig.json).
+Keep the [comment rule](../assets/nodejs/rules/comments.ts) in `rules/` and the [JavaScript example](../assets/nodejs/src/render.mjs) and [TypeScript example](../assets/nodejs/src/session.ts) in `src/`.
 Run the commands from the consumer root with the Node runtime the project supports.
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm run check
+pnpm run check:typescript
 ```
 
-For an existing project, extend its `oxlint.config.ts` with the selected config objects and keep its other rules and formatter.
-Keep each imported local config and the rule at its consumer-relative path.
-For comments alone, extend the existing config with the comment config.
-For comments and indexed named captures, extend it with both groups as in the composed example.
-Keep `eslint-plugin-regexp` only if the project opts into the regexp group.
-Adapt the file overrides and retain the project's other lint dependencies.
+The root config enables type-aware linting through the catalog-owned Oxlint backend.
+For an existing project, merge the selected `jsPlugins` entries and overrides into its root config.
+Keep existing rules and formatter settings and adapt the source globs.
+The comments check needs the local rule, and the indexed named capture check needs `eslint-plugin-regexp`.
 Use the same project-owned `pnpm run check` locally, in hooks, and in CI.
 Let CI select pnpm from `packageManager` and provision Node where the project needs it.
 
 ## JavaScript body comments
 
-Apply the [shared Oxlint comment configuration](../assets/nodejs/comments/oxlint.config.ts) to the project's `js`, `jsx`, `mjs`, and `cjs` paths when the project adopts it.
+Apply the comment override from the [shared Oxlint config](../assets/nodejs/oxlint.config.ts) to the project's `js`, `jsx`, `mjs`, and `cjs` paths when the project adopts it.
 The rule flags standalone and trailing line comments and block comments in block-bodied functions, methods, and callbacks.
 It preserves JSDoc attached to a supported declaration, recognized tool directives, and legal markers.
 Comments outside block-bodied functions remain subject to the consumer's existing checks.
