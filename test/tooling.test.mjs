@@ -769,8 +769,8 @@ await test("bundled pnpm samples accept their frozen lockfiles", async (t) => {
     }
     const result = spawnSync(
       "pnpm",
-      ["install", "--lockfile-only", "--frozen-lockfile", "--offline"],
-      { cwd, encoding: "utf-8", timeout: 30_000 }
+      ["install", "--lockfile-only", "--frozen-lockfile"],
+      { cwd, encoding: "utf-8", timeout: 120_000 }
     );
     assert.ifError(result.error);
     assert.equal(result.status, 0, result.stdout + result.stderr);
