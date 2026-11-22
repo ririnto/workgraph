@@ -1,4 +1,0 @@
-version: v2.15.0
-plugins:
-  - module: example.com/local/lint/comments
-    path: ..

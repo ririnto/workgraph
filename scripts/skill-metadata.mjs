@@ -13,16 +13,16 @@ import yamlParser from "markdownlint-cli2/parsers/yaml";
 
 const namePattern = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
 /**
- * @param {unknown} value Input value.
- * @returns {value is Record<string, unknown>} Whether the value is a plain mapping.
+ * @param {unknown} value Parsed YAML value.
+ * @returns {value is Record<string, unknown>} Whether it has a plain object prototype.
  */
 const isMapping = (value) =>
   value !== null &&
   typeof value === "object" &&
   Object.getPrototypeOf(value) === Object.prototype;
 /**
- * @param {unknown} value Input value.
- * @returns {value is string} Whether the value is a non-empty string.
+ * @param {unknown} value Candidate field value.
+ * @returns {value is string} Whether it contains non-whitespace text.
  */
 const nonEmptyString = (value) =>
   typeof value === "string" && value.trim() !== "";
@@ -53,7 +53,7 @@ const validateName = (value, directoryName, report) => {
 };
 
 /**
- * @param {Record<string, unknown>} metadata Parsed metadata.
+ * @param {Record<string, unknown>} metadata Parsed frontmatter.
  * @param {(message: string) => void} report Diagnostic sink.
  */
 const validateFields = (metadata, report) => {
@@ -89,7 +89,7 @@ const validateFields = (metadata, report) => {
 };
 
 /**
- * @param {Record<string, unknown>} metadata Parsed metadata.
+ * @param {Record<string, unknown>} metadata Parsed frontmatter.
  * @param {(message: string) => void} report Diagnostic sink.
  */
 const validateInvocation = (metadata, report) => {
@@ -119,10 +119,10 @@ const validateInvocation = (metadata, report) => {
 };
 
 /**
- * @param {string} directoryName Name of the containing skill directory.
+ * @param {string} directoryName Parent directory name.
  * @param {unknown} metadata Optional skill metadata map.
- * @param {string} frontmatter Complete frontmatter.
- * @returns {boolean} Whether Development declares its same-file continuation within the portable prompt.
+ * @param {string} frontmatter Frontmatter including delimiters.
+ * @returns {boolean} Whether Development opts in within the portable prefix.
  */
 const supportsNativeContinuation = (directoryName, metadata, frontmatter) =>
   directoryName === "development" &&
@@ -134,7 +134,7 @@ const supportsNativeContinuation = (directoryName, metadata, frontmatter) =>
  * Validate portable skill metadata and Workgraph's host invocation limits.
  * Preserve host extensions outside the checked fields.
  * @param {string} content Complete SKILL.md source.
- * @param {string} directoryName Name of the containing skill directory.
+ * @param {string} directoryName Parent directory name.
  * @param {string} source Diagnostic source label.
  * @returns {string[]} Frontmatter, field, body, and host compatibility diagnostics.
  */
@@ -145,7 +145,7 @@ export const validateSkillContent = (
 ) => {
   /** @type {string[]} */
   const errors = [];
-  /** @param {string} message Diagnostic text. */
+  /** @param {string} message Diagnostic before source labeling. */
   const report = (message) => {
     errors.push(`${source}: ${message}`);
   };
@@ -200,9 +200,6 @@ export const validateSkillContent = (
     errors.unshift(
       `${source}: complete file must fit Codex's 8000-byte portable skill prompt limit.`
     );
-  }
-  if (hasNativeContinuation && size > 16_000) {
-    report("Development must fit two 8000-byte skill segments.");
   }
   return errors;
 };

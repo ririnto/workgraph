@@ -27,9 +27,7 @@ const report = path.join(
   `${checkTask}.json`
 );
 
-/**
- * @param {number} status Expected Gradle exit status.
- */
+/** @param {number} status Expected wrapper exit. */
 const run = (status) => {
   const result = spawnSync(wrapper, [...gradleArgs, "ktlintCheck"], {
     cwd: consumer,

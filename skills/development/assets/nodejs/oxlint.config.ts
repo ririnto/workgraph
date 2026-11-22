@@ -9,7 +9,7 @@ import core from "ultracite/oxlint/core";
 export default defineConfig({
   extends: [core],
   jsPlugins: [
-    fileURLToPath(new URL("rules/comments.ts", import.meta.url)),
+    fileURLToPath(new URL("plugins/comments.ts", import.meta.url)),
     "eslint-plugin-regexp"
   ],
   options: { typeAware: true },

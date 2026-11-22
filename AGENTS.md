@@ -51,7 +51,7 @@ Exclude generated and vendored material from mechanical prose edits.
 - Use no trailing commas in TypeScript.
 - Use `.yaml` for maintained YAML files unless the consumer requires another exact filename.
 - Use block sequences except for an explicit empty sequence.
-- Keep repository shell scripts in POSIX `sh` with the `.editorconfig` two-space indentation, formatted with `shfmt` and checked with `shellcheck`.
+- Keep repository shell scripts in POSIX `sh` with the `.editorconfig` two-space indentation and check their formatting with `shfmt`.
 
 ## Tests
 

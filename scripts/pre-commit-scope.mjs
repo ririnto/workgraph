@@ -44,8 +44,6 @@ for (const { patterns, check, test } of [
       "go.work",
       ".golangci.yaml",
       "skills/development/assets/golang/.golangci.yaml",
-      "skills/development/assets/golang/.custom-gcl.yml",
-      "skills/development/assets/golang/example/.custom-gcl.yml",
       "scripts/check-go-consumer.mjs"
     ],
     check: "check:go"
@@ -108,7 +106,7 @@ for (const { patterns, check, test } of [
       "skills/development/assets/markdown/*.{json,yaml}",
       "skills/development/assets/markdown/rules/**/*.ts",
       "skills/development/assets/nodejs/*.{json,ts,yaml}",
-      "skills/development/assets/nodejs/rules/**/*.ts",
+      "skills/development/assets/nodejs/plugins/**/*.ts",
       "skills/development/assets/nodejs/src/**",
       "skills/development/assets/nodejs/.dependency-cruiser.json",
       "skills/development/assets/typescript/tsconfig.json",

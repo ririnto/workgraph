@@ -105,22 +105,21 @@ func Read() int {
 
 #### Adopt Go checks
 
-Copy the directory containing the [lint config](../assets/golang/.golangci.yaml) and [analyzer module](../assets/golang/go.mod), including its `example/` directory.
-The runnable [example application](../assets/golang/example/go.mod) declares golangci-lint and shfmt in its own module and includes their [checksums](../assets/golang/example/go.sum).
-Its [custom build config](../assets/golang/example/.custom-gcl.yml) resolves the analyzer one directory above the application.
-Build and run the custom linter from the copied application directory.
+Copy the directory containing the [lint config](../assets/golang/.golangci.yaml), [Go module](../assets/golang/go.mod), and [checksums](../assets/golang/go.sum).
+The module declares the local golangci-lint command and shfmt.
+The [command's plugin import](../assets/golang/cmd/golangci-lint/plugins.go) registers the bundled analyzer through golangci-lint's [manual module plugin procedure](https://golangci-lint.run/docs/plugins/module-plugins/#the-manual-way).
+Run the commands from the copied module root to check the [example package](../assets/golang/example/status.go).
 
 ```sh
-cd example
-go tool golangci-lint custom
-./custom-gcl run --config ../.golangci.yaml ./...
-go tool shfmt -i 2 -d .
+GOWORK=off go tool golangci-lint run --config .golangci.yaml ./example/...
+GOWORK=off go tool shfmt -i 2 -d example/
 ```
 
 In an existing project, merge the selected `linters.enable` entries and settings with the existing config.
 To adopt only the dead-path checks, keep `gocritic` and `unused` and run the project's declared golangci-lint directly.
-For body comments, copy the [analyzer source](../assets/golang/comments.go), module manifest, and [sums](../assets/golang/go.sum) into `lint/go-comments/`.
-Place the [analyzer's custom build config](../assets/golang/.custom-gcl.yml) at the consumer root and set the plugin's `path` to `./lint/go-comments`.
+For body comments, copy the [analyzer source](../assets/golang/comments.go) into a package in the consumer's module.
+Copy [the command](../assets/golang/cmd/golangci-lint/main.go) and [its plugin import](../assets/golang/cmd/golangci-lint/plugins.go) into `cmd/golangci-lint/` and update the blank import to the analyzer's new package path.
+Keep the versions in the [asset module](../assets/golang/go.mod) if the consumer's graph permits them, then run `go get -tool ./cmd/golangci-lint` and `go mod tidy` from the consumer's module root.
 Keep the consumer's file selection and other checks.
 Use the same lint and read-only shfmt commands locally and in CI.
-Rebuild and verify the custom binary when changing the Go toolchain or lint version.
+Run and verify the registered tool when changing the Go toolchain or lint version.

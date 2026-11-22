@@ -15,9 +15,9 @@ const assets = path.resolve("skills/development/assets");
 const consumer = mkdtempSync(path.join(tmpdir(), "workgraph-node-consumer-"));
 
 /**
- * @param {string[]} args pnpm arguments.
+ * @param {string[]} args pnpm subcommand and arguments.
  * @param {number} [status] Expected process exit.
- * @returns {string} Standard output.
+ * @returns {string} Captured stdout.
  */
 const run = (args, status = 0) => {
   const result = spawnSync("pnpm", args, {
@@ -37,7 +37,7 @@ try {
     "package.json",
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
-    "rules",
+    "plugins",
     "src",
     "tsconfig.json"
   ]) {

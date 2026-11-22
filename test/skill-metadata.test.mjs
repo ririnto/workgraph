@@ -221,18 +221,15 @@ await test("only Development can opt into a bounded same-file continuation", () 
   const enabled = skillContent(
     `${fields}\nmetadata:\n  workgraph-continuation: same-file`
   );
-  const boundary = enabled + "x".repeat(16_000 - enabled.length);
-  assert.deepEqual(validateSkillContent(boundary, "development"), []);
-  assert.deepEqual(validateSkillContent(`${boundary}x`, "development"), [
-    "<skill>: Development must fit two 8000-byte skill segments."
-  ]);
+  const content = enabled + "é".repeat(12_000);
+  assert.deepEqual(validateSkillContent(content, "development"), []);
   const disabled = skillContent(fields, "x".repeat(8000));
   assert.deepEqual(validateSkillContent(disabled, "development"), [
     "<skill>: complete file must fit Codex's 8000-byte portable skill prompt limit."
   ]);
   assert.deepEqual(
     validateSkillContent(
-      boundary.replace("name: development", "name: sample-skill"),
+      content.replace("name: development", "name: sample-skill"),
       "sample-skill"
     ),
     [

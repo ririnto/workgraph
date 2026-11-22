@@ -89,7 +89,7 @@ Oxlint [tests this package for compatibility](https://oxc.rs/docs/guide/usage/li
 Verify the selected plugin version with the project's Node and Oxlint versions.
 Merge the regexp plugin and its override from the [shared Oxlint config](../assets/nodejs/oxlint.config.ts) and adapt the override to the intended paths and exceptions.
 
-Use the consumer's read-only lint entry point, such as `pnpm exec ultracite check --type-aware`, on a matching and a passing case in each language.
+Use the consumer's configured read-only lint command on a matching and a passing case in each language.
 The [rule](https://ota-meshi.github.io/eslint-plugin-regexp/rules/prefer-result-array-groups.html) reports `[1]` in this example because it resolves the index to the named capture `id`.
 
 ```js

@@ -29,17 +29,11 @@ jobs:
             go.sum
             go.work.sum
             skills/development/assets/golang/go.sum
-            skills/development/assets/golang/example/go.sum
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v6
-      - name: Install ShellCheck
-        shell: bash
-        run: |-
-          sudo apt-get update
-          sudo apt-get install -y shellcheck
       - run: pnpm install --frozen-lockfile
       - run: pnpm run check
       - name: Validate Claude plugin package and manifest

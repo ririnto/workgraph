@@ -55,7 +55,7 @@ Do not parse `ls` output.
 
 ## Validate and document scripts
 
-For shell assets, run applicable, available `shfmt` and `shellcheck` checks with the project's indentation settings.
+For shell assets, check formatting with the project's `shfmt` settings and run scripts with the shells they support.
 Report unavailable required checks instead of replacing them with weaker evidence.
 Document functions exposed by sourced scripts with declaration-level comment blocks describing their contracts.
 Treat callable sourced functions as public unless the script's API contract marks them internal.

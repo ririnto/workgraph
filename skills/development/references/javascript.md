@@ -40,7 +40,7 @@ Follow documented project API and tooling requirements for JSDoc, including requ
 ## Adopt the Oxlint groups
 
 For a standalone project, copy the Node sample directory containing its [manifest](../assets/nodejs/package.json), [catalog](../assets/nodejs/pnpm-workspace.yaml), [lockfile](../assets/nodejs/pnpm-lock.yaml), [Oxlint config](../assets/nodejs/oxlint.config.ts), [Oxfmt config](../assets/nodejs/oxfmt.config.ts), and [TypeScript project config](../assets/nodejs/tsconfig.json).
-Keep the [comment rule](../assets/nodejs/rules/comments.ts) in `rules/` and the [JavaScript example](../assets/nodejs/src/render.mjs) and [TypeScript example](../assets/nodejs/src/session.ts) in `src/`.
+Keep the [comment plugin](../assets/nodejs/plugins/comments.ts) in `plugins/` and the [JavaScript example](../assets/nodejs/src/render.mjs) and [TypeScript example](../assets/nodejs/src/session.ts) in `src/`.
 Run the commands from the consumer root with the Node runtime the project supports.
 
 ```sh

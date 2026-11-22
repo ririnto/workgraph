@@ -63,9 +63,12 @@ await test("Git hooks invoke pnpm directly and propagate its status", async () =
 
 await test("pre-commit dispatches checks for staged-only tool configuration", async (t) => {
   const cases = [
-    ["skills/development/assets/golang/.custom-gcl.yml", "check:go"],
     ["skills/development/assets/golang/.golangci.yaml", "check:go"],
-    ["skills/development/assets/golang/example/.custom-gcl.yml", "check:go"],
+    ["skills/development/assets/golang/go.mod", "check:go"],
+    [
+      "skills/development/assets/golang/cmd/golangci-lint/plugins.go",
+      "check:go"
+    ],
     ["go.work", "check:go"],
     [
       "skills/development/assets/kotlin/gradle/libs.versions.toml",
@@ -74,6 +77,10 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
     ["skills/development/assets/kotlin/.editorconfig", "check:kotlin"],
     [
       "skills/development/assets/nodejs/oxlint.config.ts",
+      "check:node-consumer"
+    ],
+    [
+      "skills/development/assets/nodejs/plugins/comments.ts",
       "check:node-consumer"
     ],
     [
@@ -402,7 +409,7 @@ const createUltraciteFixture = async (t) => {
       "oxlint.config.ts",
       "oxfmt.config.ts",
       "plugins",
-      "skills/development/assets/nodejs/rules"
+      "skills/development/assets/nodejs/plugins"
     ].map(async (entry) => {
       await cp(path.join(root, entry), path.join(directory, entry), {
         recursive: true

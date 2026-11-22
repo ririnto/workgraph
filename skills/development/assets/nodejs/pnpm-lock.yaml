@@ -174,31 +174,31 @@ settings:
 catalogs:
   default:
     '@oxlint/plugins':
-      specifier: 1.94.0
+      specifier: ^1.94.0
       version: 1.94.0
     '@tsconfig/node-lts':
-      specifier: 24.0.1
+      specifier: ^24.0.1
       version: 24.0.1
     '@types/node':
-      specifier: 24.19.2
+      specifier: ^24.19.2
       version: 24.19.2
     eslint-plugin-regexp:
-      specifier: 3.3.3
+      specifier: ^3.3.3
       version: 3.3.3
     oxfmt:
-      specifier: 0.78.0
+      specifier: ^0.78.0
       version: 0.78.0
     oxlint:
-      specifier: 1.94.0
+      specifier: ^1.94.0
       version: 1.94.0
     oxlint-tsgolint:
-      specifier: 7.0.2007
+      specifier: ^7.0.2007
       version: 7.0.2007
     typescript:
-      specifier: 7.0.2
+      specifier: ^7.0.2
       version: 7.0.2
     ultracite:
-      specifier: 8.3.0
+      specifier: ^8.3.0
       version: 8.3.0
 
 importers:

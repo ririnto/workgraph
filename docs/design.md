@@ -190,7 +190,7 @@ It also cannot register a native invocation, install frontmatter hooks, or grant
 
 The reviewed Codex portable-plugin selection path truncates complete skill files after 8,000 UTF-8 bytes.
 Workgraph retains that complete-file portability budget, including frontmatter, for skills other than Development.
-Development puts its side-effect checks and continuation instruction in the first segment and requires the rest of the same file before use.
+Development puts its side-effect checks and continuation instruction in the first segment and requires bounded reads of the same file through end of file before use.
 The native Codex manifest selects a different loading path that supplies the complete file.
 The [source review](research.md#native-skill-selection) records the reviewed branch and date and distinguishes this limit from metadata budgets and hook delivery.
 Hook output always retains complete selected files.
@@ -337,7 +337,7 @@ Oxfmt additionally excludes Markdown and uses `trailingComma: "none"`.
 The rule requires multiline TSDoc for supported exported TypeScript declarations, including public and protected members of exported class declarations.
 It does not check class-expression members through direct exported variable declarations.
 The preset's `no-inline-comments` rule checks trailing comments.
-The [comment rule template](../skills/development/assets/nodejs/rules/comments.ts) provides `comments/no-body-comments`.
+The [comment rule template](../skills/development/assets/nodejs/plugins/comments.ts) provides `comments/no-body-comments`.
 Each consuming project [maintains its own copy](../skills/development/SKILL.md#select-and-adopt-lint-checks).
 The rule checks line and block comment placement in function bodies.
 The repository enables its module-scope option to check loose comments across source files.
@@ -349,7 +349,7 @@ Function bodies reject blank lines except where the test spacing rule requires o
 Markdownlint checks relative links, heading fragments, prose, and table separators.
 Its skill rules check bundled frontmatter and require external skills to use names or published URLs.
 Relative paths to bundled skills remain valid.
-ShellCheck and shfmt check the Husky scripts.
+shfmt checks the Husky scripts, and runtime tests exercise their dispatch and exit status.
 ktlint checks the bundled Kotlin asset.
 golangci-lint and NilAway check the bundled Go asset.
 actionlint checks GitHub Actions workflows.
