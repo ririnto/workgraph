@@ -24,7 +24,7 @@ jobs:
           cache: true
       - uses: actions/setup-go@v7
         with:
-          go-version-file: tools/golangci-lint/go.mod
+          go-version-file: skills/development/assets/golang/example/tools/go.mod
           cache-dependency-path: |-
             skills/development/assets/golang/go.sum
             skills/development/assets/golang/example/tools/go.sum
