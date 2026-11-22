@@ -1,6 +1,10 @@
-# Kotlin body comments
+# Kotlin
 
-Use the [local ktlint setup](lint-rules.md#ktlint) for `*.kt` and `*.kts`.
+For source and tooling conventions, read the [Java and Kotlin guidance](java-kotlin.md).
+
+## Kotlin body comments
+
+When the project adopts the bundled Kotlin lint checks, use the [local ktlint setup](lint-rules.md#ktlint) for `*.kt` and `*.kts`.
 The `comments:no-body-comments` rule flags loose line, block, and unattached KDoc comments inside function bodies and lambdas.
 It preserves KDoc attached to declarations and known IDE, formatter, region, ktlint, and legal markers.
 The built-in `standard:no-unused-imports` rule checks a separate dead-source case.

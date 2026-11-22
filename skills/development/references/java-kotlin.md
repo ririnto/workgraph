@@ -151,7 +151,7 @@ Keep Java methods when no Kotlin equivalent satisfies the contract.
 ### Kotlin tooling
 
 For authorized Kotlin lint automation, prefer ktlint built-in rules.
-For unused imports and body comments, see the [adoptable Kotlin lint checks](lint-kotlin.md).
+For unused imports and body comments, see the [adoptable Kotlin lint checks](kotlin.md#kotlin-body-comments).
 For that automation, use ktlint's supported custom-rule API when built-ins cannot express a safe requirement.
 Verify compatibility with the project's ktlint version before implementing custom rules or fixes.
 Check Kotlin, Gradle, JVM, ktlint engine, and plugin compatibility together before selecting versions.
