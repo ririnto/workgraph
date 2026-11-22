@@ -24,3 +24,32 @@ Non-matching content uses a legal marker and displays a comment as a code exampl
 
 Use `<!-- sample -->` as the marker in examples.
 ```
+
+## Reuse a Markdownlint rule
+
+Use [Markdownlint CLI2 custom rules](https://github.com/DavidAnson/markdownlint-cli2#markdownlint-cli2jsonc) to load an external package from your project's development dependencies.
+For example, [markdownlint-rule-relative-links](https://github.com/theoludwig/markdownlint-rule-relative-links) checks local paths and Markdown heading links.
+Install it with the project's package manager and merge this fragment into the intended directory's `.markdownlint-cli2.jsonc`.
+
+```json
+{
+  "customRules": ["markdownlint-rule-relative-links"],
+  "config": {
+    "relative-links": true
+  }
+}
+```
+
+Run the project's normal read-only Markdownlint CLI2 command against Markdown that links to a present file and Markdown that links to a missing file.
+Keep the rest of the project's enabled rules and file selection.
+Check compatibility with the project's Node runtime and Markdownlint CLI2.
+The package checks Markdown links and images, not equivalent raw HTML.
+An existing path is not proof that a skill link points inside the distributed plugin.
+
+| Policy | Workgraph decision |
+| --- | --- |
+| Relative link resolution | Adopt the external rule where the project needs local file and heading checks. |
+| ASCII tree markers | Already covered by the repository's diagnostic-only search-replace rule. |
+| Hidden reference definitions | Already covered by the asset's configured MD053. |
+| Hidden notes nested in raw HTML | Review in context rather than searching text that might not be a note. |
+| Skill-package link boundaries and authored table separators | Keep project-specific checks for bundled destinations and table delimiters. |
