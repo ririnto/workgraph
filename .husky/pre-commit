@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 # vim: set fileencoding=utf-8 :
 set -e
-corepack pnpm run pre-commit
+pnpm run pre-commit
