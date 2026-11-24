@@ -33,14 +33,9 @@ Run the existing hooks and CI checks without weakening test, security, or output
 
 ## Declaration documentation
 
-For JavaScript, use multiline JSDoc for exported declarations, re-exports, default exports, and public class members, including constructors.
-Treat class members as public unless their privacy is established by language syntax or the documented API contract.
-For TypeScript, use multiline TSDoc for exported declarations, types, re-exports, default exports, and effective public or protected class members.
-Include constructors and implicitly public members, accounting for enclosing visibility.
-For TypeScript, state the public contract instead of restating the declaration's name.
-Put `/**` and `*/` on separate lines, with meaningful sentences on `*` lines.
-For JavaScript, use `@param` and `@returns` only when they clarify accepted inputs or returned values.
-For TypeScript, use them only when they clarify meaning beyond identifiers and types.
+Use the [shared comment guidance](../SKILL.md#documentation-and-comments) to decide whether a declaration needs prose.
+Preserve type information carried by JavaScript JSDoc.
+Follow documented project API and tooling requirements for JSDoc and TSDoc, including required tags and formatting.
 
 ## Code style
 
