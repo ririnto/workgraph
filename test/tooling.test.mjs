@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -59,6 +59,92 @@ await test("Git hooks invoke Corepack pnpm and propagate its status", async () =
   } finally {
     await rm(directory, { force: true, recursive: true });
   }
+});
+
+await test("pre-commit dispatches checks for staged-only tool configuration", async (t) => {
+  const cases = [
+    ["skills/development/assets/golang/.golangci.yaml", "check:go"],
+    ["skills/development/assets/golang/go.mod", "check:go"],
+    [
+      "skills/development/assets/golang/cmd/golangci-lint/plugins.go",
+      "check:go"
+    ],
+    ["go.work", "check:go"],
+    [
+      "skills/development/assets/kotlin/gradle/libs.versions.toml",
+      "check:kotlin"
+    ],
+    ["skills/development/assets/kotlin/.editorconfig", "check:kotlin"],
+    [
+      "skills/development/assets/nodejs/oxlint.config.ts",
+      "check:node-consumer"
+    ],
+    [
+      "skills/development/assets/nodejs/plugins/comments.ts",
+      "check:node-consumer"
+    ],
+    [
+      "skills/development/assets/typescript/tsconfig.json",
+      "check:node-consumer"
+    ],
+    ["notes.txt", ""]
+  ];
+  await Promise.all(
+    cases.map(async ([file, expected]) => {
+      await t.test(file, async (caseContext) => {
+        const directory = await mkdtemp(
+          path.join(tmpdir(), "workgraph-staged-")
+        );
+        caseContext.after(async () => {
+          await rm(directory, { force: true, recursive: true });
+        });
+        const env = {
+          ...process.env,
+          GIT_DIR: path.join(directory, ".git"),
+          GIT_INDEX_FILE: path.join(directory, ".git/index"),
+          GIT_WORK_TREE: directory,
+          PATH: `${directory}${path.delimiter}${process.env.PATH ?? ""}`
+        };
+        const staged = path.join(directory, file);
+        await mkdir(path.dirname(staged), { recursive: true });
+        await writeFile(staged, "fixture\n");
+        await writeFile(
+          path.join(directory, "pnpm"),
+          '#!/bin/sh\nprintf "%s\\n" "$@"\nexit 19\n',
+          { mode: 0o755 }
+        );
+        for (const args of [
+          ["init", "--template=", "-q"],
+          ["add", "--", file]
+        ]) {
+          const result = spawnSync("git", args, {
+            cwd: directory,
+            encoding: "utf-8",
+            env
+          });
+          assert.ifError(result.error);
+          assert.equal(result.status, 0, result.stderr);
+        }
+        const result = spawnSync(
+          process.execPath,
+          [
+            path.resolve(import.meta.dirname, "../scripts/pre-commit-scope.mjs")
+          ],
+          { cwd: directory, encoding: "utf-8", env }
+        );
+        assert.ifError(result.error);
+        assert.equal(result.status, 19, result.stderr);
+        const dispatched = result.stdout
+          .split("\n")
+          .filter((argument) =>
+            ["check:go", "check:kotlin", "check:node-consumer"].includes(
+              argument
+            )
+          );
+        assert.deepEqual(dispatched, expected ? [expected] : []);
+      });
+    })
+  );
 });
 
 await test("prose formatting checks sentences and preserves Markdown syntax", () => {
@@ -323,7 +409,7 @@ const createUltraciteFixture = async (t) => {
       "oxlint.config.ts",
       "oxfmt.config.ts",
       "plugins",
-      "skills/development/assets/lint"
+      "skills/development/assets/nodejs/plugins"
     ].map(async (entry) => {
       await cp(path.join(root, entry), path.join(directory, entry), {
         recursive: true
@@ -550,20 +636,17 @@ await test("local Markdown comments config checks hidden notes and preserves lit
   t.after(async () => {
     await rm(directory, { force: true, recursive: true });
   });
-  const assets = path.join(root, "skills/development/assets/lint");
-  await mkdir(path.join(directory, "lint"));
+  const assets = path.join(root, "skills/development/assets/markdown");
+  await mkdir(path.join(directory, "rules"));
+  await mkdir(path.join(directory, "node_modules"));
   await Promise.all([
     cp(
-      path.join(assets, "markdownlint-cli2.jsonc"),
-      path.join(directory, ".markdownlint-cli2.jsonc")
+      path.join(assets, "rules/comments.ts"),
+      path.join(directory, "rules/comments.ts")
     ),
-    cp(
-      path.join(assets, "markdown-comments.ts"),
-      path.join(directory, "lint/markdown-comments.ts")
-    ),
-    symlink(
-      path.join(root, "node_modules"),
-      path.join(directory, "node_modules")
+    writeFile(
+      path.join(directory, "node_modules/ignored.md"),
+      "# Dependency\n\n<!-- Ignore this dependency file. -->\n"
     ),
     writeFile(
       path.join(directory, "rejected.md"),
@@ -598,7 +681,7 @@ await test("local Markdown comments config checks hidden notes and preserves lit
         "Copyright 2026 Example Authors",
         "-->",
         "",
-        "<!-- markdownlint-disable-next-line MD013 -->",
+        "<!-- markdownlint-disable-next-line line-length -->",
         "Example: `<!-- inline example -->`.",
         "",
         "```html",
@@ -612,38 +695,95 @@ await test("local Markdown comments config checks hidden notes and preserves lit
     root,
     "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs"
   );
-  const accepted = spawnSync(
-    process.execPath,
-    [command, "--no-globs", "accepted.md"],
-    {
-      cwd: directory,
-      encoding: "utf-8"
-    }
+  /** @type {unknown} */
+  const config = JSON.parse(
+    readFileSync(path.join(assets, ".markdownlint-cli2.jsonc"), "utf-8")
   );
-  assert.ifError(accepted.error);
-  assert.equal(accepted.status, 0, accepted.stderr);
-  const rejected = spawnSync(
-    process.execPath,
-    [command, "--no-globs", "rejected.md"],
-    {
-      cwd: directory,
-      encoding: "utf-8"
-    }
-  );
-  assert.ifError(rejected.error);
-  assert.equal(rejected.status, 1, rejected.stderr);
-  assert.deepEqual(
-    rejected.stderr
-      .trim()
-      .split("\n")
-      .map((line) => line.split(" ").slice(0, 3)),
+  assert.ok(isObject(config));
+  assert.ok(isObject(config.config));
+  const hiddenDiagnostics = [
+    ["rejected.md:3", "error", "comments/no-hidden-notes"],
+    ["rejected.md:5", "error", "comments/no-hidden-notes"],
+    ["rejected.md:7", "error", "comments/no-hidden-notes"]
+  ];
+  const linkDiagnostic = [
+    "rejected.md:10:1",
+    "error",
+    "MD053/link-image-reference-definitions"
+  ];
+  const acceptedFile = path.join(directory, "accepted.md");
+  const rejectedFile = path.join(directory, "rejected.md");
+  const acceptedBytes = readFileSync(acceptedFile);
+  const rejectedBytes = readFileSync(rejectedFile);
+  for (const [settings, expected] of [
+    [config.config, [...hiddenDiagnostics, linkDiagnostic]],
     [
-      ["rejected.md:3", "error", "comments/no-hidden-notes"],
-      ["rejected.md:5", "error", "comments/no-hidden-notes"],
-      ["rejected.md:7", "error", "comments/no-hidden-notes"],
-      ["rejected.md:10:1", "error", "MD053/link-image-reference-definitions"]
-    ]
+      { ...config.config, "link-image-reference-definitions": false },
+      hiddenDiagnostics
+    ],
+    [{ ...config.config, "comments/no-hidden-notes": false }, [linkDiagnostic]]
+  ]) {
+    writeFileSync(
+      path.join(directory, ".markdownlint-cli2.jsonc"),
+      JSON.stringify({ ...config, config: settings })
+    );
+    const accepted = spawnSync(
+      process.execPath,
+      [command, "--no-globs", "accepted.md"],
+      { cwd: directory, encoding: "utf-8" }
+    );
+    assert.ifError(accepted.error);
+    assert.equal(accepted.status, 0, accepted.stderr);
+    const rejected = spawnSync(process.execPath, [command], {
+      cwd: directory,
+      encoding: "utf-8"
+    });
+    assert.ifError(rejected.error);
+    assert.equal(rejected.status, 1, rejected.stderr);
+    assert.deepEqual(
+      rejected.stderr
+        .trim()
+        .split("\n")
+        .map((line) => line.split(" ").slice(0, 3)),
+      expected
+    );
+    assert.deepEqual(readFileSync(acceptedFile), acceptedBytes);
+    assert.deepEqual(readFileSync(rejectedFile), rejectedBytes);
+  }
+});
+
+await test("bundled pnpm samples accept their frozen lockfiles", async (t) => {
+  const root = path.resolve(
+    import.meta.dirname,
+    "../skills/development/assets"
   );
+  const directory = await mkdtemp(
+    path.join(tmpdir(), "workgraph-sample-lock-")
+  );
+  t.after(async () => {
+    await rm(directory, { force: true, recursive: true });
+  });
+  for (const sample of ["markdown", "nodejs"]) {
+    const cwd = path.join(directory, sample);
+    mkdirSync(cwd);
+    for (const file of [
+      "package.json",
+      "pnpm-workspace.yaml",
+      "pnpm-lock.yaml"
+    ]) {
+      writeFileSync(
+        path.join(cwd, file),
+        readFileSync(path.join(root, sample, file))
+      );
+    }
+    const result = spawnSync(
+      "pnpm",
+      ["install", "--lockfile-only", "--frozen-lockfile"],
+      { cwd, encoding: "utf-8", timeout: 120_000 }
+    );
+    assert.ifError(result.error);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+  }
 });
 
 /** @typedef {{result: unknown} & Record<string, unknown>} CompletionEvidence */

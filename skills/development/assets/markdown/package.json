@@ -1,0 +1,12 @@
+{
+  "name": "markdown-lint-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "markdownlint-cli2"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "catalog:"
+  },
+  "packageManager": "pnpm@12.21.0"
+}

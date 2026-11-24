@@ -1,0 +1,11 @@
+[*.{kt,kts}]
+ij_kotlin_allow_trailing_comma = false
+ij_kotlin_allow_trailing_comma_on_call_site = false
+ij_kotlin_code_style_defaults = KOTLIN_STYLE_GUIDE
+ktlint_code_style = ktlint_official
+ktlint_standard_function-expression-body = enabled
+ktlint_standard_if-else-bracing = enabled
+ktlint_standard_multiline-if-else = enabled
+ktlint_standard_no-consecutive-blank-lines = enabled
+ktlint_standard_no-unused-imports = enabled
+ktlint_comments_no-body-comments = enabled

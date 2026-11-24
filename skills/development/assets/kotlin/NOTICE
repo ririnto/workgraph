@@ -1,0 +1,5 @@
+The Kotlin EditorConfig and Gradle ktlint setup adapt the Sinon Harness Kotlin tooling by ririnto.
+Original source https://github.com/ririnto/sinon/tree/main/plugins/harness/tooling/kotlin
+The adapted material uses Apache-2.0. See LICENSE-APACHE.
+The bundled Gradle Wrapper is from Gradle 9.9.1 and retains its Apache-2.0 notices.
+The custom Kotlin rule retains the Workgraph MIT license. See LICENSE.

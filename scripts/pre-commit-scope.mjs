@@ -38,10 +38,46 @@ const checks = [
 ];
 const tests = ["test/validation.test.mjs"];
 for (const { patterns, check, test } of [
-  { patterns: ["**/*.{go,mod,sum}", ".golangci.yaml"], check: "check:go" },
-  { patterns: ["**/*.{kt,kts}", ".editorconfig"], check: "check:kotlin" },
-  { patterns: [".husky/*", "**/*.sh", ".editorconfig"], check: "check:shell" },
-  { patterns: [".github/workflows/*.{yaml,yml}"], check: "check:workflows" },
+  {
+    patterns: [
+      "**/*.{go,mod,sum}",
+      "go.work",
+      ".golangci.yaml",
+      "skills/development/assets/golang/.golangci.yaml",
+      "scripts/check-go-consumer.mjs"
+    ],
+    check: "check:go"
+  },
+  {
+    patterns: [
+      "**/*.{kt,kts}",
+      ".editorconfig",
+      "skills/development/assets/kotlin/.editorconfig",
+      "skills/development/assets/kotlin/gradle/libs.versions.toml",
+      "skills/development/assets/kotlin/gradle/wrapper/**",
+      "skills/development/assets/kotlin/gradlew",
+      "skills/development/assets/kotlin/gradlew.bat",
+      "skills/development/assets/kotlin/buildSrc/src/main/resources/**",
+      "scripts/check-ktlint-consumer.mjs"
+    ],
+    check: "check:kotlin"
+  },
+  {
+    patterns: [
+      "skills/development/assets/nodejs/**",
+      "skills/development/assets/typescript/tsconfig.json",
+      "scripts/check-node-consumer.mjs"
+    ],
+    check: "check:node-consumer"
+  },
+  {
+    patterns: [".husky/*", "**/*.sh", ".editorconfig", "go.{mod,sum}"],
+    check: "check:shell"
+  },
+  {
+    patterns: [".github/workflows/*.{yaml,yml}", "go.{mod,sum}"],
+    check: "check:workflows"
+  },
   {
     patterns: ["hooks/**", "skills/**", "**/plugin.json"],
     test: "hooks/*.test.mjs"
@@ -66,6 +102,14 @@ for (const { patterns, check, test } of [
       "test/tooling.test.mjs",
       "package.json",
       "pnpm-*.yaml",
+      "skills/development/assets/markdown/.markdownlint-cli2.jsonc",
+      "skills/development/assets/markdown/*.{json,yaml}",
+      "skills/development/assets/markdown/rules/**/*.ts",
+      "skills/development/assets/nodejs/*.{json,ts,yaml}",
+      "skills/development/assets/nodejs/plugins/**/*.ts",
+      "skills/development/assets/nodejs/src/**",
+      "skills/development/assets/nodejs/.dependency-cruiser.json",
+      "skills/development/assets/typescript/tsconfig.json",
       "tsconfig.json"
     ],
     test: "test/tooling.test.mjs"

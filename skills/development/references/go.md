@@ -38,10 +38,8 @@ Use `t.Parallel()` for independent cases whose setup and shared resources permit
 ### Workspaces and tool dependencies
 
 Use `go.work` when repository modules need workspace coordination and the declared Go version supports it.
-Keep adopted Go tools and their versions in a repository-owned `go.mod` or dedicated modfile.
-Workspace coordination does not replace module ownership of tool dependencies.
-Manage and run tools using their owning module.
-Use an explicit `-modfile=<file>.mod` only outside workspace mode.
+Declare adopted tools and their versions in the Go project that uses them.
+A workspace can make the declared tools available when a check runs from another module in that workspace.
 
 For Go 1.24 or later, use `go get -tool <tool-package>@<version>` to record tool dependencies in the module file.
 Run them with `go tool <tool-package>`.
@@ -65,7 +63,7 @@ Preserve independently required security and semantic checks.
 
 #### Go dead paths and comments
 
-When the project adopts the bundled Go lint checks, use the [local golangci-lint setup](lint-rules.md#golangci-lint).
+When the project adopts the bundled lint checks, use the [Go lint examples](#adopt-go-checks).
 Go's package loader uses build tags and module roots to select source.
 Run required configurations when build tags change the files being checked.
 
@@ -104,3 +102,24 @@ func Read() int {
     return 1
 }
 ```
+
+#### Adopt Go checks
+
+Copy the directory containing the [lint config](../assets/golang/.golangci.yaml), [Go module](../assets/golang/go.mod), and [checksums](../assets/golang/go.sum).
+The module declares the local golangci-lint command and shfmt.
+The [command's plugin import](../assets/golang/cmd/golangci-lint/plugins.go) registers the bundled analyzer through golangci-lint's [manual module plugin procedure](https://golangci-lint.run/docs/plugins/module-plugins/#the-manual-way).
+Run the commands from the copied module root to check the [example package](../assets/golang/example/status.go).
+
+```sh
+GOWORK=off go tool golangci-lint run --config .golangci.yaml ./example/...
+GOWORK=off go tool shfmt -i 2 -d example/
+```
+
+In an existing project, merge the selected `linters.enable` entries and settings with the existing config.
+To adopt only the dead-path checks, keep `gocritic` and `unused` and run the project's declared golangci-lint directly.
+For body comments, copy the [analyzer source](../assets/golang/comments.go) into a package in the consumer's module.
+Copy [the command](../assets/golang/cmd/golangci-lint/main.go) and [its plugin import](../assets/golang/cmd/golangci-lint/plugins.go) into `cmd/golangci-lint/` and update the blank import to the analyzer's new package path.
+Keep the versions in the [asset module](../assets/golang/go.mod) if the consumer's graph permits them, then run `go get -tool ./cmd/golangci-lint` and `go mod tidy` from the consumer's module root.
+Keep the consumer's file selection and other checks.
+Use the same lint and read-only shfmt commands locally and in CI.
+Run and verify the registered tool when changing the Go toolchain or lint version.

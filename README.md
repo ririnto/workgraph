@@ -112,8 +112,8 @@ References hold detail selected by a task, host, language, or operation.
 | Conditional detail | Source | Read trigger |
 | --- | --- | --- |
 | Assigned fix queues | Delivery's [fix queue guidance](skills/delivery/references/fix-queues.md) | Handling or assessing an assigned queue requires this reference. |
-| Build and tooling | Development's [language references](skills/development/SKILL.md#development-lifecycle) and [lint rule guidance](skills/development/references/lint-rules.md) | Language references include their tooling conventions, while shared lint guidance covers rule selection and fixes. |
-| Kotest | Kotlin's [Kotest guidance](skills/development/references/kotest.md) | Creating or changing Kotest specs or assertions requires this reference. |
+| Build and tooling | Development's [language references](skills/development/SKILL.md#development-lifecycle) and [lint rule guidance](skills/development/SKILL.md#select-and-adopt-lint-checks) | Language references include their tooling conventions, while shared lint guidance covers rule selection and fixes. |
+| Kotest | Kotlin's [Kotest guidance](skills/development/references/kotlin.md#kotest) | Creating or changing Kotest specs or assertions requires this reference. |
 | Installed plugin updates | Delivery's [plugin update guidance](skills/delivery/references/plugin-updates.md) | An authorized update selects the account release or marketplace installation and verifies the result at that destination. |
 | Worktree connections | Cleanup's [native attachment guidance](skills/codex-scoped-cleanup/references/native-attachments.md) | Changing Worktree Artifact connections requires this reference. |
 | Worktrees and caches | Cleanup's [worktree and cache guidance](skills/codex-scoped-cleanup/references/worktrees-caches.md) | Archiving, restoring, or removing worktrees or caches requires this reference. |
@@ -148,17 +148,21 @@ Use pnpm and the Node version range in `package.json` for development.
 The managed development runtime uses the exact Node.js version in `devEngines.runtime`.
 The supported Node.js range remains in `engines.node`.
 Install the pnpm version declared in `package.json` before installing the pinned development tools.
-Install ktlint 1.8.0, golangci-lint 2.15.0, actionlint 1.7.12, and ShellCheck for the native lint checks.
-The shell format check runs the repository-managed shfmt Go tool.
-Use JDK 21 or later and Gradle 9 to build and exercise the Kotlin ruleset with ktlint.
-Use the Go version in the bundled Go module's `go.mod`.
-Install NilAway with the version used in the [check workflow](.github/workflows/check.yaml) and put the binary on `PATH`.
-Linux CI installs the same checkers before running `pnpm run check`.
+Use the Go version in the [repository module](go.mod), which declares golangci-lint, NilAway, actionlint, and shfmt.
+The [workspace](go.work) lets the repository run its linters from the separate [Go asset module](skills/development/assets/golang/go.mod).
+The Go asset module declares the tools that check its bundled example.
+The root module keeps the YAML parser version required by actionlint 1.7.12 until [actionlint supports the newer parser API](https://github.com/rhysd/actionlint/pull/735).
+Install ShellCheck for tracked shell scripts and workflow commands.
+Use JDK 21 or later and the bundled Gradle wrapper to lint the Kotlin build logic and check a fresh sample with the custom ruleset.
+Linux CI provisions the runtimes and runs the same `pnpm run check` command.
 
 ```sh
 pnpm install --frozen-lockfile
 pnpm run check
+pnpm run validate:claude
 ```
+
+The Claude validation command uses the pinned CLI version to check both the package directory and the native manifest.
 
 Installation runs Husky through `prepare` and installs Git dispatchers in `.husky/_/`.
 The pre-commit hook checks the staged diff for whitespace errors and conflict markers.
