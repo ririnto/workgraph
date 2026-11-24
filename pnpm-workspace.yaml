@@ -7,7 +7,7 @@ catalog:
   "@types/node": ^24.19.2
   husky: ^9.1.7
   markdownlint: ^0.42.2
-  markdownlint-cli2: ^0.24.1
+  markdownlint-cli2: ^0.24.2
   markdownlint-rule-relative-links: ^5.1.4
   markdownlint-rule-search-replace: ^1.2.0
   npm-run-all2: ^9.0.4
