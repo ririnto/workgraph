@@ -22,6 +22,7 @@ jobs:
         with:
           install: false
           cache: true
+          cache-dependency-path: pnpm-lock.yaml
       - uses: actions/setup-go@v7
         with:
           go-version-file: skills/development/assets/lint/go-comments/go.mod
