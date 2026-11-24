@@ -21,10 +21,13 @@ function render(label) {
 }
 ```
 
-The same file passes this rule with documentation on a declaration and a coverage directive used by the project.
+The same file passes this rule with type information on the declaration and a coverage directive used by the project.
 
 ```js
-/** Returns the label without surrounding whitespace. */
+/**
+ * @param {string} label
+ * @returns {string}
+ */
 function render(label) {
   /* c8 ignore next */
   return label.trim();
