@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 # vim: set fileencoding=utf-8 :
 set -e
-pnpm run pre-push
+corepack pnpm run pre-push

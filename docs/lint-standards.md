@@ -49,8 +49,8 @@ The root Markdown configuration does not load that rule.
 
 | Entry point | Pillars | Effective check and scope |
 | --- | --- | --- |
-| [.husky/pre-commit](../.husky/pre-commit) | Stability, consistency, maintainability | Husky dispatches to `pnpm run pre-commit`. The script checks staged whitespace, runs the common validators, and selects additional tests and native lint gates from staged paths. |
-| [.husky/pre-push](../.husky/pre-push) | Stability, consistency, maintainability | Husky dispatches to `pnpm run pre-push`, which runs the full `check` gate. |
+| [.husky/pre-commit](../.husky/pre-commit) | Stability, consistency, maintainability | Husky dispatches to `corepack pnpm run pre-commit`. The script checks staged whitespace, runs the common validators, and selects additional tests and native lint gates from staged paths. |
+| [.husky/pre-push](../.husky/pre-push) | Stability, consistency, maintainability | Husky dispatches to `corepack pnpm run pre-push`, which runs the full `check` gate. |
 | [GitHub Actions](../.github/workflows/check.yaml) | Stability, consistency | Linux installs from the frozen lockfile, runs the full `check` gate, and validates both Claude package entry points with strict mode. macOS runs the Node hook tests without a development dependency install. |
 
 Ultracite is the repository entry point for Oxlint and Oxfmt in local checks, fixes, tests, and CI.

@@ -27,11 +27,11 @@ const isObject = (value) =>
  */
 const isArray = (value) => Array.isArray(value);
 
-await test("Git hooks invoke pnpm directly and propagate its status", async () => {
+await test("Git hooks invoke Corepack pnpm and propagate its status", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-hooks-"));
   try {
     await writeFile(
-      path.join(directory, "pnpm"),
+      path.join(directory, "corepack"),
       '#!/bin/sh\nprintf "%s\\n" "$@"\nexit "$HOOK_STATUS"\n',
       { mode: 0o755 }
     );
@@ -53,7 +53,7 @@ await test("Git hooks invoke pnpm directly and propagate its status", async () =
         );
         assert.ifError(result.error);
         assert.equal(result.status, status, result.stderr);
-        assert.equal(result.stdout, `run\n${hook}\n`);
+        assert.equal(result.stdout, `pnpm\nrun\n${hook}\n`);
       }
     }
   } finally {
