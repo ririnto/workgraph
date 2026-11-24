@@ -10,7 +10,7 @@ catalog:
   markdownlint-cli2: ^0.24.2
   markdownlint-rule-relative-links: ^5.1.4
   markdownlint-rule-search-replace: ^1.2.0
-  npm-run-all2: ^9.0.4
+  npm-run-all2: ^9.1.0
   oxfmt: ^0.78.0
   oxlint: ^1.94.0
   oxlint-tsgolint: ^7.0.2007
