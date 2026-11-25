@@ -10,14 +10,27 @@ Follow repository rules, lint, tools, and user choices within task authority, re
 For source, build, or tool changes, read matching playbooks and language references unless loaded.
 Read [Node.js](references/nodejs.md) for lint or dependency advisories.
 Read [control flow](references/control-flow.md) for new or changed loops.
-Read [Kotest](references/kotest.md) for specs or assertions.
+Read [Kotlin's Kotest guidance](references/kotlin.md#kotest) for specs or assertions.
+
+## Side-effect boundaries
+
+Verify preserved or approved new behavior with targeted evidence.
+Use prose when automation cannot preserve the contract.
+Report material behavior changes and remaining uncertainty.
+
+- For comments, check directives, declaration attachment, tooling, public contracts, and safety information.
+- For logging, check effects, cost, and information exposure.
+- For async changes, check scheduling, callback contracts, rejections, and cancellation.
+- For exit changes, check behavior, cleanup, cost, and security.
+- For dependencies, check resolution, runtime requirements, and supported APIs.
+- For lint rules, check classification and behavior in each target.
+- For diagnostics, preserve observable identifiers and error contracts or migrate consumers together.
 
 ## Development lifecycle
 
-Identify contracts, consumers, exclusions, and acceptance evidence before editing.
+Identify contracts, consumers, exclusions, and acceptance evidence.
 Read [instruction design](references/instruction-design.md) for agent instructions.
-Use evidence from affected code to choose the smallest safe change within scope.
-Keep required checks.
+Use source evidence to choose the smallest safe change and keep required checks.
 
 | Outcome | Playbook |
 | --- | --- |
@@ -31,7 +44,7 @@ Check the full diff for unsupported guards, dead compatibility paths, and unrela
 
 | Language | Source | Reference |
 | --- | --- | --- |
-| Java | `.java` | [Java and Kotlin](references/java-kotlin.md) |
+| Java | `.java` | [Java](references/java.md) |
 | Kotlin | `.kt`, `.kts` | [Kotlin](references/kotlin.md) |
 | TypeScript | `.ts`, `.tsx`, `.mts`, `.cts` | [TypeScript](references/typescript.md) |
 | JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | [JavaScript](references/javascript.md) |
@@ -43,16 +56,14 @@ Check the full diff for unsupported guards, dead compatibility paths, and unrela
 
 ## Shared code style
 
-Exempt externally maintained files and configs (such as Gradle and Maven wrappers) from style defaults.
-Limit style cleanup to the external contribution diff unless authorized to expand it.
+Exempt externally maintained files, such as Gradle wrappers, from style defaults.
+Limit style cleanup to the contribution diff unless authorized to expand it.
 
-Preserve declared runtime, toolchain, public contracts, and required failure behavior.
-Keep required effects, resource lifetimes, and interfaces in transformations.
-Test via production interfaces without exposing internals or adding test-only hooks.
+Preserve declared runtimes, toolchains, interfaces, failure behavior, effects, and resource lifetimes.
+Test through production interfaces without exposing internals.
 
-Use standard ecosystem paths outside production for tests, Storybook stories, and other non-production code.
-Move misplaced files in their original task.
-For unclear paths, use official guidance and note why.
+Use ecosystem paths outside production for tests, stories, and other non-production code.
+Move misplaced files in their original task and consult official guidance for unclear paths.
 Use `compose.yaml` for Docker Compose.
 
 Replace superseded code and consumers together and remove obsolete paths.
@@ -61,84 +72,69 @@ Avoid copying workarounds.
 Use suitable official SDK or framework properties.
 Skip duplicate checks when the operation rejects input as required.
 Prefer immutable bindings and minimal mutable state.
-Subject to configured lint, inline single-use variables and keep single-use logic inline.
-When inlining, preserve observable effects, resource lifetimes, evaluation contracts, and required interfaces.
+Inline single-use bindings and logic when lint permits and effects, lifetimes, evaluation, and interfaces hold.
 
-Expand single-line control-flow bodies to a block on separate lines, even when the language permits the one-line form.
-Apply this in every language and script, including PowerShell.
-Indentation width follows the project's configured formatter or convention.
+Expand single-line control-flow bodies to blocks on separate lines in all languages and scripts.
+Use the configured indentation.
 
 ### Keep design proportional
 
 Prefer existing interfaces, direct data flow, native commands, and built-in help.
-Keep required targets explicit.
-Add abstractions, dependencies, or fallbacks only for unmet needs.
-Skip unrealistic edge cases in code and tests.
-Revisit data and ownership before adding complexity.
+Keep required targets explicit and focus on realistic cases.
+Revisit data and ownership before adding abstractions, dependencies, or fallbacks.
 
 ### Extract regex matches
 
-Prefer native named captures, backreferences, and replacement references if the engine and interface support them.
-Use positional groups if required.
-Use supported forms if names are unavailable.
-Prefer a clearer parser or literal operation without needless wrappers.
-Array indexing alone does not access regex captures.
+Use named captures, backreferences, and replacements where supported, including for full matches.
+Use positional groups when required by the engine or interface.
+Prefer clearer parsers or literal operations.
 
 ## Documentation and comments
 
-Follow project doc and comment norms.
-Prefer explanatory names, types, and small functions.
-Comment on contracts and reasons code cannot express.
-Preserve declaration attachment, directives, licenses, and safety invariants.
+Follow project comment norms and document contracts or reasons the code cannot express.
+Preserve required API and tool documentation, declaration attachment, directives, licenses, and safety invariants.
 Remove commented-out code, obsolete instructions, and comments that justify a workaround in changed files.
 Fix the cause or record an unresolved external constraint with its owner and evidence.
 When a correction applies only to the current case, keep its scope local.
 
-## Side-effect boundaries
-
-Verify preserved or approved new behavior with targeted evidence.
-Use prose when automation cannot preserve the contract.
-Report material behavior changes and remaining uncertainty.
-
-Read [effect checks](references/side-effects.md) for changes to execution, directives, dependencies, or diagnostics.
-
 ## Dependency versions
 
-Prefer officially supported LTS releases.
-Use stable releases if no LTS line exists.
-Verify current support and runtime, toolchain, and dependent API compatibility.
-Use native catalogs and lockfiles.
-Keep compatible managed versions.
+Prefer supported LTS releases or stable releases where LTS is unavailable.
+Check runtime, toolchain, and API compatibility.
+Keep compatible managed versions, native catalogs, lockfiles, and integrity checks.
 Skip unrelated upgrades.
-Keep integrity checks, lockfile fields, signatures, and checksums.
 
 ## Automation
 
-Fix recurring ownership and interface defects first.
-Use existing types, schemas, lint, or build checks for mechanical requirements.
-Keep judgment in prose without duplicating executable checks.
-Keep lint and formatter choices when adding guidance or filling config gaps.
-Use project commands for routine local and CI work.
-Use declarative automation where supported.
-Use the project language only for substantial logic existing tools lack.
-For recurring corrections, improve the design first and enforce what tools can check.
+Fix recurring ownership and interface defects, then enforce mechanical requirements with existing types, schemas, lint, or builds.
+Keep judgment in prose and existing lint and formatter choices in configuration.
+Use the same project commands locally and in CI.
+Prefer declarative automation and reserve project code for logic the tools lack.
 
-Read [lint rule guidance](references/lint-rules.md) when selecting lint checks, adopting lint assets, or changing rules or fixes.
 Read [React and Electron boundaries](references/react-electron.md) for effects, timers, or process imports.
+
+### Select and adopt lint checks
+
+Choose compatible built-in rules before custom rules.
+Scope a custom rule to the recurring syntax or path it checks.
+Name the violation and its fix in the diagnostic.
+When the project adopts a rule, copy its linked assets into the consumer with their [MIT license notice](../../LICENSE) and any additional license and attribution.
+Register consumer-relative paths and merge the settings with existing checks and formatters.
+Use the consumer's own versions and read-only commands to verify matching and preserved cases.
+For scoped rules, check a violation inside the boundary and an allowed use outside it.
+Offer fixes only when they preserve behavior, effects, and directives.
+Verify repeated formatting and fixes converge.
 
 ## Verification
 
-Identify the target, trigger, input, and expected observable result.
-Check the lowest public interface that exercises the failure.
-Use process or app checks when direct calls cannot show behavior.
-Reuse existing checks that exercise the change.
-Use representative inputs or an isolated local fixture when needed to observe the result.
+Identify the target, trigger, input, and expected result.
+Use existing checks at the lowest public interface that shows the behavior.
+Use a representative fixture and process or app checks when direct calls cannot show it.
 Fix observed in-scope failures and rerun the affected checks.
 Add tests or extend coverage only for requests, requirements, or realistic uncovered regressions.
 Reserve source-shape assertions for explicit structural contracts.
-Exercise owned behavior, substituting external or nondeterministic boundaries only for controlled input.
-Remove redundant or low-value tests, fixtures, and runs within scope, preserving relevant failure coverage.
-Preserve security, external-input, and data-integrity coverage without count or percentage targets.
+Exercise owned behavior and substitute external or nondeterministic boundaries for controlled input.
+Remove redundant checks within scope while preserving security, external-input, data-integrity, and failure coverage.
 Use repeatable inputs for stateful failures.
 Consider model checking when consequential transitions or interleavings remain untested by examples.
 Stop when evidence covers required checks and changed risks.
@@ -146,7 +142,7 @@ Wait in blocking mode.
 Use `gh run watch --exit-status`, `gh pr checks --watch`, or the tool's wait flag when available.
 Do not poll snapshots such as `gh run view` or `glab ci status`.
 Record commands, setup, exit codes, failures, and raw results apart from analysis.
-Measure slow checks before optimization and report conditions, durations, and preserved coverage.
-Require direct evidence for execution, formal proof, native activation, and model adherence claims.
-Report required checks blocked by the host.
+Measure slow checks before optimization and report timing, conditions, and preserved coverage.
+Require direct evidence for execution, formal proof, native activation, and model adherence.
+Report blocked required checks.
 Read [runtime and formal evidence](references/runtime-formal-evidence.md) for visual work, user flows, feature maps, invariants, or release checks.

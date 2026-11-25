@@ -1,0 +1,5 @@
+catalog:
+  markdownlint-cli2: ^0.24.1
+
+overrides:
+  micromark-extension-math>katex: ^0.19.1
