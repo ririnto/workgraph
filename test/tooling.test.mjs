@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import {
+  existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -241,13 +242,24 @@ await test("shell policy reports discarded diagnostics and portable guard violat
     'if [ -z "$value" ]; then exit 1; fi',
     '[[ "$value" == a* ]] && echo pattern',
     '[[ "$value" =~ ^a ]] && echo regex',
-    'test -n "$value" || echo empty && echo done'
+    'test -n "$value" || echo empty && echo done',
+    'test -n "$value" || exit 1 && echo done',
+    '! test -n "$value" || exit 1',
+    'test -n "$value" || exit 1 &',
+    'test -n "$value" || exit 1 2>guard.log',
+    'for item in "$@"; do',
+    '  if [ -z "$item" ]; then exit 1; fi',
+    "done"
   ];
   const defect = [
     "echo hello > /dev/null",
     'echo hello 2>>"/dev"/null',
     '[[ -n "$value" ]]',
-    '[ "$value" != "" ] || exit 1'
+    '[ "$value" != "" ] || exit 1',
+    'case "$value" in',
+    '  *) test -n "$value" || exit 2 ;;',
+    "esac",
+    '(test -n "$value" || exit 3)'
   ];
   const fixture = createTrackedFixture(t, {
     [filename]: `${control.join("\n")}\n`,
@@ -270,6 +282,8 @@ await test("shell policy reports discarded diagnostics and portable guard violat
     { file: filename, rule: "R31" },
     { file: filename, rule: "R31" },
     { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
     { file: filename, rule: "R33" }
   ]);
   assert.equal(readFileSync(file, "utf-8"), source);
@@ -278,19 +292,49 @@ await test("shell policy reports discarded diagnostics and portable guard violat
 await test("Go workspace policy requires tracked modules and ignores fixture modules", (t) => {
   const fixture = createTrackedFixture(t, {
     "go.mod": "module example.invalid/root\n\ngo 1.24\n",
-    "go.work": "go 1.24\n\nuse (\n\t.\n\t./asset\n)\n",
-    "asset/go.mod": "module example.invalid/asset\n\ngo 1.24\n",
     "test/fixtures/excluded/go.mod":
       "module example.invalid/excluded\n\ngo 1.24\n"
   });
   const args = [
     path.resolve(import.meta.dirname, "../scripts/check-go-workspace.mjs")
   ];
+  writeFileSync(
+    path.join(fixture.cwd, "go"),
+    "#!/bin/sh\nprintf 'go invoked\\n' >> go-invocations\nexit 99\n",
+    { mode: 0o700 }
+  );
+  const withoutWorkspace = {
+    ...fixture,
+    env: {
+      ...fixture.env,
+      PATH: `${fixture.cwd}${path.delimiter}${fixture.env.PATH ?? ""}`
+    }
+  };
+  const single = spawnSync(process.execPath, args, withoutWorkspace);
+  assert.ifError(single.error);
+  assert.equal(single.status, 0, single.stderr);
+  assert.equal(single.stderr, "");
+  mkdirSync(path.join(fixture.cwd, "asset"));
+  writeFileSync(
+    path.join(fixture.cwd, "asset/go.mod"),
+    "module example.invalid/asset\n\ngo 1.24\n"
+  );
+  execFileSync("git", ["add", "--", "asset/go.mod"], fixture);
+  const workspace = path.join(fixture.cwd, "go.work");
+  writeFileSync(workspace, "go 1.24\n\nuse (\n\t.\n\t./asset\n)\n");
+  const missing = spawnSync(process.execPath, args, withoutWorkspace);
+  assert.ifError(missing.error);
+  assert.equal(missing.status, 1, missing.stderr);
+  assert.deepEqual(ruleDiagnostics(missing.stderr), [
+    { file: "asset/go.mod", rule: "R40" },
+    { file: "go.mod", rule: "R40" }
+  ]);
+  assert.equal(existsSync(path.join(fixture.cwd, "go-invocations")), false);
+  execFileSync("git", ["add", "--", "go.work"], fixture);
   const clean = spawnSync(process.execPath, args, fixture);
   assert.ifError(clean.error);
   assert.equal(clean.status, 0, clean.stderr);
   assert.equal(clean.stderr, "");
-  const workspace = path.join(fixture.cwd, "go.work");
   const incomplete = "go 1.24\n\nuse (\n\t.\n\t./obsolete\n)\n";
   writeFileSync(workspace, incomplete);
   const rejected = spawnSync(process.execPath, args, fixture);

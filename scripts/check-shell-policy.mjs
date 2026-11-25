@@ -6,7 +6,8 @@ import path from "node:path";
 /** @typedef {{
  *   Type?: string, Pos?: Position, End?: Position, OpPos?: Position,
  *   Word?: Syntax, Parts?: Syntax[], Value?: string, Dollar?: boolean,
- *   Redirs?: Syntax[], Stmts?: Syntax[], Cmd?: Syntax,
+ *   Redirs?: Syntax[], Cmd?: Syntax, Stmts?: Syntax[],
+ *   Cond?: Syntax | Syntax[], Then?: Syntax[], Do?: Syntax[],
  *   Negated?: boolean, Background?: boolean
  * }} Syntax The fields used from shfmt's JSON syntax tree. */
 
@@ -122,22 +123,24 @@ for (const file of files.filter(Boolean)) {
           position: node.Pos
         });
       }
-      if (node.Type === "File" || node.Type === "Block") {
-        for (const statement of node.Stmts ?? []) {
-          if (
-            statement.Pos &&
-            statement.Negated !== true &&
-            statement.Background !== true &&
-            (statement.Redirs?.length ?? 0) === 0 &&
-            statement.Cmd?.Type === "BinaryCmd" &&
-            exitGuard.test(spelling(source, statement.Cmd))
-          ) {
-            diagnostics.push({
-              message:
-                "[R33] Use an explicit if statement for this exit guard.",
-              position: statement.Pos
-            });
-          }
+      for (const statement of [
+        ...(node.Stmts ?? []),
+        ...(Array.isArray(node.Cond) ? node.Cond : []),
+        ...(node.Then ?? []),
+        ...(node.Do ?? [])
+      ]) {
+        if (
+          statement.Pos &&
+          statement.Negated !== true &&
+          statement.Background !== true &&
+          (statement.Redirs?.length ?? 0) === 0 &&
+          statement.Cmd?.Type === "BinaryCmd" &&
+          exitGuard.test(spelling(source, statement.Cmd))
+        ) {
+          diagnostics.push({
+            message: "[R33] Use an explicit if statement for this exit guard.",
+            position: statement.Pos
+          });
         }
       }
       for (const child of Object.values(node)) {
