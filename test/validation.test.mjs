@@ -138,7 +138,7 @@ jobs:
         with:
           install: false
           save-cache: \${{ true }}
-          dest: ~/setup-pnpm
+          dest: ./custom-pnpm
           cache-dependency-path: pnpm-lock.yaml
           unrecorded-input: false
       - uses: pnpm/setup@v2
@@ -184,6 +184,7 @@ jobs:
     `${fixture}      - uses: pnpm/setup@v3
         with:
           CACHE: false
+          dest: ~/setup-pnpm
       - uses: pnpm/setup@v3
         with:
           cache: false
@@ -221,6 +222,7 @@ jobs:
       ["CACHE", 1],
       ["FETCH-DEPTH", 1],
       ["cache", 1],
+      ["dest", 1],
       ["fetch-depth", 1],
       ["filter", 1],
       ["gpg-private-key", 3],

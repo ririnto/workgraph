@@ -51,7 +51,9 @@ The fresh Go consumer runs the copied asset as a standalone module with `GOWORK=
 The [action input registry](../.github/action-inputs.json) records declared inputs, the UTC snapshot date, and the resolved commit for each approved `uses` reference.
 When approving a reference, read its action metadata through the GitHub API at that exact ref and verify it against the resolved commit.
 Record literal defaults as runner-coerced strings, including the empty string for an explicit YAML null default.
-Use `null` for inputs without a declared default and objects with `contextDependent: true` for context-dependent defaults.
+Record a default as context-dependent only when the action metadata ties it to another input, the repository, or the runner.
+Use an object with `contextDependent: true` and the documented condition for those defaults.
+Use `null` for other inputs without a declared default.
 The offline check uses the recorded snapshots, so refresh a moving tag's metadata when reviewing changes to its defaults.
 
 ## Local and hosted gates

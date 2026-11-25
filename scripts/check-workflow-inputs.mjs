@@ -26,7 +26,6 @@ const evenMidpoint =
   /^(?<coefficient>\d\.\d{13}[02468])50+e(?<exponent>[+-]\d+)$/u;
 
 /**
- * Confirm a decimal midpoint exactly, since the probe itself rounds.
  * @param {number} magnitude Absolute number.
  * @param {{ coefficient: string, exponent: string }} midpoint Decimal probe.
  * @returns {boolean} Whether the number is exactly at the midpoint.

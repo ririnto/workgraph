@@ -5,15 +5,18 @@
     "inputs": {
       "repository": {
         "contextDependent": true,
-        "default": "${{ github.repository }}"
+        "default": "${{ github.repository }}",
+        "condition": "The workflow repository supplies the checkout repository."
       },
       "ref": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The triggering ref or SHA applies to the workflow repository. Other repositories use their default branch."
       },
       "token": {
         "contextDependent": true,
-        "default": "${{ github.token }}"
+        "default": "${{ github.token }}",
+        "condition": "The workflow supplies its GitHub token."
       },
       "ssh-key": null,
       "ssh-known-hosts": null,
@@ -33,7 +36,8 @@
       "set-safe-directory": "true",
       "github-server-url": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The GitHub instance running the workflow supplies the server URL."
       },
       "allow-unsafe-pr-checkout": "false"
     }
@@ -47,17 +51,20 @@
       "check-latest": "false",
       "token": {
         "contextDependent": true,
-        "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}"
+        "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}",
+        "condition": "The workflow token applies on github.com. Other GitHub instances use an empty token."
       },
       "cache": "true",
       "cache-dependency-path": null,
       "architecture": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The runner supplies its system architecture."
       },
       "go-download-base-url": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The runner environment can supply GO_DOWNLOAD_BASE_URL. Otherwise the action uses https://go.dev/dl."
       }
     }
   },
@@ -71,7 +78,8 @@
       "java-package": "jdk",
       "architecture": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The runner supplies its architecture."
       },
       "jdk-file": null,
       "jdkFile": null,
@@ -95,34 +103,48 @@
       "settings-path": null,
       "overwrite-settings": "true",
       "gpg-private-key": "",
-      "gpg-passphrase-env-var": null,
+      "gpg-passphrase-env-var": {
+        "contextDependent": true,
+        "default": null,
+        "condition": "The gpg-private-key input enables the GPG_PASSPHRASE default."
+      },
       "gpg-passphrase": null,
       "cache": null,
       "cache-jdk": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The cache input enables JDK caching when it configures dependency caching."
       },
       "cache-dependency-path": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The action searches the repository for dependency files when this input is omitted."
       },
-      "cache-path": null,
+      "cache-path": {
+        "contextDependent": true,
+        "default": null,
+        "condition": "The selected package manager determines the dependency cache path."
+      },
       "cache-read-only": "false",
       "job-status": {
         "contextDependent": true,
-        "default": "${{ job.status }}"
+        "default": "${{ job.status }}",
+        "condition": "The current job supplies its status."
       },
       "token": {
         "contextDependent": true,
-        "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}"
+        "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}",
+        "condition": "The workflow token applies on github.com. Other GitHub instances use an empty token."
       },
       "mvn-toolchain-id": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The Maven toolchain vendor and java-version input determine the ID."
       },
       "mvn-toolchain-vendor": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The distribution input supplies the Maven toolchain vendor."
       },
       "show-download-progress": "false",
       "problem-matcher": "false"
@@ -134,13 +156,15 @@
     "inputs": {
       "gradle-version": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The project supplies its Gradle Wrapper when no version is specified."
       },
       "cache-provider": "enhanced",
       "cache-disabled": "false",
       "cache-read-only": {
         "contextDependent": true,
-        "default": "${{ github.event.repository != null && github.ref_name != github.event.repository.default_branch }}"
+        "default": "${{ github.event.repository != null && github.ref_name != github.event.repository.default_branch }}",
+        "condition": "The repository default branch and current ref determine whether the cache is read-only."
       },
       "cache-write-only": "false",
       "cache-overwrite-existing": "false",
@@ -160,7 +184,8 @@
       "dependency-graph-include-configurations": null,
       "artifact-retention-days": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The repository supplies its artifact retention setting."
       },
       "build-scan-publish": "false",
       "build-scan-terms-of-use-url": null,
@@ -183,11 +208,13 @@
       "gradle-home-cache-strict-match": "false",
       "workflow-job-context": {
         "contextDependent": true,
-        "default": "${{ toJSON(matrix) }}"
+        "default": "${{ toJSON(matrix) }}",
+        "condition": "The current job supplies its matrix values."
       },
       "github-token": {
         "contextDependent": true,
-        "default": "${{ github.token }}"
+        "default": "${{ github.token }}",
+        "condition": "The workflow supplies its GitHub token."
       }
     }
   },
@@ -197,35 +224,30 @@
     "inputs": {
       "version": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The project package.json supplies devEngines.packageManager or packageManager."
       },
-      "registry": {
-        "contextDependent": true,
-        "default": null
-      },
-      "dest": {
-        "contextDependent": true,
-        "default": "~/setup-pnpm"
-      },
+      "registry": null,
+      "dest": "~/setup-pnpm",
       "runtime": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The project manifest and version files determine runtimes when none are specified."
       },
       "node-version-file": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The manifest and version files under working-directory determine fallback discovery."
       },
       "cache": "false",
       "save-cache": "true",
       "cache-dependency-path": {
         "contextDependent": true,
-        "default": null
+        "default": null,
+        "condition": "The repository layout and working-directory determine which pnpm lockfile is used."
       },
       "working-directory": ".",
-      "package-json-file": {
-        "contextDependent": true,
-        "default": null
-      },
+      "package-json-file": null,
       "require-lockfile": "false",
       "install": "true",
       "token": null
