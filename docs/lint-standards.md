@@ -39,7 +39,7 @@ The preset sorts value imports, so applying its fixes can change initialization 
 | Keep links resolvable and skill metadata loadable | Stability, maintainability | `relative-links` checks relative link targets and headings. `docs/no-relative-skill-links` checks that relative skill links target bundled skills. `docs/skill-frontmatter` checks bundled frontmatter structure. `check:skill-metadata` validates invocation policy and host prompt limits. |
 | Keep shell hooks portable and formatted | Stability, consistency | `check:shell` runs ShellCheck and compares shfmt output for the tracked Husky hooks and shell scripts. The shell policy checks those files for output redirection to `/dev/null`, portable unary tests, and simple exit guards outside test fixtures. |
 | Validate the bundled Go and Kotlin source | Performance, stability, consistency | `check:go` validates workspace membership, runs the [.golangci.yaml profile](../.golangci.yaml) and NilAway, and checks a fresh Go consumer. `check:kotlin` runs the wrapper's `ktlintCheck` on the build logic and a fresh sample that loads the custom ruleset and accepts both trailing-comma styles. |
-| Validate workflows, issue forms, and plugin metadata | Stability, maintainability | `check:workflows` uses actionlint. `check:issue-forms` validates the supported issue-form subset. `check:plugin-version` checks release parity, package paths, and host metadata. |
+| Validate workflows, issue forms, and plugin metadata | Stability, maintainability | `check:workflows` runs actionlint and reports literal inputs that equal approved defaults. `check:issue-forms` validates the supported issue-form subset. `check:plugin-version` checks release parity, package paths, and host metadata. |
 | Check production dependencies for known advisories | Stability | `check:production-audit` runs `pnpm audit --prod`. The package currently declares no production dependencies. |
 
 The [tooling tests](../test/tooling.test.mjs) exercise representative accepted and rejected inputs through the lint tools and cover Git hook arguments and status propagation.
@@ -48,6 +48,13 @@ The root Markdown configuration does not load that rule.
 The shell policy and Go workspace check use Workgraph's tracked files and repository tooling.
 The workspace check compares `go.work` with tracked project modules and excludes modules under `test/fixtures/`.
 The fresh Go consumer runs the copied asset as a standalone module with `GOWORK=off`.
+The [action input registry](../.github/action-inputs.json) records declared inputs, the UTC snapshot date, and the resolved commit for each approved `uses` reference.
+When approving a reference, read its action metadata through the GitHub API at that exact ref and verify it against the resolved commit.
+Record literal defaults as runner-coerced strings, including the empty string for an explicit YAML null default.
+Record a default as context-dependent only when the action metadata ties it to another input, the repository, or the runner.
+Use an object with `contextDependent: true` and the documented condition for those defaults.
+Use `null` for other inputs without a declared default.
+The offline check uses the recorded snapshots, so refresh a moving tag's metadata when reviewing changes to its defaults.
 
 ## Local and hosted gates
 

@@ -82,7 +82,12 @@ for (const { patterns, check, test } of [
     check: "check:shell"
   },
   {
-    patterns: [".github/workflows/*.{yaml,yml}", "go.{mod,sum}"],
+    patterns: [
+      ".github/workflows/*.{yaml,yml}",
+      ".github/action-inputs.json",
+      "scripts/check-workflow-inputs.mjs",
+      "go.{mod,sum}"
+    ],
     check: "check:workflows"
   },
   {
