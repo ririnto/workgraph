@@ -51,13 +51,13 @@ const members = new Set(
 );
 for (const module of modules.difference(members)) {
   process.stderr.write(
-    `go.work [R40] Missing workspace member for ${module}.\n`
+    `${module} [R40] Missing workspace member in go.work.\n`
   );
   process.exitCode = 1;
 }
 for (const member of [...members.difference(modules)].toSorted()) {
   process.stderr.write(
-    `go.work [R40] Workspace member ${member} has no tracked project go.mod.\n`
+    `${member} [R40] Workspace member has no tracked project go.mod.\n`
   );
   process.exitCode = 1;
 }

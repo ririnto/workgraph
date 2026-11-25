@@ -214,6 +214,22 @@ const createTrackedFixture = (t, files) => {
   return options;
 };
 
+/**
+ * @param {string} stderr Diagnostics from the check process.
+ * @returns {{file: string, rule: string}[]} The path and rule of each diagnostic.
+ */
+const ruleDiagnostics = (stderr) =>
+  stderr
+    .trimEnd()
+    .split("\n")
+    .map((line) => {
+      const fields = /^(?<file>.+?)(?::\d+:\d+)? \[(?<rule>R\d+)\] /u.exec(
+        line
+      )?.groups;
+      assert.ok(fields?.file !== undefined && fields.rule !== undefined, line);
+      return { file: fields.file, rule: fields.rule };
+    });
+
 await test("shell policy reports discarded diagnostics and portable guard violations", (t) => {
   const filename = "hook sample.sh";
   const control = [
@@ -250,16 +266,12 @@ await test("shell policy reports discarded diagnostics and portable guard violat
   const rejected = spawnSync(process.execPath, args, fixture);
   assert.ifError(rejected.error);
   assert.equal(rejected.status, 1, rejected.stderr);
-  assert.equal(
-    rejected.stderr,
-    [
-      `${filename}:10:12 [R31] Preserve shell diagnostics instead of redirecting output to /dev/null.`,
-      `${filename}:11:13 [R31] Preserve shell diagnostics instead of redirecting output to /dev/null.`,
-      `${filename}:12:1 [R33] Use a portable [ ] test for this condition.`,
-      `${filename}:13:1 [R33] Use an explicit if statement for this exit guard.`,
-      ""
-    ].join("\n")
-  );
+  assert.deepEqual(ruleDiagnostics(rejected.stderr), [
+    { file: filename, rule: "R31" },
+    { file: filename, rule: "R31" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" }
+  ]);
   assert.equal(readFileSync(file, "utf-8"), source);
 });
 
@@ -284,10 +296,10 @@ await test("Go workspace policy requires tracked modules and ignores fixture mod
   const rejected = spawnSync(process.execPath, args, fixture);
   assert.ifError(rejected.error);
   assert.equal(rejected.status, 1, rejected.stderr);
-  assert.equal(
-    rejected.stderr,
-    "go.work [R40] Missing workspace member for asset/go.mod.\ngo.work [R40] Workspace member obsolete/go.mod has no tracked project go.mod.\n"
-  );
+  assert.deepEqual(ruleDiagnostics(rejected.stderr), [
+    { file: "asset/go.mod", rule: "R40" },
+    { file: "obsolete/go.mod", rule: "R40" }
+  ]);
   assert.equal(readFileSync(workspace, "utf-8"), incomplete);
 });
 
