@@ -48,9 +48,11 @@ The root Markdown configuration does not load that rule.
 The shell policy and Go workspace check use Workgraph's tracked files and repository tooling.
 The workspace check compares `go.work` with tracked project modules and excludes modules under `test/fixtures/`.
 The fresh Go consumer runs the copied asset as a standalone module with `GOWORK=off`.
-The [action input registry](../.github/action-inputs.json) records declared inputs and the resolved commit for each approved `uses` reference.
+The [action input registry](../.github/action-inputs.json) records declared inputs, the UTC snapshot date, and the resolved commit for each approved `uses` reference.
 When approving a reference, read its action metadata through the GitHub API at that exact ref and verify it against the resolved commit.
-Record literal defaults as strings, inputs without a default as `null`, and context-dependent defaults as objects with `contextDependent: true`.
+Record literal defaults as runner-coerced strings, including the empty string for an explicit YAML null default.
+Use `null` for inputs without a declared default and objects with `contextDependent: true` for context-dependent defaults.
+The offline check uses the recorded snapshots, so refresh a moving tag's metadata when reviewing changes to its defaults.
 
 ## Local and hosted gates
 

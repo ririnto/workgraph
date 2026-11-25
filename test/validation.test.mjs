@@ -96,14 +96,37 @@ const runValidation = (root, filename) => {
   return result;
 };
 
+/**
+ * @param {string} output Workflow check output.
+ * @returns {Map<string, number>} Count of R35 diagnostics per input.
+ */
+const workflowDiagnosticCounts = (output) => {
+  /** @type {Map<string, number>} */
+  const counts = new Map();
+  for (const { groups } of output.matchAll(
+    /\[R35\][^"\n]*"(?<input>[\w-]+)"/gu
+  )) {
+    const input = groups?.input ?? "";
+    counts.set(input, (counts.get(input) ?? 0) + 1);
+  }
+  return counts;
+};
+
 await test("workflow input defaults report equal literals only for approved action references", (t) => {
   const root = copyValidation(t);
   const directory = path.join(root, ".github/workflows");
   mkdirSync(directory, { recursive: true });
-  cpSync(
-    new URL(".github/action-inputs.json", repositoryRoot),
-    path.join(root, ".github/action-inputs.json")
-  );
+  mkdirSync(path.join(root, ".git"));
+  for (const file of [
+    "package.json",
+    "pnpm-workspace.yaml",
+    "pnpm-lock.yaml",
+    "go.mod",
+    "go.sum",
+    ".github/action-inputs.json"
+  ]) {
+    cpSync(new URL(file, repositoryRoot), path.join(root, file));
+  }
   const filename = path.join(directory, "check.yml");
   const fixture = `name: Check inputs
 on: push
@@ -117,6 +140,7 @@ jobs:
           save-cache: \${{ true }}
           dest: ~/setup-pnpm
           cache-dependency-path: pnpm-lock.yaml
+          unrecorded-input: false
       - uses: pnpm/setup@v2
         with:
           cache: false
@@ -127,27 +151,81 @@ jobs:
         with:
           fetch-depth: 2
           sparse-checkout: "null"
+          github-server-url: https://github.com
+          path: ""
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: "1.0000000000000002"
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          artifact-retention-days: 90
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          gpg-private-key: nondefault
 `;
+  const runWorkflowCheck = () =>
+    spawnSync("pnpm", ["run", "check:workflows"], {
+      cwd: root,
+      encoding: "utf-8",
+      timeout: 30_000
+    });
   writeFileSync(filename, fixture);
-  const accepted = runValidation(root, "check-workflow-inputs.mjs");
+  const accepted = runWorkflowCheck();
+  assert.ifError(accepted.error);
   assert.equal(accepted.status, 0, accepted.stderr);
-  assert.equal(accepted.stdout, "");
-  assert.equal(accepted.stderr, "");
+  assert.equal(
+    workflowDiagnosticCounts(accepted.stdout + accepted.stderr).size,
+    0
+  );
   writeFileSync(
     filename,
-    fixture
-      .replace("          install: false\n", "          cache: false\n")
-      .replace("          fetch-depth: 2\n", "          fetch-depth: 1\n")
+    `${fixture}      - uses: pnpm/setup@v3
+        with:
+          CACHE: false
+      - uses: pnpm/setup@v3
+        with:
+          cache: false
+      - uses: actions/checkout@v7
+        with:
+          FETCH-DEPTH: 1
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1.0000000000000002
+          sparse-checkout:
+          filter: ""
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          gpg-private-key:
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          gpg-private-key: null
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+          gpg-private-key: ""
+`
   );
-  const rejected = runValidation(root, "check-workflow-inputs.mjs");
+  const rejected = runWorkflowCheck();
+  assert.ifError(rejected.error);
   assert.equal(rejected.status, 1, rejected.stderr);
-  assert.equal(rejected.stdout, "");
-  assert.equal(
-    rejected.stderr,
-    [
-      '.github/workflows/check.yml: job check, step 1 [R35] Omit input "cache" equal to the documented default for pnpm/setup@v3.\n',
-      '.github/workflows/check.yml: job check, step 4 [R35] Omit input "fetch-depth" equal to the documented default for actions/checkout@v7.\n'
-    ].join("")
+  assert.deepEqual(
+    workflowDiagnosticCounts(rejected.stdout + rejected.stderr),
+    new Map([
+      ["CACHE", 1],
+      ["FETCH-DEPTH", 1],
+      ["cache", 1],
+      ["fetch-depth", 1],
+      ["filter", 1],
+      ["gpg-private-key", 3],
+      ["sparse-checkout", 1]
+    ])
   );
 });
 

@@ -1,6 +1,7 @@
 {
   "actions/checkout@v7": {
     "commit": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "snapshotDate": "2026-11-25",
     "inputs": {
       "repository": {
         "contextDependent": true,
@@ -21,8 +22,8 @@
       "persist-credentials": "true",
       "path": null,
       "clean": "true",
-      "filter": null,
-      "sparse-checkout": null,
+      "filter": "",
+      "sparse-checkout": "",
       "sparse-checkout-cone-mode": "true",
       "fetch-depth": "1",
       "fetch-tags": "false",
@@ -30,12 +31,16 @@
       "lfs": "false",
       "submodules": "false",
       "set-safe-directory": "true",
-      "github-server-url": null,
+      "github-server-url": {
+        "contextDependent": true,
+        "default": null
+      },
       "allow-unsafe-pr-checkout": "false"
     }
   },
   "actions/setup-go@v7": {
     "commit": "d8cbb8045d7f43706b9177cceb36c1f91a6644d5",
+    "snapshotDate": "2026-11-25",
     "inputs": {
       "go-version": null,
       "go-version-file": null,
@@ -58,6 +63,7 @@
   },
   "actions/setup-java@v6": {
     "commit": "d1374f8ac74474200d16ef8ecee22c7ae7a51880",
+    "snapshotDate": "2026-11-25",
     "inputs": {
       "java-version": null,
       "java-version-file": null,
@@ -124,6 +130,7 @@
   },
   "gradle/actions/setup-gradle@v6": {
     "commit": "8da46b539cd8fe6ab27ca75128919a18d757604c",
+    "snapshotDate": "2026-11-25",
     "inputs": {
       "gradle-version": {
         "contextDependent": true,
@@ -151,7 +158,10 @@
       "dependency-graph-include-projects": null,
       "dependency-graph-exclude-configurations": null,
       "dependency-graph-include-configurations": null,
-      "artifact-retention-days": null,
+      "artifact-retention-days": {
+        "contextDependent": true,
+        "default": null
+      },
       "build-scan-publish": "false",
       "build-scan-terms-of-use-url": null,
       "build-scan-terms-of-use-agree": null,
@@ -183,6 +193,7 @@
   },
   "pnpm/setup@v3": {
     "commit": "731dfb6463bbd11c11fd0ee11fe00ed0e36d48a1",
+    "snapshotDate": "2026-11-25",
     "inputs": {
       "version": {
         "contextDependent": true,

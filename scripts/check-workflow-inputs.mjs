@@ -8,9 +8,90 @@ import snapshots from "../.github/action-inputs.json" with { type: "json" };
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const directory = path.join(root, ".github/workflows");
-/** @type {Map<string, { commit: string, inputs: Record<string, unknown> }>} */
-const actions = new Map(Object.entries(snapshots));
 const commitPattern = /^[0-9a-f]{40}$/u;
+const actions = new Map(
+  Object.entries(snapshots)
+    .filter(([, { commit }]) => commitPattern.test(commit))
+    .map(([uses, { inputs }]) => [
+      uses,
+      new Map(
+        Object.entries(inputs).map(([input, value]) => [
+          input.toLowerCase(),
+          value
+        ])
+      )
+    ])
+);
+const evenMidpoint =
+  /^(?<coefficient>\d\.\d{13}[02468])50+e(?<exponent>[+-]\d+)$/u;
+
+/**
+ * Confirm a decimal midpoint exactly, since the probe itself rounds.
+ * @param {number} magnitude Absolute number.
+ * @param {{ coefficient: string, exponent: string }} midpoint Decimal probe.
+ * @returns {boolean} Whether the number is exactly at the midpoint.
+ */
+const isExactMidpoint = (magnitude, midpoint) => {
+  const digits = BigInt(`${midpoint.coefficient.replace(".", "")}5`);
+  const power = Number(midpoint.exponent) - 15;
+  if (power >= 0) {
+    return (
+      Number.isInteger(magnitude) &&
+      BigInt(magnitude) === digits * 10n ** BigInt(power)
+    );
+  }
+  const denominator = 5n ** BigInt(-power);
+  return (
+    digits % denominator === 0n &&
+    magnitude === Number(digits / denominator) * 2 ** power
+  );
+};
+
+/**
+ * Match the runner's invariant G15 number format, including rounding ties to even.
+ * @param {number} value YAML number token.
+ * @returns {string} Action input text.
+ */
+const formatRunnerNumber = (value) => {
+  if (!Number.isFinite(value)) {
+    return String(value);
+  }
+  if (Object.is(value, -0)) {
+    return "-0";
+  }
+  const magnitude = Math.abs(value);
+  const midpoint = evenMidpoint.exec(magnitude.toExponential(20))?.groups;
+  const [coefficient, exponent] =
+    midpoint &&
+    isExactMidpoint(magnitude, {
+      coefficient: midpoint.coefficient,
+      exponent: midpoint.exponent
+    })
+      ? [midpoint.coefficient, midpoint.exponent]
+      : magnitude.toExponential(14).split("e");
+  const power = Number(exponent);
+  if (power >= -4 && power < 15) {
+    return `${value < 0 ? "-" : ""}${Number(`${coefficient}e${exponent}`)}`;
+  }
+  return `${value < 0 ? "-" : ""}${Number(coefficient)}E${power < 0 ? "-" : "+"}${String(Math.abs(power)).padStart(2, "0")}`;
+};
+
+/**
+ * @param {unknown} value Parsed workflow input.
+ * @returns {string | null} The runner's scalar text, or null for an expression or collection.
+ */
+const literalInput = (value) => {
+  if (value === null) {
+    return "";
+  }
+  if (typeof value === "number") {
+    return formatRunnerNumber(value);
+  }
+  if (typeof value === "boolean") {
+    return String(value);
+  }
+  return typeof value === "string" && !value.includes("${{") ? value : null;
+};
 
 /**
  * @param {unknown} value Parsed YAML value.
@@ -45,19 +126,16 @@ const checkWorkflow = (workflow, source) => {
       if (typeof uses !== "string" || !isMapping(inputs)) {
         continue;
       }
-      const action = actions.get(uses);
-      if (action === undefined || !commitPattern.test(action.commit)) {
+      const defaults = actions.get(uses);
+      if (defaults === undefined) {
         continue;
       }
       for (const [input, value] of Object.entries(inputs)) {
-        const fallback = action.inputs[input];
+        const fallback = defaults.get(input.toLowerCase());
         if (
           typeof fallback === "string" &&
           !fallback.includes("${{") &&
-          (typeof value === "string" ||
-            typeof value === "boolean" ||
-            typeof value === "number") &&
-          String(value) === fallback
+          literalInput(value) === fallback
         ) {
           process.stderr.write(
             `${source}: job ${job}, step ${index + 1} [R35] Omit input "${input}" equal to the documented default for ${uses}.\n`
