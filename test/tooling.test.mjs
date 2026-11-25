@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -27,33 +27,57 @@ const isObject = (value) =>
  */
 const isArray = (value) => Array.isArray(value);
 
-await test("Git hooks invoke Corepack pnpm and propagate its status", async () => {
+await test("Git hooks run their repository scripts and propagate their status", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-hooks-"));
   try {
-    await writeFile(
-      path.join(directory, "corepack"),
-      '#!/bin/sh\nprintf "%s\\n" "$@"\nexit "$HOOK_STATUS"\n',
-      { mode: 0o755 }
+    const gitVariables = new Set(
+      execFileSync("git", ["rev-parse", "--local-env-vars"], {
+        encoding: "utf-8"
+      })
+        .trim()
+        .split("\n")
     );
-    for (const hook of ["pre-commit", "pre-push"]) {
-      for (const status of [0, 17]) {
-        const result = spawnSync(
-          "sh",
-          [
-            "-c",
-            'PATH=$1; export PATH; . "$2"',
-            "sh",
-            directory,
-            path.resolve(import.meta.dirname, "../.husky", hook)
-          ],
-          {
-            encoding: "utf-8",
-            env: { ...process.env, HOOK_STATUS: String(status) }
-          }
+    const env = Object.fromEntries(
+      Object.entries(process.env).filter(([name]) => !gitVariables.has(name))
+    );
+    execFileSync("git", ["init", "--quiet", "--template="], {
+      cwd: directory,
+      env
+    });
+    await mkdir(path.join(directory, ".git", "hooks"));
+    const hooks = ["pre-commit", "pre-push"];
+    await writeFile(
+      path.join(directory, "package.json"),
+      JSON.stringify({
+        scripts: Object.fromEntries(
+          hooks.map((hook) => [
+            hook,
+            `printf '${hook} %s\\n' "$HOOK_STATUS" > hook-output; exit "$HOOK_STATUS"`
+          ])
+        )
+      })
+    );
+    await Promise.all(
+      hooks.map(async (hook) => {
+        await cp(
+          path.resolve(import.meta.dirname, "../.husky", hook),
+          path.join(directory, ".git", "hooks", hook)
         );
+      })
+    );
+    for (const hook of hooks) {
+      for (const status of [0, 17]) {
+        const result = spawnSync("git", ["hook", "run", hook], {
+          cwd: directory,
+          encoding: "utf-8",
+          env: { ...env, HOOK_STATUS: String(status) }
+        });
         assert.ifError(result.error);
         assert.equal(result.status, status, result.stderr);
-        assert.equal(result.stdout, `pnpm\nrun\n${hook}\n`);
+        assert.equal(
+          readFileSync(path.join(directory, "hook-output"), "utf-8"),
+          `${hook} ${status}\n`
+        );
       }
     }
   } finally {

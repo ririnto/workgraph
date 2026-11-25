@@ -39,3 +39,21 @@ Repeat a selected case when comparing behavior across runs.
 | Direct | [Source correction](../evals/development-natural-trigger/case.yaml) | Main loads Development and fixes the supplied bug without delegation. |
 | Agent | [Worker completion](../evals/agent-completion-callback/case.yaml) | Main waits for the background worker and uses its completed result. |
 | Workflow | [Bundled delivery](../evals/delivery-completion-evidence/case.yaml) | The registered workflow returns phase records that support the reported outcome. |
+
+### Workflow continuation
+
+The bundled delivery case makes one Workflow call.
+To evaluate same-session continuation, seed an existing workflow script in the eval workspace with [`context.scaffold_script` and `--scaffold`](https://code.claude.com/docs/en/plugin-evals#seed-the-workspace-or-conversation).
+Give the case `Read`, `Edit`, and `Workflow` under the evaluator's [tool grant rules](https://code.claude.com/docs/en/plugin-evals#grant-tools).
+
+1. Launch the fixture by absolute [`scriptPath`](https://code.claude.com/docs/en/agent-sdk/typescript#workflow) and wait for the completion callback.
+   Verify that Main received the actual results in the callback payload.
+2. Edit the exact returned `scriptPath` to append a stage that uses those results.
+3. In the same session, pass the returned `scriptPath` and set `resumeFromRunId` to the first `runId`.
+   Keep `args` and the completed calls unchanged.
+4. Inspect `workflow_progress` for `cached: true` on each reused result and match its agent ID to the first run.
+   Confirm that the new stage ran with the actual earlier results.
+
+Direct reads of journals in the evaluator's protected configuration directory remain subject to its filesystem deny rules.
+Those rules also blocked continuation from an inline launch whose returned script was stored in that directory.
+Testing that inline launch path requires a host-supported way to edit the returned script while preserving the deny rules.
