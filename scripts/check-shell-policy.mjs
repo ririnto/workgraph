@@ -11,7 +11,8 @@ import path from "node:path";
  *   Negated?: boolean, Background?: boolean
  * }} Syntax The fields used from shfmt's JSON syntax tree. */
 
-const word = String.raw`(?:[\w./-]+|'[^'\n]*'|"(?:[^"\\$\x60\n]*|\$(?:[a-zA-Z_]\w*|\{[a-zA-Z_]\w*\}))")`;
+const simpleParameter = String.raw`\$(?:[a-zA-Z_]\w*|\{[a-zA-Z_]\w*\})`;
+const word = String.raw`(?:[\w./-]+|${simpleParameter}|'[^'\n]*'|"(?:[^"\\$\x60\n]*|${simpleParameter})")`;
 const unaryTest = String.raw`(?:-n|-z|-f)\s+${word}`;
 const doubleBracket = new RegExp(String.raw`^\[\[\s+${unaryTest}\s+\]\]$`, "u");
 const guardTest = String.raw`(?:${unaryTest}|${word}\s+(?:=|!=|-eq)\s+${word})`;
@@ -119,7 +120,8 @@ for (const file of files.filter(Boolean)) {
         doubleBracket.test(spelling(source, node))
       ) {
         diagnostics.push({
-          message: "[R33] Use a portable [ ] test for this condition.",
+          message:
+            "[R33] Use a portable [ ] test and quote each variable operand so an empty expansion stays an operand.",
           position: node.Pos
         });
       }

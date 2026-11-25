@@ -242,6 +242,8 @@ await test("shell policy reports discarded diagnostics and portable guard violat
     'if [ -z "$value" ]; then exit 1; fi',
     '[[ "$value" == a* ]] && echo pattern',
     '[[ "$value" =~ ^a ]] && echo regex',
+    "[[ $value == a* ]] && echo pattern",
+    "[[ $value =~ ^a ]] && echo regex",
     'test -n "$value" || echo empty && echo done',
     'test -n "$value" || exit 1 && echo done',
     '! test -n "$value" || exit 1',
@@ -259,7 +261,12 @@ await test("shell policy reports discarded diagnostics and portable guard violat
     'case "$value" in',
     '  *) test -n "$value" || exit 2 ;;',
     "esac",
-    '(test -n "$value" || exit 3)'
+    '(test -n "$value" || exit 3)',
+    "[[ -n $value ]]",
+    `[[ -z \${value} ]]`,
+    "[[ -f $value ]]",
+    "test -n $value || exit 4",
+    `[ \${value} != $expected ] || exit 5`
   ];
   const fixture = createTrackedFixture(t, {
     [filename]: `${control.join("\n")}\n`,
@@ -281,6 +288,11 @@ await test("shell policy reports discarded diagnostics and portable guard violat
   assert.deepEqual(ruleDiagnostics(rejected.stderr), [
     { file: filename, rule: "R31" },
     { file: filename, rule: "R31" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
     { file: filename, rule: "R33" },
     { file: filename, rule: "R33" },
     { file: filename, rule: "R33" },
