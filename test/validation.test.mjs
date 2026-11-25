@@ -96,6 +96,61 @@ const runValidation = (root, filename) => {
   return result;
 };
 
+await test("workflow input defaults report equal literals only for approved action references", (t) => {
+  const root = copyValidation(t);
+  const directory = path.join(root, ".github/workflows");
+  mkdirSync(directory, { recursive: true });
+  cpSync(
+    new URL(".github/action-inputs.json", repositoryRoot),
+    path.join(root, ".github/action-inputs.json")
+  );
+  const filename = path.join(directory, "check.yml");
+  const fixture = `name: Check inputs
+on: push
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pnpm/setup@v3
+        with:
+          install: false
+          save-cache: \${{ true }}
+          dest: ~/setup-pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: pnpm/setup@v2
+        with:
+          cache: false
+      - uses: other/setup@v3
+        with:
+          cache: false
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+          sparse-checkout: "null"
+`;
+  writeFileSync(filename, fixture);
+  const accepted = runValidation(root, "check-workflow-inputs.mjs");
+  assert.equal(accepted.status, 0, accepted.stderr);
+  assert.equal(accepted.stdout, "");
+  assert.equal(accepted.stderr, "");
+  writeFileSync(
+    filename,
+    fixture
+      .replace("          install: false\n", "          cache: false\n")
+      .replace("          fetch-depth: 2\n", "          fetch-depth: 1\n")
+  );
+  const rejected = runValidation(root, "check-workflow-inputs.mjs");
+  assert.equal(rejected.status, 1, rejected.stderr);
+  assert.equal(rejected.stdout, "");
+  assert.equal(
+    rejected.stderr,
+    [
+      '.github/workflows/check.yml: job check, step 1 [R35] Omit input "cache" equal to the documented default for pnpm/setup@v3.\n',
+      '.github/workflows/check.yml: job check, step 4 [R35] Omit input "fetch-depth" equal to the documented default for actions/checkout@v7.\n'
+    ].join("")
+  );
+});
+
 await test("issue form validation reports malformed input and field violations", () => {
   /** @type {[string, string[]][]} */
   const cases = [

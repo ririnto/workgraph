@@ -1,0 +1,223 @@
+{
+  "actions/checkout@v7": {
+    "commit": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+    "inputs": {
+      "repository": {
+        "contextDependent": true,
+        "default": "${{ github.repository }}"
+      },
+      "ref": {
+        "contextDependent": true,
+        "default": null
+      },
+      "token": {
+        "contextDependent": true,
+        "default": "${{ github.token }}"
+      },
+      "ssh-key": null,
+      "ssh-known-hosts": null,
+      "ssh-strict": "true",
+      "ssh-user": "git",
+      "persist-credentials": "true",
+      "path": null,
+      "clean": "true",
+      "filter": null,
+      "sparse-checkout": null,
+      "sparse-checkout-cone-mode": "true",
+      "fetch-depth": "1",
+      "fetch-tags": "false",
+      "show-progress": "true",
+      "lfs": "false",
+      "submodules": "false",
+      "set-safe-directory": "true",
+      "github-server-url": null,
+      "allow-unsafe-pr-checkout": "false"
+    }
+  },
+  "actions/setup-go@v7": {
+    "commit": "d8cbb8045d7f43706b9177cceb36c1f91a6644d5",
+    "inputs": {
+      "go-version": null,
+      "go-version-file": null,
+      "check-latest": "false",
+      "token": {
+        "contextDependent": true,
+        "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}"
+      },
+      "cache": "true",
+      "cache-dependency-path": null,
+      "architecture": {
+        "contextDependent": true,
+        "default": null
+      },
+      "go-download-base-url": {
+        "contextDependent": true,
+        "default": null
+      }
+    }
+  },
+  "actions/setup-java@v6": {
+    "commit": "d1374f8ac74474200d16ef8ecee22c7ae7a51880",
+    "inputs": {
+      "java-version": null,
+      "java-version-file": null,
+      "distribution": null,
+      "java-package": "jdk",
+      "architecture": {
+        "contextDependent": true,
+        "default": null
+      },
+      "jdk-file": null,
+      "jdkFile": null,
+      "check-latest": "false",
+      "force-download": "false",
+      "set-default": "true",
+      "verify-signature": null,
+      "verify-signature-public-key": null,
+      "server-id": "github",
+      "server-username-env-var": null,
+      "server-username": null,
+      "server-password-env-var": null,
+      "server-password": null,
+      "mvn-server-credentials": null,
+      "mvn-server-repository-origins": null,
+      "mvn-repositories": null,
+      "mvn-plugin-repositories": null,
+      "mvn-mirrors": null,
+      "mvn-repositories-include-central": "true",
+      "mvn-repositories-prioritize-central": "true",
+      "settings-path": null,
+      "overwrite-settings": "true",
+      "gpg-private-key": "",
+      "gpg-passphrase-env-var": null,
+      "gpg-passphrase": null,
+      "cache": null,
+      "cache-jdk": {
+        "contextDependent": true,
+        "default": null
+      },
+      "cache-dependency-path": {
+        "contextDependent": true,
+        "default": null
+      },
+      "cache-path": null,
+      "cache-read-only": "false",
+      "job-status": {
+        "contextDependent": true,
+        "default": "${{ job.status }}"
+      },
+      "token": {
+        "contextDependent": true,
+        "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}"
+      },
+      "mvn-toolchain-id": {
+        "contextDependent": true,
+        "default": null
+      },
+      "mvn-toolchain-vendor": {
+        "contextDependent": true,
+        "default": null
+      },
+      "show-download-progress": "false",
+      "problem-matcher": "false"
+    }
+  },
+  "gradle/actions/setup-gradle@v6": {
+    "commit": "8da46b539cd8fe6ab27ca75128919a18d757604c",
+    "inputs": {
+      "gradle-version": {
+        "contextDependent": true,
+        "default": null
+      },
+      "cache-provider": "enhanced",
+      "cache-disabled": "false",
+      "cache-read-only": {
+        "contextDependent": true,
+        "default": "${{ github.event.repository != null && github.ref_name != github.event.repository.default_branch }}"
+      },
+      "cache-write-only": "false",
+      "cache-overwrite-existing": "false",
+      "cache-encryption-key": null,
+      "cache-cleanup": "on-success",
+      "gradle-home-cache-cleanup": null,
+      "gradle-home-cache-includes": "caches\nnotifications\n",
+      "gradle-home-cache-excludes": null,
+      "add-job-summary": "always",
+      "add-job-summary-as-pr-comment": "never",
+      "dependency-graph": "disabled",
+      "dependency-graph-report-dir": "dependency-graph-reports",
+      "dependency-graph-continue-on-failure": "true",
+      "dependency-graph-exclude-projects": null,
+      "dependency-graph-include-projects": null,
+      "dependency-graph-exclude-configurations": null,
+      "dependency-graph-include-configurations": null,
+      "artifact-retention-days": null,
+      "build-scan-publish": "false",
+      "build-scan-terms-of-use-url": null,
+      "build-scan-terms-of-use-agree": null,
+      "develocity-access-key": null,
+      "develocity-token-expiry": null,
+      "develocity-injection-enabled": null,
+      "develocity-url": null,
+      "develocity-allow-untrusted-server": null,
+      "develocity-capture-file-fingerprints": null,
+      "develocity-enforce-url": null,
+      "develocity-plugin-version": null,
+      "develocity-ccud-plugin-version": null,
+      "gradle-plugin-repository-url": null,
+      "gradle-plugin-repository-username": null,
+      "gradle-plugin-repository-password": null,
+      "validate-wrappers": "true",
+      "allow-snapshot-wrappers": "false",
+      "arguments": null,
+      "gradle-home-cache-strict-match": "false",
+      "workflow-job-context": {
+        "contextDependent": true,
+        "default": "${{ toJSON(matrix) }}"
+      },
+      "github-token": {
+        "contextDependent": true,
+        "default": "${{ github.token }}"
+      }
+    }
+  },
+  "pnpm/setup@v3": {
+    "commit": "731dfb6463bbd11c11fd0ee11fe00ed0e36d48a1",
+    "inputs": {
+      "version": {
+        "contextDependent": true,
+        "default": null
+      },
+      "registry": {
+        "contextDependent": true,
+        "default": null
+      },
+      "dest": {
+        "contextDependent": true,
+        "default": "~/setup-pnpm"
+      },
+      "runtime": {
+        "contextDependent": true,
+        "default": null
+      },
+      "node-version-file": {
+        "contextDependent": true,
+        "default": null
+      },
+      "cache": "false",
+      "save-cache": "true",
+      "cache-dependency-path": {
+        "contextDependent": true,
+        "default": null
+      },
+      "working-directory": ".",
+      "package-json-file": {
+        "contextDependent": true,
+        "default": null
+      },
+      "require-lockfile": "false",
+      "install": "true",
+      "token": null
+    }
+  }
+}

@@ -32,7 +32,7 @@
     "check:shell:format": "bash -c 'set -eo pipefail; git ls-files -z -- .husky/pre-commit .husky/pre-push \"*.sh\" | xargs -0 env GOWORK=off go tool shfmt -i 2 -d --'",
     "check:shell:lint": "bash -c 'set -eo pipefail; git ls-files -z -- .husky/pre-commit .husky/pre-push \"*.sh\" | xargs -0 shellcheck --'",
     "check:shell:policy": "node scripts/check-shell-policy.mjs",
-    "check:workflows": "GOWORK=off go tool actionlint",
+    "check:workflows": "GOWORK=off go tool actionlint && node scripts/check-workflow-inputs.mjs",
     "validate:claude": "npm exec --yes --package=@anthropic-ai/claude-code@2.1.305 -- run-s validate:claude:version validate:claude:package validate:claude:manifest",
     "validate:claude:version": "sh -ec 'uname -sm; command -v claude; claude --version'",
     "validate:claude:package": "claude plugin validate --strict ./",
