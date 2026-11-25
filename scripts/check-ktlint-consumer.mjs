@@ -13,7 +13,7 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-const kotlin = path.resolve("skills/development/assets/kotlin");
+const kotlin = path.resolve("skills/development/assets/gradle");
 const fixtures = path.resolve("test/fixtures/ktlint");
 const consumer = realpathSync(
   mkdtempSync(path.join(tmpdir(), "workgraph-ktlint-consumer-"))
@@ -65,6 +65,19 @@ try {
     path.join(fixtures, "Preserved.kt"),
     path.join(sources, "Preserved.kt")
   );
+  const withCommas = path.join(sources, "WithTrailingCommas.kt");
+  const commaStyle = `object WithTrailingCommas {
+    fun label(
+        first: String,
+        second: String,
+    ): String =
+        TrailingComma.combine(
+            first,
+            second,
+        )
+}
+`;
+  writeFileSync(withCommas, commaStyle);
   run(0);
   assert.deepEqual(JSON.parse(readFileSync(report, "utf-8")), []);
   unlinkSync(path.join(consumer, ".editorconfig"));
@@ -72,7 +85,10 @@ try {
   assert.partialDeepStrictEqual(JSON.parse(readFileSync(report, "utf-8")), [
     {
       file: path.join(sources, "TrailingComma.kt"),
-      errors: [{ rule: "standard:trailing-comma-on-declaration-site" }]
+      errors: [
+        { rule: "standard:trailing-comma-on-declaration-site" },
+        { rule: "standard:trailing-comma-on-call-site" }
+      ]
     }
   ]);
   cpSync(
@@ -80,50 +96,41 @@ try {
     path.join(consumer, ".editorconfig")
   );
   cpSync(path.join(fixtures, "Matching.kt"), path.join(sources, "Matching.kt"));
-  const violation = path.join(sources, "TrailingCommaViolation.kt");
-  const invalid =
-    "fun invalid(\n    first: String,\n    second: String,\n): String =\n    combine(\n        first,\n        second,\n    )\n";
-  writeFileSync(violation, invalid);
+  const noNewline = path.join(sources, "MissingFinalNewline.kt");
+  writeFileSync(noNewline, "object MissingFinalNewline");
   run(1);
   const message =
     "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration.";
-  assert.deepEqual(JSON.parse(readFileSync(report, "utf-8")), [
-    {
-      file: path.join(sources, "Matching.kt"),
-      errors: [
-        {
-          line: 2,
-          column: 5,
-          message,
-          rule: "comments:no-body-comments"
-        },
-        {
-          line: 5,
-          column: 9,
-          message,
-          rule: "comments:no-body-comments"
-        }
-      ]
-    },
-    {
-      file: violation,
-      errors: [
-        {
-          line: 3,
-          column: 19,
-          message: 'Unnecessary trailing comma before ")"',
-          rule: "standard:trailing-comma-on-declaration-site"
-        },
-        {
-          line: 7,
-          column: 15,
-          message: 'Unnecessary trailing comma before ")"',
-          rule: "standard:trailing-comma-on-call-site"
-        }
-      ]
-    }
-  ]);
-  assert.equal(readFileSync(violation, "utf-8"), invalid);
+  /** @type {unknown} */
+  const violations = JSON.parse(readFileSync(report, "utf-8"));
+  assert.ok(Array.isArray(violations));
+  /** @type {unknown[]} */
+  const reports = violations;
+  const [comments, newline, ...unexpected] = reports;
+  assert.deepEqual(unexpected, []);
+  assert.partialDeepStrictEqual(newline, {
+    file: noNewline,
+    errors: [{ rule: "standard:final-newline" }]
+  });
+  assert.deepEqual(comments, {
+    file: path.join(sources, "Matching.kt"),
+    errors: [
+      {
+        line: 2,
+        column: 5,
+        message,
+        rule: "comments:no-body-comments"
+      },
+      {
+        line: 5,
+        column: 9,
+        message,
+        rule: "comments:no-body-comments"
+      }
+    ]
+  });
+  assert.equal(readFileSync(withCommas, "utf-8"), commaStyle);
+  assert.equal(readFileSync(noNewline, "utf-8"), "object MissingFinalNewline");
   for (const file of ["Matching.kt", "Preserved.kt", "TrailingComma.kt"]) {
     assert.deepEqual(
       readFileSync(path.join(sources, file)),

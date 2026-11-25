@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync
+} from "node:fs";
 import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -94,11 +101,13 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
       "check:go"
     ],
     ["go.work", "check:go"],
+    ["scripts/check-go-workspace.mjs", "check:go"],
+    ["scripts/check-shell-policy.mjs", "check:shell"],
     [
-      "skills/development/assets/kotlin/gradle/libs.versions.toml",
+      "skills/development/assets/gradle/gradle/libs.versions.toml",
       "check:kotlin"
     ],
-    ["skills/development/assets/kotlin/.editorconfig", "check:kotlin"],
+    ["skills/development/assets/gradle/.editorconfig", "check:kotlin"],
     [
       "skills/development/assets/nodejs/oxlint.config.ts",
       "check:node-consumer"
@@ -161,14 +170,193 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
         const dispatched = result.stdout
           .split("\n")
           .filter((argument) =>
-            ["check:go", "check:kotlin", "check:node-consumer"].includes(
-              argument
-            )
+            [
+              "check:go",
+              "check:kotlin",
+              "check:node-consumer",
+              "check:shell"
+            ].includes(argument)
           );
         assert.deepEqual(dispatched, expected ? [expected] : []);
       });
     })
   );
+});
+
+/**
+ * @param {import("node:test").TestContext} t Test that owns the fixture.
+ * @param {Record<string, string>} files Paths and contents to track.
+ * @returns {{cwd: string, env: NodeJS.ProcessEnv, encoding: "utf-8"}} Options for checks in the fixture.
+ */
+const createTrackedFixture = (t, files) => {
+  const cwd = mkdtempSync(path.join(tmpdir(), "workgraph-native-check-"));
+  t.after(() => {
+    rmSync(cwd, { force: true, recursive: true });
+  });
+  const gitVariables = new Set(
+    execFileSync("git", ["rev-parse", "--local-env-vars"], {
+      encoding: "utf-8"
+    })
+      .trim()
+      .split("\n")
+  );
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => !gitVariables.has(key))
+  );
+  /** @type {{cwd: string, env: NodeJS.ProcessEnv, encoding: "utf-8"}} */
+  const options = { cwd, env, encoding: "utf-8" };
+  execFileSync("git", ["init", "--quiet", "--template="], options);
+  for (const [file, source] of Object.entries(files)) {
+    const target = path.join(cwd, file);
+    mkdirSync(path.dirname(target), { recursive: true });
+    writeFileSync(target, source);
+  }
+  execFileSync("git", ["add", "--", ...Object.keys(files)], options);
+  return options;
+};
+
+/**
+ * @param {string} stderr Diagnostics from the check process.
+ * @returns {{file: string, rule: string}[]} The path and rule of each diagnostic.
+ */
+const ruleDiagnostics = (stderr) =>
+  stderr
+    .trimEnd()
+    .split("\n")
+    .map((line) => {
+      const fields = /^(?<file>.+?)(?::\d+:\d+)? \[(?<rule>R\d+)\] /u.exec(
+        line
+      )?.groups;
+      assert.ok(fields?.file !== undefined && fields.rule !== undefined, line);
+      return { file: fields.file, rule: fields.rule };
+    });
+
+await test("shell policy reports discarded diagnostics and portable guard violations", (t) => {
+  const filename = "hook sample.sh";
+  const control = [
+    "#!/usr/bin/env bash",
+    'value="$1"',
+    'printf "%s\\n" "literal > /dev/null"',
+    "cat </dev/null",
+    "curl -o /dev/null https://example.invalid",
+    'if [ -z "$value" ]; then exit 1; fi',
+    '[[ "$value" == a* ]] && echo pattern',
+    '[[ "$value" =~ ^a ]] && echo regex',
+    "[[ $value == a* ]] && echo pattern",
+    "[[ $value =~ ^a ]] && echo regex",
+    'test -n "$value" || echo empty && echo done',
+    'test -n "$value" || exit 1 && echo done',
+    '! test -n "$value" || exit 1',
+    'test -n "$value" || exit 1 &',
+    'test -n "$value" || exit 1 2>guard.log',
+    'for item in "$@"; do',
+    '  if [ -z "$item" ]; then exit 1; fi',
+    "done"
+  ];
+  const defect = [
+    "echo hello > /dev/null",
+    'echo hello 2>>"/dev"/null',
+    '[[ -n "$value" ]]',
+    '[ "$value" != "" ] || exit 1',
+    'case "$value" in',
+    '  *) test -n "$value" || exit 2 ;;',
+    "esac",
+    '(test -n "$value" || exit 3)',
+    "[[ -n $value ]]",
+    `[[ -z \${value} ]]`,
+    "[[ -f $value ]]",
+    "test -n $value || exit 4",
+    `[ \${value} != $expected ] || exit 5`
+  ];
+  const fixture = createTrackedFixture(t, {
+    [filename]: `${control.join("\n")}\n`,
+    "test/fixtures/excluded.sh": "#!/bin/sh\necho fixture > /dev/null\n"
+  });
+  const args = [
+    path.resolve(import.meta.dirname, "../scripts/check-shell-policy.mjs")
+  ];
+  const clean = spawnSync(process.execPath, args, fixture);
+  assert.ifError(clean.error);
+  assert.equal(clean.status, 0, clean.stderr);
+  assert.equal(clean.stderr, "");
+  const source = `${[...control, ...defect].join("\n")}\n`;
+  const file = path.join(fixture.cwd, filename);
+  writeFileSync(file, source);
+  const rejected = spawnSync(process.execPath, args, fixture);
+  assert.ifError(rejected.error);
+  assert.equal(rejected.status, 1, rejected.stderr);
+  assert.deepEqual(ruleDiagnostics(rejected.stderr), [
+    { file: filename, rule: "R31" },
+    { file: filename, rule: "R31" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" },
+    { file: filename, rule: "R33" }
+  ]);
+  assert.equal(readFileSync(file, "utf-8"), source);
+});
+
+await test("Go workspace policy requires tracked modules and ignores fixture modules", (t) => {
+  const fixture = createTrackedFixture(t, {
+    "go.mod": "module example.invalid/root\n\ngo 1.24\n",
+    "test/fixtures/excluded/go.mod":
+      "module example.invalid/excluded\n\ngo 1.24\n"
+  });
+  const args = [
+    path.resolve(import.meta.dirname, "../scripts/check-go-workspace.mjs")
+  ];
+  writeFileSync(
+    path.join(fixture.cwd, "go"),
+    "#!/bin/sh\nprintf 'go invoked\\n' >> go-invocations\nexit 99\n",
+    { mode: 0o700 }
+  );
+  const withoutWorkspace = {
+    ...fixture,
+    env: {
+      ...fixture.env,
+      PATH: `${fixture.cwd}${path.delimiter}${fixture.env.PATH ?? ""}`
+    }
+  };
+  const single = spawnSync(process.execPath, args, withoutWorkspace);
+  assert.ifError(single.error);
+  assert.equal(single.status, 0, single.stderr);
+  assert.equal(single.stderr, "");
+  mkdirSync(path.join(fixture.cwd, "asset"));
+  writeFileSync(
+    path.join(fixture.cwd, "asset/go.mod"),
+    "module example.invalid/asset\n\ngo 1.24\n"
+  );
+  execFileSync("git", ["add", "--", "asset/go.mod"], fixture);
+  const workspace = path.join(fixture.cwd, "go.work");
+  writeFileSync(workspace, "go 1.24\n\nuse (\n\t.\n\t./asset\n)\n");
+  const missing = spawnSync(process.execPath, args, withoutWorkspace);
+  assert.ifError(missing.error);
+  assert.equal(missing.status, 1, missing.stderr);
+  assert.deepEqual(ruleDiagnostics(missing.stderr), [
+    { file: "asset/go.mod", rule: "R40" },
+    { file: "go.mod", rule: "R40" }
+  ]);
+  assert.equal(existsSync(path.join(fixture.cwd, "go-invocations")), false);
+  execFileSync("git", ["add", "--", "go.work"], fixture);
+  const clean = spawnSync(process.execPath, args, fixture);
+  assert.ifError(clean.error);
+  assert.equal(clean.status, 0, clean.stderr);
+  assert.equal(clean.stderr, "");
+  const incomplete = "go 1.24\n\nuse (\n\t.\n\t./obsolete\n)\n";
+  writeFileSync(workspace, incomplete);
+  const rejected = spawnSync(process.execPath, args, fixture);
+  assert.ifError(rejected.error);
+  assert.equal(rejected.status, 1, rejected.stderr);
+  assert.deepEqual(ruleDiagnostics(rejected.stderr), [
+    { file: "asset/go.mod", rule: "R40" },
+    { file: "obsolete/go.mod", rule: "R40" }
+  ]);
+  assert.equal(readFileSync(workspace, "utf-8"), incomplete);
 });
 
 await test("prose formatting checks sentences and preserves Markdown syntax", () => {
