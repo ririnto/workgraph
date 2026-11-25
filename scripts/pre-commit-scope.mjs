@@ -44,7 +44,8 @@ for (const { patterns, check, test } of [
       "go.work",
       ".golangci.yaml",
       "skills/development/assets/golang/.golangci.yaml",
-      "scripts/check-go-consumer.mjs"
+      "scripts/check-go-consumer.mjs",
+      "scripts/check-go-workspace.mjs"
     ],
     check: "check:go"
   },
@@ -52,12 +53,12 @@ for (const { patterns, check, test } of [
     patterns: [
       "**/*.{kt,kts}",
       ".editorconfig",
-      "skills/development/assets/kotlin/.editorconfig",
-      "skills/development/assets/kotlin/gradle/libs.versions.toml",
-      "skills/development/assets/kotlin/gradle/wrapper/**",
-      "skills/development/assets/kotlin/gradlew",
-      "skills/development/assets/kotlin/gradlew.bat",
-      "skills/development/assets/kotlin/buildSrc/src/main/resources/**",
+      "skills/development/assets/gradle/.editorconfig",
+      "skills/development/assets/gradle/gradle/libs.versions.toml",
+      "skills/development/assets/gradle/gradle/wrapper/**",
+      "skills/development/assets/gradle/gradlew",
+      "skills/development/assets/gradle/gradlew.bat",
+      "skills/development/assets/gradle/buildSrc/src/main/resources/**",
       "scripts/check-ktlint-consumer.mjs"
     ],
     check: "check:kotlin"
@@ -71,7 +72,13 @@ for (const { patterns, check, test } of [
     check: "check:node-consumer"
   },
   {
-    patterns: [".husky/*", "**/*.sh", ".editorconfig", "go.{mod,sum}"],
+    patterns: [
+      ".husky/*",
+      "**/*.sh",
+      ".editorconfig",
+      "go.{mod,sum}",
+      "scripts/check-shell-policy.mjs"
+    ],
     check: "check:shell"
   },
   {
@@ -96,6 +103,8 @@ for (const { patterns, check, test } of [
       "workflows/**",
       "rules/**",
       "scripts/pre-commit-scope.mjs",
+      "scripts/check-go-workspace.mjs",
+      "scripts/check-shell-policy.mjs",
       ".husky/*",
       "*.config.ts",
       ".markdownlint-cli2.jsonc",

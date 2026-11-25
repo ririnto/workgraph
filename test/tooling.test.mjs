@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync
+} from "node:fs";
 import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -94,11 +100,13 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
       "check:go"
     ],
     ["go.work", "check:go"],
+    ["scripts/check-go-workspace.mjs", "check:go"],
+    ["scripts/check-shell-policy.mjs", "check:shell"],
     [
-      "skills/development/assets/kotlin/gradle/libs.versions.toml",
+      "skills/development/assets/gradle/gradle/libs.versions.toml",
       "check:kotlin"
     ],
-    ["skills/development/assets/kotlin/.editorconfig", "check:kotlin"],
+    ["skills/development/assets/gradle/.editorconfig", "check:kotlin"],
     [
       "skills/development/assets/nodejs/oxlint.config.ts",
       "check:node-consumer"
@@ -161,14 +169,126 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
         const dispatched = result.stdout
           .split("\n")
           .filter((argument) =>
-            ["check:go", "check:kotlin", "check:node-consumer"].includes(
-              argument
-            )
+            [
+              "check:go",
+              "check:kotlin",
+              "check:node-consumer",
+              "check:shell"
+            ].includes(argument)
           );
         assert.deepEqual(dispatched, expected ? [expected] : []);
       });
     })
   );
+});
+
+/**
+ * @param {import("node:test").TestContext} t Test that owns the fixture.
+ * @param {Record<string, string>} files Paths and contents to track.
+ * @returns {{cwd: string, env: NodeJS.ProcessEnv, encoding: "utf-8"}} Options for checks in the fixture.
+ */
+const createTrackedFixture = (t, files) => {
+  const cwd = mkdtempSync(path.join(tmpdir(), "workgraph-native-check-"));
+  t.after(() => {
+    rmSync(cwd, { force: true, recursive: true });
+  });
+  const gitVariables = new Set(
+    execFileSync("git", ["rev-parse", "--local-env-vars"], {
+      encoding: "utf-8"
+    })
+      .trim()
+      .split("\n")
+  );
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => !gitVariables.has(key))
+  );
+  /** @type {{cwd: string, env: NodeJS.ProcessEnv, encoding: "utf-8"}} */
+  const options = { cwd, env, encoding: "utf-8" };
+  execFileSync("git", ["init", "--quiet", "--template="], options);
+  for (const [file, source] of Object.entries(files)) {
+    const target = path.join(cwd, file);
+    mkdirSync(path.dirname(target), { recursive: true });
+    writeFileSync(target, source);
+  }
+  execFileSync("git", ["add", "--", ...Object.keys(files)], options);
+  return options;
+};
+
+await test("shell policy reports discarded diagnostics and portable guard violations", (t) => {
+  const filename = "hook sample.sh";
+  const control = [
+    "#!/usr/bin/env bash",
+    'value="$1"',
+    'printf "%s\\n" "literal > /dev/null"',
+    "cat </dev/null",
+    "curl -o /dev/null https://example.invalid",
+    'if [ -z "$value" ]; then exit 1; fi',
+    '[[ "$value" == a* ]] && echo pattern',
+    '[[ "$value" =~ ^a ]] && echo regex',
+    'test -n "$value" || echo empty && echo done'
+  ];
+  const defect = [
+    "echo hello > /dev/null",
+    'echo hello 2>>"/dev"/null',
+    '[[ -n "$value" ]]',
+    '[ "$value" != "" ] || exit 1'
+  ];
+  const fixture = createTrackedFixture(t, {
+    [filename]: `${control.join("\n")}\n`,
+    "test/fixtures/excluded.sh": "#!/bin/sh\necho fixture > /dev/null\n"
+  });
+  const args = [
+    path.resolve(import.meta.dirname, "../scripts/check-shell-policy.mjs")
+  ];
+  const clean = spawnSync(process.execPath, args, fixture);
+  assert.ifError(clean.error);
+  assert.equal(clean.status, 0, clean.stderr);
+  assert.equal(clean.stderr, "");
+  const source = `${[...control, ...defect].join("\n")}\n`;
+  const file = path.join(fixture.cwd, filename);
+  writeFileSync(file, source);
+  const rejected = spawnSync(process.execPath, args, fixture);
+  assert.ifError(rejected.error);
+  assert.equal(rejected.status, 1, rejected.stderr);
+  assert.equal(
+    rejected.stderr,
+    [
+      `${filename}:10:12 [R31] Preserve shell diagnostics instead of redirecting output to /dev/null.`,
+      `${filename}:11:13 [R31] Preserve shell diagnostics instead of redirecting output to /dev/null.`,
+      `${filename}:12:1 [R33] Use a portable [ ] test for this condition.`,
+      `${filename}:13:1 [R33] Use an explicit if statement for this exit guard.`,
+      ""
+    ].join("\n")
+  );
+  assert.equal(readFileSync(file, "utf-8"), source);
+});
+
+await test("Go workspace policy requires tracked modules and ignores fixture modules", (t) => {
+  const fixture = createTrackedFixture(t, {
+    "go.mod": "module example.invalid/root\n\ngo 1.24\n",
+    "go.work": "go 1.24\n\nuse (\n\t.\n\t./asset\n)\n",
+    "asset/go.mod": "module example.invalid/asset\n\ngo 1.24\n",
+    "test/fixtures/excluded/go.mod":
+      "module example.invalid/excluded\n\ngo 1.24\n"
+  });
+  const args = [
+    path.resolve(import.meta.dirname, "../scripts/check-go-workspace.mjs")
+  ];
+  const clean = spawnSync(process.execPath, args, fixture);
+  assert.ifError(clean.error);
+  assert.equal(clean.status, 0, clean.stderr);
+  assert.equal(clean.stderr, "");
+  const workspace = path.join(fixture.cwd, "go.work");
+  const incomplete = "go 1.24\n\nuse (\n\t.\n\t./obsolete\n)\n";
+  writeFileSync(workspace, incomplete);
+  const rejected = spawnSync(process.execPath, args, fixture);
+  assert.ifError(rejected.error);
+  assert.equal(rejected.status, 1, rejected.stderr);
+  assert.equal(
+    rejected.stderr,
+    "go.work [R40] Missing workspace member for asset/go.mod.\ngo.work [R40] Workspace member obsolete/go.mod has no tracked project go.mod.\n"
+  );
+  assert.equal(readFileSync(workspace, "utf-8"), incomplete);
 });
 
 await test("prose formatting checks sentences and preserves Markdown syntax", () => {

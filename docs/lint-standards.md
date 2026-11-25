@@ -37,14 +37,16 @@ The preset sorts value imports, so applying its fixes can change initialization 
 | --- | --- | --- |
 | Keep Markdown source readable and use ASCII tree markers | Consistency, maintainability | [`check:markdownlint-cli2`](../.markdownlint-cli2.jsonc) honors Git ignores for `**/*.md`. It applies `docs/prose-format`, `docs/no-em-dash`, `docs/table-separators`, and the `no-box-drawing` search-replace rule. The latter includes code blocks and reports the first box-drawing character per line. |
 | Keep links resolvable and skill metadata loadable | Stability, maintainability | `relative-links` checks relative link targets and headings. `docs/no-relative-skill-links` checks that relative skill links target bundled skills. `docs/skill-frontmatter` checks bundled frontmatter structure. `check:skill-metadata` validates invocation policy and host prompt limits. |
-| Keep shell hooks portable and formatted | Stability, consistency | `check:shell` runs ShellCheck and compares shfmt output for the tracked Husky hooks and shell scripts. Runtime tests check gating and exit propagation. |
-| Validate the bundled Go and Kotlin source | Performance, stability, consistency | `check:go` runs the [.golangci.yaml profile](../.golangci.yaml), NilAway on the analyzer package, and a fresh Go consumer check. `check:kotlin` runs the wrapper's `ktlintCheck` on the build logic and a fresh sample that loads the custom ruleset. |
+| Keep shell hooks portable and formatted | Stability, consistency | `check:shell` runs ShellCheck and compares shfmt output for the tracked Husky hooks and shell scripts. The shell policy checks those files for output redirection to `/dev/null`, portable unary tests, and simple exit guards outside test fixtures. |
+| Validate the bundled Go and Kotlin source | Performance, stability, consistency | `check:go` validates workspace membership, runs the [.golangci.yaml profile](../.golangci.yaml) and NilAway, and checks a fresh Go consumer. `check:kotlin` runs the wrapper's `ktlintCheck` on the build logic and a fresh sample that loads the custom ruleset and checks both trailing-comma settings. |
 | Validate workflows, issue forms, and plugin metadata | Stability, maintainability | `check:workflows` uses actionlint. `check:issue-forms` validates the supported issue-form subset. `check:plugin-version` checks release parity, package paths, and host metadata. |
 | Check production dependencies for known advisories | Stability | `check:production-audit` runs `pnpm audit --prod`. The package currently declares no production dependencies. |
 
 The [tooling tests](../test/tooling.test.mjs) exercise representative accepted and rejected inputs through the lint tools and cover Git hook arguments and status propagation.
 The distributed Markdown hidden-note rule has a test for its standalone consumer setup.
 The root Markdown configuration does not load that rule.
+The workspace check compares `go.work` with tracked project modules and excludes modules under `test/fixtures/`.
+The fresh Go consumer runs the copied asset as a standalone module with `GOWORK=off`.
 
 ## Local and hosted gates
 

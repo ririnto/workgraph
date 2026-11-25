@@ -117,14 +117,14 @@ Review import conversion and control-flow changes for semantic equivalence.
 
 ### Adopt ktlint checks
 
-For a fresh project, copy the bundled [Kotlin .editorconfig](../assets/kotlin/.editorconfig) to the consumer root.
+For a fresh project, copy the bundled [Kotlin .editorconfig](../assets/gradle/.editorconfig) to the consumer root.
 The standard ktlint rules can run independently.
 For an existing project, merge only the selected entries into its Kotlin section and retain its other rules and formatter settings.
 The [ktlint 1.8.0 documentation](https://github.com/ktlint/ktlint/blob/1.8.0/documentation/release-latest/docs/install/cli.md#rule-configuration-editorconfig) describes normal EditorConfig lookup.
 
-For a standalone project, copy the whole Kotlin sample from the directory containing its [root build](../assets/kotlin/build.gradle.kts).
-Include the [wrapper](../assets/kotlin/gradlew), the [default catalog](../assets/kotlin/gradle/libs.versions.toml), the [buildSrc build](../assets/kotlin/buildSrc/build.gradle.kts), and its complete sources and [provider registration](../assets/kotlin/buildSrc/src/main/resources/META-INF/services/com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3).
-Keep the bundled [MIT notice](../assets/kotlin/LICENSE), [Apache-2.0 license](../assets/kotlin/LICENSE-APACHE), and [attribution](../assets/kotlin/NOTICE).
+For a standalone project, copy the whole Kotlin sample from the directory containing its [root build](../assets/gradle/build.gradle.kts).
+Include the [wrapper](../assets/gradle/gradlew), the [default catalog](../assets/gradle/gradle/libs.versions.toml), the [buildSrc build](../assets/gradle/buildSrc/build.gradle.kts), and its complete sources and [provider registration](../assets/gradle/buildSrc/src/main/resources/META-INF/services/com.pinterest.ktlint.cli.ruleset.core.api.RuleSetProviderV3).
+Keep the bundled [MIT notice](../assets/gradle/LICENSE), [Apache-2.0 license](../assets/gradle/LICENSE-APACHE), and [attribution](../assets/gradle/NOTICE).
 Use JDK 21 or later.
 
 ```sh
