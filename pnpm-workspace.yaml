@@ -14,7 +14,7 @@ catalog:
   oxfmt: ^0.78.0
   oxlint: ^1.94.0
   oxlint-tsgolint: ^7.0.2008
-  pnpm: ^12.22.0
+  pnpm: ^12.23.0
   typescript: ^7.0.2
   ultracite: ^8.3.1
 
