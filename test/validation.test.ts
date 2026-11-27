@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import type { SpawnSyncReturns } from "node:child_process";
 import {
   cpSync,
   mkdirSync,
@@ -12,10 +13,11 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
+import type { TestContext } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { validateIssueFormContent } from "../scripts/issue-forms.mjs";
-import { validatePluginVersions } from "../scripts/plugin-version.mjs";
+import { validateIssueFormContent } from "../scripts/issue-forms.ts";
+import { validatePluginVersions } from "../scripts/plugin-version.ts";
 
 const repositoryRoot = new URL("../", import.meta.url);
 const validIssueForm = `name: Bug report
@@ -59,10 +61,10 @@ body:
 `;
 
 /**
- * @param {import("node:test").TestContext} t Test lifecycle.
- * @returns {string} Root of the relocated validators.
+ * @param t Test lifecycle.
+ * @returns Root of the relocated validators.
  */
-const copyValidation = (t) => {
+const copyValidation = (t: TestContext): string => {
   const root = mkdtempSync(path.join(tmpdir(), "workgraph-validation-"));
   t.after(() => {
     rmSync(root, { force: true, recursive: true });
@@ -78,11 +80,14 @@ const copyValidation = (t) => {
 };
 
 /**
- * @param {string} root Plugin root.
- * @param {string} filename Validation entrypoint.
- * @returns {import("node:child_process").SpawnSyncReturns<string>} Validator exit status and output.
+ * @param root Plugin root.
+ * @param filename Validation entrypoint.
+ * @returns Validator exit status and output.
  */
-const runValidation = (root, filename) => {
+const runValidation = (
+  root: string,
+  filename: string
+): SpawnSyncReturns<string> => {
   const result = spawnSync(
     process.execPath,
     [path.join(root, "scripts", filename)],
@@ -97,12 +102,11 @@ const runValidation = (root, filename) => {
 };
 
 /**
- * @param {string} output Workflow check output.
- * @returns {Map<string, number>} Count of R35 diagnostics per input.
+ * @param output Workflow check output.
+ * @returns Count of R35 diagnostics per input.
  */
-const workflowDiagnosticCounts = (output) => {
-  /** @type {Map<string, number>} */
-  const counts = new Map();
+const workflowDiagnosticCounts = (output: string): Map<string, number> => {
+  const counts = new Map<string, number>();
   for (const { groups } of output.matchAll(
     /\[R35\][^"\n]*"(?<input>[\w-]+)"/gu
   )) {
@@ -232,8 +236,7 @@ jobs:
 });
 
 await test("issue form validation reports malformed input and field violations", () => {
-  /** @type {[string, string[]][]} */
-  const cases = [
+  const cases: [string, string[]][] = [
     [validIssueForm, []],
     ["name: [\n", ["bug_report.yaml:2: issue form must contain valid YAML."]],
     [
@@ -278,7 +281,7 @@ await test("issue form command reports invalid input and duplicate names from di
   const directory = path.join(root, ".github/ISSUE_TEMPLATE");
   mkdirSync(directory, { recursive: true });
   writeFileSync(path.join(directory, "bug_report.yaml"), "name: [\n");
-  const malformed = runValidation(root, "issue-forms.mjs");
+  const malformed = runValidation(root, "issue-forms.ts");
   assert.equal(malformed.status, 1);
   assert.equal(malformed.stdout, "");
   assert.equal(
@@ -290,7 +293,7 @@ await test("issue form command reports invalid input and duplicate names from di
     path.join(directory, "duplicate.yaml"),
     validIssueForm.replace("name: Bug report", "name: BUG REPORT")
   );
-  const duplicate = runValidation(root, "issue-forms.mjs");
+  const duplicate = runValidation(root, "issue-forms.ts");
   assert.equal(duplicate.status, 1);
   assert.equal(duplicate.stdout, "");
   assert.equal(
@@ -300,10 +303,10 @@ await test("issue form command reports invalid input and duplicate names from di
 });
 
 /**
- * @param {import("node:test").TestContext} t Test lifecycle.
- * @returns {string} Root of the relocated plugin.
+ * @param t Test lifecycle.
+ * @returns Root of the relocated plugin.
  */
-const copyPluginPackage = (t) => {
+const copyPluginPackage = (t: TestContext): string => {
   const root = copyValidation(t);
   for (const filename of [
     ".codex-plugin/plugin.json",
@@ -414,8 +417,7 @@ await test("release versions enforce padded calendar dates and daily sequences",
 });
 
 await test("plugin command validates canonical identity, catalogs, and release metadata", async (t) => {
-  /** @type {[string, Record<string, unknown>, string][]} */
-  const cases = [
+  const cases: [string, Record<string, unknown>, string][] = [
     [".codex-plugin/plugin.json", {}, ""],
     [
       ".codex-plugin/plugin.json",
@@ -480,7 +482,7 @@ await test("plugin command validates canonical identity, catalogs, and release m
     [
       "hooks/skills-only.json",
       {
-        hooks: { sessionStart: [{ command: "node hooks/inject-context.mjs" }] }
+        hooks: { sessionStart: [{ command: "node hooks/inject-context.ts" }] }
       },
       "Skills-only hook configuration must contain no handlers."
     ],
@@ -555,15 +557,16 @@ await test("plugin command validates canonical identity, catalogs, and release m
       await t.test(diagnostic || "valid relocated package", (context) => {
         const root = copyPluginPackage(context);
         const manifestPath = path.join(root, filename);
-        /** @type {unknown} */
-        const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+        const manifest: unknown = JSON.parse(
+          readFileSync(manifestPath, "utf-8")
+        );
         assert.ok(
           manifest !== null &&
             typeof manifest === "object" &&
             !Array.isArray(manifest)
         );
         writeFileSync(manifestPath, JSON.stringify({ ...manifest, ...patch }));
-        const result = runValidation(root, "plugin-version.mjs");
+        const result = runValidation(root, "plugin-version.ts");
         assert.equal(result.status, diagnostic === "" ? 0 : 1, result.stderr);
         assert.equal(
           result.stdout,
@@ -584,8 +587,7 @@ await test("plugin command validates canonical identity, catalogs, and release m
 
 await test("plugin command rejects shadowing manifests and conventional hook discovery", (t) => {
   const root = copyPluginPackage(t);
-  /** @type {[string, Record<string, unknown>][]} */
-  const files = [
+  const files: [string, Record<string, unknown>][] = [
     [
       "plugin.json",
       {
@@ -600,7 +602,7 @@ await test("plugin command rejects shadowing manifests and conventional hook dis
   for (const [filename, content] of files) {
     const file = path.join(root, filename);
     writeFileSync(file, JSON.stringify(content));
-    const result = runValidation(root, "plugin-version.mjs");
+    const result = runValidation(root, "plugin-version.ts");
     assert.equal(result.status, 1);
     assert.equal(
       result.stderr,
@@ -621,7 +623,7 @@ await test("plugin command rejects escaping package symlinks", (t) => {
   const bundledHooks = path.join(root, "hooks/codex-hooks.json");
   rmSync(bundledHooks);
   symlinkSync(outsideHooks, bundledHooks);
-  const escaped = runValidation(root, "plugin-version.mjs");
+  const escaped = runValidation(root, "plugin-version.ts");
   assert.equal(escaped.status, 1);
   assert.equal(
     escaped.stderr,
@@ -635,9 +637,9 @@ await test("validation entrypoints execute from unrelated directories through re
     rmSync(root, { force: true, recursive: true });
   });
   for (const [filename, expected] of [
-    ["issue-forms.mjs", "Validated 2 GitHub issue forms.\n"],
+    ["issue-forms.ts", "Validated 2 GitHub issue forms.\n"],
     [
-      "plugin-version.mjs",
+      "plugin-version.ts",
       "Validated four native manifests, release versions, bundled paths, and three marketplace catalogs.\n"
     ]
   ]) {

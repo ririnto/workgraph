@@ -299,7 +299,7 @@ Development owns correction priorities and architecture boundaries, while Main a
 Existing host tools handle event-triggered work within the authorized graph.
 This design adds no scheduler, telemetry service, or runtime dependency.
 
-`hooks/inject-context.test.mjs` uses Node's test runner and child processes to check the real command.
+`hooks/inject-context.test.ts` uses Node's test runner and child processes to check the real command.
 It compares the complete output with the selected source files, loaded source paths, and host reference selection rather than asserting document prose.
 It covers invalid arguments, role and reference file errors, invalid frontmatter, and empty selected content with exact diagnostics.
 It removes every other skill and the unselected host reference to show that startup depends only on the selected files.
@@ -355,11 +355,11 @@ golangci-lint and NilAway check the bundled Go asset.
 actionlint checks GitHub Actions workflows.
 
 Development validation gates live in `scripts/`, with their Node tests in `test/`.
-The issue-form gate, `scripts/issue-forms.mjs`, parses `.github/ISSUE_TEMPLATE/*.yaml` with markdownlint-cli2's public YAML parser.
+The issue-form gate, `scripts/issue-forms.ts`, parses `.github/ISSUE_TEMPLATE/*.yaml` with markdownlint-cli2's public YAML parser.
 It validates nonempty top-level `name` and `description` strings, a nonempty body, and field IDs and labels.
 It also checks unique chooser names, field IDs, and labels, plus GitHub's field ID character rules.
 Local validation covers this repository's form subset and does not establish GitHub's live chooser recognition.
-The package gate, `scripts/plugin-version.mjs`, checks all four native manifests and the host catalogs from its module location.
+The package gate, `scripts/plugin-version.ts`, checks all four native manifests and the host catalogs from its module location.
 The version check validates the following:
 
 - The complete `yyyy.MM.dd.seq` string
@@ -370,8 +370,8 @@ The version check validates the following:
 - Release parity
 
 It rejects the root portable manifest and generic hook files that would shadow or cross native host boundaries.
-`test/validation.test.mjs` exercises valid and invalid forms, package paths, and release versions through exact diagnostics.
-`test/skill-metadata.test.mjs` covers portable metadata, host extensions, invocation controls, the complete-file UTF-8 prompt boundary, and relocated execution.
+`test/validation.test.ts` exercises valid and invalid forms, package paths, and release versions through exact diagnostics.
+`test/skill-metadata.test.ts` covers portable metadata, host extensions, invocation controls, the complete-file UTF-8 prompt boundary, and relocated execution.
 
 Linux CI runs the full suite, including hook tests, on the minimum supported Node version.
 The macOS job runs the hooks without installing development dependencies.

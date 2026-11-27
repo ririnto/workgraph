@@ -42,7 +42,7 @@ The preset sorts value imports, so applying its fixes can change initialization 
 | Validate workflows, issue forms, and plugin metadata | Stability, maintainability | `check:workflows` runs actionlint and reports literal inputs that equal approved defaults. `check:issue-forms` validates the supported issue-form subset. `check:plugin-version` checks release parity, package paths, and host metadata. |
 | Check production dependencies for known advisories | Stability | `check:production-audit` runs `pnpm audit --prod`. The package currently declares no production dependencies. |
 
-The [tooling tests](../test/tooling.test.mjs) exercise representative accepted and rejected inputs through the lint tools and cover Git hook arguments and status propagation.
+The [tooling tests](../test/tooling.test.ts) exercise representative accepted and rejected inputs through the lint tools and cover Git hook arguments and status propagation.
 The distributed Markdown hidden-note rule has a test for its standalone consumer setup.
 The root Markdown configuration does not load that rule.
 The shell policy and Go workspace check use Workgraph's tracked files and repository tooling.

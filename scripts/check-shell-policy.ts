@@ -2,14 +2,30 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-/** @typedef {{Offset: number, Line: number, Col: number}} Position */
-/** @typedef {{
- *   Type?: string, Pos?: Position, End?: Position, OpPos?: Position,
- *   Word?: Syntax, Parts?: Syntax[], Value?: string, Dollar?: boolean,
- *   Redirs?: Syntax[], Cmd?: Syntax, Stmts?: Syntax[],
- *   Cond?: Syntax | Syntax[], Then?: Syntax[], Do?: Syntax[],
- *   Negated?: boolean, Background?: boolean
- * }} Syntax The fields used from shfmt's JSON syntax tree. */
+interface Position {
+  Offset: number;
+  Line: number;
+  Col: number;
+}
+/** The fields used from shfmt's JSON syntax tree. */
+interface Syntax {
+  Type?: string;
+  Pos?: Position;
+  End?: Position;
+  OpPos?: Position;
+  Word?: Syntax;
+  Parts?: Syntax[];
+  Value?: string;
+  Dollar?: boolean;
+  Redirs?: Syntax[];
+  Cmd?: Syntax;
+  Stmts?: Syntax[];
+  Cond?: Syntax | Syntax[];
+  Then?: Syntax[];
+  Do?: Syntax[];
+  Negated?: boolean;
+  Background?: boolean;
+}
 
 const simpleParameter = String.raw`\$(?:[a-zA-Z_]\w*|\{[a-zA-Z_]\w*\})`;
 const word = String.raw`(?:[\w./-]+|${simpleParameter}|'[^'\n]*'|"(?:[^"\\$\x60\n]*|${simpleParameter})")`;
@@ -22,20 +38,20 @@ const exitGuard = new RegExp(
 );
 
 /**
- * @param {Buffer} source The script bytes.
- * @param {Syntax | undefined} node A parsed node with byte offsets.
- * @returns {string} The spelling of the parsed syntax.
+ * @param source The script bytes.
+ * @param node A parsed node with byte offsets.
+ * @returns The spelling of the parsed syntax.
  */
-const spelling = (source, node) =>
+const spelling = (source: Buffer, node: Syntax | undefined): string =>
   node?.Pos && node.End
     ? source.toString("utf-8", node.Pos.Offset, node.End.Offset)
     : "";
 
 /**
- * @param {Syntax} part A parsed shell word part.
- * @returns {string | null} Its literal text when it needs no expansion.
+ * @param part A parsed shell word part.
+ * @returns Its literal text when it needs no expansion.
  */
-const literal = (part) => {
+const literal = (part: Syntax): string | null => {
   if (
     part.Type === "Lit" ||
     (part.Type === "SglQuoted" && part.Dollar !== true)
@@ -67,8 +83,7 @@ const files = execFileSync(
 ).split("\0");
 for (const file of files.filter(Boolean)) {
   const source = readFileSync(file);
-  /** @type {unknown[]} */
-  const pending = [
+  const pending: unknown[] = [
     JSON.parse(
       execFileSync("go", ["tool", "shfmt", "--to-json", "--filename", file], {
         cwd: path.resolve(import.meta.dirname, ".."),
@@ -78,8 +93,7 @@ for (const file of files.filter(Boolean)) {
       })
     )
   ];
-  /** @type {{position: Position, message: string}[]} */
-  const diagnostics = [];
+  const diagnostics: { position: Position; message: string }[] = [];
   while (pending.length > 0) {
     const entry = pending.pop();
     if (Array.isArray(entry)) {
@@ -87,8 +101,7 @@ for (const file of files.filter(Boolean)) {
         pending.push(child);
       }
     } else if (entry !== null && typeof entry === "object") {
-      /** @type {Syntax} */
-      const node = entry;
+      const node: Syntax = entry;
       for (const redirect of node.Redirs ?? []) {
         if (
           redirect.OpPos &&

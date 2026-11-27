@@ -11,9 +11,10 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
+import type { TestContext } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { validateSkillContent } from "../scripts/skill-metadata.mjs";
+import { validateSkillContent } from "../scripts/skill-metadata.ts";
 
 const skillContent = (
   fields = "name: sample-skill\ndescription: Use for the sample task.\ndisable-model-invocation: true",
@@ -21,10 +22,12 @@ const skillContent = (
 ) => `---\n${fields}\n---\n${body}`;
 
 /**
- * @param {import("node:test").TestContext} t Test lifecycle.
- * @returns {{entrypoint: string, root: string}} Relocated validator and plugin root.
+ * @param t Test lifecycle.
+ * @returns Relocated validator and plugin root.
  */
-const metadataFixture = (t) => {
+const metadataFixture = (
+  t: TestContext
+): { entrypoint: string; root: string } => {
   const temporary = mkdtempSync(
     path.join(tmpdir(), "workgraph-skill-metadata-")
   );
@@ -33,9 +36,9 @@ const metadataFixture = (t) => {
   });
   const root = path.join(temporary, "plugin");
   const source = fileURLToPath(
-    new URL("../scripts/skill-metadata.mjs", import.meta.url)
+    new URL("../scripts/skill-metadata.ts", import.meta.url)
   );
-  const entrypoint = path.join(root, "scripts/skill-metadata.mjs");
+  const entrypoint = path.join(root, "scripts/skill-metadata.ts");
   mkdirSync(path.dirname(entrypoint), { recursive: true });
   cpSync(source, entrypoint);
   symlinkSync(
@@ -46,11 +49,15 @@ const metadataFixture = (t) => {
 };
 
 /**
- * @param {string} filename Entrypoint.
- * @param {string} diagnostic Expected stderr.
- * @param {number} count Expected skill count.
+ * @param filename Entrypoint.
+ * @param diagnostic Expected stderr.
+ * @param count Expected skill count.
  */
-const assertMetadataCommand = (filename, diagnostic = "", count = 1) => {
+const assertMetadataCommand = (
+  filename: string,
+  diagnostic = "",
+  count = 1
+) => {
   const result = spawnSync(process.execPath, [filename], {
     cwd: tmpdir(),
     encoding: "utf-8",
@@ -167,8 +174,7 @@ await test("skill metadata counts and normalizes Unicode characters", () => {
       []
     );
   }
-  /** @type {[string, number, string, string][]} */
-  const boundaries = [
+  const boundaries: [string, number, string, string][] = [
     ["name", 64, "𐐨", "𐐨".repeat(64)],
     ["description", 1024, "😀", "sample-skill"],
     ["compatibility", 500, "😀", "sample-skill"]
@@ -179,8 +185,10 @@ await test("skill metadata counts and normalizes Unicode characters", () => {
       "disable-model-invocation": true,
       name: directory
     };
-    /** @type {Record<string, string | boolean>} */
-    const fields = { ...defaults, [key]: value.repeat(limit) };
+    const fields: Record<string, string | boolean> = {
+      ...defaults,
+      [key]: value.repeat(limit)
+    };
     assert.deepEqual(
       validateSkillContent(skillContent(JSON.stringify(fields)), directory),
       []
@@ -242,8 +250,7 @@ await test("skill metadata rejects invalid optional field types", () => {
 });
 
 await test("skill metadata blocks model invocation and keeps user invocation on", () => {
-  /** @type {[string, string[], string[], string][]} */
-  const invocationCases = [
+  const invocationCases: [string, string[], string[], string][] = [
     [
       "disable-model-invocation",
       ["true", "YES", "On", "1", '"true"'],
@@ -307,8 +314,7 @@ await test("skill metadata rejects malformed frontmatter and empty bodies", () =
       ["<skill>: frontmatter must be a YAML mapping."]
     );
   }
-  /** @type {[string, number][]} */
-  const invalidYaml = [
+  const invalidYaml: [string, number][] = [
     ["name: [", 2],
     ["name: sample-skill\nname: different\ndescription: Task.", 3],
     [
@@ -340,10 +346,9 @@ await test("skill metadata command resolves its own checkout", (t) => {
     path.join(directory, "agents/openai.yaml"),
     "policy:\n  allow_implicit_invocation: false\n"
   );
-  const alias = path.join(root, "validate.mjs");
+  const alias = path.join(root, "validate.ts");
   symlinkSync(entrypoint, alias, "file");
-  /** @type {[string | null, string][]} */
-  const cases = [
+  const cases: [string | null, string][] = [
     [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
     [
       skillContent(
@@ -368,8 +373,7 @@ await test("skill metadata command requires a Codex invocation policy", (t) => {
   mkdirSync(path.join(directory, "agents"), { recursive: true });
   writeFileSync(path.join(directory, "SKILL.md"), skillContent());
   const policy = path.join(directory, "agents/openai.yaml");
-  /** @type {[string | null, string][]} */
-  const cases = [
+  const cases: [string | null, string][] = [
     [null, "policy file must be readable."],
     ["policy: [", "policy file must contain valid YAML."],
     ["policy: {}", "policy.allow_implicit_invocation must be false."],
@@ -410,8 +414,7 @@ await test("skill metadata command validates internal links by their alias", (t)
   symlinkSync("../bundled/reference", path.join(root, "skills/sample-skill"));
   writeFileSync(path.join(root, "bundled/notes.md"), "Supporting notes.\n");
   symlinkSync("../bundled/notes.md", path.join(root, "skills/notes.md"));
-  /** @type {[string | null, string][]} */
-  const cases = [
+  const cases: [string | null, string][] = [
     [null, "skills/sample-skill/SKILL.md: skill file must be readable.\n"],
     [skillContent(), ""],
     [

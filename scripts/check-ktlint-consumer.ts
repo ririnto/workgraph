@@ -28,8 +28,8 @@ const report = path.join(
   `${checkTask}.json`
 );
 
-/** @param {number} status Expected wrapper exit. */
-const run = (status) => {
+/** @param status Expected wrapper exit. */
+const run = (status: number) => {
   const result = spawnSync(wrapper, [...gradleArgs, "ktlintCheck"], {
     cwd: consumer,
     encoding: "utf-8"
@@ -101,11 +101,9 @@ try {
   run(1);
   const message =
     "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration.";
-  /** @type {unknown} */
-  const violations = JSON.parse(readFileSync(report, "utf-8"));
+  const violations: unknown = JSON.parse(readFileSync(report, "utf-8"));
   assert.ok(Array.isArray(violations));
-  /** @type {unknown[]} */
-  const reports = violations;
+  const reports: unknown[] = violations;
   const [comments, newline, ...unexpected] = reports;
   assert.deepEqual(unexpected, []);
   assert.partialDeepStrictEqual(newline, {

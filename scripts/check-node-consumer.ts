@@ -15,11 +15,11 @@ const assets = path.resolve("skills/development/assets");
 const consumer = mkdtempSync(path.join(tmpdir(), "workgraph-node-consumer-"));
 
 /**
- * @param {string[]} args pnpm subcommand and arguments.
- * @param {number} [status] Expected process exit.
- * @returns {string} Captured stdout.
+ * @param args pnpm subcommand and arguments.
+ * @param status Expected process exit.
+ * @returns Captured stdout.
  */
-const run = (args, status = 0) => {
+const run = (args: string[], status = 0): string => {
   const result = spawnSync("pnpm", args, {
     cwd: consumer,
     encoding: "utf-8",
