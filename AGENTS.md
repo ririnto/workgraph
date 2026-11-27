@@ -69,7 +69,7 @@ Keep development validation gates in `scripts/` and their Node tests in `test/`.
 Select the narrowest applicable read-only gate.
 
 - Use `pnpm run check:markdownlint-cli2` for prose-only changes.
-- Use `node --test "hooks/**/*.test.mjs"` for changes confined to hook execution.
+- Use `node --test "hooks/**/*.test.{mjs,ts}"` for changes confined to hook execution.
 - Use `pnpm run check:issue-forms` for issue form YAML changes.
 - Use `pnpm run check:plugin-version` for host manifest version checks.
 - Use `pnpm run check:skill-metadata` for skill frontmatter, invocation policy, and native prompt compatibility checks.

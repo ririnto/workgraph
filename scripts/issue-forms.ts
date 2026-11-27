@@ -6,23 +6,26 @@ import yamlParser from "markdownlint-cli2/parsers/yaml";
 
 const fieldIdPattern = /^[A-Za-z0-9_-]+$/u;
 /**
- * @param {unknown} value Input value.
- * @returns {value is Record<string, unknown>} Whether the value is a mapping.
+ * @param value Input value.
+ * @returns Whether the value is a mapping.
  */
-const isMapping = (value) =>
+const isMapping = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 /**
- * @param {unknown} value Input value.
- * @returns {value is string} Whether the value is a non-empty string.
+ * @param value Input value.
+ * @returns Whether the value is a non-empty string.
  */
-const nonEmptyString = (value) =>
+const nonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim() !== "";
 
 /**
- * @param {Record<string, unknown>} form Parsed form.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param form Parsed form.
+ * @param report Diagnostic sink.
  */
-const validateTopLevel = (form, report) => {
+const validateTopLevel = (
+  form: Record<string, unknown>,
+  report: (message: string) => void
+) => {
   const { body, description, name } = form;
   for (const [key, value] of Object.entries({ description, name })) {
     if (!nonEmptyString(value)) {
@@ -38,12 +41,17 @@ const validateTopLevel = (form, report) => {
 };
 
 /**
- * @param {unknown} id Candidate ID.
- * @param {string} fieldName Field location.
- * @param {Set<string>} ids Seen IDs.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param id Candidate ID.
+ * @param fieldName Field location.
+ * @param ids Seen IDs.
+ * @param report Diagnostic sink.
  */
-const validateFieldId = (id, fieldName, ids, report) => {
+const validateFieldId = (
+  id: unknown,
+  fieldName: string,
+  ids: Set<string>,
+  report: (message: string) => void
+) => {
   if (nonEmptyString(id)) {
     if (!fieldIdPattern.test(id)) {
       report(
@@ -61,12 +69,17 @@ const validateFieldId = (id, fieldName, ids, report) => {
 };
 
 /**
- * @param {unknown} label Candidate label.
- * @param {string} fieldName Field location.
- * @param {Set<string>} labels Seen labels.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param label Candidate label.
+ * @param fieldName Field location.
+ * @param labels Seen labels.
+ * @param report Diagnostic sink.
  */
-const validateFieldLabel = (label, fieldName, labels, report) => {
+const validateFieldLabel = (
+  label: unknown,
+  fieldName: string,
+  labels: Set<string>,
+  report: (message: string) => void
+) => {
   if (nonEmptyString(label)) {
     const normalizedLabel = label.trim().toLowerCase();
     if (labels.has(normalizedLabel)) {
@@ -79,12 +92,17 @@ const validateFieldLabel = (label, fieldName, labels, report) => {
 };
 
 /**
- * @param {unknown} attributes Candidate attributes.
- * @param {string} fieldName Field location.
- * @param {Set<string>} labels Seen labels.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param attributes Candidate attributes.
+ * @param fieldName Field location.
+ * @param labels Seen labels.
+ * @param report Diagnostic sink.
  */
-const validateAttributes = (attributes, fieldName, labels, report) => {
+const validateAttributes = (
+  attributes: unknown,
+  fieldName: string,
+  labels: Set<string>,
+  report: (message: string) => void
+) => {
   if (isMapping(attributes)) {
     validateFieldLabel(attributes.label, fieldName, labels, report);
   } else {
@@ -93,14 +111,12 @@ const validateAttributes = (attributes, fieldName, labels, report) => {
 };
 
 /**
- * @param {unknown[]} body Form fields.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param body Form fields.
+ * @param report Diagnostic sink.
  */
-const validateFields = (body, report) => {
-  /** @type {Set<string>} */
-  const ids = new Set();
-  /** @type {Set<string>} */
-  const labels = new Set();
+const validateFields = (body: unknown[], report: (message: string) => void) => {
+  const ids = new Set<string>();
+  const labels = new Set<string>();
   for (const [index, field] of body.entries()) {
     const fieldName = `body[${index + 1}]`;
     if (isMapping(field)) {
@@ -113,20 +129,23 @@ const validateFields = (body, report) => {
 };
 
 /**
- * @param {unknown} body Candidate fields.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param body Candidate fields.
+ * @param report Diagnostic sink.
  */
-const validateBody = (body, report) => {
+const validateBody = (body: unknown, report: (message: string) => void) => {
   if (Array.isArray(body) && body.length > 0) {
     validateFields(body, report);
   }
 };
 
 /**
- * @param {Record<string, unknown>} form Parsed form.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param form Parsed form.
+ * @param report Diagnostic sink.
  */
-const validateMappedForm = (form, report) => {
+const validateMappedForm = (
+  form: Record<string, unknown>,
+  report: (message: string) => void
+) => {
   const { body } = form;
   validateTopLevel(form, report);
   validateBody(body, report);
@@ -134,15 +153,17 @@ const validateMappedForm = (form, report) => {
 
 /**
  * Validate the issue-form fields Workgraph uses.
- * @param {unknown} form Parsed YAML value.
- * @param {string} source Diagnostic source label.
- * @returns {string[]} Schema diagnostics.
+ * @param form Parsed YAML value.
+ * @param source Diagnostic source label.
+ * @returns Schema diagnostics.
  */
-export const validateIssueForm = (form, source = "<form>") => {
-  /** @type {string[]} */
-  const errors = [];
-  /** @param {string} message Diagnostic text. */
-  const report = (message) => {
+export const validateIssueForm = (
+  form: unknown,
+  source = "<form>"
+): string[] => {
+  const errors: string[] = [];
+  /** @param message Diagnostic text. */
+  const report = (message: string) => {
     errors.push(`${source}: ${message}`);
   };
   if (isMapping(form)) {
@@ -154,11 +175,14 @@ export const validateIssueForm = (form, source = "<form>") => {
 };
 
 /**
- * @param {string} content YAML text.
- * @param {string} source Diagnostic source.
- * @returns {{errors: string[], form: unknown, source: string}} Form value and diagnostics.
+ * @param content YAML text.
+ * @param source Diagnostic source.
+ * @returns Form value and diagnostics.
  */
-const parseIssueFormContent = (content, source) => {
+const parseIssueFormContent = (
+  content: string,
+  source: string
+): { errors: string[]; form: unknown; source: string } => {
   try {
     const form = yamlParser(content);
     return { errors: validateIssueForm(form, source), form, source };
@@ -181,19 +205,23 @@ const parseIssueFormContent = (content, source) => {
 
 /**
  * Parse and validate one issue form with markdownlint-cli2's YAML parser.
- * @param {string} content YAML source text.
- * @param {string} source Diagnostic source label.
- * @returns {string[]} Parse and schema diagnostics.
+ * @param content YAML source text.
+ * @param source Diagnostic source label.
+ * @returns Parse and schema diagnostics.
  */
-export const validateIssueFormContent = (content, source = "<form>") =>
-  parseIssueFormContent(content, source).errors;
+export const validateIssueFormContent = (
+  content: string,
+  source = "<form>"
+): string[] => parseIssueFormContent(content, source).errors;
 
 /**
  * Validate issue forms together, including unique chooser names.
- * @param {{content: string, source: string}[]} forms Labeled YAML sources.
- * @returns {string[]} Parse, schema, and duplicate-name diagnostics.
+ * @param forms Labeled YAML sources.
+ * @returns Parse, schema, and duplicate-name diagnostics.
  */
-export const validateIssueForms = (forms) => {
+export const validateIssueForms = (
+  forms: { content: string; source: string }[]
+): string[] => {
   const parsedForms = forms.map(({ content, source }) =>
     parseIssueFormContent(content, source)
   );

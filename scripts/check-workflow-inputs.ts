@@ -26,11 +26,14 @@ const evenMidpoint =
   /^(?<coefficient>\d\.\d{13}[02468])50+e(?<exponent>[+-]\d+)$/u;
 
 /**
- * @param {number} magnitude Absolute number.
- * @param {{ coefficient: string, exponent: string }} midpoint Decimal probe.
- * @returns {boolean} Whether the number is exactly at the midpoint.
+ * @param magnitude Absolute number.
+ * @param midpoint Decimal probe.
+ * @returns Whether the number is exactly at the midpoint.
  */
-const isExactMidpoint = (magnitude, midpoint) => {
+const isExactMidpoint = (
+  magnitude: number,
+  midpoint: { coefficient: string; exponent: string }
+): boolean => {
   const digits = BigInt(`${midpoint.coefficient.replace(".", "")}5`);
   const power = Number(midpoint.exponent) - 15;
   if (power >= 0) {
@@ -48,10 +51,10 @@ const isExactMidpoint = (magnitude, midpoint) => {
 
 /**
  * Match the runner's invariant G15 number format, including rounding ties to even.
- * @param {number} value YAML number token.
- * @returns {string} Action input text.
+ * @param value YAML number token.
+ * @returns Action input text.
  */
-const formatRunnerNumber = (value) => {
+const formatRunnerNumber = (value: number): string => {
   if (!Number.isFinite(value)) {
     return String(value);
   }
@@ -76,10 +79,10 @@ const formatRunnerNumber = (value) => {
 };
 
 /**
- * @param {unknown} value Parsed workflow input.
- * @returns {string | null} The runner's scalar text, or null for an expression or collection.
+ * @param value Parsed workflow input.
+ * @returns The runner's scalar text, or null for an expression or collection.
  */
-const literalInput = (value) => {
+const literalInput = (value: unknown): string | null => {
   if (value === null) {
     return "";
   }
@@ -93,23 +96,23 @@ const literalInput = (value) => {
 };
 
 /**
- * @param {unknown} value Parsed YAML value.
- * @returns {value is Record<string, unknown>} Whether the value is a mapping.
+ * @param value Parsed YAML value.
+ * @returns Whether the value is a mapping.
  */
-const isMapping = (value) =>
+const isMapping = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
 /**
- * @param {unknown} value Parsed YAML value.
- * @returns {value is unknown[]} Whether the value is a sequence.
+ * @param value Parsed YAML value.
+ * @returns Whether the value is a sequence.
  */
-const isSequence = (value) => Array.isArray(value);
+const isSequence = (value: unknown): value is unknown[] => Array.isArray(value);
 
 /**
- * @param {unknown} workflow Parsed workflow.
- * @param {string} source Repository-relative workflow path.
+ * @param workflow Parsed workflow.
+ * @param source Repository-relative workflow path.
  */
-const checkWorkflow = (workflow, source) => {
+const checkWorkflow = (workflow: unknown, source: string) => {
   if (!isMapping(workflow) || !isMapping(workflow.jobs)) {
     return;
   }

@@ -13,26 +13,30 @@ import yamlParser from "markdownlint-cli2/parsers/yaml";
 
 const namePattern = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
 /**
- * @param {unknown} value Input value.
- * @returns {value is Record<string, unknown>} Whether the value is a plain mapping.
+ * @param value Input value.
+ * @returns Whether the value is a plain mapping.
  */
-const isMapping = (value) =>
+const isMapping = (value: unknown): value is Record<string, unknown> =>
   value !== null &&
   typeof value === "object" &&
   Object.getPrototypeOf(value) === Object.prototype;
 /**
- * @param {unknown} value Input value.
- * @returns {value is string} Whether the value is a non-empty string.
+ * @param value Input value.
+ * @returns Whether the value is a non-empty string.
  */
-const nonEmptyString = (value) =>
+const nonEmptyString = (value: unknown): value is string =>
   typeof value === "string" && value.trim() !== "";
 
 /**
- * @param {unknown} value Candidate name.
- * @param {string} directoryName Parent directory name.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param value Candidate name.
+ * @param directoryName Parent directory name.
+ * @param report Diagnostic sink.
  */
-const validateName = (value, directoryName, report) => {
+const validateName = (
+  value: unknown,
+  directoryName: string,
+  report: (message: string) => void
+) => {
   if (!nonEmptyString(value)) {
     report("name must be a non-empty string.");
     return;
@@ -53,12 +57,14 @@ const validateName = (value, directoryName, report) => {
 };
 
 /**
- * @param {Record<string, unknown>} metadata Parsed metadata.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param metadata Parsed metadata.
+ * @param report Diagnostic sink.
  */
-const validateFields = (metadata, report) => {
-  /** @type {[string, number][]} */
-  const fields = [
+const validateFields = (
+  metadata: Record<string, unknown>,
+  report: (message: string) => void
+) => {
+  const fields: [string, number][] = [
     ["description", 1024],
     ["compatibility", 500]
   ];
@@ -89,12 +95,14 @@ const validateFields = (metadata, report) => {
 };
 
 /**
- * @param {Record<string, unknown>} metadata Parsed metadata.
- * @param {(message: string) => void} report Diagnostic sink.
+ * @param metadata Parsed metadata.
+ * @param report Diagnostic sink.
  */
-const validateInvocation = (metadata, report) => {
-  /** @type {[string, (string | number | boolean)[], string][]} */
-  const settings = [
+const validateInvocation = (
+  metadata: Record<string, unknown>,
+  report: (message: string) => void
+) => {
+  const settings: [string, (string | number | boolean)[], string][] = [
     [
       "disable-model-invocation",
       [true, 1, "true", "yes", "on", "1"],
@@ -121,20 +129,19 @@ const validateInvocation = (metadata, report) => {
 /**
  * Validate portable skill metadata and Workgraph's host invocation limits.
  * Preserve host extensions outside the checked fields.
- * @param {string} content Complete SKILL.md source.
- * @param {string} directoryName Name of the containing skill directory.
- * @param {string} source Diagnostic source label.
- * @returns {string[]} Frontmatter, field, body, and host compatibility diagnostics.
+ * @param content Complete SKILL.md source.
+ * @param directoryName Name of the containing skill directory.
+ * @param source Diagnostic source label.
+ * @returns Frontmatter, field, body, and host compatibility diagnostics.
  */
 export const validateSkillContent = (
-  content,
-  directoryName,
+  content: string,
+  directoryName: string,
   source = "<skill>"
-) => {
-  /** @type {string[]} */
-  const errors = [];
-  /** @param {string} message Diagnostic text. */
-  const report = (message) => {
+): string[] => {
+  const errors: string[] = [];
+  /** @param message Diagnostic text. */
+  const report = (message: string) => {
     errors.push(`${source}: ${message}`);
   };
   if (Buffer.byteLength(content, "utf-8") > 8000) {
@@ -180,11 +187,11 @@ export const validateSkillContent = (
 };
 
 /**
- * @param {string} root Plugin root.
- * @param {string} source Relative source path.
- * @returns {string} Canonical path inside the plugin root.
+ * @param root Plugin root.
+ * @param source Relative source path.
+ * @returns Canonical path inside the plugin root.
  */
-const bundledPath = (root, source) => {
+const bundledPath = (root: string, source: string): string => {
   const resolved = realpathSync(path.join(root, source));
   const relative = path.relative(root, resolved);
   if (

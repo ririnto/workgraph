@@ -19,8 +19,7 @@ const modules = new Set(
     .filter(Boolean)
 );
 if (modules.delete("go.work")) {
-  /** @type {unknown} */
-  const workspace = JSON.parse(
+  const workspace: unknown = JSON.parse(
     execFileSync("go", ["work", "edit", "-json", "go.work"], {
       encoding: "utf-8",
       env: { ...process.env, GOWORK: "off" }
@@ -34,8 +33,7 @@ if (modules.delete("go.work")) {
   ) {
     throw new Error("go.work [R40] Go did not return workspace membership.");
   }
-  /** @type {unknown[]} */
-  const uses = workspace.Use ?? [];
+  const uses: unknown[] = workspace.Use ?? [];
   const members = new Set(
     uses.map((entry) => {
       if (

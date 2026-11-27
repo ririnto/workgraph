@@ -2,12 +2,12 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 
 /**
- * @param {string} command Executable to run.
- * @param {string[]} args Arguments passed without shell expansion.
- * @param {boolean} [capture] Return command stdout.
- * @returns {string} Captured stdout, or an empty string when inherited.
+ * @param command Executable to run.
+ * @param args Arguments passed without shell expansion.
+ * @param capture Return command stdout.
+ * @returns Captured stdout, or an empty string when inherited.
  */
-const run = (command, args, capture = false) => {
+const run = (command: string, args: string[], capture = false): string => {
   const result = spawnSync(command, args, {
     encoding: "utf-8",
     stdio: ["inherit", capture ? "pipe" : "inherit", "inherit"]
@@ -36,7 +36,7 @@ const checks = [
   "check:typescript",
   "check:ultracite"
 ];
-const tests = ["test/validation.test.mjs"];
+const tests = ["test/validation.test.ts"];
 for (const { patterns, check, test } of [
   {
     patterns: [
@@ -44,8 +44,8 @@ for (const { patterns, check, test } of [
       "go.work",
       ".golangci.yaml",
       "skills/development/assets/golang/.golangci.yaml",
-      "scripts/check-go-consumer.mjs",
-      "scripts/check-go-workspace.mjs"
+      "scripts/check-go-consumer.ts",
+      "scripts/check-go-workspace.ts"
     ],
     check: "check:go"
   },
@@ -59,7 +59,7 @@ for (const { patterns, check, test } of [
       "skills/development/assets/gradle/gradlew",
       "skills/development/assets/gradle/gradlew.bat",
       "skills/development/assets/gradle/buildSrc/src/main/resources/**",
-      "scripts/check-ktlint-consumer.mjs"
+      "scripts/check-ktlint-consumer.ts"
     ],
     check: "check:kotlin"
   },
@@ -67,7 +67,7 @@ for (const { patterns, check, test } of [
     patterns: [
       "skills/development/assets/nodejs/**",
       "skills/development/assets/typescript/tsconfig.json",
-      "scripts/check-node-consumer.mjs"
+      "scripts/check-node-consumer.ts"
     ],
     check: "check:node-consumer"
   },
@@ -77,7 +77,7 @@ for (const { patterns, check, test } of [
       "**/*.sh",
       ".editorconfig",
       "go.{mod,sum}",
-      "scripts/check-shell-policy.mjs"
+      "scripts/check-shell-policy.ts"
     ],
     check: "check:shell"
   },
@@ -85,35 +85,35 @@ for (const { patterns, check, test } of [
     patterns: [
       ".github/workflows/*.{yaml,yml}",
       ".github/action-inputs.json",
-      "scripts/check-workflow-inputs.mjs",
+      "scripts/check-workflow-inputs.ts",
       "go.{mod,sum}"
     ],
     check: "check:workflows"
   },
   {
     patterns: ["hooks/**", "skills/**", "**/plugin.json"],
-    test: "hooks/*.test.mjs"
+    test: "hooks/*.test.{mjs,ts}"
   },
   {
     patterns: [
-      "scripts/skill-metadata.mjs",
+      "scripts/skill-metadata.ts",
       "skills/**",
-      "test/skill-metadata.test.mjs"
+      "test/skill-metadata.test.ts"
     ],
-    test: "test/skill-metadata.test.mjs"
+    test: "test/skill-metadata.test.ts"
   },
   {
     patterns: [
       "plugins/**",
       "workflows/**",
       "rules/**",
-      "scripts/pre-commit-scope.mjs",
-      "scripts/check-go-workspace.mjs",
-      "scripts/check-shell-policy.mjs",
+      "scripts/pre-commit-scope.ts",
+      "scripts/check-go-workspace.ts",
+      "scripts/check-shell-policy.ts",
       ".husky/*",
       "*.config.ts",
       ".markdownlint-cli2.jsonc",
-      "test/tooling.test.mjs",
+      "test/tooling.test.ts",
       "package.json",
       "pnpm-*.yaml",
       "skills/development/assets/markdown/.markdownlint-cli2.jsonc",
@@ -126,7 +126,7 @@ for (const { patterns, check, test } of [
       "skills/development/assets/typescript/tsconfig.json",
       "tsconfig.json"
     ],
-    test: "test/tooling.test.mjs"
+    test: "test/tooling.test.ts"
   }
 ]) {
   if (

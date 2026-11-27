@@ -26,33 +26,32 @@ const metadataFields = [
 const nativeFields = new Set(["$schema", ...metadataFields, "skills", "hooks"]);
 
 /**
- * @param {unknown} value Input value.
- * @returns {value is Record<string, unknown>} Whether the value is a JSON object.
+ * @param value Input value.
+ * @returns Whether the value is a JSON object.
  */
-const isObject = (value) =>
+const isObject = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
 /**
- * @param {unknown} value Input value.
- * @returns {value is unknown[]} Whether the value is an array.
+ * @param value Input value.
+ * @returns Whether the value is an array.
  */
-const isArray = (value) => Array.isArray(value);
+const isArray = (value: unknown): value is unknown[] => Array.isArray(value);
 
 /**
  * Validate matching yyyy.MM.dd.seq releases with real dates and padded sequences.
- * @param {unknown} codexVersion Codex version.
- * @param {unknown} claudeVersion Claude version.
- * @param {unknown} cursorVersion Cursor version.
- * @param {unknown} copilotVersion Copilot version.
+ * @param codexVersion Codex version.
+ * @param claudeVersion Claude version.
+ * @param cursorVersion Cursor version.
+ * @param copilotVersion Copilot version.
  */
 export const validatePluginVersions = (
-  codexVersion,
-  claudeVersion,
-  cursorVersion,
-  copilotVersion
+  codexVersion: unknown,
+  claudeVersion: unknown,
+  cursorVersion: unknown,
+  copilotVersion: unknown
 ) => {
-  /** @type {[string, unknown][]} */
-  const versions = [
+  const versions: [string, unknown][] = [
     ["Codex", codexVersion],
     ["Claude", claudeVersion],
     ["Cursor", cursorVersion],
@@ -85,18 +84,21 @@ export const validatePluginVersions = (
 
 /**
  * Reject duplicate release metadata in catalogs and the private package.
- * @param {[string, Record<string, unknown>][]} marketplaces Catalog manifests.
- * @param {Record<string, unknown>} packageManifest Private package manifest.
+ * @param marketplaces Catalog manifests.
+ * @param packageManifest Private package manifest.
  */
 export const validateOmittedManifestVersions = (
-  marketplaces,
-  packageManifest
+  marketplaces: [string, Record<string, unknown>][],
+  packageManifest: Record<string, unknown>
 ) => {
-  /** @type {[string, Record<string, unknown>][]} */
-  const manifests = [...marketplaces, ["Private package", packageManifest]];
+  const manifests: [string, Record<string, unknown>][] = [
+    ...marketplaces,
+    ["Private package", packageManifest]
+  ];
   for (const [name, manifest] of manifests) {
-    /** @type {unknown[]} */
-    const plugins = Array.isArray(manifest.plugins) ? manifest.plugins : [];
+    const plugins: unknown[] = Array.isArray(manifest.plugins)
+      ? manifest.plugins
+      : [];
     if (
       Object.hasOwn(manifest, "version") ||
       (isObject(manifest.metadata) &&
@@ -111,13 +113,18 @@ export const validateOmittedManifestVersions = (
 };
 
 /**
- * @param {string} root Plugin root.
- * @param {unknown} value Declared path.
- * @param {string} label Diagnostic label.
- * @param {"file" | "directory"} kind Expected path kind.
- * @returns {string} Canonical path inside the package.
+ * @param root Plugin root.
+ * @param value Declared path.
+ * @param label Diagnostic label.
+ * @param kind Expected path kind.
+ * @returns Canonical path inside the package.
  */
-const bundledPath = (root, value, label, kind) => {
+const bundledPath = (
+  root: string,
+  value: unknown,
+  label: string,
+  kind: "file" | "directory"
+): string => {
   if (
     typeof value !== "string" ||
     !value.startsWith("./") ||
@@ -148,13 +155,15 @@ const bundledPath = (root, value, label, kind) => {
 };
 
 /**
- * @param {string} root Plugin root.
- * @param {string} filename Manifest path.
- * @returns {Record<string, unknown>} Parsed manifest.
+ * @param root Plugin root.
+ * @param filename Manifest path.
+ * @returns Parsed manifest.
  */
-const readManifest = (root, filename) => {
-  /** @type {unknown} */
-  const manifest = JSON.parse(
+const readManifest = (
+  root: string,
+  filename: string
+): Record<string, unknown> => {
+  const manifest: unknown = JSON.parse(
     readFileSync(bundledPath(root, `./${filename}`, filename, "file"), "utf-8")
   );
   if (!isObject(manifest)) {
@@ -164,10 +173,13 @@ const readManifest = (root, filename) => {
 };
 
 /**
- * @param {Record<string, unknown>} manifest Manifest data.
- * @param {string} host Host name.
+ * @param manifest Manifest data.
+ * @param host Host name.
  */
-const validateNativeManifest = (manifest, host) => {
+const validateNativeManifest = (
+  manifest: Record<string, unknown>,
+  host: string
+) => {
   if (host !== "Claude" && Object.hasOwn(manifest, "$schema")) {
     throw new Error(`${host} native manifest must omit the schema field.`);
   }
@@ -211,12 +223,17 @@ const validateNativeManifest = (manifest, host) => {
 };
 
 /**
- * @param {string} root Plugin root.
- * @param {string} name Catalog label.
- * @param {Record<string, unknown>} marketplace Catalog data.
- * @param {Record<string, unknown>} codex Native manifest.
+ * @param root Plugin root.
+ * @param name Catalog label.
+ * @param marketplace Catalog data.
+ * @param codex Native manifest.
  */
-const validateMarketplace = (root, name, marketplace, codex) => {
+const validateMarketplace = (
+  root: string,
+  name: string,
+  marketplace: Record<string, unknown>,
+  codex: Record<string, unknown>
+) => {
   if (
     marketplace.name !== codex.name ||
     !isArray(marketplace.plugins) ||
@@ -277,16 +294,14 @@ const run = () => {
   const claude = readManifest(root, ".claude-plugin/plugin.json");
   const cursor = readManifest(root, ".cursor-plugin/plugin.json");
   const copilot = readManifest(root, ".plugin/plugin.json");
-  /** @type {[string, Record<string, unknown>, string][]} */
-  const manifests = [
+  const manifests: [string, Record<string, unknown>, string][] = [
     ["Codex", codex, "codex-hooks.json"],
     ["Claude", claude, "claude-hooks.json"],
     ["Cursor", cursor, "skills-only.json"],
     ["Copilot", copilot, "skills-only.json"]
   ];
   const packageManifest = readManifest(root, "package.json");
-  /** @type {[string, Record<string, unknown>][]} */
-  const marketplaces = [
+  const marketplaces: [string, Record<string, unknown>][] = [
     [
       "Claude marketplace",
       readManifest(root, ".claude-plugin/marketplace.json")

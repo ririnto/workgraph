@@ -5,11 +5,11 @@ import { fileURLToPath } from "node:url";
 
 /**
  * Report hook errors without emitting partial context.
- * @param {string} message Failure description.
- * @param {number} code Process exit status.
- * @returns {never} This function exits the process.
+ * @param message Failure description.
+ * @param code Process exit status.
+ * @returns This function exits the process.
  */
-const fail = (message, code) => {
+const fail = (message: string, code: number): never => {
   console.error(`inject-context: ${message}`);
   process.exit(code);
 };
@@ -17,11 +17,14 @@ const fail = (message, code) => {
 /**
  * Resolve and load required text before emitting any context.
  * Match trimmed delimiter lines and preserve the remaining text.
- * @param {string} file Skill-relative instruction path.
- * @param {boolean} stripFrontmatter Whether to remove skill metadata.
- * @returns {{body: string, content: string, source: string}} Loaded instruction text and canonical path.
+ * @param file Skill-relative instruction path.
+ * @param stripFrontmatter Whether to remove skill metadata.
+ * @returns Loaded instruction text and canonical path.
  */
-const readInstruction = (file, stripFrontmatter) => {
+const readInstruction = (
+  file: string,
+  stripFrontmatter: boolean
+): { body: string; content: string; source: string } => {
   try {
     const source = realpathSync(
       fileURLToPath(new URL(`../skills/${file}`, import.meta.url))
@@ -63,9 +66,8 @@ const readInstruction = (file, stripFrontmatter) => {
 /**
  * Map each supported host to its bundled reference filename.
  * Avoid name stems that a host resolves as its automatic memory file.
- * @type {Record<string, string>}
  */
-const hostReferenceFiles = {
+const hostReferenceFiles: Record<string, string> = {
   claude: "claude-code.md",
   codex: "codex.md"
 };

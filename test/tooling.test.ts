@@ -12,6 +12,7 @@ import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
+import type { TestContext } from "node:test";
 
 import { lint } from "markdownlint/sync";
 
@@ -22,17 +23,17 @@ import skillFrontmatter from "../rules/skill-frontmatter.ts";
 import tableSeparators from "../rules/table-separators.ts";
 
 /**
- * @param {unknown} value Parsed JSON value.
- * @returns {value is Record<string, unknown>} Whether the value is an object.
+ * @param value Parsed JSON value.
+ * @returns Whether the value is an object.
  */
-const isObject = (value) =>
+const isObject = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object" && !Array.isArray(value);
 
 /**
- * @param {unknown} value Parsed JSON value.
- * @returns {value is unknown[]} Whether the value is an array.
+ * @param value Parsed JSON value.
+ * @returns Whether the value is an array.
  */
-const isArray = (value) => Array.isArray(value);
+const isArray = (value: unknown): value is unknown[] => Array.isArray(value);
 
 await test("Git hooks run their repository scripts and propagate their status", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "workgraph-hooks-"));
@@ -101,8 +102,8 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
       "check:go"
     ],
     ["go.work", "check:go"],
-    ["scripts/check-go-workspace.mjs", "check:go"],
-    ["scripts/check-shell-policy.mjs", "check:shell"],
+    ["scripts/check-go-workspace.ts", "check:go"],
+    ["scripts/check-shell-policy.ts", "check:shell"],
     [
       "skills/development/assets/gradle/gradle/libs.versions.toml",
       "check:kotlin"
@@ -160,9 +161,7 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
         }
         const result = spawnSync(
           process.execPath,
-          [
-            path.resolve(import.meta.dirname, "../scripts/pre-commit-scope.mjs")
-          ],
+          [path.resolve(import.meta.dirname, "../scripts/pre-commit-scope.ts")],
           { cwd: directory, encoding: "utf-8", env }
         );
         assert.ifError(result.error);
@@ -184,11 +183,14 @@ await test("pre-commit dispatches checks for staged-only tool configuration", as
 });
 
 /**
- * @param {import("node:test").TestContext} t Test that owns the fixture.
- * @param {Record<string, string>} files Paths and contents to track.
- * @returns {{cwd: string, env: NodeJS.ProcessEnv, encoding: "utf-8"}} Options for checks in the fixture.
+ * @param t Test that owns the fixture.
+ * @param files Paths and contents to track.
+ * @returns Options for checks in the fixture.
  */
-const createTrackedFixture = (t, files) => {
+const createTrackedFixture = (
+  t: TestContext,
+  files: Record<string, string>
+): { cwd: string; env: NodeJS.ProcessEnv; encoding: "utf-8" } => {
   const cwd = mkdtempSync(path.join(tmpdir(), "workgraph-native-check-"));
   t.after(() => {
     rmSync(cwd, { force: true, recursive: true });
@@ -203,8 +205,11 @@ const createTrackedFixture = (t, files) => {
   const env = Object.fromEntries(
     Object.entries(process.env).filter(([key]) => !gitVariables.has(key))
   );
-  /** @type {{cwd: string, env: NodeJS.ProcessEnv, encoding: "utf-8"}} */
-  const options = { cwd, env, encoding: "utf-8" };
+  const options: { cwd: string; env: NodeJS.ProcessEnv; encoding: "utf-8" } = {
+    cwd,
+    env,
+    encoding: "utf-8"
+  };
   execFileSync("git", ["init", "--quiet", "--template="], options);
   for (const [file, source] of Object.entries(files)) {
     const target = path.join(cwd, file);
@@ -216,10 +221,10 @@ const createTrackedFixture = (t, files) => {
 };
 
 /**
- * @param {string} stderr Diagnostics from the check process.
- * @returns {{file: string, rule: string}[]} The path and rule of each diagnostic.
+ * @param stderr Diagnostics from the check process.
+ * @returns The path and rule of each diagnostic.
  */
-const ruleDiagnostics = (stderr) =>
+const ruleDiagnostics = (stderr: string): { file: string; rule: string }[] =>
   stderr
     .trimEnd()
     .split("\n")
@@ -273,7 +278,7 @@ await test("shell policy reports discarded diagnostics and portable guard violat
     "test/fixtures/excluded.sh": "#!/bin/sh\necho fixture > /dev/null\n"
   });
   const args = [
-    path.resolve(import.meta.dirname, "../scripts/check-shell-policy.mjs")
+    path.resolve(import.meta.dirname, "../scripts/check-shell-policy.ts")
   ];
   const clean = spawnSync(process.execPath, args, fixture);
   assert.ifError(clean.error);
@@ -308,7 +313,7 @@ await test("Go workspace policy requires tracked modules and ignores fixture mod
       "module example.invalid/excluded\n\ngo 1.24\n"
   });
   const args = [
-    path.resolve(import.meta.dirname, "../scripts/check-go-workspace.mjs")
+    path.resolve(import.meta.dirname, "../scripts/check-go-workspace.ts")
   ];
   writeFileSync(
     path.join(fixture.cwd, "go"),
@@ -607,10 +612,10 @@ await test("box drawing rule covers all Markdown with first UTF-16 match and no 
 });
 
 /**
- * @param {import("node:test").TestContext} t Test that owns the fixture.
- * @returns {Promise<string>} Directory with the real Ultracite configuration.
+ * @param t Test that owns the fixture.
+ * @returns Directory with the real Ultracite configuration.
  */
-const createUltraciteFixture = async (t) => {
+const createUltraciteFixture = async (t: TestContext): Promise<string> => {
   const root = path.resolve(import.meta.dirname, "..");
   const directory = await mkdtemp(path.join(tmpdir(), "ultracite-fixture-"));
   t.after(async () => {
@@ -636,11 +641,14 @@ const createUltraciteFixture = async (t) => {
 };
 
 /**
- * @param {string} directory Fixture checkout.
- * @param {string[]} files Paths to check.
- * @returns {{diagnostics: unknown[], status: number | null}} Lint diagnostics and exit status.
+ * @param directory Fixture checkout.
+ * @param files Paths to check.
+ * @returns Lint diagnostics and exit status.
  */
-const runUltraciteFixture = (directory, files) => {
+const runUltraciteFixture = (
+  directory: string,
+  files: string[]
+): { diagnostics: unknown[]; status: number | null } => {
   const result = spawnSync(
     process.execPath,
     [
@@ -658,8 +666,7 @@ const runUltraciteFixture = (directory, files) => {
   assert.ifError(result.error);
   const start = result.stdout.search(/\{\s*"diagnostics"\s*:/u);
   assert.notEqual(start, -1, result.stdout + result.stderr);
-  /** @type {unknown} */
-  const output = JSON.parse(
+  const output: unknown = JSON.parse(
     result.stdout.slice(start, result.stdout.lastIndexOf("}") + 1)
   );
   assert.ok(isObject(output));
@@ -907,8 +914,7 @@ await test("local Markdown comments config checks hidden notes and preserves lit
     root,
     "node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs"
   );
-  /** @type {unknown} */
-  const config = JSON.parse(
+  const config: unknown = JSON.parse(
     readFileSync(path.join(assets, ".markdownlint-cli2.jsonc"), "utf-8")
   );
   assert.ok(isObject(config));
@@ -998,19 +1004,54 @@ await test("bundled pnpm samples accept their frozen lockfiles", async (t) => {
   }
 });
 
-/** @typedef {{result: unknown} & Record<string, unknown>} CompletionEvidence */
-/** @typedef {{key: string, status: string, reason: unknown, prerequisites: string[], completionEvidence: CompletionEvidence[]} & Record<string, unknown>} WorkflowNode */
-/** @typedef {{from: string, to: string, type: string, condition: unknown}} WorkflowEdge */
-/** @typedef {{title: string, status: string} & Record<string, unknown>} PhaseEvidence */
-/** @typedef {{key: string, state: string} & Record<string, unknown>} WorkflowResource */
-/** @typedef {{key: string, branch: unknown, paths: unknown} & Record<string, unknown>} WorkflowUnit */
-/** @typedef {{complete: boolean, earlyExit: unknown, split: boolean, graph: {nodes: WorkflowNode[], edges: WorkflowEdge[]}, phaseEvidence: PhaseEvidence[], resources: WorkflowResource[], units: WorkflowUnit[], review: Record<string, unknown>, reviewHistory: Record<string, unknown>[], integration: Record<string, unknown>, fixRounds: {max: number, used: number}, publish: unknown, explorations: unknown[], sweepEvidence: unknown}} WorkflowResult */
+type CompletionEvidence = { result: unknown } & Record<string, unknown>;
+type WorkflowNode = {
+  key: string;
+  status: string;
+  reason: unknown;
+  prerequisites: string[];
+  completionEvidence: CompletionEvidence[];
+} & Record<string, unknown>;
+interface WorkflowEdge {
+  from: string;
+  to: string;
+  type: string;
+  condition: unknown;
+}
+type PhaseEvidence = { title: string; status: string } & Record<
+  string,
+  unknown
+>;
+type WorkflowResource = { key: string; state: string } & Record<
+  string,
+  unknown
+>;
+type WorkflowUnit = { key: string; branch: unknown; paths: unknown } & Record<
+  string,
+  unknown
+>;
+interface WorkflowResult {
+  complete: boolean;
+  earlyExit: unknown;
+  split: boolean;
+  graph: { nodes: WorkflowNode[]; edges: WorkflowEdge[] };
+  phaseEvidence: PhaseEvidence[];
+  resources: WorkflowResource[];
+  units: WorkflowUnit[];
+  review: Record<string, unknown>;
+  reviewHistory: Record<string, unknown>[];
+  integration: Record<string, unknown>;
+  fixRounds: { max: number; used: number };
+  publish: unknown;
+  explorations: unknown[];
+  sweepEvidence: unknown;
+}
 
 /**
- * @param {unknown} value Workflow node.
- * @returns {value is WorkflowNode} Whether the node has the fields used by the tests.
+ * @param value Workflow node.
+ * @returns Whether the node has the fields used by the tests.
  */
-const isWorkflowNode = (value) =>
+const isWorkflowNode = (value: unknown): value is WorkflowNode =>
   isObject(value) &&
   typeof value.key === "string" &&
   typeof value.status === "string" &&
@@ -1021,18 +1062,19 @@ const isWorkflowNode = (value) =>
   value.completionEvidence.every((item) => isObject(item) && "result" in item);
 
 /**
- * @param {unknown} value Workflow edge.
- * @returns {value is WorkflowEdge} Whether the edge has the fields used by the tests.
+ * @param value Workflow edge.
+ * @returns Whether the edge has the fields used by the tests.
  */
-const isWorkflowEdge = (value) =>
+const isWorkflowEdge = (value: unknown): value is WorkflowEdge =>
   isObject(value) &&
   typeof value.from === "string" &&
   typeof value.to === "string" &&
   typeof value.type === "string" &&
   "condition" in value;
 
-/** @type {(value: unknown) => asserts value is WorkflowResult} */
-const assertWorkflowResult = (value) => {
+const assertWorkflowResult: (
+  value: unknown
+) => asserts value is WorkflowResult = (value) => {
   assert.ok(isObject(value));
   assert.ok(typeof value.complete === "boolean");
   assert.ok(typeof value.split === "boolean");
@@ -1086,18 +1128,16 @@ const assertWorkflowResult = (value) => {
 };
 
 /**
- * @param {string} file Workflow source path.
- * @returns {Function} Callable workflow sample.
+ * @param file Workflow source path.
+ * @returns Callable workflow sample.
  */
-const compileWorkflowSource = (file) => {
-  /** @type {unknown} */
-  const prototype = Object.getPrototypeOf(async () => {});
+const compileWorkflowSource = (file: string) => {
+  const prototype: unknown = Object.getPrototypeOf(async () => {});
   assert.ok(isObject(prototype));
   const { constructor } = prototype;
   assert.ok(typeof constructor === "function");
   const source = readFileSync(file, "utf-8").replace(/^export /mu, "");
-  /** @type {unknown} */
-  const compiled = Reflect.construct(constructor, [
+  const compiled: unknown = Reflect.construct(constructor, [
     "args",
     "agent",
     "parallel",
@@ -1111,21 +1151,29 @@ const compileWorkflowSource = (file) => {
   assert.ok(typeof compiled === "function");
   return compiled;
 };
-/** @typedef {{phase: string, label: string, agentType?: unknown, effort?: unknown, isolation?: unknown, model?: unknown}} AgentOptions */
+interface AgentOptions {
+  phase: string;
+  label: string;
+  agentType?: unknown;
+  effort?: unknown;
+  isolation?: unknown;
+  model?: unknown;
+}
 
 /**
- * @param {Record<string, (options: AgentOptions) => unknown>} table Phase handlers.
- * @returns {(options: AgentOptions) => unknown} Agent handler.
+ * @param table Phase handlers.
+ * @returns Agent handler.
  */
-const dispatchTable = (table) => {
+const dispatchTable = (
+  table: Record<string, (options: AgentOptions) => unknown>
+): ((options: AgentOptions) => unknown) => {
   let lastReview = 0;
-  /** @type {string | null} */
-  let headBranch = null;
+  let headBranch: string | null = null;
   /**
-   * @param {AgentOptions} options Agent dispatch options.
-   * @returns {unknown} Payload for the requested phase.
+   * @param options Agent dispatch options.
+   * @returns Payload for the requested phase.
    */
-  const dispatch = (options) => {
+  const dispatch = (options: AgentOptions): unknown => {
     if (options.label.startsWith("verify-findings:")) {
       return table.Verify === undefined
         ? {
@@ -1166,10 +1214,10 @@ const dispatchTable = (table) => {
   return dispatch;
 };
 /**
- * @param {...unknown} payloads Responses to return in order.
- * @returns {() => unknown} Function returning the next response.
+ * @param payloads Responses to return in order.
+ * @returns Function returning the next response.
  */
-const sequence = (...payloads) => {
+const sequence = (...payloads: unknown[]): (() => unknown) => {
   let served = 0;
   return () => {
     const payload = payloads[Math.min(served, payloads.length - 1)];
@@ -1178,21 +1226,47 @@ const sequence = (...payloads) => {
   };
 };
 /**
- * @param {string} file Workflow source.
- * @param {Record<string, unknown>} args Workflow input.
- * @param {(options: AgentOptions) => unknown} payloadFor Agent response factory.
- * @returns {Promise<{calls: {agentType: unknown, effort: unknown, effortProvided: boolean, isolation: unknown, label: string, model: unknown, modelProvided: boolean, phase: string, prompt: string}[], result: WorkflowResult}>} Workflow outcome and observed agent calls.
+ * @param file Workflow source.
+ * @param args Workflow input.
+ * @param payloadFor Agent response factory.
+ * @returns Workflow outcome and observed agent calls.
  */
-const runWorkflowSample = async (file, args, payloadFor) => {
-  /** @type {{agentType: unknown, effort: unknown, effortProvided: boolean, isolation: unknown, label: string, model: unknown, modelProvided: boolean, phase: string, prompt: string}[]} */
-  const calls = [];
+const runWorkflowSample = async (
+  file: string,
+  args: Record<string, unknown>,
+  payloadFor: (options: AgentOptions) => unknown
+): Promise<{
+  calls: {
+    agentType: unknown;
+    effort: unknown;
+    effortProvided: boolean;
+    isolation: unknown;
+    label: string;
+    model: unknown;
+    modelProvided: boolean;
+    phase: string;
+    prompt: string;
+  }[];
+  result: WorkflowResult;
+}> => {
+  const calls: {
+    agentType: unknown;
+    effort: unknown;
+    effortProvided: boolean;
+    isolation: unknown;
+    label: string;
+    model: unknown;
+    modelProvided: boolean;
+    phase: string;
+    prompt: string;
+  }[] = [];
   const environment = {
     /**
-     * @param {string} prompt Agent prompt.
-     * @param {AgentOptions} options Agent dispatch options.
-     * @returns {Promise<unknown>} Simulated agent payload.
+     * @param prompt Agent prompt.
+     * @param options Agent dispatch options.
+     * @returns Simulated agent payload.
      */
-    agent: async (prompt, options) => {
+    agent: async (prompt: string, options: AgentOptions): Promise<unknown> => {
       calls.push({
         agentType: options.agentType,
         effort: options.effort,
@@ -1209,10 +1283,10 @@ const runWorkflowSample = async (file, args, payloadFor) => {
     budget: { remaining: () => Infinity, spent: () => 0, total: null },
     log: () => null,
     /**
-     * @param {(() => Promise<unknown>)[]} thunks Work items.
-     * @returns {Promise<unknown[]>} Completed work in invocation order.
+     * @param thunks Work items.
+     * @returns Completed work in invocation order.
      */
-    parallel: async (thunks) =>
+    parallel: async (thunks: (() => Promise<unknown>)[]): Promise<unknown[]> =>
       await Promise.all(thunks.map(async (thunk) => await thunk())),
     phase: () => null,
     pipeline: () => {
@@ -1222,17 +1296,20 @@ const runWorkflowSample = async (file, args, payloadFor) => {
       throw new Error("workflow must not run in these samples");
     }
   };
-  /** @type {unknown} */
-  const result = await Reflect.apply(compileWorkflowSource(file), undefined, [
-    { repository: sampleRepository, ...args },
-    environment.agent,
-    environment.parallel,
-    environment.pipeline,
-    environment.phase,
-    environment.log,
-    environment.workflow,
-    environment.budget
-  ]);
+  const result: unknown = await Reflect.apply(
+    compileWorkflowSource(file),
+    undefined,
+    [
+      { repository: sampleRepository, ...args },
+      environment.agent,
+      environment.parallel,
+      environment.pipeline,
+      environment.phase,
+      environment.log,
+      environment.workflow,
+      environment.budget
+    ]
+  );
   assertWorkflowResult(result);
   return { calls, result };
 };
@@ -1288,10 +1365,10 @@ const simpleRepair = {
   startRef: "unit-u1"
 };
 /**
- * @param {AgentOptions} options Agent dispatch options.
- * @returns {typeof simpleImplement} Implementation payload for the selected unit.
+ * @param options Agent dispatch options.
+ * @returns Implementation payload for the selected unit.
  */
-const splitImplement = (options) => {
+const splitImplement = (options: AgentOptions): typeof simpleImplement => {
   const secondUnit = options.label.startsWith("implement:u2");
   const repair = options.label.includes(":fix-");
   return {
@@ -1307,20 +1384,20 @@ const splitImplement = (options) => {
   };
 };
 /**
- * @param {AgentOptions} options Agent dispatch options.
- * @returns {typeof simpleImplement} Implementation payload with the selected starting ref.
+ * @param options Agent dispatch options.
+ * @returns Implementation payload with the selected starting ref.
  */
-const wrongStart = (options) => {
+const wrongStart = (options: AgentOptions): typeof simpleImplement => {
   const result = splitImplement(options);
   return options.label.includes(":fix-")
     ? { ...result, startRef: "wrong-ref" }
     : result;
 };
 /**
- * @param {AgentOptions} options Agent dispatch options.
- * @returns {typeof simpleImplement} Implementation payload with a failed repair when requested.
+ * @param options Agent dispatch options.
+ * @returns Implementation payload with a failed repair when requested.
  */
-const failedRepair = (options) =>
+const failedRepair = (options: AgentOptions): typeof simpleImplement =>
   options.label.includes(":fix-")
     ? {
         ...splitImplement(options),
@@ -1329,10 +1406,10 @@ const failedRepair = (options) =>
       }
     : splitImplement(options);
 /**
- * @param {AgentOptions} options Agent dispatch options.
- * @returns {typeof simpleImplement} Implementation payload for the current attempt.
+ * @param options Agent dispatch options.
+ * @returns Implementation payload for the current attempt.
  */
-const multiRound = (options) => {
+const multiRound = (options: AgentOptions): typeof simpleImplement => {
   if (options.label.includes(":fix-1")) {
     return { ...splitImplement(options), branch: "unit-u1-r1" };
   }
@@ -1735,8 +1812,11 @@ await test("delivery can finish at Explore or Plan when the whole goal needs no 
     stopReason: "Invalid report",
     units: []
   };
-  /** @type {[typeof open, { evidence: string, units: unknown[], stopReason?: string }, string | null][]} */
-  const cases = [
+  const cases: [
+    typeof open,
+    { evidence: string; units: unknown[]; stopReason?: string },
+    string | null
+  ][] = [
     [settled, plan, "Explore"],
     [open, plan, "Plan"],
     [open, { evidence: "No decision", units: [] }, null],
@@ -2689,8 +2769,7 @@ await test("delivery samples reject malformed findings and preserve review evide
 });
 
 await test("delivery samples append each phase's prompt part as its final section", async () => {
-  /** @type {Record<string, string>} */
-  const promptParts = {
+  const promptParts: Record<string, string> = {
     explore: "explore part",
     implement: "implement part",
     integrate: "integrate part",
@@ -2787,10 +2866,10 @@ await test("delivery samples pass candidate, issue, request, and owned findings 
         assert.equal(plan.prompt.split(value).length - 1, 1);
       }
       /**
-       * @param {string} text Prompt section.
-       * @returns {string[]} Labels of calls containing the complete prompt section.
+       * @param text Prompt section.
+       * @returns Labels of calls containing the complete prompt section.
        */
-      const owns = (text) =>
+      const owns = (text: string): string[] =>
         calls
           .filter((call) => call.prompt.split("\n\n").includes(text))
           .map(({ label }) => label);

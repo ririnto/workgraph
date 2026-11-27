@@ -15,11 +15,11 @@ const consumer = mkdtempSync(path.join(tmpdir(), "workgraph-go-consumer-"));
 const example = path.join(consumer, "example");
 
 /**
- * @param {string[]} args Go subcommand and arguments.
- * @param {number} [status] Expected process exit.
- * @returns {string} Captured stdout.
+ * @param args Go subcommand and arguments.
+ * @param status Expected process exit.
+ * @returns Captured stdout.
  */
-const run = (args, status = 0) => {
+const run = (args: string[], status = 0): string => {
   const result = spawnSync("go", args, {
     cwd: consumer,
     encoding: "utf-8",
