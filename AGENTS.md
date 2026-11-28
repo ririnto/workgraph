@@ -14,7 +14,7 @@ Explicit user requirements take priority over project defaults within host and s
 - Keep required procedures in each skill body and link conditional resources inside the plugin where their read conditions apply.
   Link the owner of a rule when both sources load together.
 - Route lifecycle and language guidance through Development, with lifecycle procedures in `skills/development/playbooks/`.
-  Workflow owns its native operation, Main owns coordination, and Delivery owns repository integration.
+  Main owns coordination, and Delivery owns repository integration.
 - Load the role and its selected host reference completely and confirm both contain text before emitting hook context.
   Identify the actual source paths and content already present.
   Deliver the skill body without frontmatter for Claude and the complete file for Codex.
@@ -82,11 +82,6 @@ For injected prose, use the existing hook tests for role selection, host isolati
 Inspect the affected rendered context when the changed property needs further evidence.
 
 Follow the [evaluation reporting requirements](README.md#development) for repeated behavioral runs, individual outcomes, and limited smoke checks.
-
-For Workflow invocation changes, run `PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 1 --ablation none --allow-tools Workflow --no-publish --output-dir ../workgraph-eval-results` in a trusted checkout.
-This behavioral check uses real agents and requires a host with Workflow enabled.
-Keep evaluation reports local and outside the repository with `--output-dir`.
-Inspect tool results because an attempted invocation alone does not prove successful execution.
 
 Report exact commands, results, and unverified behavior under the active role's evidence policy.
 Claim model adherence only to the extent observed in behavioral evaluations.

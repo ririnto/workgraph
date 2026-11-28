@@ -64,7 +64,6 @@
     "**/__generated__",
     "**/*.gen.*",
     "**/*.generated.*",
-    "**/*.auto.*",
-    "workflows/*.js"
+    "**/*.auto.*"
   ]
 }

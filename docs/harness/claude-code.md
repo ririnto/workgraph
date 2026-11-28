@@ -66,7 +66,6 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 
 ```text
 /workgraph:main-agent-contract Fix the parser's escaped-quote bug and verify the original trigger within the authorized scope.
-/workgraph:workflow Design a bounded in-memory LRU cache with deterministic eviction.
 ```
 
 | Invocation | Purpose |
@@ -74,7 +73,6 @@ The public mode entry remains `/workgraph:main-agent-contract`.
 | `/workgraph:main-agent-contract` | Load Main Agent mode in the main session. |
 | `/workgraph:subagent-context` | Load the Worker role for an existing bounded dispatch. |
 | `/workgraph:delivery` | Load Main's repository delivery procedure. |
-| `/workgraph:workflow` | Request native Claude Code Workflow or load its design guidance. |
 | `/workgraph:development` | Select the matching development playbook and language references. |
 | `/workgraph:memory-maintenance` | Load authorized durable memory maintenance guidance. |
 
@@ -85,14 +83,11 @@ Manual role invocation reads its Claude reference unless that complete content i
 Invoking a skill does not create a dispatch, change the session's role, or grant permissions.
 The [skill map](../../README.md#skill-invocation) identifies each procedure's owner and trigger.
 Main's [Claude reference](../../skills/main-agent-contract/references/claude-code.md) owns tool selection.
-The shared [Workflow entry point](../../skills/workflow/SKILL.md) admits only Claude Code Main before loading its execution procedure.
-The bundled [adaptive delivery workflow](../workflow-samples.md) registers as `workgraph:adaptive-delivery`, with the plan's unit count selecting whether integration runs.
 Codex Scoped Cleanup does not authorize Codex resource operations when invoked in Claude Code.
 
 ## Evaluate discovery and outcomes
 
 Use Claude Code 2.1.269 or later for native plugin evaluations.
-Use 2.1.305 or later for checks that require completed-call replay.
 Choose the [case](../verification-map.md#native-evaluation-cases) for the affected host behavior and run it once from a trusted checkout.
 For example, this case checks whether Main handles a bounded source request directly.
 
