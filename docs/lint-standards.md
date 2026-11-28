@@ -31,6 +31,15 @@ The regex rule can accept an indexed access to a named capture.
 Review changes to directives, literals, and evaluation order even when the formatter accepts them.
 The preset sorts value imports, so applying its fixes can change initialization order when an imported module has top-level effects.
 
+| Area | Confirmed difference and reason |
+| --- | --- |
+| Em dash | Workgraph checks authored headings and table cells that Sinon excludes so its broader Markdown rule remains intact. |
+| Table separators | Workgraph preserves exact diagnostics and fixes for authored tables while matching Sinon's generated-document and license exemptions. |
+| Relative skill links | Workgraph skips ordinary blockquotes, preserves bundled links and alerts for distributed instructions, and exempts only source-linked quotations, while Sinon masks quotations by syntax and rejects all relative destinations. |
+| TSDoc | Workgraph checks directly exported variable class expressions while retaining wider export and member requirements, and parenthesized default-export class expressions remain uncovered to keep this change within scope. |
+| Spacing | Workgraph recognizes named `node:test` imports and `suite` registrations, while Sinon recognizes Vitest, Jest, and Bun imports with different modifiers because each rule serves its repository's test framework. |
+| Effective scope | Workgraph enables all five rule areas at its repository root, while Sinon limits two Markdown rules in its root and applies them without that path limit in its materialized pnpm profile to match each consumer. |
+
 ## Markdown, native tooling, and validation
 
 | Standard | Pillars | Effective check and scope |

@@ -1,5 +1,7 @@
 import type { MicromarkToken, Rule } from "markdownlint";
 
+import { protectedDocument } from "./no-em-dash.ts";
+
 /**
  * Workgraph adapts the Sinon Harness control flow while preserving its diagnostic contract.
  * The upstream Apache-2.0 license is retained in LICENSES/sinon-harness.txt.
@@ -40,6 +42,9 @@ const collect = (
 const rule: Rule = {
   description: "Markdown table separators must use exactly three hyphens",
   function: (params, onError) => {
+    if (protectedDocument(params)) {
+      return;
+    }
     for (const row of collect(
       params.parsers.micromark?.tokens ?? [],
       "tableDelimiterRow"
