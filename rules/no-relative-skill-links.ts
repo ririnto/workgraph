@@ -2,6 +2,11 @@ import path from "node:path";
 
 import type { Rule } from "markdownlint";
 
+import {
+  protectedDocument,
+  sourceAttributedQuoteRanges
+} from "./no-em-dash.ts";
+
 const alertPattern =
   /^ {0,3}(?:>[ \t]*)+\[!(?:NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(?:\r\n|\r|\n|$)/iu;
 
@@ -10,7 +15,12 @@ const alertPattern =
  */
 export default {
   description: "Relative skill links must target a bundled Workgraph skill",
-  function: ({ name, parsers }, onError) => {
+  function: (params, onError) => {
+    if (protectedDocument(params)) {
+      return;
+    }
+    const { name, parsers } = params;
+    const attributedQuotes = sourceAttributedQuoteRanges(params);
     const pending = [...(parsers.micromark?.tokens ?? [])];
     for (
       let token = pending.pop();
@@ -21,6 +31,13 @@ export default {
         token.type === "resourceDestination" ||
         token.type === "definitionDestination"
       ) {
+        const isAttributed = (attributedQuotes.get(token.startLine) ?? []).some(
+          ([start, end]) =>
+            start <= token.startColumn - 1 && token.startColumn - 1 < end
+        );
+        if (isAttributed) {
+          continue;
+        }
         const destination = token.text.replaceAll(/^<|>$/gu, "");
         if (/^(?:[a-z][a-z\d+.-]*:|\/|#)/iu.test(destination)) {
           continue;

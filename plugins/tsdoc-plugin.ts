@@ -227,6 +227,16 @@ const exportTsdocRule = {
             ? variableName(node)
             : nodeName(node)
         );
+        if (node.type === "VariableDeclaration") {
+          for (const declarator of node.declarations) {
+            if (
+              declarator.id.type === "Identifier" &&
+              declarator.init?.type === "ClassExpression"
+            ) {
+              validateClassMembers(declarator.init);
+            }
+          }
+        }
       }
     };
     /**
