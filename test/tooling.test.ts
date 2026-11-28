@@ -396,6 +396,98 @@ await test("prose formatting checks sentences and preserves Markdown syntax", ()
   );
 });
 
+await test("the copied prose rule reports maintained fixtures through CLI2", async () => {
+  const directory = await mkdtemp(
+    path.join(tmpdir(), "workgraph-copied-prose-")
+  );
+  const ruleDirectory = path.join(directory, "rules");
+  const fixtureDirectory = path.join(
+    import.meta.dirname,
+    "../rules/fixtures/prose-format"
+  );
+  const command = path.join(
+    import.meta.dirname,
+    "../node_modules/markdownlint-cli2/markdownlint-cli2-bin.mjs"
+  );
+  try {
+    await mkdir(ruleDirectory);
+    await cp(
+      path.join(import.meta.dirname, "../.gitignore"),
+      path.join(directory, ".gitignore")
+    );
+    await symlink(
+      path.join(import.meta.dirname, "../node_modules"),
+      path.join(directory, "node_modules"),
+      "dir"
+    );
+    await cp(
+      path.join(import.meta.dirname, "../rules/prose-format.ts"),
+      path.join(ruleDirectory, "prose-format.ts")
+    );
+    await writeFile(
+      path.join(directory, ".markdownlint-cli2.jsonc"),
+      JSON.stringify({
+        config: { default: false, "docs/prose-format": true },
+        customRules: ["rules/prose-format.ts"],
+        gitignore: true
+      })
+    );
+    await Promise.all(
+      ["valid", "invalid"].map(async (name) => {
+        await cp(
+          path.join(fixtureDirectory, `${name}.md.txt`),
+          path.join(directory, `${name}.md`)
+        );
+      })
+    );
+    await writeFile(
+      path.join(directory, "suppressed.md"),
+      "<!-- markdownlint-disable docs/prose-format -->\n# First. Second.\n"
+    );
+    const valid = spawnSync(
+      process.execPath,
+      [command, "valid.md", "suppressed.md"],
+      { cwd: directory, encoding: "utf-8", timeout: 15_000 }
+    );
+    assert.ifError(valid.error);
+    assert.equal(valid.status, 0, valid.stderr + valid.stdout);
+    assert.equal(
+      valid.stderr + valid.stdout,
+      `markdownlint-cli2 v0.24.2 (markdownlint v0.42.2)
+Finding: valid.md suppressed.md
+Linting: 2 files
+Summary: 0 issues in 0 files
+`
+    );
+    const invalid = spawnSync(
+      process.execPath,
+      [command, "--fix", "invalid.md"],
+      { cwd: directory, encoding: "utf-8", timeout: 15_000 }
+    );
+    assert.ifError(invalid.error);
+    assert.equal(invalid.status, 1, invalid.stderr + invalid.stdout);
+    assert.equal(
+      invalid.stderr + invalid.stdout,
+      `invalid.md:1 error docs/prose-format Prose sentences must be separated by source lines [Put each sentence on its own source line.]
+invalid.md:3 error docs/prose-format Prose sentences must be separated by source lines [Put each sentence on its own source line.]
+invalid.md:5 error docs/prose-format Prose sentences must be separated by source lines [Put each sentence on its own source line.]
+invalid.md:7 error docs/prose-format Prose sentences must be separated by source lines [Do not join prose with semicolons.]
+invalid.md:9 error docs/prose-format Prose sentences must be separated by source lines [Put each sentence on its own source line.]
+markdownlint-cli2 v0.24.2 (markdownlint v0.42.2)
+Finding: invalid.md
+Linting: 1 file
+Summary: 5 issues in 1 file
+`
+    );
+    assert.equal(
+      readFileSync(path.join(directory, "invalid.md"), "utf-8"),
+      readFileSync(path.join(fixtureDirectory, "invalid.md.txt"), "utf-8")
+    );
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
 await test("em-dash rule checks prose and preserves code and links", () => {
   const source = [
     "# Heading — heading",
