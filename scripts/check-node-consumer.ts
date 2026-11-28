@@ -52,12 +52,12 @@ try {
     'import { readCount } from "./task.js";\n\nexport const check = (): void => {\n  readCount();\n};\n';
   writeFileSync(caller, call);
   writeFileSync(dependency, "export const readCount = (): number => 1;\n");
-  run(["run", "check"]);
-  run(["run", "check:typescript"]);
+  run(["check"]);
+  run(["check:typescript"]);
   const asynchronous =
     "export const readCount = async (): Promise<number> => {\n  const count = await Promise.resolve(1);\n  return count + 1;\n};\n";
   writeFileSync(dependency, asynchronous);
-  const lint = run(["run", "check", "--format", "json"], 1);
+  const lint = run(["check", "--format", "json"], 1);
   const start = lint.search(/\{\s*"diagnostics"\s*:/u);
   assert.notEqual(start, -1, lint);
   assert.partialDeepStrictEqual(
@@ -83,7 +83,7 @@ try {
   const mistyped = "export const marker: string = 1;\n";
   writeFileSync(outside, mistyped);
   assert.equal(
-    run(["run", "check:typescript", "--pretty", "false"], 1).trim(),
+    run(["check:typescript", "--pretty", "false"], 1).trim(),
     ".hidden/.entry.ts(1,14): error TS2322: Type 'number' is not assignable to type 'string'."
   );
   assert.equal(readFileSync(outside, "utf-8"), mistyped);

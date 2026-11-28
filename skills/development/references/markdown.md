@@ -34,7 +34,7 @@ Use a Node runtime that supports type stripping.
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm run check
+pnpm check
 ```
 
 The sample checks hidden HTML notes and unused or duplicate link definitions.

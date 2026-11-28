@@ -170,7 +170,7 @@ jobs:
           gpg-private-key: nondefault
 `;
   const runWorkflowCheck = () =>
-    spawnSync("pnpm", ["run", "check:workflows"], {
+    spawnSync("pnpm", ["check:workflows"], {
       cwd: root,
       encoding: "utf-8",
       timeout: 30_000

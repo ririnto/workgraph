@@ -32,7 +32,7 @@ printf '# Example\n\nStart the service. Check its status.\n' | pnpm exec markdow
 
 The first command exits with code 0.
 The second command exits with code 1 and reports `docs/prose-format` on line 3.
-In Workgraph, run `pnpm run check:markdownlint-cli2` and `pnpm run check:test` before replacing a rule with the same ID.
+In Workgraph, run `pnpm check:markdownlint-cli2` and `pnpm check:test` before replacing a rule with the same ID.
 
 ## Other Markdown checks
 
