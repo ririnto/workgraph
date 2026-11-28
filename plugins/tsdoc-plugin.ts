@@ -229,7 +229,10 @@ const exportTsdocRule = {
         );
         if (node.type === "VariableDeclaration") {
           for (const declarator of node.declarations) {
-            if (declarator.init?.type === "ClassExpression") {
+            if (
+              declarator.id.type === "Identifier" &&
+              declarator.init?.type === "ClassExpression"
+            ) {
               validateClassMembers(declarator.init);
             }
           }

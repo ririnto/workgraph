@@ -1232,6 +1232,12 @@ export const Service = class {
   protected protectedMissing() { return 1; }
   constructor() {}
 };
+/**
+ * Name of the internal implementation.
+ */
+export const { name: implementationName } = class Internal {
+  internalHelper() { return 1; }
+};
 `
   );
   const { diagnostics, status } = runUltraciteFixture(directory, ["source.ts"]);
