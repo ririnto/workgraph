@@ -118,11 +118,6 @@ We read the complete official [Claude prompting best-practices guide](https://pl
 Its explicit outcomes, contextual instructions, examples, source separation, and scoped tool guidance informed agent-facing instruction authoring.
 These adaptations retain model-specific evidence limits and do not redistribute the guide or configure host behavior.
 
-We read the complete original [mirku workflow post](https://x.com/mirku21/status/2111200540772221418).
-Its role split, isolated edits, verification, fix-loop bound, and approval example informed the native Workflow stage guidance.
-The complete official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows.md) informed supported execution and permission boundaries.
-Workgraph adapts those decisions without redistributing the post or supplying another execution engine.
-
 We read the complete original [How the Claude Code team does code review](https://claude.dev/blog/solving-code-review-at-anthropic.md).
 The article credits Addy Osmani, Morgan Westlee Lunt, and Qing Wang.
 Its layered review, verified findings, risk selection, and convergence lessons informed Workgraph's Delivery procedure and Main review staffing guidance.
@@ -205,7 +200,6 @@ We consulted the Go project's [Go 1.23 release notes](https://go.dev/doc/go1.23)
 Those official sources informed version-aware Go iteration guidance and supplied no redistributed code.
 We read the full [Agent Skills combined source](https://agentskills.io/llms-full.txt), including its specification and skill creation guidance.
 Its guidance informed the conditional reference boundary without supplying plugin code or bundled assets.
-We consulted Anthropic's official [Claude Code Workflow documentation](https://code.claude.com/docs/en/workflows) and [subagent documentation](https://code.claude.com/docs/en/sub-agents) for host behavior.
 We reviewed the official [Claude Code skills documentation](https://code.claude.com/docs/en/skills) for activation descriptions, invocation controls, and supporting files.
 We reviewed Google's Gemini API [thinking reference](https://ai.google.dev/gemini-api/docs/thinking) and its [Gemini 3.8 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash) and [Gemini 4 Argon](https://ai.google.dev/gemini-api/docs/models/gemini-4-argon) model pages for provider thinking levels, defaults, and token limits.
 We reviewed GitHub's [Copilot models-and-pricing documentation](https://docs.github.com/en/copilot/reference/copilot-billing/models-and-pricing) for the cited promotional display rates.

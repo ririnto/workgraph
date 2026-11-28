@@ -9,7 +9,6 @@ execution:
     - Read
     - Skill
     - Agent
-    - Workflow
   prompt: |-
     A Python helper in my GitHub Actions workflow shares tags across calls.
     Return the corrected function. Preserve in-place updates for a supplied list, including an empty list.
@@ -23,6 +22,6 @@ graders:
     focus: trace
     criteria: |-
       The bundled Development skill is read or is already fully loaded.
-      Main handles the request directly without invoking Agent or Workflow.
+      Main handles the request directly without invoking Agent.
       Calls without a list get independent results. A supplied list is mutated and returned by identity.
       The response makes no claim of running code or editing files.

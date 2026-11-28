@@ -105,7 +105,6 @@ for (const { patterns, check, test } of [
   {
     patterns: [
       "plugins/**",
-      "workflows/**",
       "rules/**",
       "scripts/pre-commit-scope.ts",
       "scripts/check-go-workspace.ts",
