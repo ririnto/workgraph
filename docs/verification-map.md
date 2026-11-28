@@ -15,7 +15,6 @@ For native observations, choose a case below and use the [evaluation command](..
 | Hook failures emit no partial context. | `hooks/inject-context.ts`. | `node --test "hooks/**/*.test.{mjs,ts}"` | Tests compare exact diagnostics for invalid arguments, missing or empty files, and invalid frontmatter, with empty output on file errors. |
 | Bundled task skills remain available without entering automatic role context. | `skills/` and `hooks/inject-context.test.ts`. | `node --test "hooks/**/*.test.{mjs,ts}"` | Tests remove every unselected skill and host reference before checking source-derived output. |
 | Agents rely on auto-injected repository guidance without named retrieval instructions. | `skills/`, contributor entry documents, and `docs/reviews.md`. | Loading-context review and `pnpm run check:markdownlint-cli2` | The Markdown gate checks link targets, while instruction placement remains a source-review claim rather than a prose test. |
-| The delivery script routes early exits, model selectors, unit ownership, repairs, and publication. | `workflows/delivery.js` | `pnpm run check:test` | The harness runs the actual script with supplied agent results. |
 | Markdown references resolve to files and headings. | `README.md`, `skills/`, and `docs/`. | `pnpm run check:markdownlint-cli2` | The Markdown gate checks repository file and heading links through the adopted rule. |
 | Issue templates follow Workgraph's supported schema. | `.github/ISSUE_TEMPLATE/*.yaml` and `scripts/issue-forms.ts`. | `pnpm run check:issue-forms` | `pnpm run check:test` covers required fields, unique names, field IDs, and invalid forms. |
 | Native host packages share names and versions and have valid catalog destinations. | The four native manifests, host catalogs, and `scripts/plugin-version.ts`. | `pnpm run check:plugin-version` | `pnpm run check:test` covers calendar releases, parity, contained paths, invalid catalog values, root-manifest shadowing, and cross-host default hook discovery. |
@@ -38,22 +37,3 @@ Repeat a selected case when comparing behavior across runs.
 | --- | --- | --- |
 | Direct | [Source correction](../evals/development-natural-trigger/case.yaml) | Main loads Development and fixes the supplied bug without delegation. |
 | Agent | [Worker completion](../evals/agent-completion-callback/case.yaml) | Main waits for the background worker and uses its completed result. |
-| Workflow | [Bundled delivery](../evals/delivery-completion-evidence/case.yaml) | The registered workflow returns phase records that support the reported outcome. |
-
-### Workflow continuation
-
-The bundled delivery case makes one Workflow call.
-To evaluate same-session continuation, seed an existing workflow script in the eval workspace with [`context.scaffold_script` and `--scaffold`](https://code.claude.com/docs/en/plugin-evals#seed-the-workspace-or-conversation).
-Give the case `Read`, `Edit`, and `Workflow` under the evaluator's [tool grant rules](https://code.claude.com/docs/en/plugin-evals#grant-tools).
-
-1. Launch the fixture by absolute [`scriptPath`](https://code.claude.com/docs/en/agent-sdk/typescript#workflow) and wait for the completion callback.
-   Verify that Main received the actual results in the callback payload.
-2. Edit the exact returned `scriptPath` to append a stage that uses those results.
-3. In the same session, pass the returned `scriptPath` and set `resumeFromRunId` to the first `runId`.
-   Keep `args` and the completed calls unchanged.
-4. Inspect `workflow_progress` for `cached: true` on each reused result and match its agent ID to the first run.
-   Confirm that the new stage ran with the actual earlier results.
-
-Direct reads of journals in the evaluator's protected configuration directory remain subject to its filesystem deny rules.
-Those rules also blocked continuation from an inline launch whose returned script was stored in that directory.
-Testing that inline launch path requires a host-supported way to edit the returned script while preserving the deny rules.

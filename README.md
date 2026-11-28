@@ -76,20 +76,11 @@ The approach adjusts as evidence changes, while preserving the complete requeste
 Repository scope follows the request without an activity threshold or archive-status exclusion.
 Actual permissions, protected branches, security controls, and required acceptance checks still govern execution.
 
-For Claude Code Main, [Workflow](skills/workflow/SKILL.md) contains host and role admission and the execution procedure.
-Main's [Claude reference](skills/main-agent-contract/references/claude-code.md) owns tool selection.
-The conditional authoring and delivery references stay behind that admission boundary.
-Codex uses native delegation rather than Claude Code Workflow.
-Workgraph bundles one [adaptive delivery workflow](docs/workflow-samples.md), that can finish at Explore or Plan when the evidence shows no change is needed, or publish and review the requested change.
-Those samples use injectable prompt parts, optional per-phase model and effort selectors, and explicit skip, failure, and bounded-recovery records.
-The admitted Claude Main procedure also covers read-only design without bundling a specialist-agent graph.
-All workflow sources launch through the native Workflow interface, and Workgraph supplies no replacement execution engine.
-
 ## Skill invocation
 
 All skills remain user-invocable and block model invocation, following [pstack](https://github.com/cursor/plugins/tree/main/pstack)'s skill boundary.
 Roles and procedures link each bundled `SKILL.md`, so models read the linked file instead of invoking the skill.
-Users keep the explicit forms, such as `/workgraph:workflow` in Claude Code or `$workgraph:development` in Codex.
+Users keep the explicit forms, such as `/workgraph:development` in Claude Code or `$workgraph:development` in Codex.
 Claude Code, Cursor, and Copilot read `disable-model-invocation: true`, and Codex reads each skill's `agents/openai.yaml` policy.
 Hooks operate without skill invocation.
 Conditional skills load only when their stated task scope matches and their complete content is not already present.
@@ -102,7 +93,6 @@ Conditional skills load only when their stated task scope matches and their comp
 | Development router | [Development](skills/development/SKILL.md) | Source work selects the matching lifecycle playbook and language references. |
 | Lifecycle playbook | Development's [playbooks](skills/development/playbooks/feature.md) | Features, bug fixes, refactoring, and performance work each load their matching procedure. |
 | Scoped procedure | [Delivery](skills/delivery/SKILL.md) | Main loads repository delivery procedures before repository changes or delivery. |
-| Scoped procedure | [Workflow](skills/workflow/SKILL.md) | Claude Main reads native Workflow procedures directly for the host reference's selection conditions. |
 | Scoped procedure | [Memory Maintenance](skills/memory-maintenance/SKILL.md) | Authorized durable memory changes load existing-record review and reconciliation guidance. |
 | Scoped procedure | [Codex Scoped Cleanup](skills/codex-scoped-cleanup/SKILL.md) | Codex resource retirement loads its complete owner-mediated lifecycle procedure. |
 
@@ -169,7 +159,6 @@ The pre-commit hook checks the staged diff for whitespace errors and conflict ma
 It runs the repository's Markdown, TypeScript, lint, and metadata validators, then selects native linters and tests based on staged paths.
 The pre-push hook runs the full repository check before publication.
 `pnpm run check:ultracite` checks formatting and runs lint rules, including type-aware rules on JavaScript and TypeScript files.
-Type-aware lint excludes generated files and the host workflow DSL.
 `pnpm run check:typescript` checks the configured JavaScript and TypeScript files with TypeScript and JSDoc.
 TypeScript uses the includes and exclusions in `tsconfig.json`, while Ultracite also applies its preset and Git ignores.
 `pnpm run check:production-audit` runs `pnpm audit --prod` to inspect production dependencies.
@@ -193,10 +182,9 @@ Evaluation relocates `HOME` into its sandbox, which can break home-dependent Nod
 Prepend the resolved Node binary directory to `PATH` for the evaluator and its isolated runs.
 
 ```sh
-PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case delivery-completion-evidence --runs 1 --ablation none --allow-tools Workflow --keep-temp --no-publish --output-dir ../workgraph-eval-results
+PATH="$(dirname "$(node -p process.execPath)"):$PATH" claude plugin eval ./ --case development-natural-trigger --runs 1 --ablation none --keep-temp --no-publish --output-dir ../workgraph-eval-results
 ```
 
-The example exercises Workflow delivery.
 One run checks invocation and the observed outcome.
 Use `--runs 2` or more on the selected case when assessing repeatability or comparing instruction changes.
 Report individual outcomes, including failures and incomplete runs.
