@@ -31,44 +31,43 @@ export default {
         token.type === "resourceDestination" ||
         token.type === "definitionDestination"
       ) {
-        const isAttributed = (attributedQuotes.get(token.startLine) ?? []).some(
-          ([start, end]) =>
-            start <= token.startColumn - 1 && token.startColumn - 1 < end
-        );
-        if (isAttributed) {
-          continue;
-        }
-        const destination = token.text.replaceAll(/^<|>$/gu, "");
-        if (/^(?:[a-z][a-z\d+.-]*:|\/|#)/iu.test(destination)) {
-          continue;
-        }
-        const relative = destination
-          .replace(/[?#][\s\S]*$/u, "")
-          .replaceAll(/%[\da-fA-F]{2}/gu, (escape) => {
-            const decoded = String.fromCodePoint(
-              Number.parseInt(escape.slice(1), 16)
-            );
-            return /^[\w.~-]$/u.test(decoded) ? decoded : escape;
-          });
         if (
-          /(?:^|\/)SKILL\.md$/u.test(relative) &&
-          !path.matchesGlob(
-            path.relative(
-              process.cwd(),
-              path.resolve(path.dirname(name), relative)
-            ),
-            "skills/*/SKILL.md"
+          !(attributedQuotes.get(token.startLine) ?? []).some(
+            ([start, end]) =>
+              start <= token.startColumn - 1 && token.startColumn - 1 < end
           )
         ) {
-          onError({
-            detail:
-              "Refer to external skills by name or link to their published URL.",
-            lineNumber: token.startLine,
-            range: [
-              token.startColumn,
-              Math.max(1, token.endColumn - token.startColumn)
-            ]
-          });
+          const destination = token.text.replaceAll(/^<|>$/gu, "");
+          if (!/^(?:[a-z][a-z\d+.-]*:|\/|#)/iu.test(destination)) {
+            const relative = destination
+              .replace(/[?#][\s\S]*$/u, "")
+              .replaceAll(/%[\da-fA-F]{2}/gu, (escape) => {
+                const decoded = String.fromCodePoint(
+                  Number.parseInt(escape.slice(1), 16)
+                );
+                return /^[\w.~-]$/u.test(decoded) ? decoded : escape;
+              });
+            if (
+              /(?:^|\/)SKILL\.md$/u.test(relative) &&
+              !path.matchesGlob(
+                path.relative(
+                  process.cwd(),
+                  path.resolve(path.dirname(name), relative)
+                ),
+                "skills/*/SKILL.md"
+              )
+            ) {
+              onError({
+                detail:
+                  "Refer to external skills by name or link to their published URL.",
+                lineNumber: token.startLine,
+                range: [
+                  token.startColumn,
+                  Math.max(1, token.endColumn - token.startColumn)
+                ]
+              });
+            }
+          }
         }
       } else if (token.type !== "blockQuote" || alertPattern.test(token.text)) {
         pending.push(...token.children);

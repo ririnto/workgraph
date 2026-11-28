@@ -71,20 +71,19 @@ func run(pass *analysis.Pass) (any, error) {
 		boundaries := collectCommentBoundaries(file)
 		bodies := boundaries.bodies
 		for _, group := range file.Comments {
-			if boundaries.docs[group] {
-				continue
-			}
-			for _, comment := range group.List {
-				for len(bodies) > 0 && bodies[0].End() < comment.Pos() {
-					bodies = bodies[1:]
-				}
-				if len(bodies) > 0 && bodies[0].Lbrace < comment.Pos() &&
-					comment.End() <= bodies[0].Rbrace && !reserved.MatchString(comment.Text) {
-					pass.Report(analysis.Diagnostic{
-						Pos:     comment.Pos(),
-						End:     comment.End(),
-						Message: "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration.",
-					})
+			if !boundaries.docs[group] {
+				for _, comment := range group.List {
+					for len(bodies) > 0 && bodies[0].End() < comment.Pos() {
+						bodies = bodies[1:]
+					}
+					if len(bodies) > 0 && bodies[0].Lbrace < comment.Pos() &&
+						comment.End() <= bodies[0].Rbrace && !reserved.MatchString(comment.Text) {
+						pass.Report(analysis.Diagnostic{
+							Pos:     comment.Pos(),
+							End:     comment.End(),
+							Message: "Remove dead code and workaround notes. Fix the underlying code or document the contract at its declaration.",
+						})
+					}
 				}
 			}
 		}

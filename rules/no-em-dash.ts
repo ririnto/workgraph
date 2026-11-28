@@ -118,19 +118,17 @@ const rule: Rule = {
               const lineNumber = token.startLine + index;
               const sourceColumn =
                 (index === 0 ? token.startColumn : 1) + (match.index ?? 0);
-              const isAttributed = (
-                attributedQuotes.get(lineNumber) ?? []
-              ).some(
-                ([start, end]) =>
-                  start <= sourceColumn - 1 && sourceColumn - 1 < end
-              );
-              if (isAttributed) {
-                continue;
+              if (
+                !(attributedQuotes.get(lineNumber) ?? []).some(
+                  ([start, end]) =>
+                    start <= sourceColumn - 1 && sourceColumn - 1 < end
+                )
+              ) {
+                onError({
+                  lineNumber,
+                  range: [sourceColumn, 1]
+                });
               }
-              onError({
-                lineNumber,
-                range: [sourceColumn, 1]
-              });
             }
           }
         }

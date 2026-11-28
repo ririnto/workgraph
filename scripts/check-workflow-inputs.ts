@@ -117,32 +117,28 @@ const checkWorkflow = (workflow: unknown, source: string) => {
     return;
   }
   for (const [job, definition] of Object.entries(workflow.jobs)) {
-    if (!isMapping(definition) || !isSequence(definition.steps)) {
-      continue;
-    }
-    for (const [index, step] of definition.steps.entries()) {
-      if (!isMapping(step)) {
-        continue;
-      }
-      const { uses, with: inputs } = step;
-      if (typeof uses !== "string" || !isMapping(inputs)) {
-        continue;
-      }
-      const defaults = actions.get(uses);
-      if (defaults === undefined) {
-        continue;
-      }
-      for (const [input, value] of Object.entries(inputs)) {
-        const fallback = defaults.get(input.toLowerCase());
-        if (
-          typeof fallback === "string" &&
-          !fallback.includes("${{") &&
-          literalInput(value) === fallback
-        ) {
-          process.stderr.write(
-            `${source}: job ${job}, step ${index + 1} [R35] Omit input "${input}" equal to the documented default for ${uses}.\n`
-          );
-          process.exitCode = 1;
+    if (isMapping(definition) && isSequence(definition.steps)) {
+      for (const [index, step] of definition.steps.entries()) {
+        if (isMapping(step)) {
+          const { uses, with: inputs } = step;
+          if (typeof uses === "string" && isMapping(inputs)) {
+            const defaults = actions.get(uses);
+            if (defaults !== undefined) {
+              for (const [input, value] of Object.entries(inputs)) {
+                const fallback = defaults.get(input.toLowerCase());
+                if (
+                  typeof fallback === "string" &&
+                  !fallback.includes("${{") &&
+                  literalInput(value) === fallback
+                ) {
+                  process.stderr.write(
+                    `${source}: job ${job}, step ${index + 1} [R35] Omit input "${input}" equal to the documented default for ${uses}.\n`
+                  );
+                  process.exitCode = 1;
+                }
+              }
+            }
+          }
         }
       }
     }
