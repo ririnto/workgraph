@@ -396,7 +396,7 @@ await test("prose formatting checks sentences and preserves Markdown syntax", ()
   );
 });
 
-await test("em-dash rule checks prose and preserves code and links", () => {
+await test("em-dash rule checks prose and preserves code, links, and attributed material", async (t) => {
   const source = [
     "# Heading — heading",
     "",
@@ -420,12 +420,120 @@ await test("em-dash rule checks prose and preserves code and links", () => {
       strings: { "input.md": source }
     })["input.md"] ?? [];
   assert.deepEqual(
-    errors.map(({ lineNumber }) => lineNumber).toSorted((a, b) => a - b),
-    [1, 3, 4, 8]
+    errors
+      .map(({ errorRange, lineNumber, ruleNames }) => ({
+        errorRange,
+        lineNumber,
+        ruleNames
+      }))
+      .toSorted((left, right) => left.lineNumber - right.lineNumber),
+    [
+      { errorRange: [11, 1], lineNumber: 1, ruleNames: ["docs/no-em-dash"] },
+      { errorRange: [7, 1], lineNumber: 3, ruleNames: ["docs/no-em-dash"] },
+      { errorRange: [8, 1], lineNumber: 4, ruleNames: ["docs/no-em-dash"] },
+      { errorRange: [9, 1], lineNumber: 8, ruleNames: ["docs/no-em-dash"] }
+    ]
+  );
+  const cases = [
+    {
+      name: "preserves an inline quotation attributed by a linked source",
+      filename: "docs/attributed-quote.md",
+      source: "[Original source](https://example.com): “Imported — prose.”\n",
+      expected: []
+    },
+    {
+      name: "reports an authored quoted phrase without a source",
+      filename: "docs/authored-quote.md",
+      source: "An author says “Imported — prose.”\n",
+      expected: [
+        {
+          errorRange: [26, 1],
+          lineNumber: 1,
+          ruleNames: ["docs/no-em-dash"]
+        }
+      ]
+    },
+    {
+      name: "preserves frontmatter-marked generated prose",
+      filename: "docs/generated-frontmatter.md",
+      source: "---\ngenerated: true\n---\n\nImported — prose.\n",
+      expected: []
+    },
+    {
+      name: "reports authored prose when frontmatter is not generated",
+      filename: "docs/authored-frontmatter.md",
+      source: "---\ngenerated: false\n---\n\nAuthored — prose.\n",
+      expected: [
+        {
+          errorRange: [10, 1],
+          lineNumber: 5,
+          ruleNames: ["docs/no-em-dash"]
+        }
+      ]
+    },
+    {
+      name: "preserves prose below an early generated HTML marker",
+      filename: "docs/generated-html.md",
+      source: "<!-- Generated document -->\n\nImported — prose.\n",
+      expected: []
+    },
+    {
+      name: "reports prose when the generated HTML marker is late",
+      filename: "docs/authored-late-marker.md",
+      source:
+        "Intro.\nLine two.\nLine three.\nLine four.\nLine five.\n<!-- Generated document -->\n\nAuthored — prose.\n",
+      expected: [
+        {
+          errorRange: [10, 1],
+          lineNumber: 8,
+          ruleNames: ["docs/no-em-dash"]
+        }
+      ]
+    },
+    {
+      name: "preserves license-file prose",
+      filename: "LICENSE.md",
+      source: "Imported — prose.\n",
+      expected: []
+    },
+    {
+      name: "reports prose in a non-license filename",
+      filename: "docs/licensing.md",
+      source: "Authored — prose.\n",
+      expected: [
+        {
+          errorRange: [10, 1],
+          lineNumber: 1,
+          ruleNames: ["docs/no-em-dash"]
+        }
+      ]
+    }
+  ];
+  await Promise.all(
+    cases.map(
+      async ({ expected, filename: caseFilename, name, source: input }) => {
+        await t.test(name, () => {
+          const findings =
+            lint({
+              config: { default: false, "docs/no-em-dash": true },
+              customRules: [noEmDash],
+              strings: { [caseFilename]: input }
+            })[caseFilename] ?? [];
+          assert.deepEqual(
+            findings.map(({ errorRange, lineNumber, ruleNames }) => ({
+              errorRange,
+              lineNumber,
+              ruleNames
+            })),
+            expected
+          );
+        });
+      }
+    )
   );
 });
 
-await test("skill links preserve bundled links and flag external relative targets", () => {
+await test("skill links preserve bundled links and flag external relative targets", async (t) => {
   const filename = "skills/sample/references/guide.md";
   const errors =
     lint({
@@ -449,8 +557,92 @@ await test("skill links preserve bundled links and flag external relative target
       }
     })[filename] ?? [];
   assert.deepEqual(
-    errors.map(({ lineNumber }) => lineNumber),
-    [5, 7, 12]
+    errors.map(({ lineNumber, ruleNames }) => ({ lineNumber, ruleNames })),
+    [
+      { lineNumber: 5, ruleNames: ["docs/no-relative-skill-links"] },
+      { lineNumber: 7, ruleNames: ["docs/no-relative-skill-links"] },
+      { lineNumber: 12, ruleNames: ["docs/no-relative-skill-links"] }
+    ]
+  );
+  const cases = [
+    {
+      name: "preserves a linked-source quotation with a relative skill link",
+      filename: "skills/sample/references/guide.md",
+      source:
+        "[Original source](https://example.com): “Read [outside](../../../examples/quoted/SKILL.md).”\n",
+      expected: []
+    },
+    {
+      name: "reports an authored quotation with a relative skill link",
+      filename: "skills/sample/references/guide.md",
+      source:
+        "An author says “Read [outside](../../../examples/quoted/SKILL.md).”\n",
+      expected: [{ lineNumber: 1, ruleNames: ["docs/no-relative-skill-links"] }]
+    },
+    {
+      name: "preserves a relative skill link in generated frontmatter content",
+      filename: "docs/generated-frontmatter.md",
+      source:
+        "---\ngenerated: true\n---\n\n[Outside](../examples/other/SKILL.md)\n",
+      expected: []
+    },
+    {
+      name: "reports a relative skill link when frontmatter is not generated",
+      filename: "docs/authored-frontmatter.md",
+      source:
+        "---\ngenerated: false\n---\n\n[Outside](../examples/other/SKILL.md)\n",
+      expected: [{ lineNumber: 5, ruleNames: ["docs/no-relative-skill-links"] }]
+    },
+    {
+      name: "preserves a relative skill link in an early generated document",
+      filename: "docs/generated-html.md",
+      source:
+        "<!-- Generated document -->\n\n[Outside](../examples/other/SKILL.md)\n",
+      expected: []
+    },
+    {
+      name: "reports a relative skill link when the generated marker is late",
+      filename: "docs/authored-late-marker.md",
+      source:
+        "Intro.\nLine two.\nLine three.\nLine four.\nLine five.\n<!-- Generated document -->\n\n[Outside](../examples/other/SKILL.md)\n",
+      expected: [{ lineNumber: 8, ruleNames: ["docs/no-relative-skill-links"] }]
+    },
+    {
+      name: "preserves a relative skill link in a license file",
+      filename: "LICENSE.md",
+      source: "[Outside](examples/other/SKILL.md)\n",
+      expected: []
+    },
+    {
+      name: "reports a relative skill link in a non-license filename",
+      filename: "docs/licensing.md",
+      source: "[Outside](../examples/other/SKILL.md)\n",
+      expected: [{ lineNumber: 1, ruleNames: ["docs/no-relative-skill-links"] }]
+    }
+  ];
+  await Promise.all(
+    cases.map(
+      async ({ expected, filename: caseFilename, name, source: input }) => {
+        await t.test(name, () => {
+          const findings =
+            lint({
+              config: {
+                default: false,
+                "docs/no-relative-skill-links": true
+              },
+              customRules: [noRelativeSkillLinks],
+              strings: { [caseFilename]: input }
+            })[caseFilename] ?? [];
+          assert.deepEqual(
+            findings.map(({ lineNumber, ruleNames }) => ({
+              lineNumber,
+              ruleNames
+            })),
+            expected
+          );
+        });
+      }
+    )
   );
 });
 
@@ -512,7 +704,7 @@ await test("table separator traversal handles deeply nested blockquotes", () => 
   );
 });
 
-await test("table separator diagnostics retain fix information", () => {
+await test("table separator diagnostics retain fix information and protect original documents", async (t) => {
   const source = "| Left | Right |\n| -- | ----: |\n| one | two |\n";
   const errors =
     lint({
@@ -522,26 +714,129 @@ await test("table separator diagnostics retain fix information", () => {
     })["input.md"] ?? [];
   assert.equal(errors.length, 2);
   assert.deepEqual(
-    errors.map(({ errorDetail, errorRange, fixInfo, lineNumber }) => ({
-      detail: errorDetail,
-      fixInfo,
-      lineNumber,
-      range: errorRange
-    })),
+    errors.map(
+      ({ errorDetail, errorRange, fixInfo, lineNumber, ruleNames }) => ({
+        detail: errorDetail,
+        fixInfo,
+        lineNumber,
+        range: errorRange,
+        ruleNames
+      })
+    ),
     [
       {
         detail: "Separator cell 1 must use exactly ---.",
         fixInfo: { deleteCount: 2, editColumn: 3, insertText: "---" },
         lineNumber: 2,
-        range: [3, 2]
+        range: [3, 2],
+        ruleNames: ["docs/table-separators"]
       },
       {
         detail: "Separator cell 2 must use exactly ---.",
         fixInfo: { deleteCount: 4, editColumn: 8, insertText: "---" },
         lineNumber: 2,
-        range: [8, 4]
+        range: [8, 4],
+        ruleNames: ["docs/table-separators"]
       }
     ]
+  );
+  const cases = [
+    {
+      name: "preserves a malformed separator in generated frontmatter content",
+      filename: "docs/generated-frontmatter.md",
+      source:
+        "---\ngenerated: true\n---\n\n| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: []
+    },
+    {
+      name: "reports a malformed separator when frontmatter is not generated",
+      filename: "docs/authored-frontmatter.md",
+      source:
+        "---\ngenerated: false\n---\n\n| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: [
+        {
+          detail: "Separator cell 1 must use exactly ---.",
+          fixInfo: { deleteCount: 2, editColumn: 3, insertText: "---" },
+          lineNumber: 6,
+          range: [3, 2],
+          ruleNames: ["docs/table-separators"]
+        }
+      ]
+    },
+    {
+      name: "preserves a malformed separator below an early generated HTML marker",
+      filename: "docs/generated-html.md",
+      source:
+        "<!-- Generated document -->\n\n| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: []
+    },
+    {
+      name: "reports a malformed separator when the generated HTML marker is late",
+      filename: "docs/authored-late-marker.md",
+      source:
+        "Intro.\nLine two.\nLine three.\nLine four.\nLine five.\n<!-- Generated document -->\n\n| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: [
+        {
+          detail: "Separator cell 1 must use exactly ---.",
+          fixInfo: { deleteCount: 2, editColumn: 3, insertText: "---" },
+          lineNumber: 9,
+          range: [3, 2],
+          ruleNames: ["docs/table-separators"]
+        }
+      ]
+    },
+    {
+      name: "preserves a malformed separator in a license file",
+      filename: "LICENSE.md",
+      source: "| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: []
+    },
+    {
+      name: "reports a malformed separator in a non-license filename",
+      filename: "docs/licensing.md",
+      source: "| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: [
+        {
+          detail: "Separator cell 1 must use exactly ---.",
+          fixInfo: { deleteCount: 2, editColumn: 3, insertText: "---" },
+          lineNumber: 2,
+          range: [3, 2],
+          ruleNames: ["docs/table-separators"]
+        }
+      ]
+    }
+  ];
+  await Promise.all(
+    cases.map(
+      async ({ expected, filename: caseFilename, name, source: input }) => {
+        await t.test(name, () => {
+          const findings =
+            lint({
+              config: { default: false, "docs/table-separators": true },
+              customRules: [tableSeparators],
+              strings: { [caseFilename]: input }
+            })[caseFilename] ?? [];
+          assert.deepEqual(
+            findings.map(
+              ({
+                errorDetail,
+                errorRange,
+                fixInfo,
+                lineNumber,
+                ruleNames
+              }) => ({
+                detail: errorDetail,
+                fixInfo,
+                lineNumber,
+                range: errorRange,
+                ruleNames
+              })
+            ),
+            expected
+          );
+        });
+      }
+    )
   );
 });
 
@@ -769,6 +1064,42 @@ export { Store as Again };
     'Missing TSDoc for exported public API property "enabled".',
     'Missing TSDoc for exported public API property "status".',
     'Missing TSDoc for exported public API property "status".'
+  ]);
+});
+
+await test("TSDoc checks members of directly exported variable class expressions", async (t) => {
+  const directory = await createUltraciteFixture(t);
+  await writeFile(
+    path.join(directory, "source.ts"),
+    `/**
+ * Public service.
+ */
+export const Service = class {
+  /** One-line method documentation. */
+  invalid() { return 1; }
+  /**
+   * Documented public method.
+   */
+  documented() { return 1; }
+  publicMissing() { return 1; }
+  protected protectedMissing() { return 1; }
+  constructor() {}
+};
+`
+  );
+  const { diagnostics, status } = runUltraciteFixture(directory, ["source.ts"]);
+  assert.equal(status, 1);
+  const messages = diagnostics.flatMap((entry) => {
+    assert.ok(isObject(entry));
+    assert.ok(typeof entry.code === "string");
+    assert.ok(typeof entry.message === "string");
+    return entry.code === "tsdoc(require-export-tsdoc)" ? [entry.message] : [];
+  });
+  assert.deepEqual(messages.toSorted(), [
+    'Missing TSDoc for exported public API method "constructor".',
+    'Missing TSDoc for exported public API method "protectedMissing".',
+    'Missing TSDoc for exported public API method "publicMissing".',
+    'Use multiline TSDoc with opening and closing delimiters on separate lines for exported public API method "invalid".'
   ]);
 });
 
