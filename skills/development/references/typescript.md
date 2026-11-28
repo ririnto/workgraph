@@ -4,7 +4,7 @@
 
 For a new Node project with TypeScript, copy the [TypeScript config example](../assets/typescript/tsconfig.json) over the `tsconfig.json` in the [shared Node lint project](javascript.md#adopt-the-oxlint-groups).
 It extends the catalog-owned Node LTS preset and includes TypeScript files anywhere in the project, including dotfiles and files in dot directories.
-Use `pnpm run check:typescript` for the separate type check and `pnpm run check` for type-aware linting of the sample's `src`.
+Use `pnpm check:typescript` for the separate type check and `pnpm check` for type-aware linting of the sample's `src`.
 For an existing project, merge the relevant include patterns and keep its compiler options.
 
 For each source extension already eligible in the project, use these four `include` patterns, replacing `E` with that extension.

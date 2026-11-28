@@ -40,9 +40,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run check
+      - run: pnpm check
       - name: Validate Claude plugin package and manifest
-        run: pnpm run validate:claude
+        run: pnpm validate:claude
   macos:
     name: macOS hooks
     runs-on: macos-latest
@@ -51,6 +51,6 @@ jobs:
       - uses: pnpm/setup@v3
         with:
           install: false
-      - run: pnpm run test:hooks
+      - run: pnpm test:hooks
         env:
           pnpm_config_verify_deps_before_run: "false"

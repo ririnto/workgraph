@@ -68,13 +68,13 @@ For Workgraph contributor pull-request reviews, follow the scoped policy in [doc
 Keep development validation gates in `scripts/` and their Node tests in `test/`.
 Select the narrowest applicable read-only gate.
 
-- Use `pnpm run check:markdownlint-cli2` for prose-only changes.
+- Use `pnpm check:markdownlint-cli2` for prose-only changes.
 - Use `node --test "hooks/**/*.test.{mjs,ts}"` for changes confined to hook execution.
-- Use `pnpm run check:issue-forms` for issue form YAML changes.
-- Use `pnpm run check:plugin-version` for host manifest version checks.
-- Use `pnpm run check:skill-metadata` for skill frontmatter, invocation policy, and native prompt compatibility checks.
-- Use `pnpm run check:test` for the maintained test suites.
-- Use `pnpm run check` for mixed changes or repository-wide validation.
+- Use `pnpm check:issue-forms` for issue form YAML changes.
+- Use `pnpm check:plugin-version` for host manifest version checks.
+- Use `pnpm check:skill-metadata` for skill frontmatter, invocation policy, and native prompt compatibility checks.
+- Use `pnpm check:test` for the maintained test suites.
+- Use `pnpm check` for mixed changes or repository-wide validation.
   Its production dependency audit contacts the package registry.
 
 After plugin configuration changes, run `claude plugin validate --strict ./` and `claude plugin validate --strict .claude-plugin/plugin.json`.

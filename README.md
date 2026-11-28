@@ -144,12 +144,12 @@ The Go asset module declares the tools that check its bundled example.
 The root module keeps the YAML parser version required by actionlint 1.7.12 until [actionlint supports the newer parser API](https://github.com/rhysd/actionlint/pull/735).
 Install ShellCheck for tracked shell scripts and workflow commands.
 Use JDK 21 or later and the bundled Gradle wrapper to lint the Kotlin build logic and check a fresh sample with the custom ruleset.
-Linux CI provisions the runtimes and runs the same `pnpm run check` command.
+Linux CI provisions the runtimes and runs the same `pnpm check` command.
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm run check
-pnpm run validate:claude
+pnpm check
+pnpm validate:claude
 ```
 
 The Claude validation command uses the pinned CLI version to check both the package directory and the native manifest.
@@ -158,10 +158,10 @@ Installation runs Husky through `prepare` and installs Git dispatchers in `.husk
 The pre-commit hook checks the staged diff for whitespace errors and conflict markers.
 It runs the repository's Markdown, TypeScript, lint, and metadata validators, then selects native linters and tests based on staged paths.
 The pre-push hook runs the full repository check before publication.
-`pnpm run check:ultracite` checks formatting and runs lint rules, including type-aware rules on JavaScript and TypeScript files.
-`pnpm run check:typescript` checks the configured JavaScript and TypeScript files with TypeScript and JSDoc.
+`pnpm check:ultracite` checks formatting and runs lint rules, including type-aware rules on JavaScript and TypeScript files.
+`pnpm check:typescript` checks the configured JavaScript and TypeScript files with TypeScript and JSDoc.
 TypeScript uses the includes and exclusions in `tsconfig.json`, while Ultracite also applies its preset and Git ignores.
-`pnpm run check:production-audit` runs `pnpm audit --prod` to inspect production dependencies.
+`pnpm check:production-audit` runs `pnpm audit --prod` to inspect production dependencies.
 The manifest currently declares none.
 It remains a forward-looking check when the project adds production dependencies.
 

@@ -45,15 +45,15 @@ Run the commands from the consumer root with the Node runtime the project suppor
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm run check
-pnpm run check:typescript
+pnpm check
+pnpm check:typescript
 ```
 
 The root config enables type-aware linting through the catalog-owned Oxlint backend.
 For an existing project, merge the selected `jsPlugins` entries and overrides into its root config.
 Keep existing rules and formatter settings and adapt the source globs.
 The comments check needs the local rule, and the indexed named capture check needs `eslint-plugin-regexp`.
-Use the same project-owned `pnpm run check` locally, in hooks, and in CI.
+Use the same project-owned `pnpm check` locally, in hooks, and in CI.
 Let CI select pnpm from `packageManager` and provision Node where the project needs it.
 
 ## JavaScript body comments
