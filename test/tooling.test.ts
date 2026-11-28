@@ -497,6 +497,18 @@ await test("em-dash rule checks prose and preserves code, links, and attributed 
       expected: []
     },
     {
+      name: "preserves LICENCE prose",
+      filename: "LICENCE",
+      source: "Imported — prose.\n",
+      expected: []
+    },
+    {
+      name: "preserves COPYING prose",
+      filename: "COPYING",
+      source: "Imported — prose.\n",
+      expected: []
+    },
+    {
       name: "reports prose in a non-license filename",
       filename: "docs/licensing.md",
       source: "Authored — prose.\n",
@@ -610,6 +622,18 @@ await test("skill links preserve bundled links and flag external relative target
     {
       name: "preserves a relative skill link in a license file",
       filename: "LICENSE.md",
+      source: "[Outside](examples/other/SKILL.md)\n",
+      expected: []
+    },
+    {
+      name: "preserves a relative skill link in LICENCE",
+      filename: "LICENCE",
+      source: "[Outside](examples/other/SKILL.md)\n",
+      expected: []
+    },
+    {
+      name: "preserves a relative skill link in COPYING",
+      filename: "COPYING",
       source: "[Outside](examples/other/SKILL.md)\n",
       expected: []
     },
@@ -788,6 +812,18 @@ await test("table separator diagnostics retain fix information and protect origi
     {
       name: "preserves a malformed separator in a license file",
       filename: "LICENSE.md",
+      source: "| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: []
+    },
+    {
+      name: "preserves a malformed separator in LICENCE",
+      filename: "LICENCE",
+      source: "| Left | Right |\n| -- | --- |\n| one | two |\n",
+      expected: []
+    },
+    {
+      name: "preserves a malformed separator in COPYING",
+      filename: "COPYING",
       source: "| Left | Right |\n| -- | --- |\n| one | two |\n",
       expected: []
     },
