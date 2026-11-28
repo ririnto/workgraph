@@ -546,6 +546,18 @@ await test("em-dash rule checks prose and preserves code, links, and attributed 
       ]
     },
     {
+      name: "reports a quotation after escaped link syntax",
+      filename: "docs/authored-quote.md",
+      source: "\\[Original source](https://example.com): “Authored — prose.”\n",
+      expected: [
+        {
+          errorRange: [52, 1],
+          lineNumber: 1,
+          ruleNames: ["docs/no-em-dash"]
+        }
+      ]
+    },
+    {
       name: "preserves frontmatter-marked generated prose",
       filename: "docs/generated-frontmatter.md",
       source: "---\ngenerated: true\n---\n\nImported — prose.\n",
@@ -681,6 +693,13 @@ await test("skill links preserve bundled links and flag external relative target
       filename: "skills/sample/references/guide.md",
       source:
         "An author says “Read [outside](../../../examples/quoted/SKILL.md).”\n",
+      expected: [{ lineNumber: 1, ruleNames: ["docs/no-relative-skill-links"] }]
+    },
+    {
+      name: "reports a relative skill link after malformed attribution",
+      filename: "skills/sample/references/guide.md",
+      source:
+        "[Original source](invalid destination): “Read [outside](../../../examples/quoted/SKILL.md).”\n",
       expected: [{ lineNumber: 1, ruleNames: ["docs/no-relative-skill-links"] }]
     },
     {

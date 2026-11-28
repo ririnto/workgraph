@@ -20,7 +20,7 @@ export default {
       return;
     }
     const { name, parsers } = params;
-    const attributedQuotes = sourceAttributedQuoteRanges(params.lines);
+    const attributedQuotes = sourceAttributedQuoteRanges(params);
     const pending = [...(parsers.micromark?.tokens ?? [])];
     for (
       let token = pending.pop();
