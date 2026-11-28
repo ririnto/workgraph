@@ -32,8 +32,7 @@ Markdown endpoints were used when available, with extensionless official pages a
 Workgraph uses native Codex, Claude, Cursor, and OpenPlugin descriptors because the reviewed Codex portable loader omits hooks.
 They select one shared skills tree and explicit host-specific hook configurations.
 The package gate checks shared metadata, versions, catalog destinations, and contained paths across these consumers.
-The maintainer's release contract is `yyyy.MM.dd.seq`, preserving separate calendar fields and daily sequences.
-Workgraph retains its requested calendar format across the native descriptors.
+Workgraph records each `yyyy.MM.dd-seq` release in the native descriptors and marketplace plugin entries.
 The [release instructions](../README.md#version-updates) define the format.
 
 Portable packaging standardizes shared skills and MCP configuration, not every host's execution tools or hooks.

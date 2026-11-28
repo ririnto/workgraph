@@ -333,31 +333,34 @@ const copyPluginPackage = (t: TestContext): string => {
   return root;
 };
 
-await test("release versions enforce padded calendar dates and daily sequences", () => {
+await test("release versions enforce padded calendar dates and unpadded daily sequences", () => {
   for (const version of [
-    "2026.01.01.01",
-    "2026.10.30.06",
-    "2024.02.29.99",
-    "2000.02.29.01",
-    "2026.12.31.99",
-    "2026.12.31.100",
-    "2027.01.01.01"
+    "2026.11.27-1",
+    "2026.11.27-12",
+    "2024.02.29-99",
+    "2000.02.29-1",
+    "2026.12.31-99",
+    "2026.12.31-100",
+    "2027.01.01-1"
   ]) {
     assert.doesNotThrow(() => {
       validatePluginVersions(version, version, version, version);
     });
   }
   for (const version of [
-    "2026.1030.5",
-    "2026.1.01.01",
-    "2026.01.1.01",
-    "2026.10.30.1",
-    "2026.10.30.00",
-    "2026.10.30.001",
-    "2026.10.30.010",
-    "2026.10.30.06-preview",
-    "2026.10.30.06+build",
-    "2026.10.30.06\n",
+    "2026.11.27.01",
+    "2026.11.27",
+    "2026.11.27-01",
+    "2026.11.27-1.2",
+    "2026.1030-5",
+    "2026.1.01-1",
+    "2026.01.1-1",
+    "2026.10.30-0",
+    "2026.10.30-001",
+    "2026.10.30-010",
+    "2026.10.30-6-preview",
+    "2026.10.30-6+build",
+    "2026.10.30-6\n",
     2026,
     null
   ]) {
@@ -367,18 +370,18 @@ await test("release versions enforce padded calendar dates and daily sequences",
       },
       {
         message:
-          "Codex plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10."
+          "Codex plugin version must use yyyy.MM.dd-seq with a positive, unpadded daily sequence."
       }
     );
   }
   for (const version of [
-    "2026.02.29.01",
-    "2100.02.29.01",
-    "2026.04.31.01",
-    "2026.13.01.01",
-    "2026.00.01.01",
-    "2026.12.32.01",
-    "2026.01.00.01"
+    "2026.02.29-1",
+    "2100.02.29-1",
+    "2026.04.31-1",
+    "2026.13.01-1",
+    "2026.00.01-1",
+    "2026.12.32-1",
+    "2026.01.00-1"
   ]) {
     assert.throws(
       () => {
@@ -392,10 +395,10 @@ await test("release versions enforce padded calendar dates and daily sequences",
   assert.throws(
     () => {
       validatePluginVersions(
-        "2026.10.30.06",
-        "2026.10.30.07",
-        "2026.10.30.06",
-        "2026.10.30.06"
+        "2026.10.30-6",
+        "2026.10.30-7",
+        "2026.10.30-6",
+        "2026.10.30-6"
       );
     },
     { message: "Native plugin versions must match across all hosts." }
@@ -403,15 +406,15 @@ await test("release versions enforce padded calendar dates and daily sequences",
   assert.throws(
     () => {
       validatePluginVersions(
-        "2026.10.30.06",
-        "2026.1030.5",
-        "2026.10.30.06",
-        "2026.10.30.06"
+        "2026.10.30-6",
+        "2026.1030-5",
+        "2026.10.30-6",
+        "2026.10.30-6"
       );
     },
     {
       message:
-        "Claude plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10."
+        "Claude plugin version must use yyyy.MM.dd-seq with a positive, unpadded daily sequence."
     }
   );
 });
@@ -471,7 +474,7 @@ await test("plugin command validates canonical identity, catalogs, and release m
     ],
     [
       ".cursor-plugin/plugin.json",
-      { version: "2026.10.31.01" },
+      { version: "2026.10.31-1" },
       "Native plugin versions must match across all hosts."
     ],
     [
@@ -493,8 +496,15 @@ await test("plugin command validates canonical identity, catalogs, and release m
     ],
     [
       ".claude-plugin/marketplace.json",
-      { plugins: [{ name: "workgraph", source: "./", version: "1.0.0" }] },
-      "Claude marketplace manifest must omit the version field."
+      {
+        plugins: [{ name: "workgraph", source: "./", version: "2026.11.27-1" }]
+      },
+      "Claude marketplace plugin version must match the native manifest version."
+    ],
+    [
+      ".cursor-plugin/marketplace.json",
+      { plugins: [{ name: "workgraph", source: "./" }] },
+      "Cursor marketplace plugin version must match the native manifest version."
     ],
     [
       ".agents/plugins/marketplace.json",

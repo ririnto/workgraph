@@ -130,7 +130,7 @@ The gate validates these boundaries alongside contained paths and shared skill d
 
 OpenAI uses `.agents/plugins/marketplace.json`, and Claude and Copilot share `.claude-plugin/marketplace.json`.
 Cursor uses `.cursor-plugin/marketplace.json`.
-Each catalog points to this repository's root plugin and leaves release versions to its manifest.
+Each catalog points to this repository's root plugin and repeats its manifest version on the plugin entry.
 Catalog discovery and plugin installation remain separate host operations.
 
 Copilot and Cursor consume shared skills without Workgraph's Claude or Codex lifecycle hooks.
@@ -334,12 +334,12 @@ Local validation covers this repository's form subset and does not establish Git
 The package gate, `scripts/plugin-version.ts`, checks all four native manifests and the host catalogs from its module location.
 The version check validates the following:
 
-- The complete `yyyy.MM.dd.seq` string
+- The complete `yyyy.MM.dd-seq` string
 - Real calendar dates
-- Padded positive sequences
+- Positive daily sequences without leading zeros
 - Matching plugin names
 - Bundled paths
-- Release parity
+- Matching versions across native manifests and marketplace plugin entries
 
 It rejects the root portable manifest and generic hook files that would shadow or cross native host boundaries.
 `test/validation.test.ts` exercises valid and invalid forms, package paths, and release versions through exact diagnostics.
