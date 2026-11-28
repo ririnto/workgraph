@@ -201,7 +201,7 @@ Read [the research notes](docs/research.md) for source evidence and qualificatio
 
 ## Version updates
 
-Maintain one release number across all four native host manifests.
+Maintain one release number across the four native host manifests and three marketplace entries.
 
 | File | Field |
 | --- | --- |
@@ -209,20 +209,19 @@ Maintain one release number across all four native host manifests.
 | `.claude-plugin/plugin.json` | `version` |
 | `.cursor-plugin/plugin.json` | `version` |
 | `.plugin/plugin.json` | `version` |
+| `.agents/plugins/marketplace.json` | `plugins[0].version` |
+| `.claude-plugin/marketplace.json` | `plugins[0].version` |
+| `.cursor-plugin/marketplace.json` | `plugins[0].version` |
 
-Use `yyyy.MM.dd.seq`, with a four-digit year and two-digit month and day.
-Write sequences `01` through `99` with two digits, then use `100` and higher without extra leading zeros.
-For example, October 30's sixth release is `2026.10.30.06`, and January 8's first release is `2026.01.08.01`.
-Start the sequence at `01` on a new date.
+Use `yyyy.MM.dd-seq`, with a four-digit year, two-digit month and day, and a hyphen before the daily sequence.
+Write the sequence as a positive decimal integer without leading zeros.
+For example, October 30's sixth release is `2026.10.30-6`.
+Start the sequence at `1` on a new date.
 Increment the sequence for another release that day.
-Update all four fields together when publishing plugin changes.
-
-This calendar version is the project's release contract.
 
 Claude Code reads the plugin manifest version before an optional marketplace entry version.
-Its marketplace-level version describes the catalog, not the plugin release.
-Workgraph's catalogs omit release versions because the selected plugin manifest supplies them.
-The private development package also needs no version.
+Set the catalog's version only on the Workgraph plugin entry.
+Omit the version from the private development package.
 See the [Claude marketplace reference](https://code.claude.com/docs/en/plugins/marketplace-reference#plugin-entries) for these field definitions.
 
 Codex reads `.codex-plugin/plugin.json`, Claude Code reads its own descriptor, Cursor reads `.cursor-plugin/plugin.json`, and Copilot reads the OpenPlugin descriptor at `.plugin/plugin.json`.
@@ -230,7 +229,7 @@ The shared `skills/` tree remains the only copy of the instructions.
 Root `plugin.json` is intentionally absent because the reviewed Codex loader prioritizes that portable manifest and skips its hooks.
 The [source review](docs/research.md#codex-native-hook-discovery-and-trust) records this compatibility requirement and the separate hook-trust boundary.
 
-1. Set the same new release number in all four host manifests.
+1. Set the same new release number in all four host manifests and three marketplace entries.
 2. Run the applicable checks from the auto-injected repository guidance, including strict Claude validation.
 3. Inspect the complete diff and confirm metadata, versions, and marketplace paths match.
 4. Commit the changes and versions together.

@@ -6,7 +6,8 @@
   "plugins": [
     {
       "name": "workgraph",
-      "source": "./"
+      "source": "./",
+      "version": "2026.11.28-3"
     }
   ]
 }

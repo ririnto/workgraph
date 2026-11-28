@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 
 const versionPattern =
-  /^(?<year>[1-9]\d{3})\.(?<month>\d{2})\.(?<day>\d{2})\.(?<sequence>0[1-9]|[1-9]\d+)$/u;
+  /^(?<year>[1-9]\d{3})\.(?<month>\d{2})\.(?<day>\d{2})-[1-9]\d*$/u;
 const namePattern = /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/u;
 const metadataFields = [
   "name",
@@ -39,7 +39,6 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 const isArray = (value: unknown): value is unknown[] => Array.isArray(value);
 
 /**
- * Validate matching yyyy.MM.dd.seq releases with real dates and padded sequences.
  * @param codexVersion Codex version.
  * @param claudeVersion Claude version.
  * @param cursorVersion Cursor version.
@@ -62,7 +61,7 @@ export const validatePluginVersions = (
       typeof version === "string" ? versionPattern.exec(version) : null;
     if (!match?.groups) {
       throw new Error(
-        `${host} plugin version must use yyyy.MM.dd.seq with two-digit month/day and sequence padding below 10.`
+        `${host} plugin version must use yyyy.MM.dd-seq with a positive, unpadded daily sequence.`
       );
     }
     const year = Number(match.groups.year);
@@ -83,11 +82,10 @@ export const validatePluginVersions = (
 };
 
 /**
- * Reject duplicate release metadata in catalogs and the private package.
  * @param marketplaces Catalog manifests.
  * @param packageManifest Private package manifest.
  */
-export const validateOmittedManifestVersions = (
+const validateVersionPlacement = (
   marketplaces: [string, Record<string, unknown>][],
   packageManifest: Record<string, unknown>
 ) => {
@@ -96,16 +94,15 @@ export const validateOmittedManifestVersions = (
     ["Private package", packageManifest]
   ];
   for (const [name, manifest] of manifests) {
-    const plugins: unknown[] = Array.isArray(manifest.plugins)
-      ? manifest.plugins
-      : [];
     if (
       Object.hasOwn(manifest, "version") ||
       (isObject(manifest.metadata) &&
         Object.hasOwn(manifest.metadata, "version")) ||
-      plugins.some(
-        (plugin) => isObject(plugin) && Object.hasOwn(plugin, "version")
-      )
+      (manifest === packageManifest &&
+        isArray(manifest.plugins) &&
+        manifest.plugins.some(
+          (plugin) => isObject(plugin) && Object.hasOwn(plugin, "version")
+        ))
     ) {
       throw new Error(`${name} manifest must omit the version field.`);
     }
@@ -250,14 +247,13 @@ const validateMarketplace = (
     );
   }
   const isOpenAI = name === "OpenAI marketplace";
-  if (
-    isOpenAI &&
-    (!isObject(plugin.source) || plugin.source.source !== "local")
-  ) {
-    throw new Error("OpenAI marketplace must use a local plugin source.");
+  let { source } = plugin;
+  if (isOpenAI) {
+    if (!isObject(source) || source.source !== "local") {
+      throw new Error("OpenAI marketplace must use a local plugin source.");
+    }
+    ({ path: source } = source);
   }
-  const source =
-    isOpenAI && isObject(plugin.source) ? plugin.source.path : plugin.source;
   if (bundledPath(root, source, `${name} source`, "directory") !== root) {
     throw new Error(`${name} source must select the canonical plugin root.`);
   }
@@ -277,6 +273,11 @@ const validateMarketplace = (
   ) {
     throw new Error(
       "OpenAI marketplace must preserve user-controlled installation policy."
+    );
+  }
+  if (plugin.version !== codex.version) {
+    throw new Error(
+      `${name} plugin version must match the native manifest version.`
     );
   }
 };
@@ -373,7 +374,7 @@ const run = () => {
   for (const skill of skills) {
     bundledPath(root, `./skills/${skill}/SKILL.md`, "Shared skill", "file");
   }
-  validateOmittedManifestVersions(marketplaces, packageManifest);
+  validateVersionPlacement(marketplaces, packageManifest);
   for (const [name, marketplace] of marketplaces) {
     validateMarketplace(root, name, marketplace, codex);
   }
